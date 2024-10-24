@@ -24,6 +24,8 @@ export class EhldComponent implements AfterViewInit {
   svgContent: string = '';
   selectedElement: SVGGElement | undefined = undefined;
   selectedIdFromUrl = '';
+  flaggedIdFromUrl: string[] = [];
+  flaggedElements: (SVGGElement | undefined)[] = [];
   stIdToSVGGElement: Map<string, SVGGElement> = new Map<string, SVGGElement>();
   panZoom?: SvgPanZoom.Instance;
 
@@ -36,6 +38,10 @@ export class EhldComponent implements AfterViewInit {
 
   selecting = this.stateService.onChange.select$.pipe(
     tap(value => this.selectedIdFromUrl = value))
+    .subscribe();
+
+  flagging = this.stateService.onChange.flag$.pipe(
+    tap(value => this.flaggedIdFromUrl = value))
     .subscribe();
 
   ngAfterViewInit(): void {
@@ -58,11 +64,11 @@ export class EhldComponent implements AfterViewInit {
 
   // Example of zooming: https://stackblitz.com/edit/svg-pan-zoom?file=src%2Fapp%2Fapp.component.html,src%2Fapp%2Fapp.component.ts,src%2Fapp%2Fapp.module.ts
   // SVG pan zoom documentation: https://github.com/bumbu/svg-pan-zoom?tab=readme-ov-file
-  initializePanAndZoom(){
+  initializePanAndZoom() {
     const svgElement = this.ehldContainer!.nativeElement.querySelector('svg');
     if (svgElement) {
       // Disable default tooltips to be shown when hovering on svg element
-      svgElement.querySelectorAll('title').forEach(item=>{
+      svgElement.querySelectorAll('title').forEach(item => {
         item.innerHTML = '';
       });
       svgElement.setAttribute('width', '100%');
@@ -83,16 +89,12 @@ export class EhldComponent implements AfterViewInit {
         if (svgContent) {
           const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(svgContent);
           this.svgContent = sanitizedSvg as string;
-
           if (this.svgContent) {
             this.cdr.detectChanges();
-            this.addEventListenerToSvg();
-            // set initial selection element
             this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer);
-            this.selectedElement = this.stIdToSVGGElement.get(this.selectedIdFromUrl)
-            if (this.selectedElement) {
-              this.ehldService.applyOutline(this.selectedElement);
-            }
+            this.setInitailSelection();
+            this.setInitialFlag();
+            this.addEventListenerToSvg();
           }
         } else {
           throw new Error('Error loading EHLD SVG');
@@ -101,6 +103,24 @@ export class EhldComponent implements AfterViewInit {
     )
   }
 
+  private setInitailSelection() {
+    this.selectedElement = this.stIdToSVGGElement.get(this.selectedIdFromUrl)
+    if (this.selectedElement) {
+      this.ehldService.applyOutline(this.selectedElement, this.flaggedElements);
+    }
+  }
+
+  private setInitialFlag() {
+    this.flaggedElements = this.flaggedIdFromUrl
+      .map(e => this.stIdToSVGGElement.get(e))
+      .filter(e => e !== undefined);
+
+    this.flaggedElements?.forEach(element => {
+      if (element) {
+        this.ehldService.applyFlagOutline(element)
+      }
+    });
+  }
 
   private addEventListenerToSvg(): void {
     const svgElement = this.ehldContainer!.nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
@@ -114,13 +134,13 @@ export class EhldComponent implements AfterViewInit {
 
       element.addEventListener('mouseout', () => {
         if (element !== this.selectedElement) {
-          this.ehldService.removeShadow(element);
+          this.ehldService.removeShadow(element, this.flaggedElements);
         }
       })
 
       element.addEventListener('click', () => {
         if (this.selectedElement) {
-          this.ehldService.removeOutline(this.selectedElement);
+          this.ehldService.removeOutline(this.selectedElement, this.flaggedElements);
         }
         this.selectedElement = element;
 
@@ -130,8 +150,7 @@ export class EhldComponent implements AfterViewInit {
           if (stId) this.stateService.set('select', stId);
         }
 
-        this.ehldService.applyOutline(element);
-        console.log('SVG selected');
+        this.ehldService.applyOutline(element, this.flaggedElements);
       });
 
       element.addEventListener('dblclick', () => {
@@ -141,8 +160,6 @@ export class EhldComponent implements AfterViewInit {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
             this.diagramId = stId;
-            console.log("this.diagramId updated value is ", this.diagramId)
-            // this.diagramId$.next(stId);
             this.router.navigate(['PathwayBrowser', this.diagramId], {
               queryParamsHandling: "preserve"
             }).then(() => {
@@ -150,9 +167,7 @@ export class EhldComponent implements AfterViewInit {
             });
           }
         }
-
       })
-
     })
   }
 
