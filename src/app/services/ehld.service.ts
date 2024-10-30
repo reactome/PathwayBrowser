@@ -65,7 +65,7 @@ export class EhldService {
   }
 
   // Hover an element
-  applyShadow(svgElement: SVGGElement,) {
+  applyShadow(svgElement: SVGGElement,flaggedElement: (SVGGElement | undefined)[]) {
     // const filterId = 'hoveringFilter';
     // // Check if the filter already exists; if not, create it
     // let existingFilter = document.getElementById(filterId);
@@ -96,8 +96,16 @@ export class EhldService {
     // }
     // // Apply the filter to the SVG element
     // svgElement.style.filter = `url(#${filterId})`;
+
     const hoveringShadow = `drop-shadow(0 0 7px var(--select-edge))`;
-    svgElement.style.filter = hoveringShadow;
+    if (this.isFlagged(svgElement, flaggedElement)) {
+      const flagOuterOutline = `drop-shadow(0 0 7px var(--flag))`;
+      const hoveringInnerOutline = `drop-shadow(0 0 3px var(--select-edge))`;
+      svgElement.style.filter = `${flagOuterOutline} ${hoveringInnerOutline}`;
+    } else {
+      svgElement.style.filter = hoveringShadow;
+    }
+
   }
 
   removeShadow(svgElement: SVGGElement, flaggedElement: (SVGGElement | undefined)[]): void {
@@ -192,8 +200,9 @@ export class EhldService {
     const selectionOutline = `drop-shadow(0 0 4px var(--select-edge)) drop-shadow(0 0 4px var(--select-edge)) drop-shadow(0 0 4px var(--select-edge))  drop-shadow(0 0 4px var(--select-edge))`;
 
     if (this.isFlagged(svgElement, flaggedElement)) {
-      const flagOutline = `drop-shadow(0 0 7px var(--flag))`;
-      svgElement.style.filter = `${flagOutline} ${selectionOutline}`;
+      const flagOuterOutline = `drop-shadow(0 0 2px var(--flag)) drop-shadow(0 0 2px var(--flag)) drop-shadow(0 0 2px var(--flag)) drop-shadow(0 0 2px var(--flag))`;
+      const selectionInnerOutline = `drop-shadow(0 0 1px var(--select-edge)) drop-shadow(0 0 1px var(--select-edge)) drop-shadow(0 0 1px var(--select-edge)) drop-shadow(0 0 1px var(--select-edge))`;
+      svgElement.style.filter = `${flagOuterOutline} ${selectionInnerOutline}`;
     } else {
       svgElement.style.filter = selectionOutline;
     }

@@ -128,7 +128,7 @@ export class EhldComponent implements AfterViewInit {
     svgElement.forEach((element: SVGGElement) => {
       element.addEventListener('mouseover', () => {
         if (element !== this.selectedElement) {
-          this.ehldService.applyShadow(element);
+          this.ehldService.applyShadow(element, this.flaggedElements);
         }
       })
 
