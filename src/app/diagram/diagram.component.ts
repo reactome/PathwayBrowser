@@ -165,9 +165,10 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
           relativeTo: this.route
         }))
 
-        this.event.setSubpathwaysColors(new Map(
-          this.cy?.nodes('.Shadow').map(node => [node.data('reactomeId'), node.data('color')])
-        ));
+        const shadowNodes = this.cy?.nodes('.Shadow');
+        this.event.setSubpathwaysColors(shadowNodes && shadowNodes.length > 0
+          ? new Map(shadowNodes.map(node => [node.data('reactomeId'), node.data('color')]))
+          : undefined);
 
         this.loadCompare(elements, container);
 

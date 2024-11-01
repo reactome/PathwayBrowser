@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from 
 import {Event} from "../model/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatest, combineLatestWith, concatMap, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
+import {combineLatestWith, filter, fromEvent, map, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {SplitComponent} from "angular-split";
@@ -108,50 +108,18 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       filter(colors => colors !== undefined)).subscribe(colors => {
       this.subpathwayColors = colors;
     })
-
-    this.eventService.loadEventChildren$.pipe(
-      switchMap(treeEvent => {
-        return combineLatest([
-          of(treeEvent), // Emit the current treeEvent
-          this.eventService.subpathwaysColors$.pipe(
-            filter(colors => colors !== undefined),
-            //take(1),
-          )
-        ]);
-      }),
-      switchMap(([treeEvent, colors]) => {
-        this.collapseSiblingEvent(treeEvent); // Collapse sibling events
-        return this.eventService.fetchChildrenEvents(treeEvent).pipe(
-          map(enhancedResult => ({
-            event: enhancedResult,
-            treeData: treeEvent,
-            colors: colors
-          }))
-        );
-      })
-    ).subscribe(({event, treeData, colors}) => {
-      console.log("colors:", colors);
-      this.eventService.setCurrentEventAndObj(treeData, event);
-      this.eventService.setSubpathwayColors(treeData, colors);
-      this.eventService.setTreeData(this.treeDataSource.data);
-      console.log("bye - loadEventChildren completed with colors ready");
-    });
   }
 
   buildInitialTreeWithTlps(taxId: string): void {
     const idToUse = this.selectedIdFromUrl ? this.selectedIdFromUrl : this.diagramId;
     this.eventService.fetchTlpsBySpecies(taxId).pipe(
       tap(results => this.eventService.setTreeData(results)),
-      concatMap(() => this.eventService.treeData$.pipe(
-        filter(treeData => treeData != null),
-        take(1)
-      )),
       // Fetch enhanced event data and combine with subpathwaysColors$
       switchMap((treeData) =>
         this.eventService.fetchEnhancedEventData(idToUse).pipe(
           combineLatestWith(
             this.eventService.subpathwaysColors$.pipe(
-              filter(colors => colors != undefined),
+              tap(results => console.log("colors in buildInitialTreeWithTlps", results)),
               take(1),
             )
           ),
@@ -270,24 +238,9 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       })
     }
 
-    this.collapseSiblingEvent(event);
+    this.eventService.collapseSiblingEvent(event, this.tree);
   }
 
-
-  private collapseSiblingEvent(event: Event) {
-    if (event.ancestors) {
-      // Get 1st parent
-      let eventParent = event.parent;
-      // Loop through the parent's children to collapse any expanded siblings
-      eventParent.hasEvent?.forEach(childEvent => {
-        if (childEvent !== event && this.tree.isExpanded(childEvent)) {
-          this.tree.collapse(childEvent);
-          this.tree.collapseDescendants(childEvent);
-          childEvent.isSelected = false;
-        }
-      })
-    }
-  }
 
   private selectAllParents(selectedEvent: Event, events: Event[]) {
     events.forEach(event => {

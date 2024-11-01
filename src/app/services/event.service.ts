@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Event} from "../model/event.model";
-import {BehaviorSubject, concatMap, EMPTY, from, map, Observable, of, Subject, switchMap, tap} from "rxjs";
+import {BehaviorSubject, concatMap, EMPTY, from, map, Observable, of, Subject, switchMap, take, tap} from "rxjs";
 import {JSOGDeserializer} from "../utils/JSOGDeserializer";
 import {DiagramStateService} from "./diagram-state.service";
 import {MatTree} from "@angular/material/tree";
@@ -29,12 +29,8 @@ export class EventService {
   private _breadcrumbsSubject = new Subject<Event[]>();
   breadcrumbs$ = this._breadcrumbsSubject.asObservable();
 
-
-  private _subpathwaysColors = new BehaviorSubject<Map<number, string> | undefined>(undefined);
+  private _subpathwaysColors = new Subject<Map<number, string> | undefined>();
   subpathwaysColors$ = this._subpathwaysColors.asObservable();
-
-  private _loadEventChildren = new Subject<Event>();
-  loadEventChildren$ = this._loadEventChildren.asObservable();
 
   constructor(private http: HttpClient, private state: DiagramStateService) {
   }
@@ -60,13 +56,10 @@ export class EventService {
     this._breadcrumbsSubject.next(events);
   }
 
-  setSubpathwaysColors(colorMap: Map<number, string>) {
+  setSubpathwaysColors(colorMap: Map<number, string> | undefined) {
     this._subpathwaysColors.next(colorMap);
   }
 
-  loadEventChildren(event: Event) {
-    this._loadEventChildren.next(event);
-  }
 
   fetchTlpsBySpecies(taxId: string): Observable<Event[]> {
     let url = `${this._TOP_LEVEL_PATHWAYS}${taxId}`;
@@ -101,6 +94,31 @@ export class EventService {
       })
     )
   }
+
+  loadEventChildren(event: Event) {
+    this.fetchChildrenEvents(event).pipe(
+      switchMap(enhancedResult => {
+        if (enhancedResult.hasDiagram && !enhancedResult.hasEHLD) {
+          //  If hasDiagram is true,it's not EHLD, wait for the latest color map from subpathwaysColors$
+          return this.subpathwaysColors$.pipe(
+            take(1),
+            map(colors => ({event: enhancedResult, treeData: event, colors}))
+          );
+        } else {
+          // If hasDiagram is false, color is undefined
+          return of({event: enhancedResult, treeData: event, colors: undefined});
+        }
+      })
+    ).subscribe(({event: enhancedResult, treeData, colors}) => {
+      if (colors && colors.size > 0) {
+        this.setSubtreeColors(treeData, colors);
+      }
+      this.setCurrentEventAndObj(treeData, enhancedResult);
+      this.setTreeData(this.treeData$.value);
+      console.log("loadEventChildren completed with colors:", colors);
+    });
+  }
+
 
   fetchChildrenEvents(event: Event): Observable<Event> {
     return this.fetchEnhancedEventData(event.stId).pipe(
@@ -267,7 +285,6 @@ export class EventService {
   private handleExistingEventSelection(event: Event, tree: MatTree<Event, string>, flatTreeNodes: Event[]): Observable<[Event[], Event]> {
     return this.fetchEventAncestors(event.stId).pipe(
       map(ancestors => {
-        console.log('ancestors in handleExisting Event selection', ancestors);
         const finalAncestor = this.getFinalAncestor(ancestors);
         // Create a Set to store the stIds from ancestors for quick lookup
         const ancestorStIds = new Set(finalAncestor.map(ancestor => ancestor.stId));
@@ -304,8 +321,6 @@ export class EventService {
   buildNestedTree(roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, subpathwayColors: Map<number, string> | undefined, matTree: MatTree<Event, string>): Observable<Event[]> {
     const tree = [...roots];
     this.lastMatchedEvent = null; // Reset at start
-
-    console.log("diagramID", diagramId);
 
     return from(ancestors).pipe(
       concatMap((ancestor, index) => {
@@ -356,8 +371,8 @@ export class EventService {
       this.lastMatchedEvent = treeEvent;
     }
 
-    if (treeEvent.stId === diagramId && subpathwayColors !== undefined) {
-      this.setSubpathwayColors(treeEvent, subpathwayColors);
+    if (treeEvent.stId === diagramId && subpathwayColors) {
+      this.setSubtreeColors(treeEvent, subpathwayColors);
     }
 
     if (selectedIdFromUrl && selectedIdFromUrl === treeEvent.stId) {
@@ -385,7 +400,7 @@ export class EventService {
   }
 
 
-  setSubpathwayColors(event: Event, colors: Map<number, string> | undefined) {
+  setSubtreeColors(event: Event, colors: Map<number, string> | undefined) {
     if (colors && event.hasEvent) {
       event.hasEvent.forEach(e => {
         if (e.schemaClass === 'Pathway' && !e.hasDiagram) {
@@ -520,5 +535,19 @@ export class EventService {
     return parents.find(p => p.hasDiagram);
   }
 
+  collapseSiblingEvent(event: Event,matTree: MatTree<Event, string>) {
+    if (event.ancestors) {
+      // Get 1st parent
+      let eventParent = event.parent;
+      // Loop through the parent's children to collapse any expanded siblings
+      eventParent.hasEvent?.forEach(childEvent => {
+        if (childEvent !== event && matTree.isExpanded(childEvent)) {
+          matTree.collapse(childEvent);
+          matTree.collapseDescendants(childEvent);
+          childEvent.isSelected = false;
+        }
+      })
+    }
+  }
 
 }
