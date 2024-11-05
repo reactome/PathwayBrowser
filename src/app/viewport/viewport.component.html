@@ -58,18 +58,18 @@
 
         </div>
         <div class="content">
-<!--          <as-split direction="vertical" gutterSize="4">-->
-<!--            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>-->
-<!--            <as-split-area [size]="80">-->
+          <as-split direction="vertical" gutterSize="4">
+            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
+            <as-split-area [size]="80">
 
               <cr-ehld *ngIf="hasEHLD" [id]="diagramId"></cr-ehld>
-              <cr-diagram *ngIf="!hasEHLD" #diagram [id]="diagramId" [interactor]="interactors"></cr-diagram>
+              <cr-diagram *ngIf="!hasEHLD && hasEHLD !== undefined " #diagram [id]="diagramId" [interactor]="interactors"></cr-diagram>
 
-<!--            </as-split-area>-->
-<!--            <as-split-area [size]="20">-->
-<!--              <cr-details></cr-details>-->
-<!--            </as-split-area>-->
-<!--          </as-split>-->
+            </as-split-area>
+            <as-split-area [size]="20">
+              <cr-details></cr-details>
+            </as-split-area>
+          </as-split>
         </div>
       </div>
     </as-split-area>

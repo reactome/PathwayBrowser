@@ -23,7 +23,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
   @Input('id') diagramId: string = '';
-  hasEHLD: boolean = false;
+  hasEHLD: boolean | undefined =  undefined;
 
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
   currentSpecies: Species | undefined = undefined;
@@ -54,13 +54,13 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
       this.currentInteractorResource = resource;
     });
 
-    this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
-      this.hasEHLD = hasEHLD;
-    });
-
     if (this.diagramId) {
       this.checkHasEHLD();
     }
+
+    this.ehldService.hasEHLD$.pipe(untilDestroyed(this),).subscribe((hasEHLD) => {
+      this.hasEHLD = hasEHLD;
+    });
 
   }
 

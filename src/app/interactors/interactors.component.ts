@@ -28,7 +28,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
   INTACT_RESOURCE = 'IntAct';
   protected readonly ResourceType = ResourceType;
 
-  @Input('hasEHLD') hasEHLD: boolean = false;
+  @Input('hasEHLD') hasEHLD: boolean | undefined = undefined;
   @Input('cy') cy: cytoscape.Core | undefined;
   @Input('cys') cys: cytoscape.Core[] | undefined = [];
   @Output('initialiseReplaceElements') initialiseReplaceElements: EventEmitter<any> = new EventEmitter();

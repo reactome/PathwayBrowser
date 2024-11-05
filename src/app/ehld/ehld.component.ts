@@ -20,7 +20,7 @@ export class EhldComponent implements AfterViewInit {
   @ViewChild('ehld') ehldContainer?: ElementRef<HTMLDivElement>;
   @Input('id') diagramId: string = '';
 
-  hasEHLD: boolean = false;
+  hasEHLD: boolean | undefined=  undefined;
   svgContent: string = '';
   selectedElement: SVGGElement | undefined = undefined;
   selectedIdFromUrl = '';

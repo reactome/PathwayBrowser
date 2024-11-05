@@ -238,7 +238,7 @@ export class EventService {
     });
   }
 
-  buildTree(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hasEHLD: boolean): Observable<Event[]> {
+  buildTree(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hasEHLD: boolean | undefined): Observable<Event[]> {
     if (this.isEntity(event)) {
       return this.buildTreeWithSelectedEntity(event, diagramId, tree, subpathwayColors);
     } else {
