@@ -2,12 +2,13 @@ import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from 
 import {Event} from "../model/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatestWith, filter, fromEvent, map, switchMap, take, tap} from "rxjs";
+import {combineLatestWith, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {SplitComponent} from "angular-split";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {NavigationEnd, Router} from "@angular/router";
+import {EhldService} from "../services/ehld.service";
 
 
 @Component({
@@ -45,7 +46,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   ancestors: Event[] = [];
 
 
-  constructor(protected eventService: EventService, private speciesService: SpeciesService, private state: DiagramStateService, private el: ElementRef, private router: Router) {
+  constructor(protected eventService: EventService, private speciesService: SpeciesService, private state: DiagramStateService, private el: ElementRef, private router: Router, private ehldService: EhldService,) {
   }
 
   selecting = this.state.onChange.select$.pipe(
@@ -106,31 +107,35 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.eventService.subpathwaysColors$.pipe(
       untilDestroyed(this),
       filter(colors => colors !== undefined)).subscribe(colors => {
-      this.subpathwayColors = colors;
-    })
+        this.subpathwayColors = colors;
+      })
   }
 
   buildInitialTreeWithTlps(taxId: string): void {
     const idToUse = this.selectedIdFromUrl ? this.selectedIdFromUrl : this.diagramId;
     this.eventService.fetchTlpsBySpecies(taxId).pipe(
-      tap(results => this.eventService.setTreeData(results)),
-      // Fetch enhanced event data and combine with subpathwaysColors$
+      tap(allTLPs => this.eventService.setTreeData(allTLPs)), // All TLPs as initial tree data
       switchMap((treeData) =>
         this.eventService.fetchEnhancedEventData(idToUse).pipe(
           combineLatestWith(
-            this.eventService.subpathwaysColors$.pipe(
-              tap(results => console.log("colors in buildInitialTreeWithTlps", results)),
+            // EHLD flag here is for expanding tree children when tree node is a pathway in EHLD viewer from the frist load, for instance: /R-HSA-9612973?select=R-HSA-1632852
+            this.ehldService.hasEHLD$.pipe(
               take(1),
+              switchMap(hasEHLD => !hasEHLD
+                ? this.eventService.subpathwaysColors$.pipe(
+                  take(1),
+                  map(colors => ({hasEHLD, colors}))
+                )
+                : of({hasEHLD, colors: undefined})
+              )
             )
           ),
-          map(([event, colors]) => ({event, treeData, colors}))
+          map(([enhancedEvent, {hasEHLD, colors}]) => {
+            return {enhancedEvent, colors, hasEHLD, treeData};
+          })
         )
       ),
-      switchMap(({
-                   event,
-                   treeData,
-                   colors
-                 }) => this.eventService.buildTree(event, this.diagramId, this.tree, this.subpathwayColors))
+      switchMap(({enhancedEvent, treeData, colors, hasEHLD}) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD))
     ).subscribe(() => {
       document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
     });

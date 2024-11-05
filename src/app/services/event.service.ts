@@ -98,14 +98,16 @@ export class EventService {
   loadEventChildren(event: Event) {
     this.fetchChildrenEvents(event).pipe(
       switchMap(enhancedResult => {
+        // If hasDiagram is true, wait for the latest color map from subpathwaysColors$
         if (enhancedResult.hasDiagram && !enhancedResult.hasEHLD) {
-          //  If hasDiagram is true,it's not EHLD, wait for the latest color map from subpathwaysColors$
           return this.subpathwaysColors$.pipe(
+            tap((colors) => console.log("colors ", colors)),
             take(1),
             map(colors => ({event: enhancedResult, treeData: event, colors}))
           );
         } else {
-          // If hasDiagram is false, color is undefined
+          console.log("no")
+          // If hasDiagram is false, color is undefined. for instance: /R-HSA-9612973/R-HSA-1632852
           return of({event: enhancedResult, treeData: event, colors: undefined});
         }
       })
@@ -115,7 +117,6 @@ export class EventService {
       }
       this.setCurrentEventAndObj(treeData, enhancedResult);
       this.setTreeData(this.treeData$.value);
-      console.log("loadEventChildren completed with colors:", colors);
     });
   }
 
@@ -237,11 +238,15 @@ export class EventService {
     });
   }
 
-  buildTree(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined): Observable<Event[]> {
+  buildTree(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hasEHLD: boolean): Observable<Event[]> {
     if (this.isEntity(event)) {
       return this.buildTreeWithSelectedEntity(event, diagramId, tree, subpathwayColors);
     } else {
-      return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, subpathwayColors);
+      if (hasEHLD) {
+        return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors);
+      } else {
+        return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, subpathwayColors);
+      }
     }
   }
 
@@ -269,7 +274,7 @@ export class EventService {
    */
   private buildTreeWithSelectedEvent(event: Event, diagramId: string, isFromDiagram: boolean, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined): Observable<Event[]> {
     // When selected event is a subpathway or interacting pathway
-    const idToBuild = isFromDiagram ? event.stId : (this.isPathwayWithDiagram(event) ? diagramId : event.stId);
+    const idToBuild = isFromDiagram ? event.stId : (this.isPathwayWithDiagram(event) && event.stId != diagramId ? diagramId : event.stId);
     this.setCurrentObj(event);
     return this.fetchEventAncestors(idToBuild).pipe(
       map(ancestors => this.getFinalAncestor(ancestors)),

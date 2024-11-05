@@ -91,9 +91,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['diagramId']) this.checkHasEHLD();
+    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.checkHasEHLD();
   }
-
-  protected readonly console = console;
 }
 
