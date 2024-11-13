@@ -146,7 +146,7 @@ export class AnalysisService {
     )
   }
 
-  pathwaysResults(pathwayIds: number[], token?: string, resource: Analysis.Resource = 'TOTAL'): Observable<Analysis.Pathway[]> {
+  pathwaysResults(pathwayIds: number[] | string[], token?: string, resource: Analysis.Resource = 'TOTAL'): Observable<Analysis.Pathway[]> {
     if (pathwayIds.length === 0) return of([]);
     return this.http.post<Analysis.Pathway[]>(`${environment.host}/AnalysisService/token/${token || this.state.get('analysis')}/filter/pathways`, pathwayIds.join(','), {
       params: {resource}

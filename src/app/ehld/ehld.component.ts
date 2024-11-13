@@ -1,11 +1,16 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild} from '@angular/core';
-import {Observable, tap} from "rxjs";
+import {filter, forkJoin, Observable, take, tap} from "rxjs";
 import {EhldService} from "../services/ehld.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {Router} from "@angular/router";
 import SvgPanZoom from 'svg-pan-zoom';
+import {Graph} from "../model/graph.model";
+import {AnalysisService} from "../services/analysis.service";
+import {isDefined} from "../services/utils";
+import {Analysis} from "../model/analysis.model";
+import {Style} from "reactome-cytoscape-style";
 
 
 @Component({
@@ -20,20 +25,24 @@ export class EhldComponent implements AfterViewInit {
   @ViewChild('ehld') ehldContainer?: ElementRef<HTMLDivElement>;
   @Input('id') diagramId: string = '';
 
-  hasEHLD: boolean | undefined=  undefined;
+  style!: Style;
+
+  hasEHLD: boolean | undefined = undefined;
   svgContent: string = '';
   selectedElement: SVGGElement | undefined = undefined;
   selectedIdFromUrl = '';
   flaggedIdFromUrl: string[] = [];
   flaggedElements: (SVGGElement | undefined)[] = [];
   stIdToSVGGElement: Map<string, SVGGElement> = new Map<string, SVGGElement>();
+  //dbIdToSVGGElement: Map<number, SVGGElement> = new Map<number, SVGGElement>();
   panZoom?: SvgPanZoom.Instance;
 
   constructor(private ehldService: EhldService,
               private sanitizer: DomSanitizer,
               private cdr: ChangeDetectorRef,
               private stateService: DiagramStateService,
-              private router: Router,) {
+              private router: Router,
+              private analysisService: AnalysisService,) {
   }
 
   selecting = this.stateService.onChange.select$.pipe(
@@ -44,7 +53,11 @@ export class EhldComponent implements AfterViewInit {
     tap(value => this.flaggedIdFromUrl = value))
     .subscribe();
 
+  analysing = this.stateService.onChange.analysis$.subscribe((value) => this.loadAnalysis(value));
+
+
   ngAfterViewInit(): void {
+    this.style = new Style(this.ehldContainer!.nativeElement);
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
       this.hasEHLD = hasEHLD;
@@ -52,6 +65,7 @@ export class EhldComponent implements AfterViewInit {
         this.loadEhldSvg().subscribe({
           next: () => {
             this.initializePanAndZoom();
+            this.loadAnalysis(this.stateService.get('analysis'))
           },
           error: () => {
             console.error('Error loading EHLD SVG');
@@ -83,15 +97,16 @@ export class EhldComponent implements AfterViewInit {
   }
 
 
-  private loadEhldSvg(): Observable<string> {
-    return this.ehldService.getEHLDSvg(this.diagramId).pipe(
-      tap(svgContent => {
-        if (svgContent) {
-          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(svgContent);
+  private loadEhldSvg(): Observable<{ svg: string; graphData: Graph.Data }> {
+    return this.ehldService.getSVGData(this.diagramId).pipe(
+      tap(result => {
+        if (result.svg) {
+          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(result.svg);
           this.svgContent = sanitizedSvg as string;
           if (this.svgContent) {
             this.cdr.detectChanges();
             this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer);
+            //this.dbIdToSVGGElement = this.ehldService.setDbIdToSVGGElementMap(this.ehldContainer);
             this.setInitailSelection();
             this.setInitialFlag();
             this.addEventListenerToSvg();
@@ -169,6 +184,62 @@ export class EhldComponent implements AfterViewInit {
         }
       })
     })
+  }
+
+
+  private loadAnalysis(token: string | null) {
+    if (!token || !this.diagramId) {
+      return;
+    }
+    forkJoin({
+      entities: this.analysisService.foundEntities(this.diagramId, token),
+      pathways: this.analysisService.pathwaysResults([...this.stIdToSVGGElement.keys()], token),
+      result: this.analysisService.result$.pipe(filter(isDefined), take(1))
+    }).subscribe(({entities, result, pathways}) => {
+
+
+      this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
+      this.ehldService.clearAnalysisInfo(this.stIdToSVGGElement);
+
+
+      const analysisProfile = this.stateService.get('analysisProfile');
+      let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
+      if (analysisIndex === -1) analysisIndex = 0;
+
+      // let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
+      //   entity.mapsTo
+      //     .flatMap(diagramEntity => diagramEntity.ids)
+      //     .map(id => [id, entity.exp[analysisIndex] || 1]))
+      // )
+      // console.log("analysisEntityMap ", analysisEntityMap);
+
+      // let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
+      let analysisPathwayMap = new Map<string, Analysis.Pathway['entities']>(pathways.map(p => [p.stId, p.entities]));
+      console.log("analysispathwayMap ", analysisPathwayMap);
+
+      const allPathwayStIds = [...this.stIdToSVGGElement.keys()];
+      allPathwayStIds.forEach((stId) => {
+        const regionElement = this.stIdToSVGGElement.get(stId);
+        const pathwayData = analysisPathwayMap.get(stId);
+
+        if (!regionElement) return;
+
+        const exps: [number | undefined, number][] = pathwayData
+          ? [
+            [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
+            [undefined, pathwayData.total - pathwayData.found],
+          ]
+          : [[undefined, 1]];
+
+        this.ehldService.createOverlay(stId, exps, regionElement, this.style);
+
+        // If pathway data exists, show additional analysis info box
+        if (pathwayData) {
+          this.ehldService.showAnalysisInfo(regionElement, pathwayData);
+        }
+      });
+    })
+
   }
 
 }

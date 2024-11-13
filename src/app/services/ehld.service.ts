@@ -1,7 +1,12 @@
-import {ElementRef, Injectable, Renderer2, RendererFactory2} from '@angular/core';
-import {BehaviorSubject, catchError, Observable, of} from "rxjs";
+import {ElementRef, Injectable} from '@angular/core';
+import {BehaviorSubject, catchError, forkJoin, map, Observable, of} from "rxjs";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {Graph} from "../model/graph.model";
+import {Analysis} from "../model/analysis.model";
+import {isArray} from "lodash";
+import {AnalysisService} from "./analysis.service";
+import {Style} from "reactome-cytoscape-style";
 
 
 @Injectable({
@@ -10,43 +15,11 @@ import {HttpClient} from "@angular/common/http";
 export class EhldService {
 
   private readonly _HAS_EHLD = `${environment.host}/ContentService/data/query/`;
-  private readonly _SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-  public renderer: Renderer2;
-
-  // https://codepen.io/brucebentley/pen/orGPRg
-  // Copy this color from diagram GWT
-  filterColour = {
-    YELLOW:
-      "1 0 0 1 0 " +
-      "0 1 0 1 0 " +
-      "0 0 0 0 0 " +
-      "0 0 0 1 0 ",
-    //#0000ff
-    BLUE:
-      "0 0 0 0 0 " +
-      "0 0 0 0 0 " +
-      "0 0 1 1 0 " +
-      "0 0 0 1 0 ",
-
-    CYAN:
-      "1 0 0 1 0 " +
-      "0 0 0 0 0 " +
-      "0 0 1 1 0 " +
-      "0 0 0 1 0 ",
-    //#6eb3e4
-    SELECT:
-      "0.4 0 0 0 0 " +
-      "0 0.7 0 0 0 " +
-      "0 0 0.89 0 0 " +
-      "0 0 0 1 0 "
-  };
-
-  private _hasEHLD = new BehaviorSubject<boolean>(false);
+  private _hasEHLD = new BehaviorSubject<boolean | undefined>(undefined);
   hasEHLD$ = this._hasEHLD.asObservable();
 
-  constructor(private http: HttpClient, private rendererFactory: RendererFactory2) {
-    this.renderer = rendererFactory.createRenderer(null, null);
+  constructor(private http: HttpClient, private analysis: AnalysisService) {
   }
 
   setHasEHLD(value: boolean): void {
@@ -60,43 +33,25 @@ export class EhldService {
     );
   }
 
-  getEHLDSvg(id: string): Observable<string> {
-    return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
+  // getEHLDSvg(id: string): Observable<string> {
+  //   return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
+  // }
+
+  getSVGData(id: string): Observable<{ svg: string; graphData: Graph.Data }> {
+    const svgRequest = this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
+    const grapRequest = this.http.get<Graph.Data>(`${environment.host}/download/current/diagram/${id}.graph.json`)
+    return forkJoin({svg: svgRequest, graph: grapRequest}).pipe(
+      map(({svg, graph}) => {
+        return {
+          svg: svg,
+          graphData: graph
+        };
+      })
+    );
   }
 
   // Hover an element
-  applyShadow(svgElement: SVGGElement,flaggedElement: (SVGGElement | undefined)[]) {
-    // const filterId = 'hoveringFilter';
-    // // Check if the filter already exists; if not, create it
-    // let existingFilter = document.getElementById(filterId);
-    // if (!existingFilter) {
-    //   // Create the filter element
-    //   const filter = this.renderer.createElement('filter', this._SVG_NAMESPACE);
-    //   filter.setAttribute('id', filterId);
-    //   filter.setAttribute('x', '0');
-    //   filter.setAttribute('y', '0');
-    //
-    //   // Create the feDropShadow element
-    //   const dropShadow = this.renderer.createElement('feDropShadow', this._SVG_NAMESPACE);
-    //   dropShadow.setAttribute('dx', '0'); // X offset
-    //   dropShadow.setAttribute('dy', '0'); // Y offset
-    //   dropShadow.setAttribute('stdDeviation', '7'); // Blur amount
-    //   dropShadow.setAttribute('flood-color', '#006782'); // Shadow color, primary
-    //   dropShadow.setAttribute('flood-opacity', '0.8');
-    //
-    //   // Append the feDropShadow to the filter
-    //   this.renderer.appendChild(filter, dropShadow);
-    //
-    //   // Append the filter to the SVG element
-    //   const svgParent = svgElement.closest('svg');
-    //   const defs = svgParent!.querySelector('defs')
-    //   if (defs) {
-    //     this.renderer.appendChild(defs, filter);
-    //   }
-    // }
-    // // Apply the filter to the SVG element
-    // svgElement.style.filter = `url(#${filterId})`;
-
+  applyShadow(svgElement: SVGGElement, flaggedElement: (SVGGElement | undefined)[]) {
     const hoveringShadow = `drop-shadow(0 0 7px var(--select-edge))`;
     if (this.isFlagged(svgElement, flaggedElement)) {
       const flagOuterOutline = `drop-shadow(0 0 7px var(--flag))`;
@@ -118,84 +73,6 @@ export class EhldService {
 
   // Select an element
   applyOutline(svgElement: SVGGElement, flaggedElement: (SVGGElement | undefined)[]) {
-    // const filterId = 'selectionFilter';
-    // let existingFilter = document.getElementById(filterId);
-    // if (!existingFilter) {
-    //
-    //
-    //   // Create the filter element
-    //   const filter = this.renderer.createElement('filter', this._SVG_NAMESPACE);
-    //   filter.setAttribute('id', filterId);
-    //   filter.setAttribute('x', '-25%');
-    //   filter.setAttribute('y', '-25%');
-    //   filter.setAttribute('width', '150%');
-    //   filter.setAttribute('height', '150%');
-    //   filter.setAttribute('color-interpolation-filters', 'sRGB');
-    //
-    //   // Create morphology element for thick outline
-    //   const morphology = this.renderer.createElement('feMorphology', this._SVG_NAMESPACE);
-    //   morphology.setAttribute('in', 'SourceAlpha');
-    //   morphology.setAttribute('operator', 'dilate');
-    //   morphology.setAttribute('radius', '4'); // Set outline thickness here
-    //   morphology.setAttribute('result', 'dilated');
-    //
-    //   // Create color matrix element to convert to blue
-    //   const colorMatrix = this.renderer.createElement('feFlood', this._SVG_NAMESPACE);
-    //   colorMatrix.setAttribute('flood-color', 'var(--select-edge)');
-    //   colorMatrix.setAttribute('result', 'outlineColor');
-    //
-    //   const composite = this.renderer.createElement('feComposite', this._SVG_NAMESPACE);
-    //   composite.setAttribute('in', 'outlineColor');
-    //   composite.setAttribute('in2', 'dilated');
-    //   composite.setAttribute('operator', 'in');
-    //   composite.setAttribute('result', 'outline');
-    //
-    //
-    //   // Merge element
-    //   const merge = this.renderer.createElement('feMerge', this._SVG_NAMESPACE);
-    //
-    //   // Merge node (the outline)
-    //   const mergeNode1 = this.renderer.createElement('feMergeNode', this._SVG_NAMESPACE);
-    //   mergeNode1.setAttribute('in', 'outline');
-    //   // Second merge node (the original graphic)
-    //   const mergeNode2 = this.renderer.createElement('feMergeNode', this._SVG_NAMESPACE);
-    //   mergeNode2.setAttribute('in', 'SourceGraphic');
-    //   // Append the nodes to the merge
-    //   this.renderer.appendChild(merge, mergeNode1);
-    //   this.renderer.appendChild(merge, mergeNode2);
-    //
-    //   // Append the filter components
-    //   this.renderer.appendChild(filter, morphology);
-    //   this.renderer.appendChild(filter, colorMatrix);
-    //   this.renderer.appendChild(filter, composite);
-    //   this.renderer.appendChild(filter, merge);
-    //
-    //   const svgParent = svgElement.closest('svg');
-    //   const defs = svgParent!.querySelector('defs');
-    //   if (defs) {
-    //     this.renderer.appendChild(defs, filter);
-    //   }
-    // }
-
-    // svgElement.style.filter = `url(#${filterId})`;
-    // svgElement.classList.add('selected')
-    // @ts-ignore
-    // for (let e of svgElement?.parentElement?.children) {
-    //   console.log(e)
-    //   if (e.id !== 'BG' && e.id !== 'FG') {
-    //     for (let child of e.children) {
-    //       if (child.id !== 'ARROWS') {
-    //         child.style.filter= 'grayscale(1)'
-    //       }
-    //     }
-    //   // } else {
-    //     e.style.filter = 'grayscale(1)'
-    //   }
-    // }
-    // svgElement.style.filter = 'none';
-    //  svgElement.style.filter = `drop-shadow(2px 4px 6px black )`
-    // var(--select-edge))`
-    //svgElement.style.filter = `drop-shadow(0 0 0 var(--select-edge)) drop-shadow(0 0 0 var(--select-edge))  drop-shadow(0 0 0 var(--select-edge))`;
 
     const selectionOutline = `drop-shadow(0 0 4px var(--select-edge)) drop-shadow(0 0 4px var(--select-edge)) drop-shadow(0 0 4px var(--select-edge))  drop-shadow(0 0 4px var(--select-edge))`;
 
@@ -267,5 +144,182 @@ export class EhldService {
     return map
   }
 
+
+  setDbIdToSVGGElementMap(container: ElementRef<HTMLDivElement> | undefined) {
+    const map = new Map<number, SVGGElement>();
+    const svgElement = container!.nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
+    svgElement.forEach(svgElement => {
+      const idAttr = svgElement.getAttribute('id');
+      if (idAttr) {
+        const dbId = this.getDbId(idAttr);
+        if (dbId) {
+          map.set(Number(dbId), svgElement);
+        }
+      }
+    })
+    return map
+  }
+
+  getDbId(identifier: string) {
+    const DBID_PATTERN_LITE = /\d+$/;
+
+    if (identifier && identifier.trim()) {
+      const result = DBID_PATTERN_LITE.exec(identifier);
+      if (result && result.length > 0) {
+        return result[0]; // First match
+      }
+    }
+    return null;
+  }
+
+  overlay = "OVERLAY-";
+  analysisInfoId = "ANALINFO";
+  analysisInfoContainer = "analysis-info-container";
+  pattern = "pattern-";
+
+
+  clippingPath = "CLIPPINGPATH-";
+  overlayResult = "OVERLAY_RESULT-";
+  overlayBase = "OVERLAY_BASE-";
+
+
+  createOverlay(stId: string, exps: [number | undefined, number][], regionElement: SVGGElement, style: Style) {
+    const targetId = `${this.overlay}${stId}`;
+    const overlayElement = regionElement.querySelector(`#${targetId}`);
+
+    if (overlayElement) {
+      const rect = overlayElement.getElementsByTagName('rect')[0]
+      rect?.classList.add('title-bg');
+
+      this.createPattern(stId, exps, regionElement, style);
+
+      rect.style.fill = `url(#${this.pattern}${stId})`;
+      rect.setAttribute('stroke', '#000000');
+      rect.setAttribute('stroke-width', '0.5');
+
+      const text = overlayElement.getElementsByTagName('text')[0];
+      text?.classList.add('title-text');
+    } else {
+      console.log(`Overlay not found for pathway ${stId}`);
+    }
+  }
+
+
+  createPattern(stId: string, exps: [number | undefined, number] [], regionElement: SVGGElement, style: Style) {
+    const svg = regionElement.closest('svg');
+    const defs = svg!.querySelector('defs') || svg!.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
+
+    const stops: { start: number, stop: number, color: string, exp: number | undefined, width: number }[] = [];
+    const size = exps.reduce((l: number, e) => e !== undefined && isArray(e) ? l + e[1] : l + 1, 0);
+    const delta = 1 / size;
+    exps.forEach((exp, i) => {
+      const p = stops.length - 1;
+      const realExp = isArray(exp) ? exp[0] : exp;
+      console.log(stop)
+      console.log(size)
+      console.log(exp[0])
+      if (stops.length !== 0 && stops[p].exp === realExp) {
+        stops[p].stop += delta;
+        stops[p].width += delta;
+      } else {
+        stops.push({
+          start: stops[p]?.stop || 0,
+          stop: (stops[p]?.stop || 0) + delta * exp[1],
+          width: delta * exp[1],
+          color: this.analysis.palette.scale(realExp).hex(),
+          exp: realExp
+        })
+      }
+    })
+
+    const p = `<pattern id="${this.pattern}${stId}" patternUnits="objectBoundingBox" width="1" height="1" viewBox="0 0 1 1" preserveAspectRatio="none">` +
+      stops
+        .map((stop, i) => `<rect fill="${stop.color}" x="${stop.start}" height="1" width="${stop.width + 0.01}"/>`)
+        .join('') +
+      '</pattern>';
+
+    defs.insertAdjacentHTML('beforeend', p);
+  }
+
+  clearAllOverlay(regionElementsMap: Map<string, SVGGElement>) {
+    regionElementsMap.forEach((element: SVGGElement, stId: string) => {
+
+      this.clearExistingPattern(element, stId);
+
+      const targetId = `${this.overlay}${stId}`;
+      const overlayElement = element.querySelector(`#${targetId}`);
+      if (overlayElement) {
+        const rect = overlayElement.getElementsByTagName('rect')[0];
+        rect.style.fill = "revert-layer";
+      } else {
+        console.log(`Overlay not found for pathway ${stId}`);
+      }
+    })
+  }
+
+  showAnalysisInfo(regionElement: SVGGElement, analysisPathway: Analysis.Pathway['entities']) {
+
+    const analysisInfoElement = regionElement.querySelector(`g[id^="${this.analysisInfoId}"]`) as SVGGElement;
+
+    if (analysisInfoElement) {
+      // Make it visible
+      analysisInfoElement.classList.add(`${this.analysisInfoContainer}`);
+
+      const textInfoElement = analysisInfoElement.getElementsByTagName('text')[0];
+      const infoText = "Hit: " + analysisPathway.found + "/" + analysisPathway.total + " - FDR: " + analysisPathway.fdr.toExponential(2).replace('e', 'E'); // "1.23E4";
+      textInfoElement.innerHTML = infoText;
+
+      textInfoElement.removeAttribute("transform");
+      textInfoElement.classList.add('analysis-text');
+
+      const rectBox = analysisInfoElement.getElementsByTagName('rect')[0];
+      const centerX = rectBox.getBBox().x + rectBox.getBBox().width / 2;
+      const centerY = rectBox.getBBox().y + rectBox.getBBox().height / 2;
+
+      textInfoElement.setAttribute("x", String(centerX));
+      textInfoElement.setAttribute("y", String(centerY));
+    }
+
+  }
+
+  clearExistingPattern(element: SVGGElement, stId: string) {
+    const svg = element.closest('svg');
+    const defs = svg!.querySelector('defs') || svg!.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
+    const patternId = `${this.pattern}${stId}`;
+    if (defs.querySelector(`#${patternId}`) !== null) {
+      defs.querySelector(`#${patternId}`)!.remove()
+    }
+  }
+
+
+  clearOverlay(regionElement: SVGGElement | undefined, stId: string) {
+    const targetId = `${this.overlay}${stId}`;
+    if (regionElement) {
+      const overlayElement = regionElement.querySelector(`#${targetId}`);
+      if (overlayElement) {
+        const rect = overlayElement.getElementsByTagName('rect')[0];
+        rect.style.fill = "revert-layer";
+      } else {
+        console.log(`Overlay not found for pathway ${stId}`);
+      }
+    }
+
+  }
+
+  clearAnalysisInfo(regionElementsMap: Map<string, SVGGElement>) {
+    regionElementsMap.forEach((region: SVGGElement, stId: string) => {
+      const analysisInfoElement = region.querySelector(`g[id^="${this.analysisInfoId}"]`);
+      if (analysisInfoElement) {
+        console.log(analysisInfoElement)
+        analysisInfoElement.classList.remove(`${this.analysisInfoContainer}`);
+      }
+    })
+    // const targetId = `ANALINFO`;
+    // const analysisInfoElement = regionElement.querySelector(`g[id^="${targetId}"]`);
+    // if (analysisInfoElement) {
+    //   analysisInfoElement.classList.remove('analysis-info');
+    // }
+
+  }
 
 }
