@@ -107,7 +107,7 @@ export class EhldComponent implements AfterViewInit {
             this.cdr.detectChanges();
             this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer);
             //this.dbIdToSVGGElement = this.ehldService.setDbIdToSVGGElementMap(this.ehldContainer);
-            this.setInitailSelection();
+            this.setInitialSelection();
             this.setInitialFlag();
             this.addEventListenerToSvg();
           }
@@ -118,7 +118,7 @@ export class EhldComponent implements AfterViewInit {
     )
   }
 
-  private setInitailSelection() {
+  private setInitialSelection() {
     this.selectedElement = this.stIdToSVGGElement.get(this.selectedIdFromUrl)
     if (this.selectedElement) {
       this.ehldService.applyOutline(this.selectedElement, this.flaggedElements);
