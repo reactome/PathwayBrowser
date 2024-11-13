@@ -119,7 +119,7 @@ function addGradient(svgText: string, gradient: string, single: boolean = false)
   // }
   // else
   // return gradient + svgText.replaceAll('class="gradient"', 'fill="url(#gradient)"');
-    return `<style>.gradient{fill: url(#gradient)};</style>${gradient}${svgText}`;
+  return `<style>.gradient{fill: url(#gradient)};</style>${gradient}${svgText}`;
 }
 
 function _expToGradient(id: string, exps: (number | [number, number] | undefined)[], properties: Properties, palette: chroma.Scale): string | undefined {
@@ -128,10 +128,10 @@ function _expToGradient(id: string, exps: (number | [number, number] | undefined
   const stops: { start: number, stop: number, color: string, exp: number | undefined, width: number }[] = [];
   const size = exps.reduce((l: number, e) => e !== undefined && isArray(e) ? l + e[1] : l + 1, 0);
   const delta = 1 / size;
-  const notFoundColor = extract(properties.analysis.notFound);
   exps.forEach((exp, i) => {
     const p = stops.length - 1;
-    if (stops.length !== 0 && stops[p].exp === exp) {
+    const realExp = isArray(exp) ? exp[0]! : exp;
+    if (stops.length !== 0 && stops[p].exp === realExp) {
       stops[p].stop += delta;
       stops[p].width += delta;
     } else {
@@ -140,8 +140,8 @@ function _expToGradient(id: string, exps: (number | [number, number] | undefined
           start: stops[p]?.stop || 0,
           stop: (stops[p]?.stop || 0) + delta * exp[1],
           width: delta * exp[1],
-          color: exp[0] !== undefined ? palette(exp[0]).hex() : notFoundColor,
-          exp: exp[0]
+          color: palette(realExp).hex(),
+          exp: realExp
         })
         // console.log(stops, exps)
 
@@ -149,9 +149,9 @@ function _expToGradient(id: string, exps: (number | [number, number] | undefined
         stops.push({
           start: stops[p]?.stop || 0,
           stop: (stops[p]?.stop || 0) + delta,
-          color: exp !== undefined ? palette(exp).hex() : notFoundColor,
+          color: palette(realExp).hex(),
           width: delta,
-          exp: exp
+          exp: realExp
         })
       }
     }
