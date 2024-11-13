@@ -557,28 +557,11 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
             'text-outline-width': extract(style.properties.shadow.fontPadding) / 2
           })
 
-          const validGroups: Set<PaletteGroup> = new Set();
-          if (result.summary.type === 'GSA_REGULATION') {
-            validGroups.add('diverging')
-          } else if (result.summary.type === 'EXPRESSION') {
-            validGroups.add('diverging')
-            validGroups.add('sequential')
-            validGroups.add('continuous')
-          } else if (result.summary.type === 'OVERREPRESENTATION') {
-            validGroups.add('sequential')
-          }
-
-          for (let summary of this.analysis.paletteOptions.values()) {
-            summary.scale.padding(0.2)
-            summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : 0);
-            summary.domain(min, max);
-          }
-
-          this.analysis.palettes.forEach(group => group.valid = validGroups.has(group.name))
-          // TODO revert this after demo
-          // this.analysis.palette = this.analysis.paletteOptions.get(hasExpression ? 'RdBu' : 'GnBu')!;
-          this.analysis.palette = this.analysis.paletteOptions.get('GnBu')!;
-          this.reactomeStyle.loadAnalysis(cy, hasExpression ? scale(['#1532b3','#808080','#e5e61d']) : this.analysis.palette.scale);
+          this.analysis.palette = this.analysis.paletteOptions.get(hasExpression ? 'RdBu' : 'GnBu')!;
+          const notFound = extract(this.reactomeStyle.properties.analysis.notFound)
+          // @ts-ignore
+          this.analysis.palette.scale.nodata(notFound)
+          this.reactomeStyle.loadAnalysis(cy, this.analysis.palette.scale);
         })
       })
 

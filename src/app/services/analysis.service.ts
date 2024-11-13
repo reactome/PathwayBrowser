@@ -5,6 +5,7 @@ import {environment} from "../../environments/environment";
 import {Analysis} from "../model/analysis.model";
 import {DiagramStateService} from "./diagram-state.service";
 import {brewer, Scale, scale} from "chroma-js";
+import {extract, Style} from "reactome-cytoscape-style";
 
 
 export type Palette = keyof typeof brewer;
@@ -64,7 +65,9 @@ export class AnalysisService {
     },
     {name: 'diverging', valid: true, palettes: ['RdYlGn', 'RdYlBu', 'RdGy', 'RdBu', 'PuOr', 'PRGn', 'PiYG', 'BrBG']},
     {name: 'continuous', valid: false, palettes: ['Spectral', 'Viridis']},
-  ]
+  ];
+
+  style: Style = new Style(document.body);
 
   result?: Analysis.Result;
 
@@ -74,7 +77,29 @@ export class AnalysisService {
         (
           token === this.result?.summary.token ?
             of(this.result) : // Same token as cache => use cache
-            this.loadAnalysis(token) // Different token than cache => load result
+            this.loadAnalysis(token).pipe(
+              tap((result) => {
+                const validGroups: Set<PaletteGroup> = new Set();
+                if (result.summary.type === 'GSA_REGULATION') {
+                  validGroups.add('diverging')
+                } else if (result.summary.type === 'EXPRESSION') {
+                  validGroups.add('diverging')
+                  validGroups.add('sequential')
+                  validGroups.add('continuous')
+                } else if (result.summary.type === 'OVERREPRESENTATION') {
+                  validGroups.add('sequential')
+                }
+
+                for (let summary of this.paletteOptions.values()) {
+                  //@ts-ignore
+                  summary.scale.padding(0.25).nodata(extract(this.style.properties.analysis.notFound))
+                  summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : 0);
+                  summary.domain(result.expression.min || 0, result.expression.max || 1);
+                }
+
+                this.palettes.forEach(group => group.valid = validGroups.has(group.name))
+              })
+            ) // Different token than cache => load result
         ) :
         of(undefined) // No tokens => No results
     )
