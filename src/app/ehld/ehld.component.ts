@@ -198,9 +198,9 @@ export class EhldComponent implements AfterViewInit {
     }).subscribe(({entities, result, pathways}) => {
 
 
+      this.ehldService.clearExistingPatterns(this.stIdToSVGGElement, this.ehldContainer!.nativeElement.querySelector('svg'))
       this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
       this.ehldService.clearAnalysisInfo(this.stIdToSVGGElement);
-
 
       const analysisProfile = this.stateService.get('analysisProfile');
       let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
@@ -231,7 +231,7 @@ export class EhldComponent implements AfterViewInit {
           ]
           : [[undefined, 1]];
 
-        this.ehldService.createOverlay(stId, exps, regionElement, this.style);
+        this.ehldService.createOverlay(stId, exps, regionElement);
 
         // If pathway data exists, show additional analysis info box
         if (pathwayData) {
