@@ -136,28 +136,6 @@
 
 }
 
-
-#cytoscape-compare {
-  box-sizing: border-box;
-  position: absolute;
-  //border-left: 4px solid var(--error);
-  height: 100%;
-  width: 100%;
-  inset: 0 0 0 0;
-  background-color: color-mix(in srgb, var(--error) 5%, color-mix(in srgb, var(--surface) 50%, transparent));
-
-  &:before {
-    content: "";
-    height: 100%;
-    width: 4px;
-    background-color: var(--primary);
-    filter: drop-shadow(-2px 0px 0px var(--primary-container)) drop-shadow(2px 0px 0px var(--error-container));
-    position: absolute;
-    left: -2px;
-    z-index: 4;
-  }
-}
-
 body.dark :host ::ng-deep {
   svg {
     #BG-2 {
