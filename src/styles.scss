@@ -16,12 +16,14 @@ body {
   margin-right: 20px;
 }
 
-.variables {
+body {
   --opacity: 0.08;
   --structure-opacity: [[130,0], [150,100]];
   --shadow-padding: 20;
 
   --shadow-luminosity: 40;
+
+  --surface: #F6FEFF;
   --on-surface: #001F24;
   --primary: #006782;
   --on-primary: #FFFFFF;
@@ -66,14 +68,15 @@ body {
   //];
 
   --analysis-bi-palette: 'viridis';
-  --analysis-not-found: #001F24;
+  --analysis-not-found: #d6d6d6;
+
 
   &.dark {
     --opacity: 0.08;
     --shadow-luminosity: 70;
     --shadow-opacity: [[20, 40], [40, 0]];
 
-
+    --surface: #0D1617;
     --on-surface: #fff;
     --primary: #5CD4FF;
     --on-primary: #0D1617;
