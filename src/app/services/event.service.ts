@@ -101,12 +101,10 @@ export class EventService {
         // If hasDiagram is true, wait for the latest color map from subpathwaysColors$
         if (enhancedResult.hasDiagram && !enhancedResult.hasEHLD) {
           return this.subpathwaysColors$.pipe(
-            tap((colors) => console.log("colors ", colors)),
             take(1),
             map(colors => ({event: enhancedResult, treeData: event, colors}))
           );
         } else {
-          console.log("no")
           // If hasDiagram is false, color is undefined. for instance: /R-HSA-9612973/R-HSA-1632852
           return of({event: enhancedResult, treeData: event, colors: undefined});
         }
