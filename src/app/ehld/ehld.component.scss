@@ -138,17 +138,20 @@
 
 body.dark :host ::ng-deep {
   svg {
-    #BG-2 {
-      filter: invert(1) hue-rotate(180deg);
+    .human_tissue:not(.human_tissue .human_tissue):not(#R-ICO-012474) {
+      filter: invert(1) hue-rotate(-195deg);
     }
-    //filter: invert(1) hue-rotate(180deg);
+    .title-bg {
+
+    }
+    filter: invert(1) hue-rotate(195deg);
 
   }
 
 
   text {
-    fill: var(--on-surface);
-    stroke: var(--surface);
+    fill: var(--surface);
+    stroke: var(--on-surface);
     //fill: var(--surface);
     //stroke: var(--on-surface);
     stroke-width: 2px;
