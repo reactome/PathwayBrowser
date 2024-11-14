@@ -6,7 +6,6 @@ import {Graph} from "../model/graph.model";
 import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
-import {Style} from "reactome-cytoscape-style";
 
 
 @Injectable({
@@ -18,6 +17,11 @@ export class EhldService {
 
   private _hasEHLD = new BehaviorSubject<boolean | undefined>(undefined);
   hasEHLD$ = this._hasEHLD.asObservable();
+
+  overlay = "OVERLAY-";
+  analysisInfoId = "ANALINFO";
+  analysisInfoContainer = "analysis-info-container";
+  pattern = "pattern-";
 
   constructor(private http: HttpClient, private analysis: AnalysisService) {
   }
@@ -172,18 +176,8 @@ export class EhldService {
     return null;
   }
 
-  overlay = "OVERLAY-";
-  analysisInfoId = "ANALINFO";
-  analysisInfoContainer = "analysis-info-container";
-  pattern = "pattern-";
 
-
-  clippingPath = "CLIPPINGPATH-";
-  overlayResult = "OVERLAY_RESULT-";
-  overlayBase = "OVERLAY_BASE-";
-
-
-  createOverlay(stId: string, exps: [number | undefined, number][], regionElement: SVGGElement, style: Style) {
+  createOverlay(stId: string, exps: [number | undefined, number][], regionElement: SVGGElement) {
     const targetId = `${this.overlay}${stId}`;
     const overlayElement = regionElement.querySelector(`#${targetId}`);
 
@@ -191,7 +185,7 @@ export class EhldService {
       const rect = overlayElement.getElementsByTagName('rect')[0]
       rect?.classList.add('title-bg');
 
-      this.createPattern(stId, exps, regionElement, style);
+      this.createPattern(stId, exps, regionElement);
 
       rect.style.fill = `url(#${this.pattern}${stId})`;
       rect.setAttribute('stroke', '#000000');
@@ -199,13 +193,11 @@ export class EhldService {
 
       const text = overlayElement.getElementsByTagName('text')[0];
       text?.classList.add('title-text');
-    } else {
-      console.log(`Overlay not found for pathway ${stId}`);
     }
   }
 
 
-  createPattern(stId: string, exps: [number | undefined, number] [], regionElement: SVGGElement, style: Style) {
+  createPattern(stId: string, exps: [number | undefined, number] [], regionElement: SVGGElement) {
     const svg = regionElement.closest('svg');
     const defs = svg!.querySelector('defs') || svg!.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
 
@@ -215,9 +207,6 @@ export class EhldService {
     exps.forEach((exp, i) => {
       const p = stops.length - 1;
       const realExp = isArray(exp) ? exp[0] : exp;
-      console.log(stop)
-      console.log(size)
-      console.log(exp[0])
       if (stops.length !== 0 && stops[p].exp === realExp) {
         stops[p].stop += delta;
         stops[p].width += delta;
@@ -241,22 +230,6 @@ export class EhldService {
     defs.insertAdjacentHTML('beforeend', p);
   }
 
-  clearAllOverlay(regionElementsMap: Map<string, SVGGElement>) {
-    regionElementsMap.forEach((element: SVGGElement, stId: string) => {
-
-      this.clearExistingPattern(element, stId);
-
-      const targetId = `${this.overlay}${stId}`;
-      const overlayElement = element.querySelector(`#${targetId}`);
-      if (overlayElement) {
-        const rect = overlayElement.getElementsByTagName('rect')[0];
-        rect.style.fill = "revert-layer";
-      } else {
-        console.log(`Overlay not found for pathway ${stId}`);
-      }
-    })
-  }
-
   showAnalysisInfo(regionElement: SVGGElement, analysisPathway: Analysis.Pathway['entities']) {
 
     const analysisInfoElement = regionElement.querySelector(`g[id^="${this.analysisInfoId}"]`) as SVGGElement;
@@ -266,8 +239,8 @@ export class EhldService {
       analysisInfoElement.classList.add(`${this.analysisInfoContainer}`);
 
       const textInfoElement = analysisInfoElement.getElementsByTagName('text')[0];
-      const infoText = "Hit: " + analysisPathway.found + "/" + analysisPathway.total + " - FDR: " + analysisPathway.fdr.toExponential(2).replace('e', 'E'); // "1.23E4";
-      textInfoElement.innerHTML = infoText;
+      // "1.23E4";
+      textInfoElement.innerHTML = "Hit: " + analysisPathway.found + "/" + analysisPathway.total + " - FDR: " + analysisPathway.fdr.toExponential(2).replace('e', 'E');
 
       textInfoElement.removeAttribute("transform");
       textInfoElement.classList.add('analysis-text');
@@ -282,44 +255,35 @@ export class EhldService {
 
   }
 
-  clearExistingPattern(element: SVGGElement, stId: string) {
-    const svg = element.closest('svg');
-    const defs = svg!.querySelector('defs') || svg!.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
-    const patternId = `${this.pattern}${stId}`;
-    if (defs.querySelector(`#${patternId}`) !== null) {
-      defs.querySelector(`#${patternId}`)!.remove()
-    }
-  }
-
-
-  clearOverlay(regionElement: SVGGElement | undefined, stId: string) {
-    const targetId = `${this.overlay}${stId}`;
-    if (regionElement) {
-      const overlayElement = regionElement.querySelector(`#${targetId}`);
+  clearAllOverlay(regionElementsMap: Map<string, SVGGElement>) {
+    regionElementsMap.forEach((element: SVGGElement, stId: string) => {
+      const targetId = `${this.overlay}${stId}`;
+      const overlayElement = element.querySelector(`#${targetId}`);
       if (overlayElement) {
         const rect = overlayElement.getElementsByTagName('rect')[0];
         rect.style.fill = "revert-layer";
-      } else {
-        console.log(`Overlay not found for pathway ${stId}`);
       }
-    }
-
+    })
   }
 
-  clearAnalysisInfo(regionElementsMap: Map<string, SVGGElement>) {
-    regionElementsMap.forEach((region: SVGGElement, stId: string) => {
+  clearExistingPatterns(elementsMap: Map<string, SVGGElement>, svg: SVGElement | null) {
+    if (!svg) return;
+    const defs = svg.querySelector('defs') || svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
+    elementsMap.forEach((element: SVGGElement, stId: string) => {
+      const patternId = `${this.pattern}${stId}`;
+      if (defs.querySelector(`#${patternId}`) !== null) {
+        defs.querySelector(`#${patternId}`)!.remove()
+      }
+    })
+  }
+
+  clearAnalysisInfo(elementsMap: Map<string, SVGGElement>) {
+    elementsMap.forEach((region: SVGGElement, stId: string) => {
       const analysisInfoElement = region.querySelector(`g[id^="${this.analysisInfoId}"]`);
       if (analysisInfoElement) {
-        console.log(analysisInfoElement)
         analysisInfoElement.classList.remove(`${this.analysisInfoContainer}`);
       }
     })
-    // const targetId = `ANALINFO`;
-    // const analysisInfoElement = regionElement.querySelector(`g[id^="${targetId}"]`);
-    // if (analysisInfoElement) {
-    //   analysisInfoElement.classList.remove('analysis-info');
-    // }
-
   }
 
 }
