@@ -75,34 +75,33 @@ export class AnalysisService {
     switchMap(token =>
       token !== null ?
         (
-          token === this.result?.summary.token ?
-            of(this.result) : // Same token as cache => use cache
-            this.loadAnalysis(token).pipe(
-              tap((result) => {
-                const validGroups: Set<PaletteGroup> = new Set();
-                if (result.summary.type === 'GSA_REGULATION') {
-                  validGroups.add('diverging')
-                } else if (result.summary.type === 'EXPRESSION') {
-                  validGroups.add('diverging')
-                  validGroups.add('sequential')
-                  validGroups.add('continuous')
-                } else if (result.summary.type === 'OVERREPRESENTATION') {
-                  validGroups.add('sequential')
-                }
-
-                for (let summary of this.paletteOptions.values()) {
-                  //@ts-ignore
-                  summary.scale.padding(0.25).nodata(extract(this.style.properties.analysis.notFound))
-                  summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : 0);
-                  summary.domain(result.expression.min || 0, result.expression.max || 1);
-                }
-
-                this.palettes.forEach(group => group.valid = validGroups.has(group.name))
-              })
-            ) // Different token than cache => load result
+          token === this.result?.summary.token
+            ? of(this.result)// Same token as cache => use cache
+            : this.loadAnalysis(token) // Different token than cache => load result
         ) :
         of(undefined) // No tokens => No results
-    )
+    ),
+    tap((result) => {
+      if (!result) return
+      const validGroups: Set<PaletteGroup> = new Set();
+      if (result.summary.type === 'GSA_REGULATION') {
+        validGroups.add('diverging')
+      } else if (result.summary.type === 'EXPRESSION') {
+        validGroups.add('diverging')
+        validGroups.add('sequential')
+        validGroups.add('continuous')
+      } else if (result.summary.type === 'OVERREPRESENTATION') {
+        validGroups.add('sequential')
+      }
+      for (let summary of this.paletteOptions.values()) {
+        //@ts-ignore
+        summary.scale.padding(0.25).nodata(extract(this.style.properties.analysis.notFound))
+        summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : 0);
+        summary.domain(result.expression.min || 0, result.expression.max || 1);
+      }
+
+      this.palettes.forEach(group => group.valid = validGroups.has(group.name))
+    })
   )
 
   constructor(private http: HttpClient, private state: DiagramStateService) {
