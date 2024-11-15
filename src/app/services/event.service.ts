@@ -374,6 +374,8 @@ export class EventService {
       this.lastMatchedEvent = treeEvent;
     }
 
+    treeEvent.ancestors = [...(treeEvent.ancestors || []), treeEvent]
+
     if (treeEvent.stId === diagramId && subpathwayColors) {
       this.setSubtreeColors(treeEvent, subpathwayColors);
     }
