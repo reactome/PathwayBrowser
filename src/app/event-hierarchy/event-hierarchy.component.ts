@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from 
 import {Event} from "../model/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatestWith, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
+import {combineLatestWith, debounceTime, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {SplitComponent} from "angular-split";
@@ -52,6 +52,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   selecting = this.state.onChange.select$.pipe(
     tap(value => this.selectedIdFromUrl = value),
     filter(value => !this._ignore && !this._isInitialLoad && !this.speciesService.getIgnore()),// Ignore the changes from Tree itself , first load and species changes
+    debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
       const idToUse = id ? id : this.diagramId;
       return this.eventService.fetchEnhancedEventData(idToUse)
