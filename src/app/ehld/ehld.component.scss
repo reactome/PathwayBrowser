@@ -183,9 +183,14 @@ body.dark :host ::ng-deep {
 
 
   .analysis-text {
-    alignment-baseline: middle;
-    dominant-baseline: middle;
+    alignment-baseline: central;
     text-anchor: middle;
+
+    fill: var(--surface);
+    stroke: var(--on-surface);
+    stroke-width: 3px;
+    paint-order: stroke;
+    stroke-linejoin: round;
   }
 
 }
