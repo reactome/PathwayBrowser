@@ -51,7 +51,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   selecting = this.state.onChange.select$.pipe(
     tap(value => this.selectedIdFromUrl = value),
-    filter(value => !this._ignore && !this._isInitialLoad && !this.speciesService.getIgnore()),// Ignore the changes from Tree itself , first load and species changes
+    filter(value => !this._ignore && !this._isInitialLoad && this.speciesService.getIgnore()),// Ignore the changes from Tree itself , first load and species changes
     debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
       const idToUse = id ? id : this.diagramId;

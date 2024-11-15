@@ -72,7 +72,7 @@ export class SpeciesComponent implements AfterViewInit {
     this.diagramId = this.diagramId.replace(/-(.*?)-/, `-${abbreviation}-`);
 
     // Include entity to ancestors list when selecting entity in the URL
-    const ancestors = this.selectedTreeEvent.ancestors;
+    const ancestors = this.selectedTreeEvent.ancestors || [];
     const stIdSet = new Set(ancestors.map(obj => obj.stId));
     if (!stIdSet.has(this.selectedObj.stId)) {
       ancestors.push(this.selectedObj);
@@ -91,7 +91,7 @@ export class SpeciesComponent implements AfterViewInit {
           } else {
             this.state.set('select', '');
           }
-          this.speciesService.setIgnore(true);
+          this.speciesService.setIgnore(false);
           if (updatedParams['flag']) this.state.set('flag', updatedParams['flag']);
           if (updatedParams['path']) this.state.set('path', updatedParams['path'].split(','));
           // Close the species panel after navigating
