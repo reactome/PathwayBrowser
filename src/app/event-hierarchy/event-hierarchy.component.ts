@@ -273,16 +273,16 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       this.eventService.setBreadcrumbs([event]);
     } else if (event.ancestors) {
       // Set breadcrumbs including the event and its parents
-      this.eventService.setBreadcrumbs([...(event.ancestors), event]);
+      this.eventService.setBreadcrumbs([...(event.ancestors)]);
     }
   }
 
   private updateBreadcrumbsForEventDeselection(event: Event) {
     if (event.schemaClass === this._TOP) {
-      this.eventService.setBreadcrumbs([]);
+      this.eventService.setBreadcrumbs([event]);
     } else if (event.ancestors?.length) {
-      // Update breadcrumb based on the last parent in the parents
-      this.updateBreadcrumbs(event.ancestors[event.ancestors.length - 1]);
+      // Update breadcrumb based on the second-to-last item
+      this.updateBreadcrumbs(event.ancestors[event.ancestors.length - 2]);
     }
   }
 
