@@ -364,12 +364,18 @@ export class EventService {
    */
   private processHasEventData(data: Event, treeEvent: Event, selectedIdFromUrl: string, diagramId: string, subpathwayColors: Map<number, string> | undefined, matTree: MatTree<Event, string>, index: number, totalAncestors: number) {
     if (data.hasEvent) {
-      treeEvent.hasEvent = data.hasEvent.map((child: Event) => ({
-        ...child,
-        ancestors: [...(treeEvent.ancestors || []), treeEvent],
-        parent: treeEvent,
-        isSelected: child.stId === selectedIdFromUrl
-      }));
+      treeEvent.hasEvent = data.hasEvent.map((child: Event) => {
+        const ancestors = treeEvent.ancestors || [];
+        if (!ancestors.some((ancestor) => ancestor.stId === treeEvent.stId)) {
+          ancestors.push(treeEvent);
+        }
+        return {
+          ...child,
+          ancestors: [...ancestors, child],
+          parent: treeEvent,
+          isSelected: child.stId === selectedIdFromUrl
+        }
+      })
 
       matTree.expand(treeEvent);
       treeEvent.isSelected = true;
@@ -377,17 +383,17 @@ export class EventService {
       this.lastMatchedEvent = treeEvent;
     }
 
-    treeEvent.ancestors = [...(treeEvent.ancestors || []), treeEvent]
-
     if (treeEvent.stId === diagramId && subpathwayColors) {
       this.setSubtreeColors(treeEvent, subpathwayColors);
     }
 
-    if (selectedIdFromUrl && selectedIdFromUrl === treeEvent.stId) {
-      this.setBreadcrumbs([...(treeEvent.ancestors || []), treeEvent]);
-    } else {
-      this.setBreadcrumbs([treeEvent]);
-    }
+    // Entity - false, Event = true
+    const isEvent = selectedIdFromUrl === treeEvent.stId;
+    const breadcrumbs = isEvent && treeEvent.schemaClass === "TopLevelPathway"
+      ? [treeEvent]
+      : [...treeEvent.ancestors];
+    this.setBreadcrumbs(breadcrumbs);
+
 
     if (index === totalAncestors - 1) {
       this.setCurrentTreeEvent(treeEvent);
