@@ -1,3 +1,22 @@
-<div class="variables">
-  <div id="ehld" #ehld [innerHTML]="svgContent" ></div>
+<div class="variables" #container>
+  <div id="ehld" #ehld [innerHTML]="svgContent"></div>
+
+  <div id="legend-boundary" [style.--legend-width.px]="ratio  * container.clientHeight">
+    <div cdkDrag cdkDragLockAxis="x" cdkDragBoundary="#legend-boundary" id="legend-container"
+         [style.height]="container.clientHeight + 'px'">
+      <button id="legend-handle" cdkDragHandle>LEGEND</button>
+      <div id="legend">
+        <div *ngFor="let group of legendItems" class="legend-group">
+          <span>{{ group.type }}</span>
+          <div class="legend-items">
+            <!-- Loop over items within the group -->
+            <div *ngFor="let item of group.items" class="legend-item">
+              <span>{{ item.name }}</span>
+              <img [src]="item.src" [alt]="item.alt">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

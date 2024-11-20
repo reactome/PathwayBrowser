@@ -7,6 +7,17 @@ import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
 
+export interface LegendItem {
+  name: string;
+  src: string;
+  alt: string;
+}
+
+export interface LegendGroup {
+  type: string;
+  items: LegendItem[];
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +33,31 @@ export class EhldService {
   analysisInfoId = "ANALINFO";
   analysisInfoContainer = "analysis-info-container";
   pattern = "pattern-";
+
+  legendItems : LegendGroup[] = [
+    {
+      type: "Arrow",
+      items: [
+        {name: "Indication", src: "assets/EHLD-legend/R-ICO-012345.svg", alt: "indication arrow"},
+        {name: "Motion", src: "assets/EHLD-legend/R-ICO-012347.svg", alt: "motion arrow"},
+        {name: "Process", src: "assets/EHLD-legend/R-ICO-012348.svg", alt: "process arrow"},
+        {name: "Inhibition", src: "assets/EHLD-legend/R-ICO-012346.svg", alt: "inhibition arrow"},
+        {name: "Transformation", src: "assets/EHLD-legend/R-ICO-012349.svg", alt: "transformation arrow"}
+      ]
+    },
+    {
+      type: "Not Happening Arrow ",
+      items: [
+        {name: "No Motion", src: "assets/EHLD-legend/R-ICO-012339.svg", alt: "no motion arrow"}
+      ]
+    },
+    {
+      type: "Disease Related Arrow",
+      items: [
+        {name: "Disease Related Motion", src: "assets/EHLD-legend/R-ICO-012342.svg", alt: "disease-related motion arrow"}
+      ]
+    }
+  ];
 
   constructor(private http: HttpClient, private analysis: AnalysisService) {
   }

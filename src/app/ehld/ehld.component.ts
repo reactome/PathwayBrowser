@@ -1,6 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {filter, forkJoin, Observable, take, tap} from "rxjs";
-import {EhldService} from "../services/ehld.service";
+import {EhldService, LegendGroup} from "../services/ehld.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {DiagramStateService} from "../services/diagram-state.service";
@@ -28,6 +28,8 @@ export class EhldComponent implements AfterViewInit {
 
   style!: Style;
 
+  ratio = 0.384;
+
   hasEHLD: boolean | undefined = undefined;
   svgContent: string = '';
   selectedElement: SVGGElement | undefined = undefined;
@@ -37,6 +39,7 @@ export class EhldComponent implements AfterViewInit {
   stIdToSVGGElement: Map<string, SVGGElement> = new Map<string, SVGGElement>();
   //dbIdToSVGGElement: Map<number, SVGGElement> = new Map<number, SVGGElement>();
   panZoom?: SvgPanZoom.Instance;
+  legendItems: LegendGroup[] = [];
 
   constructor(private ehldService: EhldService,
               private sanitizer: DomSanitizer,
@@ -57,9 +60,10 @@ export class EhldComponent implements AfterViewInit {
 
   analysing = this.stateService.onChange.analysis$.subscribe((value) => this.loadAnalysis(value));
 
-
-ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
     this.style = new Style(this.ehldContainer!.nativeElement);
+
+    this.legendItems = this.ehldService.legendItems;
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
       this.hasEHLD = hasEHLD;

@@ -65,6 +65,36 @@
       left: -1px;
       z-index: 4;
     }
+
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    color: var(--on-surface);
+
+
+    .legend-group span {
+      display: flex;
+      justify-content: center;
+      font-weight: 400;
+      font-size: 15px;
+      padding-top: 5px;
+
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+
+      span {
+        font-size: 12px;
+      }
+
+      img {
+        width: 55%;
+      }
+    }
   }
 }
 
@@ -77,6 +107,10 @@ body.dark :host ::ng-deep {
     filter: invert(1) hue-rotate(195deg);
   }
 
+  #legend {
+    img {
+      filter: invert(1) hue-rotate(195deg);
+    }
   }
 
   text {
