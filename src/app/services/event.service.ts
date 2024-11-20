@@ -539,19 +539,19 @@ export class EventService {
     return parents.find(p => p.hasDiagram);
   }
 
-  collapseSiblingEvent(event: Event,matTree: MatTree<Event, string>) {
-    if (event.ancestors) {
-      // Get 1st parent
-      let eventParent = event.parent;
-      // Loop through the parent's children to collapse any expanded siblings
-      eventParent.hasEvent?.forEach(childEvent => {
-        if (childEvent !== event && matTree.isExpanded(childEvent)) {
-          matTree.collapse(childEvent);
-          matTree.collapseDescendants(childEvent);
-          childEvent.isSelected = false;
-        }
-      })
-    }
+  collapseSiblingEvent(event: Event, matTree: MatTree<Event, string>) {
+    if (!event.ancestors) return;
+    // Get 1st parent
+    const eventParent = event.parent;
+    if (!eventParent) return;
+    // Loop through the parent's children to collapse any expanded siblings
+    eventParent.hasEvent?.forEach(childEvent => {
+      if (childEvent !== event && matTree.isExpanded(childEvent)) {
+        matTree.collapse(childEvent);
+        matTree.collapseDescendants(childEvent);
+        childEvent.isSelected = false;
+      }
+    })
   }
 
 }
