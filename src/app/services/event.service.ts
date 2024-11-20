@@ -521,7 +521,6 @@ export class EventService {
 
   hasChild = (_: number, event: Event) => !!event.hasEvent && event.hasEvent.length > 0 || ['TopLevelPathway', 'Pathway', 'CellLineagePath'].includes(event.schemaClass);
 
-  //todo : rename it
   eventHasChild(event: Event): boolean {
     return this.hasChild(0, event);
   }
