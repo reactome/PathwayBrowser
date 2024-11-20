@@ -254,8 +254,8 @@ export class EventService {
     return this.fetchEnhancedEventData(diagramId).pipe(
       switchMap(() => this.fetchEventAncestors(diagramId)),
       map(ancestors => this.getFinalAncestor(ancestors)),
-      switchMap(ancestors => this.buildNestedTree(this.treeData$.value,ancestors, diagramId, event.stId, subpathwayColors, tree)),
-      map(( tree) => {
+      switchMap(ancestors => this.buildNestedTree(this.treeData$.value, ancestors, diagramId, event.stId, subpathwayColors, tree)),
+      map((tree) => {
         this.setTreeData(tree);
         return tree
       })
@@ -323,6 +323,9 @@ export class EventService {
    */
   buildNestedTree(roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, subpathwayColors: Map<number, string> | undefined, matTree: MatTree<Event, string>): Observable<Event[]> {
     const tree = [...roots];
+    // Add tlp itself as ancestor to tlp
+    tree.map(tlp => tlp.ancestors = [tlp])
+
     this.lastMatchedEvent = null; // Reset at start
 
     return from(ancestors).pipe(
