@@ -545,7 +545,7 @@ export class EventService {
 
   getPathwayWithDiagram(event: Event): Event | undefined {
     const parents = [...event.ancestors].reverse();
-    return parents.find(p => p.hasDiagram);
+    return parents.find(p => p.stId !== event.stId && p.hasDiagram);
   }
 
   collapseSiblingEvent(event: Event, matTree: MatTree<Event, string>) {
