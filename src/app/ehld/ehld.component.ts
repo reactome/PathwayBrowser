@@ -58,7 +58,7 @@ export class EhldComponent implements AfterViewInit {
   analysing = this.stateService.onChange.analysis$.subscribe((value) => this.loadAnalysis(value));
 
 
-  ngAfterViewInit(): void {
+ngAfterViewInit(): void {
     this.style = new Style(this.ehldContainer!.nativeElement);
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {

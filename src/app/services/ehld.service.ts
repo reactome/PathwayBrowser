@@ -183,7 +183,6 @@ export class EhldService {
 
     if (overlayElement) {
       const rect = overlayElement.getElementsByTagName('rect')[0]
-      rect?.classList.add('title-bg');
 
       this.createPattern(stId, exps, regionElement);
 
