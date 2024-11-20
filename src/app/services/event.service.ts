@@ -119,14 +119,14 @@ export class EventService {
   }
 
 
-  fetchChildrenEvents(event: Event): Observable<Event> {
-    return this.fetchEnhancedEventData(event.stId).pipe(
+  fetchChildrenEvents(tree: Event): Observable<Event> {
+    return this.fetchEnhancedEventData(tree.stId).pipe(
       switchMap(result => {
         if (result.hasEvent) {
           // Update the event structure with child relationships
-          event.hasEvent = result.hasEvent.map(child => {
-            child.ancestors = [...(event.ancestors || []), event];
-            child.parent = event;
+          tree.hasEvent = result.hasEvent.map(child => {
+            child.ancestors = [...tree.ancestors, child];
+            child.parent = tree;
             return child;
           });
           return of(result);
