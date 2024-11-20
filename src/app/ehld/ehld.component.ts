@@ -11,6 +11,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {isDefined} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
 import {Style} from "reactome-cytoscape-style";
+import {SpeciesService} from "../services/species.service";
 
 
 @Component({
@@ -42,7 +43,8 @@ export class EhldComponent implements AfterViewInit {
               private cdr: ChangeDetectorRef,
               private stateService: DiagramStateService,
               private router: Router,
-              private analysisService: AnalysisService,) {
+              private analysisService: AnalysisService,
+              private speciesService: SpeciesService) {
   }
 
   selecting = this.stateService.onChange.select$.pipe(
@@ -169,11 +171,11 @@ export class EhldComponent implements AfterViewInit {
       });
 
       element.addEventListener('dblclick', () => {
-        console.log('SVG double clicked detected');
         const idAttr = this.selectedElement?.getAttribute('id');
         if (idAttr) {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
+            this.speciesService.setIgnore(false);
             this.diagramId = stId;
             this.router.navigate(['PathwayBrowser', this.diagramId], {
               queryParamsHandling: "preserve"
@@ -239,7 +241,6 @@ export class EhldComponent implements AfterViewInit {
         }
       });
     })
-
   }
 
 }

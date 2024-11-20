@@ -82,7 +82,6 @@ export class SpeciesComponent implements AfterViewInit {
       .subscribe((newSelectedStId) => {
 
         const updatedParams = this.speciesService.updateQueryParams(['select', 'flag', 'path'], newSelectedStId, abbreviation!, this.route);
-        this.speciesService.setIgnore(true);
         this.router.navigate(['PathwayBrowser', this.diagramId], {
           queryParamsHandling: "preserve"
         }).then(() => {
@@ -91,7 +90,7 @@ export class SpeciesComponent implements AfterViewInit {
           } else {
             this.state.set('select', '');
           }
-          this.speciesService.setIgnore(false);
+          this.speciesService.setIgnore(true);
           if (updatedParams['flag']) this.state.set('flag', updatedParams['flag']);
           if (updatedParams['path']) this.state.set('path', updatedParams['path'].split(','));
           // Close the species panel after navigating
