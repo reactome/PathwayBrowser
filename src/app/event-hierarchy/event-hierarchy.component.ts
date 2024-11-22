@@ -9,6 +9,8 @@ import {SplitComponent} from "angular-split";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {NavigationEnd, Router} from "@angular/router";
 import {EhldService} from "../services/ehld.service";
+import {AnalysisService} from "../services/analysis.service";
+import {Analysis} from "../model/analysis.model";
 
 
 @Component({
@@ -46,7 +48,14 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   ancestors: Event[] = [];
 
 
-  constructor(protected eventService: EventService, private speciesService: SpeciesService, private state: DiagramStateService, private el: ElementRef, private router: Router, private ehldService: EhldService,) {
+
+  constructor(protected eventService: EventService,
+              private speciesService: SpeciesService,
+              private state: DiagramStateService,
+              private el: ElementRef,
+              private router: Router,
+              private ehldService: EhldService,
+              private analysis: AnalysisService) {
   }
 
   selecting = this.state.onChange.select$.pipe(
@@ -115,31 +124,67 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   buildInitialTreeWithTlps(taxId: string): void {
     const idToUse = this.selectedIdFromUrl ? this.selectedIdFromUrl : this.diagramId;
-    this.eventService.fetchTlpsBySpecies(taxId).pipe(
-      tap(allTLPs => this.eventService.setTreeData(allTLPs)), // All TLPs as initial tree data
-      switchMap((treeData) =>
-        this.eventService.fetchEnhancedEventData(idToUse).pipe(
+    // Fetch and prepare initial data
+    const initialData$ = this.eventService.fetchTlpsBySpecies(taxId).pipe(
+      tap(allTLPs => this.eventService.setTreeData(allTLPs)), // Set initial tree data
+      map(treeData => ({treeData})) // Wrap in an object for accumulation
+    );
+
+    // Fetch enhanced event data
+    const enhancedEventData$ = this.eventService.fetchEnhancedEventData(idToUse).pipe(
+      map(enhancedEvent => ({enhancedEvent}))
+    );
+
+    // Fetch EHLD and color data
+    const ehldAndSubpathwayColors$ = this.ehldService.hasEHLD$.pipe(
+      take(1),
+      switchMap(hasEHLD => hasEHLD
+        ? of({hasEHLD, colors: undefined}) // If EHLD exists, no colors needed
+        : this.eventService.subpathwaysColors$.pipe(
+          take(1),
+          map(colors => ({hasEHLD, colors}))
+        )
+      )
+    );
+
+    // Fetch analysis result
+    const analysisResult$ = this.analysis.result$.pipe(
+      tap( (re) =>console.log(re)),
+      take(1),
+      map(analysisResult => ({analysisResult}))
+    );
+
+    // Combine all data and merged into one object
+    initialData$.pipe(
+      switchMap(initialData =>
+        enhancedEventData$.pipe(
           combineLatestWith(
-            // EHLD flag here is for expanding tree children when tree node is a pathway in EHLD viewer from the frist load, for instance: /R-HSA-9612973?select=R-HSA-1632852
-            this.ehldService.hasEHLD$.pipe(
-              take(1),
-              switchMap(hasEHLD => !hasEHLD
-                ? this.eventService.subpathwaysColors$.pipe(
-                  take(1),
-                  map(colors => ({hasEHLD, colors}))
-                )
-                : of({hasEHLD, colors: undefined})
-              )
-            )
+            ehldAndSubpathwayColors$,
+            analysisResult$
           ),
-          map(([enhancedEvent, {hasEHLD, colors}]) => {
-            return {enhancedEvent, colors, hasEHLD, treeData};
-          })
+          map(([enhancedEvent, ehldAndColors, analysisResult]) => ({
+            ...initialData,
+            ...enhancedEvent,
+            ...ehldAndColors,
+            ...analysisResult,
+          }))
         )
       ),
-      switchMap(({enhancedEvent, treeData, colors, hasEHLD}) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD))
-    ).subscribe(() => {
-      document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
+      // Build the tree with all data
+      switchMap(({
+                   enhancedEvent,
+                   treeData,
+                   colors,
+                   hasEHLD,
+                   analysisResult,
+                 }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD, analysisResult?.pathways))
+    ).subscribe({
+      next: () => {
+        document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
+      },
+      error: (err) => {
+        throw new Error('Error in building the tree:', err);
+      }
     });
   }
 
