@@ -1,5 +1,5 @@
 <div *ngIf="obj">
-  <p>{{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }} </p>
+  <p>{{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
 
   <p>Enhanced data testing： summation data</p>
   <p style="color: #2d518d" *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
