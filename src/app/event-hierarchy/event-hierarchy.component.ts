@@ -271,26 +271,26 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.handlePathwayNavigationOnDeselection(event);
   }
 
-  private toggleEventExpansion(event: Event, isSelected: boolean) {
+  private toggleEventExpansion(treeEvent: Event, isSelected: boolean) {
     // Collapse all events when selecting any tlps
-    if (event.schemaClass === this._TOP) {
+    if (treeEvent.schemaClass === this._TOP) {
       this.tree.collapseAll();
     }
 
     if (isSelected) {
-      event.isSelected = true;
-      this.eventService.loadEventChildren(event);
-      this.tree.toggle(event);
+      treeEvent.isSelected = true;
+      this.eventService.loadEventChildren(treeEvent);
+      this.tree.toggle(treeEvent);
     } else {
-      event.isSelected = false;
-      this.tree.toggle(event);
-      this.tree.collapseDescendants(event);
-      this.eventService.fetchEnhancedEventData(event.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
+      treeEvent.isSelected = false;
+      this.tree.toggle(treeEvent);
+      this.tree.collapseDescendants(treeEvent);
+      this.eventService.fetchEnhancedEventData(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
         this.eventService.setCurrentObj(result);
       })
     }
 
-    this.eventService.collapseSiblingEvent(event, this.tree);
+    this.eventService.collapseSiblingEvent(treeEvent, this.tree);
   }
 
 

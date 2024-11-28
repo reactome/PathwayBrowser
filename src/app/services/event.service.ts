@@ -185,7 +185,7 @@ export class EventService {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
       return this.handleExistingEventSelection(treeNode, tree, allVisibleTreeNodes).pipe(
-        map(([treeData, event]) => {
+        map(([treeData, treeNode]) => {
           this.setCurrentEventAndObj(treeNode, event);
           return treeData;
         })
@@ -285,8 +285,8 @@ export class EventService {
   }
 
   // Select any reaction, subpathway and interacting pathway from diagram
-  private handleExistingEventSelection(event: Event, tree: MatTree<Event, string>, flatTreeNodes: Event[]): Observable<[Event[], Event]> {
-    return this.fetchEventAncestors(event.stId).pipe(
+  private handleExistingEventSelection(treeEvent: Event, tree: MatTree<Event, string>, flatTreeNodes: Event[]): Observable<[Event[], Event]> {
+    return this.fetchEventAncestors(treeEvent.stId).pipe(
       map(ancestors => {
         const finalAncestor = this.getFinalAncestor(ancestors);
         // Create a Set to store the stIds from ancestors for quick lookup
@@ -295,13 +295,13 @@ export class EventService {
         flatTreeNodes.forEach(treeNode => {
           treeNode.isSelected = ancestorStIds.has(treeNode.stId);
         });
-        event.ancestors = finalAncestor;
-        event.parent = finalAncestor[finalAncestor.length - 2];
+        treeEvent.ancestors = finalAncestor;
+        treeEvent.parent = finalAncestor[finalAncestor.length - 2];
         this.setTreeData(this.treeData$.value);
         this.setBreadcrumbs(finalAncestor);
         this.expandAllAncestors(finalAncestor, tree)
 
-        return [this.treeData$.value, event];
+        return [this.treeData$.value, treeEvent];
       })
     )
   }
