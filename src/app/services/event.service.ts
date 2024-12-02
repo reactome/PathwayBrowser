@@ -400,6 +400,86 @@ export class EventService {
     }
   }
 
+  addAnalysisTag(tree: Event[] | undefined, analysisResult: Analysis.Result | undefined): void {
+    if (!analysisResult || !tree) return;
+
+    const pathwaysData = analysisResult.pathways;
+    tree.forEach(node => {
+      const pathwayData = pathwaysData.find(a => a.stId === node.stId);
+
+      if (!pathwayData) return;
+
+      const fdrExponentNum = pathwayData.entities.fdr != 0 ? pathwayData.entities.fdr.toExponential(2).replace('e', 'E') : '0E0';
+      const analysisContent = "(" + pathwayData.entities.found + "/" + pathwayData.entities.total + ") FDR: " + pathwayData.entities.fdr.toExponential(2).replace('e', 'E');
+      const expressionColors = this.getExpressionColor(pathwayData, analysisResult);
+
+      const [coefficient, exponent] = pathwayData.entities.fdr.toExponential(2).split('e');
+      console.log("pathway" , [coefficient, exponent])
+      const exponentNumber = parseInt(exponent, 10);
+      const fdr  = `${coefficient} × 10<sup>${exponentNumber}</sup>`; //Output: "9.00 × 10⁻⁶"
+
+
+     // node.analysisInfo = this.toReadableScientificNotation(pathwayData.entities.fdr);
+      node.analysisContent = analysisContent;
+      node.analysisInfo =  `${pathwayData.reactions.found} / ${pathwayData.reactions.total}`;
+      // node.analysisInfo =  fdr //expression value
+
+     // node.analysisColor = expressionColors[0].color;
+      //node.analysisColor = this.analysisService.palette.scale(fdrValue).hex();
+
+      if (node.hasEvent && node.hasEvent.length > 0) {
+        this.addAnalysisTag(node.hasEvent, analysisResult);
+      }
+
+    });
+  }
+
+  addHitReactions(tree: Event[] | undefined, hitReactions: number[]) {
+    if (hitReactions.length === 0 || !tree) return;
+    tree.forEach(node => {
+      node.hit = hitReactions.includes(node.dbId);
+      if (node.hasEvent && node.hasEvent.length > 0) {
+        this.addHitReactions(node.hasEvent, hitReactions);
+      }
+    });
+  }
+
+  getExpressionColor(pathwayData: Analysis.Pathway, analysisResult: Analysis.Result) {
+    const analysisProfile = this.state.get('analysisProfile');
+    let analysisIndex = analysisProfile ? analysisResult.expression.columnNames.indexOf(analysisProfile) : 0;
+    if (analysisIndex === -1) analysisIndex = 0;
+    const exps: [number | undefined, number][] = pathwayData
+      ? [
+        [pathwayData.entities.exp[analysisIndex] || 1 - pathwayData.entities.pValue, pathwayData.entities.found],
+        [undefined, pathwayData.entities.total - pathwayData.entities.found],
+      ]
+      : [[undefined, 1]];
+
+    const stops: { start: number, stop: number, color: string, exp: number | undefined, width: number }[] = [];
+    const size = exps.reduce((l: number, e) => e !== undefined && isArray(e) ? l + e[1] : l + 1, 0);
+    const delta = 1 / size;
+    exps.forEach((exp, i) => {
+      const p = stops.length - 1;
+      const realExp = isArray(exp) ? exp[0] : exp;
+      if (stops.length !== 0 && stops[p].exp === realExp) {
+        stops[p].stop += delta;
+        stops[p].width += delta;
+      } else {
+        stops.push({
+          start: stops[p]?.stop || 0,
+          stop: (stops[p]?.stop || 0) + delta * exp[1],
+          width: delta * exp[1],
+          color: this.analysisService.palette.scale(realExp).hex(),
+          exp: realExp
+        })
+      }
+    })
+    return stops;
+  }
+
+
+
+
   findTreeEvent(events: Event[], targetId: string): Event | null {
     for (const event of events) {
       if (event.stId === targetId) {
