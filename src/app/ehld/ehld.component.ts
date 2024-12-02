@@ -203,6 +203,7 @@ export class EhldComponent implements AfterViewInit {
       result: this.analysisService.result$.pipe(filter(isDefined), take(1))
     }).subscribe(({entities, result, pathways}) => {
 
+      console.log("result", entities, result, pathways);
 
       this.ehldService.clearExistingPatterns(this.stIdToSVGGElement, this.ehldContainer!.nativeElement.querySelector('svg'))
       this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
@@ -221,7 +222,6 @@ export class EhldComponent implements AfterViewInit {
 
       // let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
       let analysisPathwayMap = new Map<string, Analysis.Pathway['entities']>(pathways.map(p => [p.stId, p.entities]));
-      console.log("analysispathwayMap ", analysisPathwayMap);
 
       const allPathwayStIds = [...this.stIdToSVGGElement.keys()];
       allPathwayStIds.forEach((stId) => {
