@@ -10,7 +10,6 @@ import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {NavigationEnd, Router} from "@angular/router";
 import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
-import {Analysis} from "../model/analysis.model";
 
 
 @Component({
@@ -149,7 +148,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
     // Fetch analysis result
     const analysisResult$ = this.analysis.result$.pipe(
-      tap( (re) =>console.log(re)),
       take(1),
       map(analysisResult => ({analysisResult}))
     );

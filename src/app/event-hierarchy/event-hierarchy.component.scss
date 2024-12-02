@@ -86,8 +86,6 @@
     .breadcrumb-item:hover::before {
       text-decoration: none;
     }
-
-
   }
 
   .gradient-holder-left {
@@ -210,12 +208,11 @@
   background: var(--primary);
   border-radius: 50px;;
   color: var(--on-primary) !important;
-}
 
-.highlight .custom-icon::ng-deep svg * {
-  fill: var(--on-primary);
+  .custom-icon::ng-deep svg * {
+    fill: var(--on-primary);
+  }
 }
-
 
 .custom-icon {
   z-index: 1; // Ensure to display tooltip : https://github.com/angular/components/issues/28888

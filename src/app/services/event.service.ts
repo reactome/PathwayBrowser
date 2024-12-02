@@ -366,6 +366,7 @@ export class EventService {
     if (data.hasEvent) {
       treeEvent.hasEvent = data.hasEvent.map((child: Event) => {
         const ancestors = treeEvent.ancestors || [];
+        // Remove duplicate ancestors
         if (!ancestors.some((ancestor) => ancestor.stId === treeEvent.stId)) {
           ancestors.push(treeEvent);
         }
@@ -498,7 +499,7 @@ export class EventService {
     if (colors && event.hasEvent) {
       event.hasEvent.forEach(e => {
         if (e.schemaClass === 'Pathway' && !e.hasDiagram) {
-          e.color = colors.get(e.dbId);
+          e.subpathwayColor = colors.get(e.dbId);
         }
       });
     }
@@ -631,10 +632,10 @@ export class EventService {
   collapseSiblingEvent(event: Event, matTree: MatTree<Event, string>) {
     if (!event.ancestors) return;
     // Get 1st parent
-    const eventParent = event.parent;
-    if (!eventParent) return;
+    const parentTree = event.parent;
+    if (!parentTree) return;
     // Loop through the parent's children to collapse any expanded siblings
-    eventParent.hasEvent?.forEach(childEvent => {
+    parentTree.hasEvent?.forEach(childEvent => {
       if (childEvent !== event && matTree.isExpanded(childEvent)) {
         matTree.collapse(childEvent);
         matTree.collapseDescendants(childEvent);
