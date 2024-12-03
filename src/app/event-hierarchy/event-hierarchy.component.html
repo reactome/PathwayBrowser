@@ -130,8 +130,14 @@
               </div>
               <!--Only provide this subpathway tag for the first layer, ignore the nested subpathways-->
               <div class="subpathway" *ngIf="!node.hasDiagram && node.parent.stId === this.diagramId"
-                   [style.background]="node.color" (mouseover)="onTagHover(node)"
+                   [style.background]="node.subpathwayColor" (mouseover)="onTagHover(node)"
                    (mouseleave)="onTagHoverLeave(node)">
+              </div>
+
+              <div class="analysis" *ngIf="node.hitReactionsCount"
+                   [style.background]="node.analysisColor" (mouseover)="onTagHover(node)"
+                   (mouseleave)="onTagHoverLeave(node)">
+                <span class="text" [matTooltip]="'Hit Reactions / Total Reactions'"> {{ node.hitReactionsCount }}</span>
               </div>
 
             </div>

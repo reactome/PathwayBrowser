@@ -64,10 +64,22 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
       const idToUse = id ? id : this.diagramId;
-      return this.eventService.fetchEnhancedEventData(idToUse)
+      return this.eventService.fetchEnhancedEventData(idToUse).pipe(
+        map(enhancedEvent => ({ idToUse, enhancedEvent }))
+      )
     }),
-    switchMap((enhancedEvent) => {
-      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.diagramId, this.subpathwayColors, this.tree, this.treeDataSource.data);
+    switchMap(({ idToUse, enhancedEvent }) => {
+      const token = this.analysis.result?.summary.token;
+      if (!token) {
+        return of({ idToUse, enhancedEvent, hitReactions: [] }); // Return empty hitReactions if token is missing
+      }
+      // Fetch hit reactions using token and pathway ID
+      return this.analysis.getHitReactions(this.diagramId, token).pipe(
+        map(hitReactions => ({ idToUse, enhancedEvent, hitReactions }))
+      );
+    }),
+    switchMap(({ idToUse, enhancedEvent, hitReactions }) => {
+      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.diagramId, this.subpathwayColors, this.tree, this.treeDataSource.data, this.analysis.result, hitReactions);
     }),
     untilDestroyed(this),
   ).subscribe((e) => {
@@ -152,19 +164,33 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       map(analysisResult => ({analysisResult}))
     );
 
+    // Fetch reactions based on token and pathway ID
+    const hitReactions$ = analysisResult$.pipe(
+      switchMap(({ analysisResult }) => {
+        const token = analysisResult?.summary.token;
+        if (!token) return of({ hitReactions: [] }); // Return empty if no token
+        return this.analysis.getHitReactions(this.diagramId, token).pipe(
+          tap(hit => {console.log("diagramId ", this.diagramId, "hit ", hit)}),
+          map(hitReactions => ({ hitReactions }))
+        );
+      })
+    );
+
     // Combine all data and merged into one object
     initialData$.pipe(
       switchMap(initialData =>
         enhancedEventData$.pipe(
           combineLatestWith(
             ehldAndSubpathwayColors$,
-            analysisResult$
+            analysisResult$,
+            hitReactions$
           ),
-          map(([enhancedEvent, ehldAndColors, analysisResult]) => ({
+          map(([enhancedEvent, ehldAndColors, analysisResult, hitReactions]) => ({
             ...initialData,
             ...enhancedEvent,
             ...ehldAndColors,
             ...analysisResult,
+            ...hitReactions
           }))
         )
       ),
@@ -175,11 +201,12 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
                    colors,
                    hasEHLD,
                    analysisResult,
-                 }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD, analysisResult?.pathways))
+                   hitReactions
+                 }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD, hitReactions))
     ).subscribe({
       next: () => {
         document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
-      },
+        },
       error: (err) => {
         throw new Error('Error in building the tree:', err);
       }

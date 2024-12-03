@@ -2,10 +2,12 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Event} from "../model/event.model";
-import {BehaviorSubject, concatMap, EMPTY, from, map, Observable, of, Subject, switchMap, take, tap} from "rxjs";
+import {BehaviorSubject, concatMap, EMPTY, from, last, map, Observable, of, Subject, switchMap, take, tap} from "rxjs";
 import {JSOGDeserializer} from "../utils/JSOGDeserializer";
 import {DiagramStateService} from "./diagram-state.service";
 import {MatTree} from "@angular/material/tree";
+import {Analysis} from "../model/analysis.model";
+import {AnalysisService} from "./analysis.service";
 
 
 @Injectable({
@@ -32,7 +34,10 @@ export class EventService {
   private _subpathwaysColors = new Subject<Map<number, string> | undefined>();
   subpathwaysColors$ = this._subpathwaysColors.asObservable();
 
-  constructor(private http: HttpClient, private state: DiagramStateService) {
+
+  constructor(private http: HttpClient,
+              private state: DiagramStateService,
+              private analysisService: AnalysisService) {
   }
 
   setTreeData(events: Event[]) {
@@ -108,13 +113,25 @@ export class EventService {
           // If hasDiagram is false, color is undefined. for instance: /R-HSA-9612973/R-HSA-1632852
           return of({event: enhancedResult, treeData: event, colors: undefined});
         }
-      })
-    ).subscribe(({event: enhancedResult, treeData, colors}) => {
+      }),
+      switchMap(({event, treeData, colors}) => {
+        const token = this.analysisService.result?.summary.token;
+        if (!token) {
+          return of({event, treeData, colors, hitReactions: []}); // Return empty hitReactions if token is missing
+        }
+        // Fetch hit reactions using token and pathway ID
+        return this.analysisService.getHitReactions(event.stId, token).pipe(
+          map(hitReactions => ({event, treeData, colors, hitReactions}))
+        );
+      }),
+    ).subscribe(({event: enhancedResult, treeData, colors, hitReactions}) => {
       if (colors && colors.size > 0) {
         this.setSubtreeColors(treeData, colors);
       }
       this.setCurrentEventAndObj(treeData, enhancedResult);
       this.setTreeData(this.treeData$.value);
+      this.addAnalysisTag(enhancedResult.hasEvent, this.analysisService.result);
+      this.addHitReactions(enhancedResult.hasEvent, hitReactions)
     });
   }
 
@@ -151,16 +168,16 @@ export class EventService {
    *  - Interacting pathway, rebuild the tree, clear previous selection, update currentTreeEvent(interacting pathway) and currentObj(interacting pathway), selection and expandedTree status
    *
    */
-  adjustTreeFromDiagramSelection(enhancedEvent: Event, diagramId: string, subpathwayColors: Map<number, string> | undefined, tree: MatTree<Event, string>, treeNodes: Event[]): Observable<Event[]> {
+  adjustTreeFromDiagramSelection(enhancedEvent: Event, diagramId: string, subpathwayColors: Map<number, string> | undefined, tree: MatTree<Event, string>, treeNodes: Event[], analysisResult: Analysis.Result | undefined, hitReactions:number[]): Observable<Event[]> {
     // All visible tree nodes
     const allVisibleTreeNodes = this.getAllVisibleTreeNodes(tree, treeNodes);
     if (this.isEntity(enhancedEvent)) {
       return this.handleEntitySelectionFromDiagram(enhancedEvent, diagramId, allVisibleTreeNodes, tree);
     } else if (this.isReaction(enhancedEvent)) {
-      return this.handleReactionSelectionFromDiagram(enhancedEvent, diagramId, allVisibleTreeNodes, tree, subpathwayColors);
+      return this.handleReactionSelectionFromDiagram(enhancedEvent, diagramId, allVisibleTreeNodes, tree, subpathwayColors,  hitReactions);
     } else if (this.isPathwayWithDiagram(enhancedEvent)) {
       // tree.collapseAll(); //todo: should we collapse all?
-      return this.handlePathwaySelectionFromDiagram(enhancedEvent, diagramId, allVisibleTreeNodes, tree, subpathwayColors, allVisibleTreeNodes);
+      return this.handlePathwaySelectionFromDiagram(enhancedEvent, diagramId, allVisibleTreeNodes, tree, subpathwayColors, allVisibleTreeNodes,  hitReactions);
     } else {
       return of(this.treeData$.value)
     }
@@ -181,7 +198,7 @@ export class EventService {
     }
   }
 
-  private handleReactionSelectionFromDiagram(event: Event, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined): Observable<Event[]> {
+  private handleReactionSelectionFromDiagram(event: Event, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hitReactions: number[]): Observable<Event[]> {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
       return this.handleExistingEventSelection(treeNode, tree, allVisibleTreeNodes).pipe(
@@ -191,7 +208,7 @@ export class EventService {
         })
       );
     } else {
-      return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors).pipe(
+      return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors,  hitReactions).pipe(
         map((treeData) => {
           this.setCurrentEventAndObj(event, event);
           return treeData;
@@ -201,7 +218,7 @@ export class EventService {
   }
 
   // Subpathway and interacting pathway
-  private handlePathwaySelectionFromDiagram(event: Event, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, treeNodes: Event[]): Observable<Event[]> {
+  private handlePathwaySelectionFromDiagram(event: Event, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, treeNodes: Event[],  hitReactions:number[]): Observable<Event[]> {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
       // Subpathway, already in the tree view
@@ -215,7 +232,7 @@ export class EventService {
     } else {
       // Interacting pathway, not visible in the tree view
       this.clearAllSelectedEvents(treeNodes);
-      return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors).pipe(
+      return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors, hitReactions).pipe(
         map(treeData => {
           return treeData;
         })
@@ -236,25 +253,25 @@ export class EventService {
     });
   }
 
-  buildTree(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hasEHLD: boolean | undefined): Observable<Event[]> {
+  buildTree(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hasEHLD: boolean | undefined,  hitReactions: number[]): Observable<Event[]> {
     if (this.isEntity(event)) {
-      return this.buildTreeWithSelectedEntity(event, diagramId, tree, subpathwayColors);
+      return this.buildTreeWithSelectedEntity(event, diagramId, tree, subpathwayColors, hitReactions);
     } else {
       if (hasEHLD) {
-        return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors);
+        return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, subpathwayColors, hitReactions );
       } else {
-        return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, subpathwayColors);
+        return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, subpathwayColors, hitReactions);
       }
     }
   }
 
   // Build tree with diagram event ancestors
-  private buildTreeWithSelectedEntity(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined): Observable<Event[]> {
+  private buildTreeWithSelectedEntity(event: Event, diagramId: string, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined,  hitReactions: number[]): Observable<Event[]> {
     this.setCurrentObj(event);
     return this.fetchEnhancedEventData(diagramId).pipe(
       switchMap(() => this.fetchEventAncestors(diagramId)),
       map(ancestors => this.getFinalAncestor(ancestors)),
-      switchMap(ancestors => this.buildNestedTree(this.treeData$.value, ancestors, diagramId, event.stId, subpathwayColors, tree)),
+      switchMap(ancestors => this.buildNestedTree(this.treeData$.value, ancestors, diagramId, event.stId, subpathwayColors, tree, hitReactions)),
       map((tree) => {
         this.setTreeData(tree);
         return tree
@@ -270,13 +287,13 @@ export class EventService {
    * @param isFromDiagram  Behaves differently based on the calling method, avoid the check for isPathwayWithDiagram(event) when calling it from handlePathwaySelectionFromDiagram,
    *                       we want to open the ancestors in the tree view when select an interacting pathway in diagram, but not when first load for an interacting pathway from URL.
    */
-  private buildTreeWithSelectedEvent(event: Event, diagramId: string, isFromDiagram: boolean, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined): Observable<Event[]> {
+  private buildTreeWithSelectedEvent(event: Event, diagramId: string, isFromDiagram: boolean, tree: MatTree<Event, string>, subpathwayColors: Map<number, string> | undefined, hitReactions: number[]): Observable<Event[]> {
     // When selected event is a subpathway or interacting pathway
     const idToBuild = isFromDiagram ? event.stId : (this.isPathwayWithDiagram(event) && event.stId != diagramId ? diagramId : event.stId);
     this.setCurrentObj(event);
     return this.fetchEventAncestors(idToBuild).pipe(
       map(ancestors => this.getFinalAncestor(ancestors)),
-      switchMap(ancestors => this.buildNestedTree(this.treeData$.value,ancestors, diagramId, event.stId, subpathwayColors, tree)),
+      switchMap(ancestors => this.buildNestedTree(this.treeData$.value,ancestors, diagramId, event.stId, subpathwayColors, tree,  hitReactions)),
       map((tree) => {
         this.setTreeData(tree);
         return tree
@@ -321,7 +338,7 @@ export class EventService {
    * @param subpathwayColors Maps of color keyed by dbId.
    * @param matTree An instance of the Material Tree component.
    */
-  buildNestedTree(roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, subpathwayColors: Map<number, string> | undefined, matTree: MatTree<Event, string>): Observable<Event[]> {
+  buildNestedTree(roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, subpathwayColors: Map<number, string> | undefined, matTree: MatTree<Event, string>,  hitReactions: number[]): Observable<Event[]> {
     const tree = [...roots];
     // Add tlp itself as ancestor to tlp
     tree.map(tlp => tlp.ancestors = [tlp])
@@ -342,7 +359,12 @@ export class EventService {
           })
         );
       }),
-      map(() => tree)
+      last(), // Wait until all ancestors are processed, then update display names
+      map(() => {
+        this.addAnalysisTag(tree, this.analysisService.result); // Add analysis result
+        this.addHitReactions(tree, hitReactions);
+        return tree;
+      }),
     );
   }
 
@@ -407,26 +429,10 @@ export class EventService {
     const pathwaysData = analysisResult.pathways;
     tree.forEach(node => {
       const pathwayData = pathwaysData.find(a => a.stId === node.stId);
-
       if (!pathwayData) return;
-
-      const fdrExponentNum = pathwayData.entities.fdr != 0 ? pathwayData.entities.fdr.toExponential(2).replace('e', 'E') : '0E0';
-      const analysisContent = "(" + pathwayData.entities.found + "/" + pathwayData.entities.total + ") FDR: " + pathwayData.entities.fdr.toExponential(2).replace('e', 'E');
-      const expressionColors = this.getExpressionColor(pathwayData, analysisResult);
-
-      const [coefficient, exponent] = pathwayData.entities.fdr.toExponential(2).split('e');
-      console.log("pathway" , [coefficient, exponent])
-      const exponentNumber = parseInt(exponent, 10);
-      const fdr  = `${coefficient} × 10<sup>${exponentNumber}</sup>`; //Output: "9.00 × 10⁻⁶"
-
-
-     // node.analysisInfo = this.toReadableScientificNotation(pathwayData.entities.fdr);
-      node.analysisContent = analysisContent;
-      node.analysisInfo =  `${pathwayData.reactions.found} / ${pathwayData.reactions.total}`;
-      // node.analysisInfo =  fdr //expression value
-
-     // node.analysisColor = expressionColors[0].color;
-      //node.analysisColor = this.analysisService.palette.scale(fdrValue).hex();
+      // const analysisContent = "Hit Reactions / Total Reactions";
+      // node.analysisContent = analysisContent;
+      node.hitReactionsCount = `${pathwayData.reactions.found} / ${pathwayData.reactions.total}`;
 
       if (node.hasEvent && node.hasEvent.length > 0) {
         this.addAnalysisTag(node.hasEvent, analysisResult);
@@ -444,41 +450,6 @@ export class EventService {
       }
     });
   }
-
-  getExpressionColor(pathwayData: Analysis.Pathway, analysisResult: Analysis.Result) {
-    const analysisProfile = this.state.get('analysisProfile');
-    let analysisIndex = analysisProfile ? analysisResult.expression.columnNames.indexOf(analysisProfile) : 0;
-    if (analysisIndex === -1) analysisIndex = 0;
-    const exps: [number | undefined, number][] = pathwayData
-      ? [
-        [pathwayData.entities.exp[analysisIndex] || 1 - pathwayData.entities.pValue, pathwayData.entities.found],
-        [undefined, pathwayData.entities.total - pathwayData.entities.found],
-      ]
-      : [[undefined, 1]];
-
-    const stops: { start: number, stop: number, color: string, exp: number | undefined, width: number }[] = [];
-    const size = exps.reduce((l: number, e) => e !== undefined && isArray(e) ? l + e[1] : l + 1, 0);
-    const delta = 1 / size;
-    exps.forEach((exp, i) => {
-      const p = stops.length - 1;
-      const realExp = isArray(exp) ? exp[0] : exp;
-      if (stops.length !== 0 && stops[p].exp === realExp) {
-        stops[p].stop += delta;
-        stops[p].width += delta;
-      } else {
-        stops.push({
-          start: stops[p]?.stop || 0,
-          stop: (stops[p]?.stop || 0) + delta * exp[1],
-          width: delta * exp[1],
-          color: this.analysisService.palette.scale(realExp).hex(),
-          exp: realExp
-        })
-      }
-    })
-    return stops;
-  }
-
-
 
 
   findTreeEvent(events: Event[], targetId: string): Event | null {
