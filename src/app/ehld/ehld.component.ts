@@ -27,14 +27,12 @@ export class EhldComponent implements AfterViewInit {
   @Input('id') diagramId: string = '';
 
   style!: Style;
-
   ratio = 0.384;
 
-  hasEHLD: boolean | undefined = undefined;
   svgContent: string = '';
-  selectedElement: SVGGElement | undefined = undefined;
-  selectedIdFromUrl = '';
-  flaggedIdFromUrl: string[] = [];
+  selectedElement?: SVGGElement;
+  selectedIdFromUrl?: string;
+  flaggedIdFromUrl?: string[];
   flaggedElements: (SVGGElement | undefined)[] = [];
   stIdToSVGGElement: Map<string, SVGGElement> = new Map<string, SVGGElement>();
   //dbIdToSVGGElement: Map<number, SVGGElement> = new Map<number, SVGGElement>();
@@ -66,8 +64,7 @@ export class EhldComponent implements AfterViewInit {
     this.legendItems = this.ehldService.legendItems;
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
-      this.hasEHLD = hasEHLD;
-      if (this.diagramId && this.hasEHLD) {
+      if (this.diagramId && hasEHLD) {
         this.loadEhldSvg().subscribe({
           next: () => {
             this.initializePanAndZoom();
@@ -125,6 +122,7 @@ export class EhldComponent implements AfterViewInit {
   }
 
   private setInitialSelection() {
+    if (!this.selectedIdFromUrl) return;
     this.selectedElement = this.stIdToSVGGElement.get(this.selectedIdFromUrl)
     if (this.selectedElement) {
       this.ehldService.applyOutline(this.selectedElement, this.flaggedElements);
@@ -132,6 +130,7 @@ export class EhldComponent implements AfterViewInit {
   }
 
   private setInitialFlag() {
+    if (!this.flaggedIdFromUrl) return;
     this.flaggedElements = this.flaggedIdFromUrl
       .map(e => this.stIdToSVGGElement.get(e))
       .filter(e => e !== undefined);
