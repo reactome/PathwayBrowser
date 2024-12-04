@@ -83,6 +83,20 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     document.querySelector(`[st-id='${this.selectedIdFromUrl}']`)?.scrollIntoView({behavior: 'smooth'});
   });
 
+
+  analysing = this.state.onChange.analysis$.pipe(
+    switchMap(result => {
+      const token = this.analysis.result?.summary.token;
+      if (!token) return of({hitReactions: []});
+      return this.analysis.getHitReactions(this.diagramId, token).pipe(
+        map(hitReactions => ({hitReactions}))
+      );
+    })
+  ).subscribe(({hitReactions}) => {
+    this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result);
+    this.eventService.addHitReactions(this.selectedTreeEvent?.hasEvent, hitReactions);
+  });
+
   ngAfterViewInit(): void {
 
     setTimeout(() => {
