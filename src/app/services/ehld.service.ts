@@ -1,5 +1,5 @@
 import {ElementRef, Injectable} from '@angular/core';
-import {BehaviorSubject, catchError, forkJoin, map, Observable, of} from "rxjs";
+import {BehaviorSubject, catchError, forkJoin, map, Observable, of, tap} from "rxjs";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Graph} from "../model/graph.model";
@@ -28,6 +28,7 @@ export class EhldService {
 
   private _hasEHLD = new BehaviorSubject<boolean | undefined>(undefined);
   hasEHLD$ = this._hasEHLD.asObservable();
+  hasEHLD? : boolean
 
   overlay = "OVERLAY-";
   analysisInfoId = "ANALINFO";
@@ -61,9 +62,10 @@ export class EhldService {
     this._hasEHLD.next(value);
   }
 
-  hasEHLD(diagramId: string): Observable<boolean> {
+  getHasEhldData(diagramId: string): Observable<boolean> {
     let url = `${this._HAS_EHLD}${diagramId}/hasEHLD`;
     return this.http.get<boolean>(url).pipe(
+      tap(result => this.hasEHLD = result),
       catchError(() => of(false))
     );
   }

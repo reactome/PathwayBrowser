@@ -71,7 +71,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     switchMap(({ idToUse, enhancedEvent }) => {
       const token = this.analysis.result?.summary.token;
       if (!token) {
-        return of({ idToUse, enhancedEvent, hitReactions: [] }); // Return empty hitReactions if token is missing
+        return of({ idToUse, enhancedEvent, hitReactions: [] }); // Return empty hitReactions if there is no token
       }
       // Fetch hit reactions using token and pathway ID
       return this.analysis.getHitReactions(this.diagramId, token).pipe(
@@ -79,7 +79,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       );
     }),
     switchMap(({ idToUse, enhancedEvent, hitReactions }) => {
-      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.diagramId, this.subpathwayColors, this.tree, this.treeDataSource.data, this.analysis.result, hitReactions);
+      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.diagramId, this.tree, hitReactions);
     }),
     untilDestroyed(this),
   ).subscribe((e) => {
@@ -126,11 +126,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       this.adjustWidths();
     });
 
-    this.eventService.subpathwaysColors$.pipe(
-      untilDestroyed(this),
-      filter(colors => colors !== undefined)).subscribe(colors => {
-        this.subpathwayColors = colors;
-      })
   }
 
   buildInitialTreeWithTlps(taxId: string): void {
@@ -202,7 +197,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
                    hasEHLD,
                    analysisResult,
                    hitReactions
-                 }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD, hitReactions))
+                 }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, hitReactions))
     ).subscribe({
       next: () => {
         document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});

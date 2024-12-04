@@ -76,7 +76,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   }
 
   private checkHasEHLD(): void {
-    this.ehldService.hasEHLD(this.diagramId).subscribe({
+    this.ehldService.getHasEhldData(this.diagramId).subscribe({
         next: (hasEHLD: boolean) => {
           this.hasEHLD = hasEHLD;
           this.ehldService.setHasEHLD(this.hasEHLD);
