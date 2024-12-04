@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import {BehaviorSubject, map, Observable, tap} from "rxjs";
+import {BehaviorSubject, map, Observable, of, tap} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
 import {Event} from "../model/event.model";
@@ -98,7 +98,9 @@ export class SpeciesService {
   }
 
 
-  getOrthologyEventStId(species: Species, selectedId: number, ancestors: Event[], ids: string[]): Observable<string> {
+  getOrthologyEventStId(species: Species, selectedId: number | undefined, ancestors: Event[], ids: string[]): Observable<string> {
+
+    if (!selectedId) return of('');
     // Only need to post all ids from URL, however the API call requires dbId as content, that's why ancestors is here
     const idsToPost: number[] = [];
     ancestors.forEach(a => {
