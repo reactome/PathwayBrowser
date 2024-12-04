@@ -40,12 +40,9 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   breadcrumbs: Event[] = [];
   scrollTimeout: undefined | ReturnType<typeof setTimeout>;
-  selectedIdFromUrl = '';
-  selectedTreeEvent!: Event;
-  selectedObj!: Event;
-  subpathwayColors: Map<number, string> | undefined = undefined;
-  ancestors: Event[] = [];
-
+  selectedIdFromUrl? :string;
+  selectedTreeEvent?: Event;
+  selectedObj?: Event;
 
 
   constructor(protected eventService: EventService,
