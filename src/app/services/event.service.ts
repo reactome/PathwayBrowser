@@ -2,7 +2,21 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Event} from "../model/event.model";
-import {BehaviorSubject, concatMap, EMPTY, from, last, map, Observable, of, Subject, switchMap, take, tap} from "rxjs";
+import {
+  BehaviorSubject,
+  concatMap,
+  EMPTY,
+  from,
+  last,
+  map,
+  Observable,
+  of,
+  skip,
+  Subject,
+  switchMap,
+  take,
+  tap
+} from "rxjs";
 import {JSOGDeserializer} from "../utils/JSOGDeserializer";
 import {DiagramStateService} from "./diagram-state.service";
 import {MatTree} from "@angular/material/tree";
@@ -37,6 +51,9 @@ export class EventService {
 
   subpathwayColors?: Map<number, string>;
 
+  private _diagramEvent = new BehaviorSubject<Event | null>(null);
+  diagramEvent$ = this._diagramEvent.asObservable().pipe();
+  diagramEvent?: Event;
 
   constructor(private http: HttpClient,
               private state: DiagramStateService,
@@ -70,6 +87,10 @@ export class EventService {
     this._subpathwaysColors.next(colorMap);
   }
 
+  setDiagramEvent(event: Event) {
+    this.diagramEvent = event;
+    this._diagramEvent.next(event);
+  }
 
   fetchTlpsBySpecies(taxId: string): Observable<Event[]> {
     let url = `${this._TOP_LEVEL_PATHWAYS}${taxId}`;
@@ -357,6 +378,12 @@ export class EventService {
         const targetTreeEvent = this.findTreeEvent(treeEventResources, ancestor.stId);
 
         if (!targetTreeEvent) return EMPTY;
+
+        // Use existing diagramEvent data if stId matches
+        if (this.diagramEvent?.stId === ancestor.stId) {
+          this.processHasEventData(this.diagramEvent, targetTreeEvent, selectedIdFromUrl, diagramId, this.subpathwayColors, matTree, index, ancestors.length);
+          return of(null); // Skip the API call and continue to the next ancestor
+        }
 
         return this.fetchEnhancedEventData(ancestor.stId).pipe(
           tap(data => {

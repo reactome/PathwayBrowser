@@ -14,8 +14,7 @@ import {Analysis} from "../model/analysis.model";
 @UntilDestroy()
 export class DetailsComponent implements AfterViewInit {
 
-  obj!: Event;
-
+  obj?: Event;
   analysisResult?: Analysis.Result;
 
   constructor(private eventService: EventService, private state: DiagramStateService, private analysis: AnalysisService) {

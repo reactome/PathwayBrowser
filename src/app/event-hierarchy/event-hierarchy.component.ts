@@ -144,7 +144,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     // Fetch and prepare initial data
     const initialData$ = this.eventService.fetchTlpsBySpecies(taxId).pipe(
       tap(allTLPs => this.eventService.setTreeData(allTLPs)), // Set initial tree data
-      map(treeData => ({treeData})) // Wrap in an object for accumulation
+      map(initialTreeData => ({initialTreeData})) // Wrap in an object for accumulation
     );
 
     // Fetch enhanced event data
@@ -157,7 +157,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       take(1),
       switchMap(hasEHLD => hasEHLD
         ? of({hasEHLD, colors: undefined}) // If EHLD exists, no colors needed
-        : this.eventService.subpathwaysColors$.pipe(
+        : this.eventService.subpathwayColors$.pipe(
           take(1),
           map(colors => ({hasEHLD, colors}))
         )
@@ -176,7 +176,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         const token = analysisResult?.summary.token;
         if (!token) return of({ hitReactions: [] }); // Return empty if no token
         return this.analysis.getHitReactions(this.diagramId, token).pipe(
-          tap(hit => {console.log("diagramId ", this.diagramId, "hit ", hit)}),
           map(hitReactions => ({ hitReactions }))
         );
       })
@@ -201,9 +200,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         )
       ),
       // Build the tree with all data
-      switchMap(({
-                   enhancedEvent,
-                   treeData,
+      switchMap(({enhancedEvent,
+                   initialTreeData,
                    colors,
                    hasEHLD,
                    analysisResult,
