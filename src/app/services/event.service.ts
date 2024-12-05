@@ -46,9 +46,8 @@ export class EventService {
   private _breadcrumbsSubject = new Subject<Event[]>();
   breadcrumbs$ = this._breadcrumbsSubject.asObservable();
 
-  private _subpathwaysColors = new Subject<Map<number, string> | undefined>();
-  subpathwaysColors$ = this._subpathwaysColors.asObservable();
-
+  private _subpathwayColors = new BehaviorSubject<Map<number, string> | undefined>(undefined);
+  subpathwayColors$ = this._subpathwayColors.asObservable();
   subpathwayColors?: Map<number, string>;
 
   private _diagramEvent = new BehaviorSubject<Event | null>(null);
@@ -82,9 +81,9 @@ export class EventService {
     this._breadcrumbsSubject.next(events);
   }
 
-  setSubpathwaysColors(colorMap: Map<number, string> | undefined) {
+  setSubpathwayColors(colorMap: Map<number, string> | undefined) {
     this.subpathwayColors = colorMap;
-    this._subpathwaysColors.next(colorMap);
+    this._subpathwayColors.next(colorMap);
   }
 
   setDiagramEvent(event: Event) {
@@ -131,7 +130,8 @@ export class EventService {
       switchMap(enhancedResult => {
         // If hasDiagram is true, wait for the latest color map from subpathwaysColors$
         if (enhancedResult.hasDiagram && !enhancedResult.hasEHLD) {
-          return this.subpathwaysColors$.pipe(
+          return this.subpathwayColors$.pipe(
+            skip(1), // Skip initial undefined
             take(1),
             map(colors => ({event: enhancedResult, treeData: event, colors}))
           );
