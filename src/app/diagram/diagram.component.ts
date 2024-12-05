@@ -183,7 +183,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     return this.event.fetchEventAncestors(this.diagramId).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
-        const pathwayWithDiagram = [...ancestors].find(p => p.hasDiagram);
+        const pathwayWithDiagram = [...ancestors].reverse().find(p => p.hasDiagram);
         if (pathwayWithDiagram) {
           const newDiagramId = pathwayWithDiagram.stId;
           if (newDiagramId !== this.diagramId) {
