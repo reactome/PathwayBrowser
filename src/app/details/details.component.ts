@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ViewEncapsulation} from '@angular/core';
 import {EventService} from "../services/event.service";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {Event} from "../model/event.model";
@@ -9,7 +9,9 @@ import {Analysis} from "../model/analysis.model";
 @Component({
   selector: 'cr-details',
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  styleUrls: ['./details.component.scss'],
+  // Make sure the component styles are exposed to be customizable.
+  //encapsulation: ViewEncapsulation.None
 })
 @UntilDestroy()
 export class DetailsComponent implements AfterViewInit {
@@ -17,10 +19,14 @@ export class DetailsComponent implements AfterViewInit {
   obj?: Event;
   analysisResult?: Analysis.Result;
 
-  constructor(private eventService: EventService, private state: DiagramStateService, private analysis: AnalysisService) {
+  constructor(private eventService: EventService,
+              private state: DiagramStateService,
+              private analysis: AnalysisService,
+           ) {
   }
 
   ngAfterViewInit(): void {
+
     this.eventService.selectedObj$.pipe(untilDestroyed(this)).subscribe(event => {
       this.obj = event;
     });

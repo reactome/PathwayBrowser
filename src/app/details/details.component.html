@@ -1,10 +1,85 @@
-<div *ngIf="obj" id="detail-container">
-  <p> dbId : {{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
+<div *ngIf="obj" id="details-container">
 
-  <p>Enhanced data testing： summation data</p>
-  <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
+  <mat-tab-group class="group-tab">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="label-content">
+        <mat-icon class="tab-icon" svgIcon="details-tab"></mat-icon>
+        <span class="label-text">Details</span>
+        </div>
+      </ng-template>
+      <ng-template matTabContent>
+        <p> dbId : {{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
 
-  <p>Enhanced data testing： created data</p>
-  <p *ngIf="obj.created"> {{ obj.created.displayName }}</p>
-  <p *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
+        <p>Enhanced data testing： summation data</p>
+        <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
+
+        <p>Enhanced data testing： created data</p>
+        <p *ngIf="obj.created"> {{ obj.created.displayName }}</p>
+        <p *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
+
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="label-content">
+        <mat-icon class="tab-icon" svgIcon="molecule-tab"></mat-icon>
+        <span class="label-text">Molecule</span>
+        </div>
+      </ng-template>
+      <ng-template matTabContent>
+        Molecule Content
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="label-content">
+        <mat-icon class="tab-icon" svgIcon="results-tab"></mat-icon>
+        <span class="label-text">Results</span>
+        </div>
+      </ng-template>
+      <ng-template matTabContent>
+        Analysis Result Content
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="label-content">
+        <mat-icon class="tab-icon" svgIcon="expression-tab"></mat-icon>
+        <span class="label-text">Expression</span>
+        </div>
+      </ng-template>
+      <ng-template matTabContent>
+        Expression Content
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="label-content">
+        <mat-icon class="tab-icon" svgIcon="info-tab"></mat-icon>
+        <span class="label-text">Info</span>
+        </div>
+      </ng-template>
+      <ng-template matTabContent>
+        Info Content
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="label-content">
+        <mat-icon class="tab-icon" svgIcon="download-tab"></mat-icon>
+        <span class="label-text">Download</span>
+        </div>
+      </ng-template>
+      <ng-template matTabContent>
+       Download Content
+      </ng-template>
+    </mat-tab>
+
+  </mat-tab-group>
 </div>

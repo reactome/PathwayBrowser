@@ -1,3 +1,94 @@
-#detail-container {
-  color: var(--on-surface)
+@use '@angular/material' as mat;
+
+#details-container {
+  color: var(--on-surface);
+
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+
+  .group-tab {
+    height: 100%;
+  }
+
 }
+
+/* Tab height */
+:host ::ng-deep .mat-mdc-tab-header {
+  height: 30px;
+
+  .mat-mdc-tab-labels {
+    height: 100%;
+  }
+
+  /* Style for the divider */
+  .mat-mdc-tab-label-container {
+    border-bottom: 1px solid var(--outline);
+  }
+}
+
+
+/* Tab Contents */
+.label-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 4px 0;
+  gap: 8px;
+
+
+  .tab-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .label-text {
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.1px;
+    color: var(--on-surface-variant);
+    font-family: 'Roboto Flex', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+}
+
+
+/* Style for active tabs */
+::ng-deep .mdc-tab--active {
+
+  // active-indicator-color
+  //color: var(--primary);
+
+  .label-text {
+    color: var(--primary) !important;
+  }
+
+  .tab-icon {
+    svg * {
+      fill: var(--primary);
+    }
+  }
+}
+
+/* Style for active indicator */
+::ng-deep .mat-mdc-tab .mdc-tab-indicator__content {
+  border: 1px solid var(--primary) !important;
+}
+
+
+//.custom-tabs {
+//  @include mat.tabs-overrides((
+//    active-indicator-color: var(--primary),
+//    active-label-text-color:var(--primary),
+//    divider-color: var(--outline),
+//    divider-height: 1px,
+//  ));
+//}
+
+
