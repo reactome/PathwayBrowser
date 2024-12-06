@@ -14,7 +14,7 @@ import {Analysis} from "../model/analysis.model";
   encapsulation: ViewEncapsulation.None
 })
 @UntilDestroy()
-export class DetailsComponent implements AfterViewInit {
+export class DetailsPanelComponent implements AfterViewInit {
 
   obj?: Event;
   analysisResult?: Analysis.Result;

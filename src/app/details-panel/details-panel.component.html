@@ -9,14 +9,8 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-        <p> dbId : {{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
 
-        <p>Enhanced data testing： summation data</p>
-        <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
-
-        <p>Enhanced data testing： created data</p>
-        <p *ngIf="obj.created"> {{ obj.created.displayName }}</p>
-        <p *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
+       <cr-details [event]="obj" [analysisResult]="analysisResult"></cr-details>
 
       </ng-template>
     </mat-tab>

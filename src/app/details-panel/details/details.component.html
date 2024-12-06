@@ -1,0 +1,11 @@
+<div *ngIf="event">
+  <p> dbId : {{ event.dbId }} {{ event.displayName }}  {{ event.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
+
+  <p>Enhanced data testing： summation data</p>
+  <p *ngIf="event.summation"> {{ event.summation[0].displayName }}</p>
+
+  <p>Enhanced data testing： created data</p>
+  <p *ngIf="event.created"> {{ event.created.displayName }}</p>
+  <p *ngIf="event.created"> {{ event.created.dateTime }}</p>
+</div>
+
