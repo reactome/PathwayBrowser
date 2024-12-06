@@ -10,7 +10,7 @@ import {MatIconRegistry} from "@angular/material/icon";
 export class AppComponent {
   title = 'PathwayBrowser'
 
-  icons = [
+  leftPanelIcons = [
     {name: 'species', route: 'species-icon'},
     {name: 'overlay', route: 'overlay-icon'},
     {name: 'arrow-down', route: 'arrow-down'},
@@ -41,18 +41,32 @@ export class AppComponent {
     {name: '8364', route: 'xenopus-tropicalis'}
   ]
 
+  detailsPanelIcons = [
+    {name: 'details-tab', route: 'details-tab'},
+    {name: 'molecule-tab', route: 'molecule-tab'},
+    {name: 'results-tab', route: 'results-tab'},
+    {name: 'expression-tab', route: 'expression-tab'},
+    {name: 'info-tab', route: 'info-tab'},
+    {name: 'download-tab', route: 'download-tab'},
+  ];
+
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
     this.loadIcons();
   }
 
   loadIcons(): void {
-    this.icons.forEach(icon => {
-      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/${icon.route}.svg`));
+    this.leftPanelIcons.forEach(icon => {
+      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/left-panel/${icon.route}.svg`));
     });
 
     this.species.forEach(icon => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/species/${icon.route}.svg`));
     });
+
+    this.detailsPanelIcons.forEach(icon => {
+      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/details-panel/${icon.route}.svg`));
+    });
+
   }
 
 }
