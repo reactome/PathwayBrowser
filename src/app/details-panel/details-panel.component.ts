@@ -7,11 +7,11 @@ import {AnalysisService} from "../services/analysis.service";
 import {Analysis} from "../model/analysis.model";
 
 @Component({
-  selector: 'cr-details',
-  templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss'],
-  // Make sure the component styles are exposed to be customizable.
-  //encapsulation: ViewEncapsulation.None
+  selector: 'cr-details-panel',
+  templateUrl: './details-panel.component.html',
+  styleUrls: ['./details-panel.component.scss'],
+  // Disabled the view encapsulation strategy by setting ViewEncapsulation.None to make sure that the component styles are exposed to be customizable.
+  encapsulation: ViewEncapsulation.None
 })
 @UntilDestroy()
 export class DetailsComponent implements AfterViewInit {
