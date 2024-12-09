@@ -147,10 +147,20 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       map(initialTreeData => ({initialTreeData})) // Wrap in an object for accumulation
     );
 
-    // Fetch enhanced event data
-    const enhancedEventData$ = this.eventService.fetchEnhancedEventData(idToUse).pipe(
-      map(enhancedEvent => ({enhancedEvent}))
-    );
+    // Conditionally fetch or reuse enhanced event data
+    const enhancedEventData$ = this.eventService.diagramEvent$.pipe(
+     // filter( event => event !== null),
+      take(1),
+      switchMap(diagramEvent => {
+        if (diagramEvent && diagramEvent.stId === idToUse) {
+          return of({enhancedEvent: diagramEvent});
+        } else {
+          return this.eventService.fetchEnhancedEventData(idToUse).pipe(
+            map(enhancedEvent => ({enhancedEvent}))
+          )
+        }
+      })
+    )
 
     // Fetch EHLD and color data
     const ehldAndSubpathwayColors$ = this.ehldService.hasEHLD$.pipe(

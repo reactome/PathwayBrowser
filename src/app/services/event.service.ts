@@ -297,7 +297,7 @@ export class EventService {
     return this.fetchEnhancedEventData(diagramId).pipe(
       switchMap(() => this.fetchEventAncestors(diagramId)),
       map(ancestors => this.getFinalAncestor(ancestors)),
-      switchMap(ancestors => this.buildNestedTree(this.treeData$.value, ancestors, diagramId, event.stId, tree, hitReactions)),
+      switchMap(ancestors => this.buildNestedTree(event, this.treeData$.value, ancestors, diagramId, event.stId, tree, hitReactions)),
       map((tree) => {
         this.setTreeData(tree);
         return tree
@@ -319,7 +319,7 @@ export class EventService {
     this.setCurrentObj(event);
     return this.fetchEventAncestors(idToBuild).pipe(
       map(ancestors => this.getFinalAncestor(ancestors)),
-      switchMap(ancestors => this.buildNestedTree(this.treeData$.value, ancestors, diagramId, event.stId, tree, hitReactions)),
+      switchMap(ancestors => this.buildNestedTree(event, this.treeData$.value, ancestors, diagramId, event.stId, tree, hitReactions)),
       map((tree) => {
         this.setTreeData(tree);
         return tree
@@ -364,7 +364,7 @@ export class EventService {
    * @param subpathwayColors Maps of color keyed by dbId.
    * @param matTree An instance of the Material Tree component.
    */
-  buildNestedTree(roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, matTree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
+  buildNestedTree(event: Event, roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, matTree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     const tree = [...roots];
     // Add tlp itself as ancestor to tlp
     tree.map(tlp => tlp.ancestors = [tlp])
@@ -382,6 +382,12 @@ export class EventService {
         // Use existing diagramEvent data if stId matches
         if (this.diagramEvent?.stId === ancestor.stId) {
           this.processHasEventData(this.diagramEvent, targetTreeEvent, selectedIdFromUrl, diagramId, this.subpathwayColors, matTree, index, ancestors.length);
+          return of(null); // Skip the API call and continue to the next ancestor
+        }
+
+        // Use existing selectedEvent data if stId matches
+        if (event.stId === ancestor.stId) {
+          this.processHasEventData(event, targetTreeEvent, selectedIdFromUrl, diagramId, this.subpathwayColors, matTree, index, ancestors.length);
           return of(null); // Skip the API call and continue to the next ancestor
         }
 
