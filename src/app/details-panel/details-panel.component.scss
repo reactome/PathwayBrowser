@@ -77,6 +77,10 @@
   .tab-icon {
     width: 20px;
     height: 20px;
+
+    svg * {
+      fill: var(--on-surface);
+    }
   }
 
   .label-text {
@@ -89,19 +93,6 @@
     font-size: 14px;
     line-height: 20px;
     text-align: center;
-  }
-
-}
-
-.dark .group-tab {
-  .label-text {
-    color: var(--on-surface);
-  }
-
-  .tab-icon {
-    svg * {
-      fill: var(--on-surface);
-    }
   }
 
 }
