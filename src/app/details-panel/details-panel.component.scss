@@ -9,34 +9,49 @@
 .group-tab {
   height: 100%;
 
+  .mat-mdc-tab-body-wrapper {
+    height: 100%;
+  }
+
   /* Tab header height */
   & .mat-mdc-tab-header {
     height: 30px;
 
     & .mat-mdc-tab-list {
-      height: 30px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 0px 20px;
+      gap: 20px;
+
     }
 
     & .mat-mdc-tab-labels {
+      align-items: center;
+      border-bottom: 1px solid var(--outline); // Style for the tab divider
+      height: 28px;
+    }
+
+    & .mat-mdc-tab-labels .mat-mdc-tab {
       height: 100%;
     }
   }
 
-  /* Style for the tab divider */
+  /* Remove default tab divider */
   .mat-mdc-tab-label-container {
-    border-bottom: 1px solid var(--outline);
+    border-bottom: none;
   }
 
   /* Style for active tabs */
   .mdc-tab--active {
 
     .label-text {
-      color: var(--primary) ;
+      color: var(--primary);
     }
 
     .tab-icon {
       svg * {
-        fill: var(--primary);
+        fill: var(--primary) !important;
       }
     }
 
@@ -78,3 +93,15 @@
 
 }
 
+.dark .group-tab {
+  .label-text {
+    color: var(--on-surface);
+  }
+
+  .tab-icon {
+    svg * {
+      fill: var(--on-surface);
+    }
+  }
+
+}
