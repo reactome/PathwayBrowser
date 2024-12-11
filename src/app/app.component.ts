@@ -48,6 +48,7 @@ export class AppComponent {
     {name: 'expression-tab', route: 'expression-tab'},
     {name: 'info-tab', route: 'info-tab'},
     {name: 'download-tab', route: 'download-tab'},
+    {name: 'double-arrow-right', route: 'double-arrow-right'},
   ];
 
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {

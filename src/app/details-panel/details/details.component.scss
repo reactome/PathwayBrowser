@@ -1,0 +1,142 @@
+$small-breakpoint-width: 959px;
+
+.details {
+
+  display: flex;
+  align-items: flex-start;
+  overflow: visible;
+  height: 100%;
+  width: 100%;
+  background: var(--surface);
+  font-family: 'Roboto Flex', sans-serif;
+
+  --padding: 20px;
+
+
+  // Switch to vertical direction on small screens
+  @media (max-width: $small-breakpoint-width) {
+    flex-direction: column;
+  }
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 85%;
+  height: 100%;
+  margin-left: var(--padding);
+
+  //background: #0C9509;
+
+  @media (max-width: $small-breakpoint-width) {
+    width: calc(100% - 2 * var(--padding));
+  }
+
+}
+
+/* Header */
+.header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0px;
+  gap: 7px;
+  width: 100%;
+  height: 48px;
+  border-bottom: 2px solid var(--primary);
+  flex-shrink: 0;
+
+
+  .label{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 10px;
+
+    & .name{
+      font-style: normal;
+      font-weight: 450;
+      font-size: 18px;
+      line-height: 32px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: var(--on-surface);
+    }
+
+  }
+
+  .details-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0px;
+    gap: 5px;
+    height: 40px;
+    //background: #145b99;
+
+
+    .details-label{
+      width: 80px;
+      height: 20px;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      letter-spacing: 0.1px;
+      color: var(--primary);
+
+    }
+  }
+
+}
+
+
+/* TOC */
+.toc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 5px 0px;
+  gap: 8px;
+  width: 15%;
+  height: 100%;
+  margin-right: var(--padding);
+
+  border: 1px solid var(--primary);
+
+
+  // Reposition on top of content on small screens and remove
+  @media (max-width: $small-breakpoint-width) {
+    position: relative;
+    visibility: hidden;
+  }
+
+}
+
+.custom-icon {
+  width: 24px;
+  height: 24px;
+
+  &::ng-deep svg * {
+    fill: var(--on-surface);
+  }
+}
+
+.double-arrow{
+  width: 18px;
+  height: 18px;
+
+  &::ng-deep svg * {
+    fill: var(--primary);
+  }
+}

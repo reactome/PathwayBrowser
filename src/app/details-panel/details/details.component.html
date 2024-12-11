@@ -1,11 +1,37 @@
-<div *ngIf="event">
-  <p> dbId : {{ event.dbId }} {{ event.displayName }}  {{ event.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
+<div *ngIf="event" class="details">
 
-  <p>Enhanced data testing： summation data</p>
-  <p *ngIf="event.summation"> {{ event.summation[0].displayName }}</p>
+  <div class="content">
+    <div class="header">
+      <div class="label">
+        <mat-icon class='custom-icon'
+                  [matTooltip]="iconMap[event.schemaClass]?.tooltip || 'Unknown Event'"
+                  [svgIcon]="iconMap[event.schemaClass]?.icon || 'pathway'">
+        </mat-icon>
+        <span class="name">{{ event.displayName }}</span>
+      </div>
+      <div class="details-button">
+        <button mat-button (click)="OpenDetailsPage(event.stId)">
+          <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
+          <span class="details-label"> Details page</span>
+        </button>
+      </div>
+    </div>
+    <div class="overview"></div>
 
-  <p>Enhanced data testing： created data</p>
-  <p *ngIf="event.created"> {{ event.created.displayName }}</p>
-  <p *ngIf="event.created"> {{ event.created.dateTime }}</p>
+    <p> dbId : {{ event.dbId }}  {{ event.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
+
+    <p>Enhanced data testing： summation data</p>
+    <p *ngIf="event.summation"> {{ event.summation[0].displayName }}</p>
+
+    <p>Enhanced data testing： created data</p>
+    <p *ngIf="event.created"> {{ event.created.displayName }}</p>
+    <p *ngIf="event.created"> {{ event.created.dateTime }}</p>
+  </div>
+
+  <div class="toc">
+    <span>TOC placeholder</span>
+    <span>External Reference</span>
+
+  </div>
 </div>
 
