@@ -29,7 +29,7 @@ export class DetailsComponent {
 
 
   OpenDetailsPage(stId: string) {
-    const url = `${environment}/content/detail/${stId}`;
+    const url = `${environment.host}/content/detail/${stId}`;
     window.open(url, '_blank');
   }
 }
