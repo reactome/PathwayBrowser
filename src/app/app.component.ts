@@ -49,6 +49,12 @@ export class AppComponent {
     {name: 'info-tab', route: 'info-tab'},
     {name: 'download-tab', route: 'download-tab'},
     {name: 'double-arrow-right', route: 'double-arrow-right'},
+    {name: 'protein', route: 'protein'},
+    {name: 'complex', route: 'complex'},
+    {name: 'small-molecule', route: 'small-molecule'},
+    {name: 'defined-set', route: 'defined-set'},
+    {name: 'other-entity', route: 'other-entity'},
+    {name: 'polymer', route: 'polymer'},
   ];
 
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {

@@ -16,9 +16,15 @@ export class DetailsComponent {
 
 
   iconMap: { [key: string]: { icon: string, tooltip: string } } = {
-    Pathway: { icon: 'pathway', tooltip: 'Reaction' },
+    Pathway: { icon: 'pathway', tooltip: 'Pathway' },
     Reaction: { icon: 'reaction', tooltip: 'Reaction' },
-    BlackBoxEvent: { icon: 'transition', tooltip: 'Black Box Event' }
+    BlackBoxEvent: { icon: 'transition', tooltip: 'Black Box Event' },
+    EntityWithAccessionedSequence: { icon: 'protein', tooltip: 'Protein' },
+    Complex: { icon: 'complex', tooltip: 'Complex' },
+    SimpleEntity:{icon:'small-molecule', tooltip:'Simple Entity'},
+    DefinedSet:{icon:'defined-set', tooltip:'Defined Set'},
+    OtherEntity:{icon:'other-entity', tooltip:'Other Entity'},
+    Polymer:{icon:'polymer', tooltip:'Polymer'},
   };
 
 
