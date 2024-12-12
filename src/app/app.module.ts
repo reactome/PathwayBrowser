@@ -43,6 +43,8 @@ import {DiagramHomeComponent} from './diagram-home/diagram-home.component';
 import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details-panel/details/details.component";
+import {OverviewBaseComponent} from "./details-panel/overview-base/overview-base.component";
+
 
 @NgModule({
   declarations: [
@@ -90,7 +92,7 @@ import {DetailsComponent} from "./details-panel/details/details.component";
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode], providers: [provideHttpClient(withInterceptorsFromDi())]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, OverviewBaseComponent], providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule {
 }

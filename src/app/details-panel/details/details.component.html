@@ -16,9 +16,21 @@
         </button>
       </div>
     </div>
-    <div class="overview"></div>
 
-    <p> dbId : {{ event.dbId }}  {{ event.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
+
+    <div class="overview">
+<!--      <div class="base">-->
+<!--        <div class="row">-->
+<!--          <span class="label">Stable identifier</span>-->
+<!--          <div class="value-container">-->
+<!--            <span class="value">{{event.stId}}</span></div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+      <cr-overview-base [obj]="event" ></cr-overview-base>
+    </div>
+
+    <p> Analysis Type: {{ analysisResult?.summary?.type || "" }}</p>
 
     <p>Enhanced data testing： summation data</p>
     <p *ngIf="event.summation"> {{ event.summation[0].displayName }}</p>
