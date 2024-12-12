@@ -58,6 +58,7 @@ $small-breakpoint-width: 959px;
     align-items: center;
     padding: 0px;
     gap: 10px;
+    overflow: hidden;
 
     & .name {
       font-style: normal;
@@ -67,6 +68,7 @@ $small-breakpoint-width: 959px;
       overflow: hidden;
       white-space: nowrap;
       color: var(--on-surface);
+      text-overflow: ellipsis;
     }
 
   }
