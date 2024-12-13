@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
 import {EventService} from "../services/event.service";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {Event} from "../model/event.model";
@@ -14,7 +14,7 @@ import {Analysis} from "../model/analysis.model";
   encapsulation: ViewEncapsulation.None
 })
 @UntilDestroy()
-export class DetailsPanelComponent implements AfterViewInit {
+export class DetailsComponent implements AfterViewInit {
 
   obj?: Event;
   analysisResult?: Analysis.Result;

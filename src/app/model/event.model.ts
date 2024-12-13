@@ -22,6 +22,29 @@ export interface Event extends DatabaseObject {
   subpathwayColor?: string;
   hitReactionsCount?: string;
   hit?: boolean;
+
+  //Obj
+  category?:string
+  className:string;
+  speciesName?: string;
+  name?: string[];
+  compartment?: Compartment[];
+  tissue?: Tissue;
+  reviewStatus?: ReviewStatus;
+}
+
+export interface Compartment{
+   displayName: string;
+   url:string;
+}
+
+export interface Tissue{
+  displayName: string;
+  url:string;
+}
+
+interface ReviewStatus {
+  displayName: string;
 }
 
 

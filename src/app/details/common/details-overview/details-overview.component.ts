@@ -11,6 +11,13 @@ export class DetailsOverviewComponent implements AfterViewInit{
   @Input('obj') obj?: Event;
 
 
+  reviewStar: { [key: string]: { percentage: number, score: number } } = {
+    "five stars": {percentage: 100, score: 5},
+    "four stars": {percentage: 80, score: 4},
+    "three stars": {percentage: 60, score: 3},
+    "two stars": {percentage: 40, score: 2},
+    "one stars": {percentage: 20, score: 1}
+  };
 
 
   labelValues: { label: string, value: string }[] = [];
