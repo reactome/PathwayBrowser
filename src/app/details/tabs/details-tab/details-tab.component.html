@@ -1,0 +1,52 @@
+<div *ngIf="obj" class="details">
+
+  <div class="content">
+    <div class="header">
+      <div class="label">
+        <mat-icon class='custom-icon'
+                  [matTooltip]="iconMap[obj.schemaClass]?.tooltip || 'Unknown Event'"
+                  [svgIcon]="iconMap[obj.schemaClass]?.icon || 'pathway'">
+        </mat-icon>
+        <span class="name">{{ obj.displayName }}</span>
+      </div>
+      <div class="details-button">
+        <button mat-button (click)="OpenDetailsPage(obj.stId)">
+          <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
+          <span class="details-label"> Details page</span>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="overview">
+      <!--      <div class="base">-->
+      <!--        <div class="row">-->
+      <!--          <span class="label">Stable identifier</span>-->
+      <!--          <div class="value-container">-->
+      <!--            <span class="value">{{event.stId}}</span></div>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <cr-details-overview [obj]="obj"></cr-details-overview>
+
+    </div>
+
+
+    <p> Analysis Type: {{ analysisResult?.summary?.type || "" }}</p>
+
+    <p>Enhanced data testing： summation data</p>
+    <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
+
+    <p>Enhanced data testing： created data</p>
+    <p *ngIf="obj.created"> {{ obj.created.displayName }}</p>
+    <p *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
+  </div>
+
+  <div class="toc">
+    <span>TOC placeholder</span>
+    <span>External Reference</span>
+    <span>Test tissue: 9727355</span>
+
+  </div>
+</div>
+

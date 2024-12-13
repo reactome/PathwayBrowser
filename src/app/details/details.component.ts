@@ -8,8 +8,8 @@ import {Analysis} from "../model/analysis.model";
 
 @Component({
   selector: 'cr-details-panel',
-  templateUrl: './details-panel.component.html',
-  styleUrls: ['./details-panel.component.scss'],
+  templateUrl: './details.component.html',
+  styleUrls: ['./details.component.scss'],
   // Disabled the view encapsulation strategy by setting ViewEncapsulation.None to make sure that the component styles are exposed to be customizable.
   encapsulation: ViewEncapsulation.None
 })

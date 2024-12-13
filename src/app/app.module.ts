@@ -36,14 +36,14 @@ import {MatRippleModule} from "@angular/material/core";
 import {EventHierarchyComponent} from './event-hierarchy/event-hierarchy.component';
 import {MatTreeModule} from "@angular/material/tree";
 import {MatTooltipModule} from "@angular/material/tooltip";
-import {DetailsPanelComponent} from "./details-panel/details-panel.component";
 import { EhldComponent } from './ehld/ehld.component';
 import {MatMenuModule} from "@angular/material/menu";
 import {DiagramHomeComponent} from './diagram-home/diagram-home.component';
 import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
-import {DetailsComponent} from "./details-panel/details/details.component";
-import {OverviewBaseComponent} from "./details-panel/overview-base/overview-base.component";
+import {DetailsComponent} from "./details/details.component";
+import {DetailsTabComponent} from "./details/tabs/details-tab/details-tab.component";
+import {DetailsOverviewComponent} from "./details/common/details-overview/details-overview.component";
 
 
 @NgModule({
@@ -56,10 +56,12 @@ import {OverviewBaseComponent} from "./details-panel/overview-base/overview-base
     ViewportComponent,
     SpeciesComponent,
     EventHierarchyComponent,
-    DetailsPanelComponent,
     EhldComponent,
     DiagramHomeComponent,
-    DetailsComponent
+    DetailsComponent,
+    DetailsTabComponent,
+    DetailsOverviewComponent
+
   ],
   bootstrap: [AppComponent],
   imports: [
@@ -92,7 +94,7 @@ import {OverviewBaseComponent} from "./details-panel/overview-base/overview-base
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, OverviewBaseComponent], providers: [provideHttpClient(withInterceptorsFromDi())]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode], providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule {
 }

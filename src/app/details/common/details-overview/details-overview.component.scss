@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0px;
+  padding: 0;
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
@@ -12,11 +12,10 @@
 
 /* row */
 .row {
-
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0px;
+  padding: 0;
   gap: 10px;
   height: 20px;
   width: 100%;
@@ -42,7 +41,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0px;
+    padding: 0;
     height: 20px;
     font-style: normal;
     font-weight: 400;
@@ -50,5 +49,38 @@
     line-height: 20px;
     letter-spacing: 0.25px;
     color: var(--on-surface);
+
+    a {
+      text-decoration: none;
+      color: var(--primary);
+    }
   }
 }
+
+
+/* Star system */
+.spinner-container {
+  display: flex;
+  align-content: center;
+  align-items: center !important;
+
+  mat-progress-spinner {
+    box-shadow: 0 0 0 2px var(--outline-variant) inset;
+    border-radius: 50%;
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .score {
+    position: absolute;
+    color: var(--on-surface);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+
+  }
+}
+
+

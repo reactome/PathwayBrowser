@@ -1,0 +1,54 @@
+<div *ngIf="obj" class="base">
+  <div *ngIf="obj.stId" class="row">
+    <span class="label">Stable identifier</span>
+    <span class="value">{{ obj.stId }}</span>
+  </div>
+
+  <div class="row">
+    <span class="label">Type</span>
+    <span class="value">
+    <!-- Display category for RLE -->
+    <ng-container *ngIf="obj.category; else showClassName">
+      {{ obj.category.charAt(0).toUpperCase() + obj.category.slice(1) }} {{ obj.className }}
+    </ng-container>
+
+    <ng-template #showClassName>
+      {{ obj.className === 'TopLevelPathway' ? 'Pathway' : obj.className }}
+      <ng-container *ngIf="obj.schemaClass !== obj.className">
+        [{{ obj.schemaClass }}]
+      </ng-container>
+    </ng-template>
+  </span>
+  </div>
+
+  <div *ngIf="obj.speciesName" class="row">
+    <span class="label">Species</span>
+    <span class="value">{{ obj.speciesName }}</span>
+  </div>
+
+  <div *ngIf="obj.compartment" class="row">
+    <span class="label">Compartment</span>
+    <span class="value" *ngFor="let compartment of obj.compartment; let last =last">
+      <a [href]="compartment.url" target="_blank">{{ compartment.displayName }}{{ !last ? ',' : '' }}</a>
+    </span>
+  </div>
+
+  <div *ngIf="obj.name && obj.name.length >1" class="row">
+    <span class="label">Synonyms</span>
+    <span class="value">{{ obj.name.slice(1) }}</span>
+  </div>
+
+  <div *ngIf="['CellDevelopmentStep', 'CellLineagePath'].includes(obj.schemaClass) && obj.tissue" class="row">
+    <span class="label">Tissue</span>
+    <span class="value">   <a [href]="obj.tissue.url" target="_blank">{{ obj.tissue.displayName }}</a></span>
+  </div>
+
+
+  <div *ngIf="obj.reviewStatus" class="row">
+    <span class="label">Review Status</span>
+    <div class="value spinner-container">
+      <mat-progress-spinner color="primary" mode="determinate" [value]="reviewStar[obj.reviewStatus.displayName].percentage"></mat-progress-spinner>
+      <div class="score"> {{ reviewStar[obj.reviewStatus.displayName].score }}/5</div>
+    </div>
+  </div>
+</div>

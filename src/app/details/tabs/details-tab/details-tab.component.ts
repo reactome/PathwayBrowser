@@ -1,17 +1,17 @@
 import {Component, Input} from '@angular/core';
-import {Event} from "../../model/event.model";
-import {Analysis} from "../../model/analysis.model";
-import {environment} from "../../../environments/environment";
+import {Event} from "../../../model/event.model";
+import {Analysis} from "../../../model/analysis.model";
+import {environment} from "../../../../environments/environment";
 
 
 @Component({
-  selector: 'cr-details',
-  templateUrl: './details.component.html',
-  styleUrl: './details.component.scss'
+  selector: 'cr-details-tab',
+  templateUrl: './details-tab.component.html',
+  styleUrl: './details-tab.component.scss'
 })
-export class DetailsComponent {
+export class DetailsTabComponent {
 
-  @Input('event') event?: Event;
+  @Input('event') obj?: Event;
   @Input('analysisResult') analysisResult?: Analysis.Result;
 
 
