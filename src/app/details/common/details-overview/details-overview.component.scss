@@ -63,6 +63,7 @@
   display: flex;
   align-content: center;
   align-items: center !important;
+  position: relative;
 
   mat-progress-spinner {
     box-shadow: 0 0 0 2px var(--outline-variant) inset;
