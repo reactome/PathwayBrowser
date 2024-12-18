@@ -31,6 +31,8 @@ export interface Event extends DatabaseObject {
   compartment?: Compartment[];
   tissue?: Tissue;
   reviewStatus?: ReviewStatus;
+  referenceEntity:referenceEntity;
+  referenceType?: string
 }
 
 export interface Compartment{
@@ -43,10 +45,13 @@ export interface Tissue{
   url:string;
 }
 
-interface ReviewStatus {
+export interface ReviewStatus {
   displayName: string;
 }
 
+export interface referenceEntity{
+  identifier: string;
+}
 
 export interface InstanceEdit {
   displayName: string;
