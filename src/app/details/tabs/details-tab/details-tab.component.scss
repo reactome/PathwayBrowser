@@ -153,3 +153,38 @@ $small-breakpoint-width: 959px;
   gap: 4px;
   width: 100%;
 }
+
+.update-layout {
+  flex-direction: row;
+  gap: 0;
+}
+
+.icon-container {
+  background: #0C9509;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px;
+
+  margin: 0 auto;
+  width: 198px;
+  height: 100px;
+
+  border: 1px solid #CAC4D0;
+  border-radius: 16px;
+
+
+  .icon {
+    width: 182px;
+    height: 84px;
+
+  }
+
+  img {
+    width: 182px;
+    height: 84px;
+
+  }
+}

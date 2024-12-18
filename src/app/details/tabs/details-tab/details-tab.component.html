@@ -3,9 +3,10 @@
   <div class="content">
     <div class="header">
       <div class="label">
-        <mat-icon class='custom-icon'
-                  [matTooltip]="iconMap[obj.schemaClass]?.tooltip || 'Unknown Event'"
-                  [svgIcon]="iconMap[obj.schemaClass]?.icon || 'pathway'">
+        <mat-icon
+          class="custom-icon"
+          [matTooltip]="getIconData(obj).tooltip"
+          [svgIcon]="getIconData(obj).icon">
         </mat-icon>
         <span class="name">{{ obj.displayName }}</span>
       </div>
