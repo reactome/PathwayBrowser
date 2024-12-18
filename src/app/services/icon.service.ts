@@ -79,6 +79,11 @@ export class IconService {
     return this.actionIcons;
   }
 
+
+  getIcon(id: string): Observable<string> {
+    return this.http.get(`${environment.host}/icon/${id}.svg`, {responseType: 'text'});
+  }
+
   getIconDetails(identifier: string): Observable<string> {
     return this.http.get<SearchResult>(`${environment.host}/ContentService/search/query?query=${identifier}&types=Icon`).pipe(
       tap((res) => console.log('res ', res)),
@@ -87,7 +92,7 @@ export class IconService {
       }),
       switchMap(entry => {
         if (entry) {
-          return this.ehldService.getIcon(entry.stId)
+          return this.getIcon(entry.stId)
         } else {
           return of('')
         }
