@@ -223,15 +223,6 @@
 .custom-icon {
   z-index: 1; // Ensure to display tooltip : https://github.com/angular/components/issues/28888
   flex-shrink: 0; // Ensure the icon does not shrink
-
-  &::ng-deep svg * {
-    fill: var(--on-surface);
-  }
-
-  &.ehld::ng-deep svg *,
-  &.primary::ng-deep svg *{
-    fill: var(--primary);
-  }
 }
 
 .button-size {
