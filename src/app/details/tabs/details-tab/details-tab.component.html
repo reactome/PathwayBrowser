@@ -19,35 +19,26 @@
     </div>
 
 
-    <div class="overview">
-      <!--      <div class="base">-->
-      <!--        <div class="row">-->
-      <!--          <span class="label">Stable identifier</span>-->
-      <!--          <div class="value-container">-->
-      <!--            <span class="value">{{event.stId}}</span></div>-->
-      <!--        </div>-->
-      <!--      </div>-->
+    <div class="overview" [ngClass]="{'update-layout': obj.referenceEntity}">
 
       <cr-details-overview [obj]="obj"></cr-details-overview>
 
+      <div *ngIf="obj.referenceEntity" class="icon-container">
+        <div class="icon" [innerHTML]="iconContent"></div>
+      </div>
+
+      <div><p>Enhanced data testing： summation data</p>
+      <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p></div>
+
+      <p> Analysis Type: {{ analysisResult?.summary?.type || "" }}</p>
+
     </div>
-
-
-    <p> Analysis Type: {{ analysisResult?.summary?.type || "" }}</p>
-
-    <p>Enhanced data testing： summation data</p>
-    <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
-
-    <p>Enhanced data testing： created data</p>
-    <p *ngIf="obj.created"> {{ obj.created.displayName }}</p>
-    <p *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
   </div>
 
   <div class="toc">
     <span>TOC placeholder</span>
     <span>External Reference</span>
     <span>Test tissue: 9727355</span>
-
   </div>
-</div>
 
+</div>
