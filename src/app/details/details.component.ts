@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
 import {EventService} from "../services/event.service";
-import {DiagramStateService} from "../services/diagram-state.service";
 import {Event} from "../model/event.model";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {Analysis} from "../model/analysis.model";
+
 
 @Component({
   selector: 'cr-details-panel',

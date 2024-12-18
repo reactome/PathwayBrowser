@@ -70,9 +70,6 @@ export class EhldService {
     );
   }
 
-  // getEHLDSvg(id: string): Observable<string> {
-  //   return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
-  // }
 
   getSVGData(id: string): Observable<{ svg: string; graphData: Graph.Data }> {
     const svgRequest = this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});

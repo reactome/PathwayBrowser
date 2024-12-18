@@ -6,10 +6,9 @@ import {Event} from "../../../model/event.model";
   templateUrl: './details-overview.component.html',
   styleUrl: './details-overview.component.scss'
 })
-export class DetailsOverviewComponent implements AfterViewInit{
+export class DetailsOverviewComponent {
 
   @Input('obj') obj?: Event;
-
 
   reviewStar: { [key: string]: { percentage: number, score: number } } = {
     "five stars": {percentage: 100, score: 5},
@@ -18,16 +17,5 @@ export class DetailsOverviewComponent implements AfterViewInit{
     "two stars": {percentage: 40, score: 2},
     "one stars": {percentage: 20, score: 1}
   };
-
-
-  labelValues: { label: string, value: string }[] = [];
-
-  ngAfterViewInit(): void {
-    // @ts-ignore
-    if(this.obj){
-      console.log(this.obj);
-    }
-  }
-
 
 }
