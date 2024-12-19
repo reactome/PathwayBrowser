@@ -54,12 +54,12 @@ export class IconService {
         'Used to describe the mechanistic detail of a depolymerisation',
       route: 'depolymerisation'
     },
-    FailedReaction:{name:'failed-reaction', tooltip:'Failed Reaction', route:'failed-reaction'},
+    FailedReaction: {name: 'failed-reaction', tooltip: 'Failed Reaction', route: 'failed-reaction'},
 
 
     //Reaction type
     "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},
-    "binding": {name: 'binding', tooltip: 'Association/Binding eaction', route: 'binding'},
+    "binding": {name: 'binding', tooltip: 'Association/Binding reaction', route: 'binding'},
     "dissociation": {name: 'dissociation', tooltip: 'Dissociation reaction', route: 'dissociation'},
     "omitted": {name: 'omitted', tooltip: 'Omitted reaction', route: 'omitted'}, //BlackBoxEvent
     "transition": {name: 'transition', tooltip: 'Transition reaction', route: 'transition'}
