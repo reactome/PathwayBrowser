@@ -1,7 +1,7 @@
 <div *ngIf="obj" id="details-container">
 
-  <mat-tab-group class="group-tab">
-    <mat-tab>
+  <mat-tab-group class="group-tab" #tabGroup>
+    <mat-tab id="firstTab">
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="details-tab"></mat-icon>
@@ -10,7 +10,7 @@
       </ng-template>
       <ng-template matTabContent>
 
-       <cr-details-tab [event]="obj" [analysisResult]="analysisResult"></cr-details-tab>
+       <cr-details-tab [event]="obj" [analysisResult]="analysisResult" [tabWidth]="firstTabWidth"></cr-details-tab>
 
       </ng-template>
     </mat-tab>

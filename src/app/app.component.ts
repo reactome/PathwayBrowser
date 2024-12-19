@@ -26,11 +26,11 @@ export class AppComponent implements OnInit {
     });
 
     actionIcons.forEach(icon => {
-      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/action-icons/${icon.route}.svg`));
+      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/general/${icon.route}.svg`));
     });
 
     Object.values(objectIcons).forEach((icon) => {
-      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/object-icons/${icon.route}.svg`));
+      this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/reactome-subject/${icon.route}.svg`));
     });
   }
 }

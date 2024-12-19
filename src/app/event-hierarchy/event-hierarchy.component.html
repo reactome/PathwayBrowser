@@ -47,7 +47,7 @@
                      (mouseover)="onNameHover($event ,node)"
                      (mouseleave)="onNameHoverLeave($event, node)"
                      (wheel)="onScroll($event, node)">
-                  {{ node.displayName }}
+                  {{ node.dbId }} {{ node.displayName }}
                 </div>
               </div>
             </button>
@@ -102,7 +102,7 @@
                 <div class="font name" (mouseover)="onNameHover($event, node)"
                      (mouseleave)="onNameHoverLeave($event, node)"
                      (wheel)="onScroll($event, node)">
-                  {{ node.displayName }}
+                  {{ node.dbId }} {{ node.displayName }}
                 </div>
               </div>
             </button>

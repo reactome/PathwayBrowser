@@ -19,10 +19,12 @@ export class DetailsComponent implements AfterViewInit {
   obj?: Event;
   analysisResult?: Analysis.Result;
 
+
+  @ViewChild('tabGroup', { read: ElementRef }) tabGroup?: ElementRef;
+  firstTabWidth?: number;
+
   constructor(private eventService: EventService,
-              private state: DiagramStateService,
-              private analysis: AnalysisService,
-           ) {
+              private analysis: AnalysisService) {
   }
 
   ngAfterViewInit(): void {
@@ -34,6 +36,22 @@ export class DetailsComponent implements AfterViewInit {
     this.analysis.result$.pipe(untilDestroyed(this)).subscribe(result => {
       this.analysisResult = result;
     })
+
+
+    if (this.tabGroup) {
+      this.getFirstTabWidth();
+    }
+
+  }
+
+  private getFirstTabWidth() {
+
+    if (this.tabGroup){
+      const firstTab = this.tabGroup.nativeElement.querySelector('#firstTab');
+      if (firstTab) {
+        this.firstTabWidth = firstTab.offsetWidth;
+      }
+    }
 
   }
 
