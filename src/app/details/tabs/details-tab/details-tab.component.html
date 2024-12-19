@@ -1,6 +1,7 @@
 <div *ngIf="obj" class="details">
 
   <div class="content">
+
     <div class="header">
       <div class="label">
         <mat-icon
@@ -27,10 +28,6 @@
         <div class="icon" [innerHTML]="iconContent"></div>
       </div>
 
-      <div><p>Enhanced data testing： summation data</p>
-      <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p></div>
-
-      <p> Analysis Type: {{ analysisResult?.summary?.type || "" }}</p>
 
     </div>
   </div>
