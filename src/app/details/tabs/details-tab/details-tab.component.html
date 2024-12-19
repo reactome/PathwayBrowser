@@ -5,8 +5,8 @@
       <div class="label">
         <mat-icon
           class="custom-icon"
-          [matTooltip]="getIconData(obj).tooltip"
-          [svgIcon]="getIconData(obj).icon">
+          [matTooltip]="getIcon(obj).tooltip"
+          [svgIcon]="getIcon(obj).name">
         </mat-icon>
         <span class="name">{{ obj.displayName }}</span>
       </div>
@@ -23,7 +23,7 @@
 
       <cr-details-overview [obj]="obj"></cr-details-overview>
 
-      <div *ngIf="obj.referenceEntity" class="icon-container">
+      <div *ngIf="obj.hasIcon" class="icon-container">
         <div class="icon" [innerHTML]="iconContent"></div>
       </div>
 

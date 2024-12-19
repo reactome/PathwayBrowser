@@ -10,6 +10,7 @@ import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {NavigationEnd, Router} from "@angular/router";
 import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
+import {IconService} from "../services/icon.service";
 
 
 @Component({
@@ -51,7 +52,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
               private el: ElementRef,
               private router: Router,
               private ehldService: EhldService,
-              private analysis: AnalysisService) {
+              private analysis: AnalysisService,
+              private iconService: IconService) {
   }
 
   selecting = this.state.onChange.select$.pipe(
@@ -426,6 +428,10 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   trackById(index: number, event: Event): string {
     return event.stId;
+  }
+
+  getIcon(obj: Event) {
+    return this.iconService.getIconDetails(obj);
   }
 
   /**

@@ -120,20 +120,36 @@ export class IconService {
     return this.http.get(`${environment.host}/icon/${id}.svg`, {responseType: 'text'});
   }
 
-  getIconDetails(identifier: string): Observable<string> {
+  fetchIcon(identifier: string): Observable<string | null> {
     return this.http.get<SearchResult>(`${environment.host}/ContentService/search/query?query=${identifier}&types=Icon`).pipe(
-      tap((res) => console.log('res ', res)),
-      map(response => {
-        return response.results[0].entries[0] || null;
-      }),
-      switchMap(entry => {
-        if (entry) {
-          return this.getIcon(entry.stId)
-        } else {
-          return of('')
-        }
-      })
-    )
+      map(response =>
+        response.results[0].typeName === "Icon" ? response.results[0].entries[0] : null
+      ),
+      switchMap(entry =>
+        entry ? this.loadIcon(entry.stId) : of(null)
+      )
+    );
   }
+
+  getIconDetails(obj: Event): { name: string; tooltip?: string; route?: string } {
+    const defaultIcon = {name: 'pathway', tooltip: 'Unknown Event'};
+    // PE
+    if (obj.schemaClass === 'EntityWithAccessionedSequence') {
+      if (obj.className !== 'Protein' && obj.referenceType) {
+        return this.objectIconMap[obj.referenceType] || defaultIcon;
+      } else {
+        return this.objectIconMap[obj.schemaClass] || defaultIcon;
+      }
+    }
+    // Reaction
+    if (['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction'].includes(obj.schemaClass)) {
+      if (obj.category) {
+        return this.objectIconMap[obj.category] || defaultIcon;
+      }
+    }
+
+    return this.objectIconMap[obj.schemaClass] || defaultIcon;
+  }
+
 
 }

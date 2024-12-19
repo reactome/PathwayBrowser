@@ -32,7 +32,8 @@ export interface Event extends DatabaseObject {
   tissue?: Tissue;
   reviewStatus?: ReviewStatus;
   referenceEntity:referenceEntity;
-  referenceType?: string
+  referenceType?: string,
+  hasIcon?:boolean
 }
 
 export interface Compartment{

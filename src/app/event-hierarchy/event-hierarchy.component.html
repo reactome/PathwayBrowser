@@ -34,10 +34,14 @@
         <div class="tree-node child-less">
           <div class="left">
             <button mat-button (click)="onTreeEventSelect(node)"
-                    [ngClass]="{'selected': node.isSelected, 'hovered': node.isHovered, 'hit': node.hit}" class="button">
-              <mat-icon class='custom-icon' [class.hitIcon]="node.hit"
-                        [matTooltip]="node.schemaClass === 'Reaction' ? 'Reaction' : 'Black Box Event'"
-                        [svgIcon]="node.schemaClass === 'Reaction' ? 'reaction' : 'transition'"></mat-icon>
+                    [ngClass]="{'selected': node.isSelected, 'hovered': node.isHovered, 'hit': node.hit}"
+                    class="button">
+              <mat-icon [class.hitIcon]="node.hit"
+                        class="custom-icon"
+                        [matTooltip]="getIcon(node).tooltip"
+                        [svgIcon]="getIcon(node).name">
+              </mat-icon>
+
               <div class="name-container">
                 <div class="font name"
                      (mouseover)="onNameHover($event ,node)"

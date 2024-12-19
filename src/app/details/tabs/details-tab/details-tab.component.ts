@@ -16,38 +16,16 @@ export class DetailsTabComponent implements AfterViewInit {
   @Input('event') obj?: Event;
   @Input('analysisResult') analysisResult?: Analysis.Result;
   iconContent: string = '';
-  iconData?: { [key: string]: { name: string; tooltip?: string; route: string } }
+
 
   @Input('tabWidth') tabWidth?: number;
 
 
   constructor(private iconService: IconService,
               private sanitizer: DomSanitizer,
-              private cdr: ChangeDetectorRef) {
-
+              private cdr: ChangeDetectorRef,
+              ) {
   }
-
-  getIconData(obj: Event): { icon: string, tooltip: string } {
-    const defaultIcon = { icon: 'pathway', tooltip: 'Unknown Event' };
-
-    if(! this.iconData) return defaultIcon;
-
-    if (obj.schemaClass === 'EntityWithAccessionedSequence') {
-      if (obj.className !== 'EntityWithAccessionedSequence' && obj.referenceType) {
-        const referenceTypeIcon = this.iconData[obj.referenceType];
-        return referenceTypeIcon ? { icon: referenceTypeIcon.name, tooltip: referenceTypeIcon.tooltip! } : { icon: 'protein', tooltip: 'Protein' };
-      } else {
-
-        const entityIcon = this.iconData[obj.schemaClass];
-        return entityIcon ? { icon: entityIcon.name, tooltip: entityIcon.tooltip! } : defaultIcon;
-      }
-    }
-
-
-    const schemaIcon = this.iconData[obj.schemaClass];
-    return schemaIcon ? { icon: schemaIcon.name, tooltip: schemaIcon.tooltip! } : defaultIcon;
-  }
-
 
 
 
@@ -58,20 +36,22 @@ export class DetailsTabComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
 
-    this.iconData = this.iconService.getObjectIcons();
-
     if (this.obj && this.obj.referenceEntity) {
-      const identifier = this.obj.referenceEntity.identifier
-      console.log("identifier", identifier)
-      this.iconService.getIconDetails(identifier).subscribe(icon => {
-        console.log(icon);
-        const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(icon);
-        this.iconContent = sanitizedSvg as string;
-        if (this.iconContent) {
+      const identifier = this.obj.referenceEntity.identifier;
+      this.iconService.fetchIcon(identifier).subscribe(icon => {
+        if (icon && this.obj) {
+          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(icon);
+          this.iconContent = sanitizedSvg as string;
+          this.obj.hasIcon = true;
           this.cdr.detectChanges();
         }
       });
     }
+  }
+
+
+  getIcon(obj: Event) {
+    return this.iconService.getIconDetails(obj);
   }
 
 }
