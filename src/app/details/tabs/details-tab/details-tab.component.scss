@@ -137,10 +137,6 @@ $small-breakpoint-width: 959px;
 .double-arrow {
   width: 18px;
   height: 18px;
-
-  &::ng-deep svg * {
-    fill: var(--primary);
-  }
 }
 
 /* Overview */
