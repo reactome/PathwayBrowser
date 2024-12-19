@@ -3,31 +3,67 @@ import {map, Observable, of, switchMap, tap} from "rxjs";
 import {SearchResult} from "../model/search-results.model";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {EhldService} from "./ehld.service";
+import {Event} from "../model/event.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class IconService {
 
-  constructor(private http: HttpClient, private ehldService: EhldService) {
+  constructor(private http: HttpClient) {
   }
 
 
   objectIconMap: { [key: string]: { name: string; tooltip?: string; route: string } } = {
-    Pathway: { name: 'pathway', tooltip: 'Pathway', route: 'pathway' },
-    Reaction: { name: 'reaction', tooltip: 'Reaction', route: 'reaction' },
-    BlackBoxEvent: { name: 'transition', tooltip: 'Black Box Event', route: 'transition' },
-    EntityWithAccessionedSequence: { name: 'protein', tooltip: 'Protein', route: 'protein' },
-    Complex: { name: 'complex', tooltip: 'Complex', route: 'complex' },
-    SimpleEntity: { name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule' },
-    DefinedSet: { name: 'defined-set', tooltip: 'Defined Set', route: 'defined-set' },
-    OtherEntity: { name: 'other-entity', tooltip: 'Other Entity', route: 'other-entity' },
-    Polymer: { name: 'polymer', tooltip: 'Polymer', route: 'polymer' },
-    CandidateSet: { name: 'candidate-set', tooltip: 'Candidate Set', route: 'candidate-set' },
-    ReferenceDNASequence: { name: 'gene', tooltip: 'Reference DNA Sequence', route: 'gene' },
-    ReferenceRNASequence: { name: 'RNA', tooltip: 'Reference RNA Sequence', route: 'RNA' },
-    GenomeEncodedEntity: { name: 'genome-encoded-entity', tooltip: 'Genome Encoded Entity', route: 'genome-encoded-entity'}
+    Pathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
+    BlackBoxEvent: {name: 'omitted', tooltip: 'Black Box Event', route: 'omitted'},
+    EntityWithAccessionedSequence: {name: 'protein', tooltip: 'Protein', route: 'protein'},
+    Complex: {
+      name: 'complex',
+      tooltip: 'An entity formed by the association of two or more component entities (these components can themselves be complexes).\n' +
+        'At least one component must be specified. Complexes represent all experimentally verified components and their stoichiometry where this is known but may not include as yet unidentified components',
+      route: 'complex'
+    },
+    SimpleEntity: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
+    DefinedSet: {name: 'defined-set', tooltip: 'Defined Set', route: 'defined-set'},
+    OtherEntity: {name: 'other-entity', tooltip: 'Other Entity', route: 'other-entity'},
+    Polymer: {name: 'polymer', tooltip: 'Polymer', route: 'polymer'},
+    CandidateSet: {name: 'candidate-set', tooltip: 'Candidate Set', route: 'candidate-set'},
+    ReferenceDNASequence: {name: 'gene', tooltip: 'Reference DNA Sequence', route: 'gene'},
+    ReferenceRNASequence: {name: 'RNA', tooltip: 'Reference RNA Sequence', route: 'RNA'},
+    GenomeEncodedEntity: {
+      name: 'genome-encoded-entity',
+      tooltip: 'Genome Encoded Entity',
+      route: 'genome-encoded-entity'
+    },
+    ProteinDrug: {name: 'protein-drug', tooltip: 'Protein Drug', route: 'protein-drug'},
+    ChemicalDrug: {
+      name: 'chemical-drug',
+      tooltip: 'A therapeutic agent that is a chemically synthesized substance',
+      route: 'chemical-drug'
+    },
+    Polymerisation: {
+      name: 'polymerisation',
+      tooltip: 'Reactions that follow the pattern: Polymer + Unit - Polymer (there may be a catalyst involved).\n' +
+        'Used to describe the mechanistic detail of a polymerisation',
+      route: 'polymerisation'
+    },
+    Depolymerisation: {
+      name: 'depolymerisation',
+      tooltip: 'Reactions that follow the pattern: Polymer + Unit - Polymer (there may be a catalyst involved).\n' +
+        'Used to describe the mechanistic detail of a depolymerisation',
+      route: 'depolymerisation'
+    },
+    FailedReaction:{name:'failed-reaction', tooltip:'Failed Reaction', route:'failed-reaction'},
+
+
+    //Reaction type
+    "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},
+    "binding": {name: 'binding', tooltip: 'Association/Binding eaction', route: 'binding'},
+    "dissociation": {name: 'dissociation', tooltip: 'Dissociation reaction', route: 'dissociation'},
+    "omitted": {name: 'omitted', tooltip: 'Omitted reaction', route: 'omitted'}, //BlackBoxEvent
+    "transition": {name: 'transition', tooltip: 'Transition reaction', route: 'transition'}
+
   };
 
 
@@ -71,16 +107,16 @@ export class IconService {
     return this.objectIconMap;
   }
 
-  getSpeciesIcons(){
+  getSpeciesIcons() {
     return this.speciesIcons;
   }
 
-  getActionIcons(){
+  getActionIcons() {
     return this.actionIcons;
   }
 
 
-  getIcon(id: string): Observable<string> {
+  loadIcon(id: string): Observable<string> {
     return this.http.get(`${environment.host}/icon/${id}.svg`, {responseType: 'text'});
   }
 
