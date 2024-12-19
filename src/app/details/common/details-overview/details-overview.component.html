@@ -10,6 +10,9 @@
     <!-- Display category for RLE -->
     <ng-container *ngIf="obj.category; else showClassName">
       {{ obj.category.charAt(0).toUpperCase() + obj.category.slice(1) }} {{ obj.className }}
+      <ng-container *ngIf="obj.schemaClass === 'Polymerisation' || obj.schemaClass === 'Depolymerisation'">
+        &middot; <span class='italic'>{{ obj.schemaClass }}</span>
+      </ng-container>
     </ng-container>
 
     <ng-template #showClassName>
