@@ -1,6 +1,9 @@
-/* Table */
-.base {
 
+:host {
+  width: 100%;
+}
+
+#overview-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -8,59 +11,73 @@
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
+  gap: 4px
+}
+
+
+.common-container {
+  width: 100%;
+}
+
+
+.multi-line-row {
+  .label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: end;
+  }
 }
 
 /* row */
 .row {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  padding: 0;
+  align-items: stretch; // Stretch children to match the tallest sibling
   gap: 10px;
-  height: 20px;
   width: 100%;
-
-  .label {
-    width: 200px;
-    height: 20px;
-
-    font-weight: 600;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.5px;
-    justify-content: flex-end;
-    padding-right: 10px;
-    color: var(--on-surface);
-    border-right: 2px solid var(--primary);
-  }
-
-
-  .value {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0;
-    height: 20px;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0.25px;
-    color: var(--on-surface);
-
-    .italic {
-      font-style: italic;
-      display: contents;
-    }
-
-    a {
-      text-decoration: none;
-      color: var(--primary);
-    }
-  }
 }
 
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  width: 200px;
+  padding-right: 10px;
+  border-right: 2px solid var(--primary);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--on-surface);
+  flex-shrink: 0; // Prevent shrinking
+
+}
+
+.value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  padding: 0;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: var(--on-surface);
+
+  .italic {
+    font-style: italic;
+    display: contents;
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--primary);
+  }
+
+}
 
 /* Star system */
 .spinner-container {
@@ -87,5 +104,20 @@
 
   }
 }
+
+.summation-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  white-space: normal;
+}
+
+.summation-container .left,
+.summation-container .right {
+  display: flex;
+  flex-direction: column;
+}
+
 
 

@@ -18,4 +18,22 @@ export class DetailsOverviewComponent {
     "one stars": {percentage: 20, score: 1}
   };
 
+
+  isShortContent(text: string): boolean {
+    // Consider content "short" if it has 500 characters or less
+    return text.length <= 500;
+  }
+
+  getLeftColumnContent(text: string): string {
+    const words = text.split(' ');
+    const mid = Math.ceil(words.length / 2);
+    return words.slice(0, mid).join(' ');
+  }
+
+  getRightColumnContent(text: string): string {
+    const words = text.split(' ');
+    const mid = Math.ceil(words.length / 2);
+    return words.slice(mid).join(' ');
+  }
+
 }
