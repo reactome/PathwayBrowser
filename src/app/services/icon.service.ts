@@ -14,7 +14,7 @@ export class IconService {
   }
 
 
-  objectIconMap: { [key: string]: { name: string; tooltip?: string; route: string } } = {
+  reactomeSubjectIcons: { [key: string]: { name: string; tooltip?: string; route: string } } = {
     Pathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
     BlackBoxEvent: {name: 'omitted', tooltip: 'Black Box Event', route: 'omitted'},
     EntityWithAccessionedSequence: {name: 'protein', tooltip: 'Protein', route: 'protein'},
@@ -67,7 +67,7 @@ export class IconService {
   };
 
 
-  actionIcons = [
+  generalIcons = [
     {name: 'species', route: 'species-icon'},
     {name: 'overlay', route: 'overlay-icon'},
     {name: 'arrow-down', route: 'arrow-down'},
@@ -82,6 +82,7 @@ export class IconService {
     {name: 'info-tab', tooltip: 'Info Tab', route: 'info-tab'},
     {name: 'download-tab', tooltip: 'Download Tab', route: 'download-tab'},
     {name: 'double-arrow-right', tooltip: 'Double Arrow Right', route: 'double-arrow-right'},
+    {name: 'reference', tooltip: 'References', route: 'reference'},
   ];
 
   speciesIcons = [
@@ -103,16 +104,16 @@ export class IconService {
     {name: '8364', route: 'xenopus-tropicalis'}
   ]
 
-  getObjectIcons() {
-    return this.objectIconMap;
+  getReactomeSubjectIcons() {
+    return this.reactomeSubjectIcons;
   }
 
   getSpeciesIcons() {
     return this.speciesIcons;
   }
 
-  getActionIcons() {
-    return this.actionIcons;
+  getGeneralIcons() {
+    return this.generalIcons;
   }
 
 
@@ -136,19 +137,19 @@ export class IconService {
     // PE
     if (obj.schemaClass === 'EntityWithAccessionedSequence') {
       if (obj.className !== 'Protein' && obj.referenceType) {
-        return this.objectIconMap[obj.referenceType] || defaultIcon;
+        return this.reactomeSubjectIcons[obj.referenceType] || defaultIcon;
       } else {
-        return this.objectIconMap[obj.schemaClass] || defaultIcon;
+        return this.reactomeSubjectIcons[obj.schemaClass] || defaultIcon;
       }
     }
     // Reaction
     if (['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction'].includes(obj.schemaClass)) {
       if (obj.category) {
-        return this.objectIconMap[obj.category] || defaultIcon;
+        return this.reactomeSubjectIcons[obj.category] || defaultIcon;
       }
     }
 
-    return this.objectIconMap[obj.schemaClass] || defaultIcon;
+    return this.reactomeSubjectIcons[obj.schemaClass] || defaultIcon;
   }
 
 

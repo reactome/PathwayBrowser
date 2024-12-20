@@ -18,18 +18,18 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
 
     const speciesIcon = this.iconService.getSpeciesIcons();
-    const actionIcons = this.iconService.getActionIcons();
-    const objectIcons = this.iconService.getObjectIcons();
+    const generalIcons = this.iconService.getGeneralIcons();
+    const reactomeSubjectIcons = this.iconService.getReactomeSubjectIcons();
 
     speciesIcon.forEach(icon => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/species/${icon.route}.svg`));
     });
 
-    actionIcons.forEach(icon => {
+    generalIcons.forEach(icon => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/general/${icon.route}.svg`));
     });
 
-    Object.values(objectIcons).forEach((icon) => {
+    Object.values(reactomeSubjectIcons).forEach((icon) => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/reactome-subject/${icon.route}.svg`));
     });
   }
