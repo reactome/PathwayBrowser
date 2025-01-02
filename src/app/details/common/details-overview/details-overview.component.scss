@@ -87,18 +87,24 @@
   position: relative;
 
   mat-progress-spinner {
-    box-shadow: 0 0 0 2px var(--outline-variant) inset;
+    box-shadow: 0 0 0 2px var(--outline-variant) inset; // Create a filled shadow circle for mat-progress-spinner
     border-radius: 50%;
-    width: 20px !important;
-    height: 20px !important;
+
+    width: 28px !important;
+    height: 28px !important;
   }
 
   .score {
     position: absolute;
+    left: 14.29%;
+    right: 10.71%;
+    top: 14.29%;
+    bottom: 14.29%;
+
     color: var(--on-surface);
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
+    font-size: 14px;
     line-height: 20px;
     letter-spacing: 0.25px;
 
