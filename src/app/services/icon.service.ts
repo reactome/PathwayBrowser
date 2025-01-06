@@ -56,6 +56,11 @@ export class IconService {
     },
     FailedReaction: {name: 'failed-reaction', tooltip: 'Failed Reaction', route: 'failed-reaction'},
 
+    CellLineagePath: {
+      name: 'pathway',
+      tooltip: 'A collection of related Events describing development of a cell line.There events can be CellDevelopmentSteps or CellLineagePaths',
+      route: 'pathway'
+    },
 
     //Reaction type
     "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},
@@ -137,16 +142,21 @@ export class IconService {
     // PE
     if (obj.schemaClass === 'EntityWithAccessionedSequence') {
       if (obj.className !== 'Protein' && obj.referenceType) {
-        return this.reactomeSubjectIcons[obj.referenceType] || defaultIcon;
+        return this.reactomeSubjectIcons[obj.referenceType];
       } else {
-        return this.reactomeSubjectIcons[obj.schemaClass] || defaultIcon;
+        return this.reactomeSubjectIcons[obj.schemaClass];
       }
     }
     // Reaction
-    if (['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction'].includes(obj.schemaClass)) {
+    if (['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction', 'CellDevelopmentStep'].includes(obj.schemaClass)) {
       if (obj.category) {
-        return this.reactomeSubjectIcons[obj.category] || defaultIcon;
+        return this.reactomeSubjectIcons[obj.category];
       }
+    }
+
+    // Cell
+    if (obj.schemaClass === 'CellLineagePath') {
+      return this.reactomeSubjectIcons[obj.schemaClass];
     }
 
     return this.reactomeSubjectIcons[obj.schemaClass] || defaultIcon;
