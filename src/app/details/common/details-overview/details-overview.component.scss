@@ -117,6 +117,9 @@
   align-items: flex-start;
   gap: 20px;
   white-space: normal;
+
+  max-height: 180px;
+  overflow-y: scroll;
 }
 
 .summation-container .left,

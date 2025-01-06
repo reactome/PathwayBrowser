@@ -69,11 +69,9 @@
 
     <!-- Long content layout, place content in left and right columns-->
     <div *ngIf="!isShortContent(obj.summation[0].text)" class="value summation-container">
-      <div class="left">
-        {{ getLeftColumnContent(obj.summation[0].text) }}
+      <div class="left" [innerHTML]="getLeftColumnContent(obj.summation[0].text)">
       </div>
-      <div class="right">
-        {{ getRightColumnContent(obj.summation[0].text) }}
+      <div class="right" [innerHTML]="getRightColumnContent(obj.summation[0].text)">
       </div>
     </div>
   </div>
