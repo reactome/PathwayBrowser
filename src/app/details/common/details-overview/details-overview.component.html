@@ -3,13 +3,13 @@
   <div class="common-container">
 
     <div *ngIf="obj.stId" class="row">
-      <span class="label">Stable identifier</span>
-      <span class="value">{{ obj.stId }}</span>
+      <div class="label">Stable identifier</div>
+      <div class="value">{{ obj.stId }}</div>
     </div>
 
     <div class="row">
-      <span class="label">Type</span>
-      <span class="value">
+      <div class="label">Type</div>
+      <div class="value">
          <!-- Display category for RLE -->
         <ng-container *ngIf="obj.category; else showClassName">
       {{ obj.category.charAt(0).toUpperCase() + obj.category.slice(1) }} {{ obj.className }}
@@ -24,36 +24,36 @@
         [{{ obj.schemaClass }}]
           </ng-container>
         </ng-template>
-     </span>
+     </div>
     </div>
 
     <div *ngIf="obj.speciesName" class="row">
-      <span class="label">Species</span>
-      <span class="value">{{ obj.speciesName }}</span>
+      <div class="label">Species</div>
+      <div class="value">{{ obj.speciesName }}</div>
     </div>
 
     <div *ngIf="obj.compartment" class="row">
-      <span class="label">Compartment</span>
-      <span class="value" *ngFor="let compartment of obj.compartment; let last =last">
+      <div class="label">Compartment</div>
+      <div class="value" *ngFor="let compartment of obj.compartment; let last =last">
       <a [href]="compartment.url" target="_blank">{{ compartment.displayName }}{{ !last ? ',' : '' }}</a>
-    </span>
+    </div>
     </div>
 
     <div *ngIf="obj.name && obj.name.length >1" class="row">
-      <span class="label">Synonyms</span>
-      <span class="value">{{ obj.name.slice(1) }}</span>
+      <div class="label">Synonyms</div>
+      <div class="value">{{ obj.name.slice(1) }}</div>
     </div>
 
     <div *ngIf="['CellDevelopmentStep', 'CellLineagePath'].includes(obj.schemaClass) && obj.tissue" class="row">
-      <span class="label">Tissue</span>
-      <span class="value">   <a [href]="obj.tissue.url" target="_blank">{{ obj.tissue.displayName }}</a></span>
+      <div class="label">Tissue</div>
+      <div class="value">   <a [href]="obj.tissue.url" target="_blank">{{ obj.tissue.displayName }}</a></div>
     </div>
   </div>
 
   <!-- Common info ends here-->
 
   <div *ngIf="obj.reviewStatus" class="row">
-    <span class="label">Review Status</span>
+    <div class="label">Review Status</div>
     <div class="value spinner-container">
       <mat-progress-spinner color="primary" mode="determinate"
                             [value]="reviewStar[obj.reviewStatus.displayName].percentage"></mat-progress-spinner>
@@ -63,7 +63,7 @@
 
 
   <div *ngIf="obj.summation" class="row" [ngClass]="{'multi-line-row': !isShortContent(obj.summation[0].text)}">
-    <span class="label">Summation</span>
+    <div class="label">Summation</div>
     <!-- Short content layout, place the content in a row-->
     <div *ngIf="isShortContent(obj.summation[0].text)" class="value">{{ obj.summation[0].text }}</div>
 
