@@ -1,5 +1,5 @@
 
-.ref-row-container {
+.publication-container {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -26,7 +26,7 @@
   }
 }
 
-.publication {
+.title {
   white-space: normal;
   display: flex;
   flex-direction: row;
@@ -37,7 +37,7 @@
   position: relative;
   min-height: fit-content;
 
-  .publication-title {
+  .publication-name {
     padding-left: 12px;
   }
 }
