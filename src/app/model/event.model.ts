@@ -31,9 +31,13 @@ export interface Event extends DatabaseObject {
   compartment?: Compartment[];
   tissue?: Tissue;
   reviewStatus?: ReviewStatus;
-  referenceEntity:referenceEntity;
+  referenceEntity:ReferenceEntity;
   referenceType?: string,
   hasIcon?:boolean
+  input: Event[];
+  output: Event[];
+  [key: string]: any;
+  literatureReference?: LiteratureReference[];
 }
 
 export interface Compartment{
@@ -50,7 +54,7 @@ export interface ReviewStatus {
   displayName: string;
 }
 
-export interface referenceEntity{
+export interface ReferenceEntity{
   identifier: string;
 }
 
@@ -62,4 +66,23 @@ export interface InstanceEdit {
 export interface Summation{
   displayName: string;
   text: string
+  literatureReference: LiteratureReference[];
+}
+
+
+export interface LiteratureReference {
+  author?: Person;
+  displayName?: string;
+  title?: string;
+  journal?: string;
+  year?: number;
+  url?: string;
+
+  // Building tree structure
+  name?: string;
+  children?: LiteratureReference[]; //just for building tree structure
+}
+
+export interface Person{
+  displayName: string;
 }
