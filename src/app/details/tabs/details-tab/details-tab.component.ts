@@ -4,6 +4,7 @@ import {Analysis} from "../../../model/analysis.model";
 import {environment} from "../../../../environments/environment";
 import {DomSanitizer} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -16,14 +17,23 @@ export class DetailsTabComponent implements AfterViewInit {
   @Input('event') obj?: Event;
   @Input('analysisResult') analysisResult?: Analysis.Result;
   iconContent: string = '';
-
+  currentUrl!: string;
 
   @Input('tabWidth') tabWidth?: number;
+
+
+  elements = [
+    { key: 'input', label: 'Inputs' },
+    { key: 'output', label: 'Outputs' },
+    { key: 'catalystActivity', label: 'Catalyst Activity' },
+    { key: 'inferredFrom', label: 'Inferred From' }
+  ]
 
 
   constructor(private iconService: IconService,
               private sanitizer: DomSanitizer,
               private cdr: ChangeDetectorRef,
+              private router: Router
               ) {
   }
 
@@ -35,6 +45,8 @@ export class DetailsTabComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+
+    this.currentUrl = this.router.url
 
     if (this.obj && this.obj.referenceEntity) {
       const identifier = this.obj.referenceEntity.identifier;
@@ -52,6 +64,13 @@ export class DetailsTabComponent implements AfterViewInit {
 
   getIcon(obj: Event) {
     return this.iconService.getIconDetails(obj);
+  }
+
+  scrollToSection(sectionId: string) {
+    const section = document.getElementById(sectionId);
+    if(section){
+      section.scrollIntoView({behavior:'smooth'});
+    }
   }
 
 }

@@ -129,5 +129,17 @@
   text-align: justify;
 }
 
+.summation-refs-container {
 
+  display: flex;
+  flex-direction: row;
+  flex:1;
 
+  max-height: 180px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+cr-tree{
+  width: 100%;
+}

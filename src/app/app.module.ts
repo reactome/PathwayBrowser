@@ -44,6 +44,7 @@ import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details/details.component";
 import {DetailsOverviewComponent} from "./details/common/details-overview/details-overview.component";
 import {DetailsTabComponent} from "./details/tabs/details-tab/details-tab.component";
+import {TreeComponent} from "./details/common/tree/tree.component";
 
 
 @NgModule({
@@ -94,7 +95,7 @@ import {DetailsTabComponent} from "./details/tabs/details-tab/details-tab.compon
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode], providers: [provideHttpClient(withInterceptorsFromDi())]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, TreeComponent], providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule {
 }
