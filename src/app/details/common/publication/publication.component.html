@@ -1,0 +1,21 @@
+<div class="ref-row-container">
+  <div class="left">
+    <div class="publication">
+      <div class="ribbon"></div>
+      <span class="publication-title">{{ ref?.displayName }}</span>
+    </div>
+    <div class="authors">
+      <span class="authors">authors</span>
+    </div>
+  </div>
+  <div class="right">
+    <div class="journal">
+      <span class="journal-text"> {{ ref?.journal }}</span>
+    </div>
+    <div class="quote-container">
+      <a [href]="ref?.url" target="_blank">
+        <mat-icon class='quote-icon' [svgIcon]="'format-quote'">></mat-icon>
+      </a>
+    </div>
+  </div>
+</div>

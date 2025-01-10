@@ -1,35 +1,17 @@
 import {AfterViewInit, Component, Input} from '@angular/core';
 import {LiteratureReference} from "../../../model/event.model";
-import {
-  MatTree,
-  MatTreeNestedDataSource,
-  MatTreeNode, MatTreeNodeDef,
-  MatTreeNodePadding,
-  MatTreeNodeToggle
-} from "@angular/material/tree";
-import {MatIcon} from "@angular/material/icon";
-import {MatIconButton} from "@angular/material/button";
+import {MatTreeNestedDataSource} from "@angular/material/tree";
 
 
 @Component({
-  selector: 'cr-tree',
-  standalone: true,
-  imports: [
-    MatTree,
-    MatTreeNode,
-    MatIcon,
-    MatTreeNodePadding,
-    MatIconButton,
-    MatTreeNodeToggle,
-    MatTreeNodeDef
-  ],
-  templateUrl: './tree.component.html',
-  styleUrl: './tree.component.scss'
+  selector: 'cr-summation-refs-tree',
+  templateUrl: './summation-refs-tree.html',
+  styleUrl: './summation-refs-tree.scss'
 })
-export class TreeComponent implements AfterViewInit {
+export class SummationRefsTreeComponent implements AfterViewInit {
 
 
-  @Input('ref') refs?: LiteratureReference[];
+  @Input('refs') refs?: LiteratureReference[];
 
   dataSource = new MatTreeNestedDataSource<LiteratureReference>();
 

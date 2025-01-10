@@ -1,36 +1,3 @@
-#tree-container {
-  background: var(--surface);
-}
-
-.button {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 4px 4px 5px;
-  gap: 10px;
-
-  width: 24px;
-  height: 24px;
-}
-
-.ref-icon {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 12px;
-  height: 12px
-}
-
-.ref-column-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0px;
-  gap: 4px;
-}
-
 
 .ref-row-container {
   display: flex;
@@ -55,6 +22,7 @@
     align-items: flex-end;
     padding: 0px;
     gap: 4px;
+    min-width: fit-content;
   }
 }
 
@@ -119,11 +87,4 @@
     width: 12px;
     height: 12px;
   }
-}
-
-.root {
-  position: sticky;
-  top: 0px;
-  z-index: 1;
-  background: var(--surface);
 }

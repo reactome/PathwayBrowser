@@ -272,117 +272,58 @@ $small-breakpoint-width: 959px;
 
     border-radius: 15px 0 0 15px;
     gap: 5px;
-
-
-  }
-
-  .composition-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-left: 10px;
-    border-left: 2px solid var(--outline-variant);
-
-    .item{
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      padding: 0px;
-      gap: 4px;
-
-      width: 100%;
-    }
-
   }
 }
 
-/* Style for Refs*/
-.ref-row-container {
+.composition-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
-  padding: 0px;
-  gap: 20px;
-  justify-content: space-between;
-  width: 100%;
+  padding-left: 10px;
+  border-left: 2px solid var(--outline-variant);
 
-  .left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0px;
-    flex: 1 1 auto;
-  }
+  flex: 1;
 
-  .right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    padding: 0px;
-    gap: 4px;
-    min-width: fit-content;
-  }
-}
-
-.publication {
-  white-space: normal;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 0px;
-
-
-  position: relative;
-  min-height: fit-content;
-
-  .publication-title {
-    padding-left: 12px;
-  }
-}
-
-/* Ideas from : https://css-tricks.com/the-shapes-of-css/#aa-flag-shape-via-zoe-rooney */
-.ribbon {
-  width: 8px;
-  background: var(--primary);
-  position: absolute;
-  height: 100%;
-  border-radius: 1px 1px 0px 0px;
-}
-
-.ribbon:after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  height: 0;
-  border-bottom: 4px solid var(--surface);
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-}
-
-
-.quote-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0px;
-  gap: 5px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50px;
-  background: var(--primary);
-
-
-  .quote-icon {
+  .item{
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 4px;
-    gap: 5px;
-    width: 12px;
-    height: 12px;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 4px;
+
+    width: 100%;
   }
+
 }
+
+.refs-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 8px;
+}
+
+.ref-row {
+  display: flex;
+  flex-direction: row;
+  padding: 4px 0;
+  gap: 10px;
+}
+
+.year-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  width: 200px;
+  justify-content: center;
+
+  border-radius: 15px 0 0 15px;
+  gap: 5px;
+
+}
+
+//cr-publication{
+//  width: 100%;
+//}

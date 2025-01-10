@@ -40,8 +40,30 @@
       </div>
     </div>
 
+
+    <!-- References divider-->
+    <div class="divider-container">
+      <div class="divider-name-container">
+        <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
+      </div>
+      <div class="divider-line-container">
+        <mat-divider class="divider"></mat-divider>
+      </div>
+    </div>
+
+    <!-- References container-->
+    <div class="refs-container">
+      <div class="ref-row" *ngFor="let ref of obj.literatureReference">
+        <div class="year-container">{{ ref.year }}</div>
+        <div class="composition-container">
+          <cr-publication [publication]=ref></cr-publication>
+        </div>
+      </div>
+    </div>
+
+
     <div class="elements-container" *ngFor="let element of elements">
-      <div *ngIf="obj[element.key]" class="section-container" [id]="element.key">
+      <div *ngIf="obj[element.key]" [id]="element.key">
         <div class="divider-container">
           <div class="divider-name-container">
             <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
@@ -54,42 +76,6 @@
           <div class="control-container">this is navigation control</div>
           <div class="composition-container">
             <div class="item">this is test content</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="divider-container">
-      <div class="divider-name-container">
-        <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
-      </div>
-      <div class="divider-line-container">
-        <mat-divider class="divider"></mat-divider>
-      </div>
-    </div>
-    <div class="content-container">
-      <div class="control-container">this is navigation control</div>
-      <div class="composition-container">
-        <div class="ref-row-container" *ngFor="let ref of obj.literatureReference">
-          <div class="left">
-            <div class="publication">
-              <div class="ribbon"></div>
-              <span class="publication-title">{{ ref.displayName }}</span>
-            </div>
-            <div class="authors">
-              <span class="authors">authors</span>
-            </div>
-          </div>
-          <div class="right">
-            <div class="journal">
-              <span class="journal-text"> {{ ref.journal }}</span>
-            </div>
-            <div class="quote-container">
-              <a [href]="ref.url" target="_blank">
-                <mat-icon class='quote-icon' [svgIcon]="'format-quote'">></mat-icon>
-              </a>
-            </div>
           </div>
         </div>
 
