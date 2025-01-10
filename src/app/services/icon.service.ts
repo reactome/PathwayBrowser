@@ -79,6 +79,9 @@ export class IconService {
     {name: 'arrow-right', route: 'arrow-right'},
     {name: 'pathway-ehld', route: 'pathway-ehld'},
     {name: 'home', route: 'home'},
+    {name: 'expand', route: 'expand'},
+    {name: 'collapse', route: 'collapse'},
+    {name: 'format-quote', route: 'format-quote'},
 
     {name: 'details-tab', tooltip: 'Details Tab', route: 'details-tab'},
     {name: 'molecule-tab', tooltip: 'Molecule Tab', route: 'molecule-tab'},
