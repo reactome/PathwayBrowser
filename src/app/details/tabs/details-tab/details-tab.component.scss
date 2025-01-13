@@ -302,6 +302,7 @@ $small-breakpoint-width: 959px;
   align-items: flex-start;
   padding: 0px;
   gap: 8px;
+  width:100%;
 }
 
 .ref-row {
@@ -309,6 +310,7 @@ $small-breakpoint-width: 959px;
   flex-direction: row;
   padding: 4px 0;
   gap: 10px;
+  width:100%;
 }
 
 .year-container {
@@ -318,12 +320,8 @@ $small-breakpoint-width: 959px;
   padding: 0;
   width: 200px;
   justify-content: center;
-
   border-radius: 15px 0 0 15px;
   gap: 5px;
+  flex-shrink: 0;
 
 }
-
-//cr-publication{
-//  width: 100%;
-//}
