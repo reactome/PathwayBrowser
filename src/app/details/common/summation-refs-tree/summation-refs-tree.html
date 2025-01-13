@@ -12,7 +12,7 @@
               [attr.aria-label]="'Toggle ' + node.name">
         <mat-icon class="ref-icon" [svgIcon]="tree.isExpanded(node) ? 'expand' : 'collapse'"></mat-icon>
       </button>
-      {{ node.name }}
+      {{ title }}
     </mat-tree-node>
   </mat-tree>
 </div>

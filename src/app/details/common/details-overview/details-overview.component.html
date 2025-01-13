@@ -77,8 +77,8 @@
       </div>
 
       <!--Display summation refs if is available-->
-      <div class="summation-refs-container" *ngIf="obj.summation[0].literatureReference as refs">
-        <cr-summation-refs-tree [refs]=refs></cr-summation-refs-tree>
+      <div class="summation-refs-container" *ngIf="obj.summation[0].literatureReference">
+        <cr-summation-refs-tree [summation]=obj.summation[0]></cr-summation-refs-tree>
       </div>
 
     </div>

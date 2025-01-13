@@ -78,9 +78,9 @@ export interface LiteratureReference {
   year?: number;
   url?: string;
 
-  // Building tree structure
-  name?: string;
-  children?: LiteratureReference[]; //just for building tree structure
+  // Just for building tree structure
+  // name?: string;
+  // children?: LiteratureReference[];
 }
 
 export interface Person{
