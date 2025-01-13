@@ -62,27 +62,36 @@
   </div>
 
 
-  <div *ngIf="obj.summation" class="row" [ngClass]="{'multi-line-row': !isShortContent(obj.summation[0].text)}">
+  <div *ngIf="obj.summation" class="row">
     <div class="label">Summation</div>
-    <!-- Short content layout, place the content in a row-->
-    <div *ngIf="isShortContent(obj.summation[0].text)" class="value">{{ obj.summation[0].text }}</div>
+    <div class="value" *ngIf="obj.summation[0].text as summationText">
+      <!-- Short content layout, place the content in a row-->
+      <div *ngIf="isShortContent(summationText)">{{ summationText }}</div>
 
-    <!-- Long content layout, place content in left and right columns-->
-    <div *ngIf="!isShortContent(obj.summation[0].text)" class="value summation-container">
-      <div class="left" [innerHTML]="getLeftColumnContent(obj.summation[0].text)">
+      <!-- Long content layout, place content in left and right columns-->
+      <div *ngIf="!isShortContent(summationText)" class="summation-content-container">
+        <div class="left" [innerHTML]="getLeftColumnContent(summationText)">
+        </div>
+        <div class="right" [innerHTML]="getRightColumnContent(summationText)">
+        </div>
       </div>
-      <div class="right" [innerHTML]="getRightColumnContent(obj.summation[0].text)">
+
+      <!--Display summation refs if is available-->
+      <div class="summation-refs-container" *ngIf="obj.summation[0].literatureReference as refs">
+        <cr-summation-refs-tree [refs]=refs></cr-summation-refs-tree>
       </div>
+
     </div>
+
   </div>
 
-  <div *ngIf="obj.summation[0].literatureReference" class="row">
-    <div class="label">
-      <mat-icon [svgIcon]="'reference'"></mat-icon>
-    </div>
-    <div class="value summation-refs-container">
-      <cr-summation-refs-tree [refs]=obj.summation[0].literatureReference></cr-summation-refs-tree>
-    </div>
-  </div>
+<!--  <div *ngIf="obj.summation[0].literatureReference" class="row">-->
+<!--    <div class="label">-->
+<!--      <mat-icon [svgIcon]="'reference'"></mat-icon>-->
+<!--    </div>-->
+<!--    <div class="value summation-refs-container">-->
+<!--      <cr-summation-refs-tree [refs]=obj.summation[0].literatureReference></cr-summation-refs-tree>-->
+<!--    </div>-->
+<!--  </div>-->
 
 </div>

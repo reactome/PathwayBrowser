@@ -111,7 +111,7 @@
   }
 }
 
-.summation-container {
+.summation-content-container {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -122,8 +122,8 @@
   overflow-y: scroll;
 }
 
-.summation-container .left,
-.summation-container .right {
+.summation-content-container .left,
+.summation-content-container .right {
   display: flex;
   flex-direction: column;
   text-align: justify;
@@ -138,9 +138,4 @@
   max-height: 180px;
   overflow-y: scroll;
   overflow-x: hidden;
-}
-
-// todo: not set width here
-cr-summation-refs-tree{
-  width: 100%;
 }
