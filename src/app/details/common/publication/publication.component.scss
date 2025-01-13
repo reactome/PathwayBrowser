@@ -88,3 +88,22 @@
     height: 12px;
   }
 }
+
+.authors {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 0 0 1.5px;
+  gap: 1.5px;
+
+  & > :last-child {
+    margin-left: 5px;
+  }
+}
+
+.first-author:before {
+  content: "•";
+  padding-right: 5px;
+  vertical-align: middle;
+  color: var(--primary);
+}
