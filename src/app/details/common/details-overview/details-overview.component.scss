@@ -66,6 +66,8 @@
   line-height: 20px;
   letter-spacing: 0.25px;
   color: var(--on-surface);
+  white-space: normal;
+  text-align: justify;
 
   .italic {
     font-style: italic;
