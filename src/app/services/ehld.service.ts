@@ -1,5 +1,5 @@
 import {ElementRef, Injectable} from '@angular/core';
-import {BehaviorSubject, catchError, forkJoin, map, Observable, of} from "rxjs";
+import {BehaviorSubject, catchError, forkJoin, map, Observable, of, tap} from "rxjs";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Graph} from "../model/graph.model";
@@ -28,6 +28,7 @@ export class EhldService {
 
   private _hasEHLD = new BehaviorSubject<boolean | undefined>(undefined);
   hasEHLD$ = this._hasEHLD.asObservable();
+  hasEHLD? : boolean
 
   overlay = "OVERLAY-";
   analysisInfoId = "ANALINFO";
@@ -36,7 +37,7 @@ export class EhldService {
 
   legendItems : LegendGroup[] = [
     {
-      type: "Arrow",
+      type: "Arrow Type",
       items: [
         {name: "Indication", src: "assets/EHLD-legend/R-ICO-012345.svg", alt: "indication arrow"},
         {name: "Motion", src: "assets/EHLD-legend/R-ICO-012347.svg", alt: "motion arrow"},
@@ -46,15 +47,10 @@ export class EhldService {
       ]
     },
     {
-      type: "Not Happening Arrow ",
+      type: "Disease Modifiers",
       items: [
-        {name: "No Motion", src: "assets/EHLD-legend/R-ICO-012339.svg", alt: "no motion arrow"}
-      ]
-    },
-    {
-      type: "Disease Related Arrow",
-      items: [
-        {name: "Disease Related Motion", src: "assets/EHLD-legend/R-ICO-012342.svg", alt: "disease-related motion arrow"}
+        {name: "Not happening", src: "assets/EHLD-legend/R-ICO-012339.svg", alt: "not happening arrow"},
+        {name: "Disease related", src: "assets/EHLD-legend/R-ICO-012342.svg", alt: "disease-related arrow"}
       ]
     }
   ];
@@ -66,9 +62,10 @@ export class EhldService {
     this._hasEHLD.next(value);
   }
 
-  hasEHLD(diagramId: string): Observable<boolean> {
+  getHasEhldData(diagramId: string): Observable<boolean> {
     let url = `${this._HAS_EHLD}${diagramId}/hasEHLD`;
     return this.http.get<boolean>(url).pipe(
+      tap(result => this.hasEHLD = result),
       catchError(() => of(false))
     );
   }

@@ -78,7 +78,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['diagramId'] && !this.isInitialLoad) {
+    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) {
       this.loadDiagram();
     }
   }
@@ -125,7 +125,9 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
 
 
   private loadDiagram(): void {
-    this.event.fetchEnhancedEventData(this.diagramId).pipe(
+    this.event.diagramEvent$.pipe(
+      filter((event): event is Event => event !== null),
+      take(1),
       switchMap((event) => {
         // If the diagramId is a subpathway without diagram, and it is a first load then load parent diagram
         // For instance: ../PathwayBrowser/R-HSA-69541
@@ -166,7 +168,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
         }))
 
         const shadowNodes = this.cy?.nodes('.Shadow');
-        this.event.setSubpathwaysColors(shadowNodes && shadowNodes.length > 0
+        this.event.setSubpathwayColors(shadowNodes && shadowNodes.length > 0
           ? new Map(shadowNodes.map(node => [node.data('reactomeId'), node.data('color')]))
           : undefined);
 
@@ -181,7 +183,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     return this.event.fetchEventAncestors(this.diagramId).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
-        const pathwayWithDiagram = [...ancestors].find(p => p.hasDiagram);
+        const pathwayWithDiagram = [...ancestors].reverse().find(p => p.hasDiagram);
         if (pathwayWithDiagram) {
           const newDiagramId = pathwayWithDiagram.stId;
           if (newDiagramId !== this.diagramId) {

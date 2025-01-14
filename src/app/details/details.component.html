@@ -1,10 +1,10 @@
-<div *ngIf="obj">
-  <p>{{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }} </p>
+<div *ngIf="obj" id="detail-container">
+  <p> dbId : {{ obj.dbId }} {{ obj.displayName }}  {{ obj.schemaClass }}  {{ analysisResult?.summary?.type || "" }}</p>
 
   <p>Enhanced data testing： summation data</p>
-  <p style="color: #2d518d" *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
+  <p *ngIf="obj.summation"> {{ obj.summation[0].displayName }}</p>
 
   <p>Enhanced data testing： created data</p>
-  <p style="color: #0C9509" *ngIf="obj.created"> {{ obj.created.displayName }}</p>
-  <p style="color: #0C9509" *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
+  <p *ngIf="obj.created"> {{ obj.created.displayName }}</p>
+  <p *ngIf="obj.created"> {{ obj.created.dateTime }}</p>
 </div>

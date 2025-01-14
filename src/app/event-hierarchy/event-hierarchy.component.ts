@@ -9,6 +9,7 @@ import {SplitComponent} from "angular-split";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {NavigationEnd, Router} from "@angular/router";
 import {EhldService} from "../services/ehld.service";
+import {AnalysisService} from "../services/analysis.service";
 
 
 @Component({
@@ -39,14 +40,18 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   breadcrumbs: Event[] = [];
   scrollTimeout: undefined | ReturnType<typeof setTimeout>;
-  selectedIdFromUrl = '';
-  selectedTreeEvent!: Event;
-  selectedObj!: Event;
-  subpathwayColors: Map<number, string> | undefined = undefined;
-  ancestors: Event[] = [];
+  selectedIdFromUrl? :string;
+  selectedTreeEvent?: Event;
+  selectedObj?: Event;
 
 
-  constructor(protected eventService: EventService, private speciesService: SpeciesService, private state: DiagramStateService, private el: ElementRef, private router: Router, private ehldService: EhldService,) {
+  constructor(protected eventService: EventService,
+              private speciesService: SpeciesService,
+              private state: DiagramStateService,
+              private el: ElementRef,
+              private router: Router,
+              private ehldService: EhldService,
+              private analysis: AnalysisService) {
   }
 
   selecting = this.state.onChange.select$.pipe(
@@ -56,14 +61,40 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
       const idToUse = id ? id : this.diagramId;
-      return this.eventService.fetchEnhancedEventData(idToUse)
+      return this.eventService.fetchEnhancedEventData(idToUse).pipe(
+        map(enhancedEvent => ({ idToUse, enhancedEvent }))
+      )
     }),
-    switchMap((enhancedEvent) => {
-      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.diagramId, this.subpathwayColors, this.tree, this.treeDataSource.data);
+    switchMap(({ idToUse, enhancedEvent }) => {
+      const token = this.analysis.result?.summary.token;
+      if (!token) {
+        return of({ idToUse, enhancedEvent, hitReactions: [] }); // Return empty hitReactions if there is no token
+      }
+      // Fetch hit reactions using token and pathway ID
+      return this.analysis.getHitReactions(this.diagramId, token).pipe(
+        map(hitReactions => ({ idToUse, enhancedEvent, hitReactions }))
+      );
+    }),
+    switchMap(({ idToUse, enhancedEvent, hitReactions }) => {
+      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.diagramId, this.tree, hitReactions);
     }),
     untilDestroyed(this),
   ).subscribe((e) => {
     document.querySelector(`[st-id='${this.selectedIdFromUrl}']`)?.scrollIntoView({behavior: 'smooth'});
+  });
+
+
+  analysing = this.state.onChange.analysis$.pipe(
+    switchMap(result => {
+      const token = this.analysis.result?.summary.token;
+      if (!token) return of({hitReactions: []});
+      return this.analysis.getHitReactions(this.diagramId, token).pipe(
+        map(hitReactions => ({hitReactions}))
+      );
+    })
+  ).subscribe(({hitReactions}) => {
+    this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result);
+    this.eventService.addHitReactions(this.selectedTreeEvent?.hasEvent, hitReactions);
   });
 
   ngAfterViewInit(): void {
@@ -106,40 +137,83 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       this.adjustWidths();
     });
 
-    this.eventService.subpathwaysColors$.pipe(
-      untilDestroyed(this),
-      filter(colors => colors !== undefined)).subscribe(colors => {
-        this.subpathwayColors = colors;
-      })
   }
 
   buildInitialTreeWithTlps(taxId: string): void {
     const idToUse = this.selectedIdFromUrl ? this.selectedIdFromUrl : this.diagramId;
-    this.eventService.fetchTlpsBySpecies(taxId).pipe(
-      tap(allTLPs => this.eventService.setTreeData(allTLPs)), // All TLPs as initial tree data
-      switchMap((treeData) =>
-        this.eventService.fetchEnhancedEventData(idToUse).pipe(
+    // Fetch and prepare initial data
+    const initialData$ = this.eventService.fetchTlpsBySpecies(taxId).pipe(
+      tap(allTLPs => this.eventService.setTreeData(allTLPs)), // Set initial tree data
+      map(initialTreeData => ({initialTreeData})) // Wrap in an object for accumulation
+    );
+
+    // Fetch enhanced event data
+    const enhancedEventData$ = this.eventService.fetchEnhancedEventData(idToUse).pipe(
+      map(enhancedEvent => ({enhancedEvent}))
+    );
+
+    // Fetch EHLD and color data
+    const ehldAndSubpathwayColors$ = this.ehldService.hasEHLD$.pipe(
+      take(1),
+      switchMap(hasEHLD => hasEHLD
+        ? of({hasEHLD, colors: undefined}) // If EHLD exists, no colors needed
+        : this.eventService.subpathwayColors$.pipe(
+          take(1),
+          map(colors => ({hasEHLD, colors}))
+        )
+      )
+    );
+
+    // Fetch analysis result
+    const analysisResult$ = this.analysis.result$.pipe(
+      take(1),
+      map(analysisResult => ({analysisResult}))
+    );
+
+    // Fetch reactions based on token and pathway ID
+    const hitReactions$ = analysisResult$.pipe(
+      switchMap(({ analysisResult }) => {
+        const token = analysisResult?.summary.token;
+        if (!token) return of({ hitReactions: [] }); // Return empty if no token
+        return this.analysis.getHitReactions(this.diagramId, token).pipe(
+          map(hitReactions => ({ hitReactions }))
+        );
+      })
+    );
+
+    // Combine all data and merged into one object
+    initialData$.pipe(
+      switchMap(initialData =>
+        enhancedEventData$.pipe(
           combineLatestWith(
-            // EHLD flag here is for expanding tree children when tree node is a pathway in EHLD viewer from the frist load, for instance: /R-HSA-9612973?select=R-HSA-1632852
-            this.ehldService.hasEHLD$.pipe(
-              take(1),
-              switchMap(hasEHLD => !hasEHLD
-                ? this.eventService.subpathwaysColors$.pipe(
-                  take(1),
-                  map(colors => ({hasEHLD, colors}))
-                )
-                : of({hasEHLD, colors: undefined})
-              )
-            )
+            ehldAndSubpathwayColors$,
+            analysisResult$,
+            hitReactions$
           ),
-          map(([enhancedEvent, {hasEHLD, colors}]) => {
-            return {enhancedEvent, colors, hasEHLD, treeData};
-          })
+          map(([enhancedEvent, ehldAndColors, analysisResult, hitReactions]) => ({
+            ...initialData,
+            ...enhancedEvent,
+            ...ehldAndColors,
+            ...analysisResult,
+            ...hitReactions
+          }))
         )
       ),
-      switchMap(({enhancedEvent, treeData, colors, hasEHLD}) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, this.subpathwayColors, hasEHLD))
-    ).subscribe(() => {
-      document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
+      // Build the tree with all data
+      switchMap(({enhancedEvent,
+                   initialTreeData,
+                   colors,
+                   hasEHLD,
+                   analysisResult,
+                   hitReactions
+                 }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, hitReactions))
+    ).subscribe({
+      next: () => {
+        document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
+        },
+      error: (err) => {
+        throw new Error('Error in building the tree:', err);
+      }
     });
   }
 
@@ -226,26 +300,26 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.handlePathwayNavigationOnDeselection(event);
   }
 
-  private toggleEventExpansion(event: Event, isSelected: boolean) {
+  private toggleEventExpansion(treeEvent: Event, isSelected: boolean) {
     // Collapse all events when selecting any tlps
-    if (event.schemaClass === this._TOP) {
+    if (treeEvent.schemaClass === this._TOP) {
       this.tree.collapseAll();
     }
 
     if (isSelected) {
-      event.isSelected = true;
-      this.eventService.loadEventChildren(event);
-      this.tree.toggle(event);
+      treeEvent.isSelected = true;
+      this.eventService.loadEventChildren(treeEvent);
+      this.tree.toggle(treeEvent);
     } else {
-      event.isSelected = false;
-      this.tree.toggle(event);
-      this.tree.collapseDescendants(event);
-      this.eventService.fetchEnhancedEventData(event.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
+      treeEvent.isSelected = false;
+      this.tree.toggle(treeEvent);
+      this.tree.collapseDescendants(treeEvent);
+      this.eventService.fetchEnhancedEventData(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
         this.eventService.setCurrentObj(result);
       })
     }
 
-    this.eventService.collapseSiblingEvent(event, this.tree);
+    this.eventService.collapseSiblingEvent(treeEvent, this.tree);
   }
 
 

@@ -19,7 +19,9 @@ export interface Event extends DatabaseObject {
   parent: Event;
   created: InstanceEdit;
   summation:Summation[]
-  color?: string;
+  subpathwayColor?: string;
+  hitReactionsCount?: string;
+  hit?: boolean;
 }
 
 

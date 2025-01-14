@@ -34,8 +34,8 @@
         <div class="tree-node child-less">
           <div class="left">
             <button mat-button (click)="onTreeEventSelect(node)"
-                    [ngClass]="{'highlight': node.isSelected, 'hovered': node.isHovered}" class="button">
-              <mat-icon class='custom-icon'
+                    [ngClass]="{'selected': node.isSelected, 'hovered': node.isHovered, 'hit': node.hit}" class="button">
+              <mat-icon class='custom-icon' [class.hitIcon]="node.hit"
                         [matTooltip]="node.schemaClass === 'Reaction' ? 'Reaction' : 'Black Box Event'"
                         [svgIcon]="node.schemaClass === 'Reaction' ? 'reaction' : 'transition'"></mat-icon>
               <div class="name-container">
@@ -90,7 +90,7 @@
             </button>
 
             <button mat-button (click)="onTreeEventSelect(node)" class="button"
-                    [ngClass]="{'highlight': node.isSelected, 'hovered': node.isHovered}">
+                    [ngClass]="{'selected': node.isSelected, 'hovered': node.isHovered, 'hit': node.hit}">
               <mat-icon #eventIcon class='custom-icon' [class.ehld]="node.hasEHLD"
                         [matTooltip]="node.hasEHLD? 'Pathway with an enhanced diagram ' : 'Pathway'"
                         [svgIcon]="node.hasEHLD  ? 'pathway-ehld' : 'pathway'"></mat-icon>
@@ -130,8 +130,14 @@
               </div>
               <!--Only provide this subpathway tag for the first layer, ignore the nested subpathways-->
               <div class="subpathway" *ngIf="!node.hasDiagram && node.parent.stId === this.diagramId"
-                   [style.background]="node.color" (mouseover)="onTagHover(node)"
+                   [style.background]="node.subpathwayColor" (mouseover)="onTagHover(node)"
                    (mouseleave)="onTagHoverLeave(node)">
+              </div>
+
+              <div class="analysis" *ngIf="node.hitReactionsCount"
+                   [style.background]="node.analysisColor" (mouseover)="onTagHover(node)"
+                   (mouseleave)="onTagHoverLeave(node)">
+                <span class="text" [matTooltip]="'Hit Reactions / Total Reactions'"> {{ node.hitReactionsCount }}</span>
               </div>
 
             </div>

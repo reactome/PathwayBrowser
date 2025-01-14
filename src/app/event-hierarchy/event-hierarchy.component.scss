@@ -86,8 +86,6 @@
     .breadcrumb-item:hover::before {
       text-decoration: none;
     }
-
-
   }
 
   .gradient-holder-left {
@@ -199,6 +197,7 @@
     flex: 0 1 auto; /* Default flex properties for right element */
     height: 100%;
     display: flex;
+    min-width: fit-content;
   }
 }
 
@@ -206,16 +205,20 @@
   height: 24px;
 }
 
-.highlight {
+.hit {
+  background: var(--primary-container);
+  color: var(--on-primary-container) !important;
+}
+
+.selected {
   background: var(--primary);
   border-radius: 50px;;
   color: var(--on-primary) !important;
-}
 
-.highlight .custom-icon::ng-deep svg * {
-  fill: var(--on-primary);
+  .custom-icon::ng-deep svg * {
+    fill: var(--on-primary);
+  }
 }
-
 
 .custom-icon {
   z-index: 1; // Ensure to display tooltip : https://github.com/angular/components/issues/28888
@@ -279,6 +282,8 @@ ul {
 
 .group {
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /**
@@ -368,6 +373,32 @@ ul {
     border-radius: var(--diameter);
     padding: 0 var(--padding);
     opacity: 0.4;
+  }
+
+  .analysis{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px 4px;
+    gap: 10px;
+    background: var(--primary-container);
+    border-radius: 10px;
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+
+    .text{
+      font-family: 'Roboto Flex', sans-serif;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.4px;
+      flex: none;
+      order: 0;
+      flex-grow: 0;
+      color: var(--on-primary-container);
+    }
   }
 }
 

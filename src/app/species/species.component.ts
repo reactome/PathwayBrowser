@@ -24,8 +24,8 @@ export class SpeciesComponent implements AfterViewInit {
     interactor: false
   }
 
-  selectedTreeEvent!: Event;
-  selectedObj!: Event;
+  selectedTreeEvent?: Event;
+  selectedObj?: Event;
 
   constructor(private speciesService: SpeciesService, private router: Router, private route: ActivatedRoute, private state: DiagramStateService, private eventService: EventService) {
 
@@ -72,13 +72,13 @@ export class SpeciesComponent implements AfterViewInit {
     this.diagramId = this.diagramId.replace(/-(.*?)-/, `-${abbreviation}-`);
 
     // Include entity to ancestors list when selecting entity in the URL
-    const ancestors = this.selectedTreeEvent.ancestors || [];
+    const ancestors = this.selectedTreeEvent?.ancestors || [];
     const stIdSet = new Set(ancestors.map(obj => obj.stId));
-    if (!stIdSet.has(this.selectedObj.stId)) {
+    if (this.selectedObj?.stId && !stIdSet.has(this.selectedObj.stId)) {
       ancestors.push(this.selectedObj);
     }
 
-    this.speciesService.getOrthologyEventStId(species, this.selectedObj.dbId, ancestors, ids)
+    this.speciesService.getOrthologyEventStId(species, this.selectedObj?.dbId, ancestors, ids)
       .subscribe((newSelectedStId) => {
 
         const updatedParams = this.speciesService.updateQueryParams(['select', 'flag', 'path'], newSelectedStId, abbreviation!, this.route);

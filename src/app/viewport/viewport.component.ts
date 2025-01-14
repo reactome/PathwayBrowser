@@ -9,6 +9,7 @@ import {EhldService} from "../services/ehld.service";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
+import {EventService} from "../services/event.service";
 
 
 @Component({
@@ -23,7 +24,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
   @Input('id') diagramId: string = '';
-  hasEHLD: boolean | undefined =  undefined;
+  hasEHLD? : boolean;
 
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
   currentSpecies: Species | undefined = undefined;
@@ -38,7 +39,8 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
               private cdRef: ChangeDetectorRef,
               public analysis: AnalysisService,
               public dark: DarkService,
-              private ehldService: EhldService
+              private ehldService: EhldService,
+              private eventService: EventService,
   ) {
   }
 
@@ -55,7 +57,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
     });
 
     if (this.diagramId) {
-      this.checkHasEHLD();
+      this.getEnhancedResult();
     }
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this),).subscribe((hasEHLD) => {
@@ -75,23 +77,20 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  private checkHasEHLD(): void {
-    this.ehldService.hasEHLD(this.diagramId).subscribe({
-        next: (hasEHLD: boolean) => {
-          this.hasEHLD = hasEHLD;
-          this.ehldService.setHasEHLD(this.hasEHLD);
-          this.cdRef.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error fetching EHLD status:', error);
-          this.hasEHLD = false;
-        }
-      }
-    );
+  private getEnhancedResult(): void {
+    this.eventService.fetchEnhancedEventData(this.diagramId)
+      .subscribe((enhancedResult) => {
+        this.eventService.setDiagramEvent(enhancedResult);
+        const hasEHLD = enhancedResult.hasEHLD ? enhancedResult.hasEHLD : false;
+        this.hasEHLD = hasEHLD;
+        this.ehldService.setHasEHLD(hasEHLD);
+        this.cdRef.detectChanges();
+      })
   }
 
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.checkHasEHLD();
+    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.getEnhancedResult();
   }
 }
 
