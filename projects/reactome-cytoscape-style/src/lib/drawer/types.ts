@@ -8,7 +8,7 @@ type BaseImage = {
   [k in keyof BackgroundImage]: BackgroundImage[k] extends PropertyValueNode<infer X> ? X : never;
 }
 
-export type Image = BaseImage & {requireGradient?: boolean}
+export type Image = BaseImage & {requireGradient?: boolean, optional?: boolean}
 
 
 export interface Drawer {

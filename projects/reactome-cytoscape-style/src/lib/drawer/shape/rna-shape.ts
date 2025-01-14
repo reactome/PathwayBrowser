@@ -13,6 +13,18 @@ export const rna: DrawerProvider = (properties, {width, height}) => {
   const oR = r + thick;
   const iR = r - thick;
   return {
+    background: {
+      "background-image": `
+       <path fill="${fill}" d="
+       M 0 0
+       H ${width}
+       V ${height - r }
+       a ${r} ${r} 0 0 1 -${r} ${r}
+       H ${r}
+       a ${r} ${r} 0 0 1 -${r} -${r}
+       Z"/>`,
+      optional: true
+    },
     hover: {
       "background-image": `<rect x="0" y="0" width="${width}" height="${2 * thick}" fill="${hover}"/>`,
       "background-position-y": -thick,

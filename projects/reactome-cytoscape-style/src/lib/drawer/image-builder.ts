@@ -43,9 +43,28 @@ export const imageBuilder = (properties: Properties, style: Style) => memoize(
 
     const drawer = provider(properties, drawerParams);
 
+    if (node.hasClass('Polymer')) {
+      [
+        drawer.background,
+        ...(drawer.decorators || [])
+      ].filter(layer => !!layer)
+        .map(originalLayer => {
+          const polymerLayer = {...originalLayer};
+          polymerLayer["background-position-x"] = (polymerLayer["background-position-x"] || 0) as number + extract(properties.polymer.distance);
+          polymerLayer["background-position-y"] = (polymerLayer["background-position-y"] || 0) as number + extract(properties.polymer.distance);
+          polymerLayer["bounds-expansion"] = (polymerLayer["bounds-expansion"] || 0) as number + extract(properties.polymer.distance) * 2;
+          polymerLayer["background-image"] = `<g style="filter: ${extract(properties.polymer.filter)}">` + polymerLayer["background-image"] + '</g>';
+          layers.push(polymerLayer);
+          return originalLayer as Image;
+        }).forEach((layer) => {
+        layers.push(layer);
+      })
+
+    }
+
     if (node.hasClass('flag') && drawer.flag) layers.push(drawer.flag);
 
-    if (drawer.background) layers.push(drawer.background);
+    if (drawer.background && !drawer.background.optional) layers.push(drawer.background);
 
     if (exps && drawer.analysis) layers.push(drawer.analysis);
 
@@ -59,7 +78,7 @@ export const imageBuilder = (properties: Properties, style: Style) => memoize(
       layers.push(RX(properties, drawerParams, clazz));
     }
 
-    if (node.classes().includes('Pathway')) {
+    if (node.hasClass('Pathway')) {
       layers.push(Pathway(properties, drawerParams));
     }
 
@@ -93,10 +112,10 @@ export const imageBuilder = (properties: Properties, style: Style) => memoize(
 
 const defaultBg: Image = {
   "background-image": "",
-  "background-position-x": "0",
-  "background-position-y": "0",
-  "background-offset-x": "0",
-  "background-offset-y": "0",
+  "background-position-x": 0,
+  "background-position-y": 0,
+  "background-offset-x": 0,
+  "background-offset-y": 0,
   "background-width": "100%",
   "background-height": "100%",
   "background-fit": "none",

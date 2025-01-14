@@ -69,6 +69,10 @@ export interface Properties extends PropertiesType {
     drug: Property<string>
     cut: Property<number>
   }
+  polymer : {
+    distance: Property<number>
+    filter: Property<string>
+  }
   cell: {
     thickness: Property<number>
     fill: Property<string>
@@ -128,7 +132,7 @@ export function setDefaults(properties: UserProperties = {}, css: CSSStyleDeclar
     .setDefault('flag', () => css.getPropertyValue('--flag') || '#DE75B4')
 
   const compartment: Properties['compartment'] = defaultable(properties.compartment || {})
-    .setDefault('opacity', () => Number.parseFloat(css.getPropertyValue('--opacity')) || 0.06)
+    .setDefault('opacity', () => Number.parseFloat(css.getPropertyValue('--compartment-opacity')) || 0.06)
     .setDefault('fill', () => css.getPropertyValue('--compartment') || '#E5834A')
 
   const shadow: Properties['shadow'] = defaultable(properties.shadow || {})
@@ -186,6 +190,10 @@ export function setDefaults(properties: UserProperties = {}, css: CSSStyleDeclar
     .setDefault("fill", () => css.getPropertyValue('--tertiary-contrast-3') || '#1660A5')
     .setDefault("stroke", () => css.getPropertyValue('--on-tertiary') || '#FFFFFF')
     .setDefault('drug', () => css.getPropertyValue('--drug-contrast-4') || '#BB557A')
+
+  const polymer: Properties['polymer' ] = defaultable(properties.polymer || {})
+    .setDefault('distance', () => 3 * extract(global.thickness))
+    .setDefault('filter', () => css.getPropertyValue('--polymer-filter') || 'invert(0.2)')
 
   const cell: Properties['cell'] = defaultable(properties.cell || {})
     .setDefault('thickness', () => Number.parseFloat(css.getPropertyValue('--cell-thickness')) || 16)
@@ -260,6 +268,7 @@ export function setDefaults(properties: UserProperties = {}, css: CSSStyleDeclar
     complex,
     entitySet,
     cell,
+    polymer,
     pathway,
     modification,
     interactor,
