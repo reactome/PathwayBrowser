@@ -96,10 +96,10 @@
 
 .authors {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
   padding: 0 0 0 1.5px;
-  gap: 1.5px;
+  gap: 5px;
 
 
   & > :last-child {
@@ -144,7 +144,7 @@
 
 .additional-authors {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   gap: 5px;
 }
