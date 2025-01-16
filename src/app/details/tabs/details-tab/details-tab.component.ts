@@ -39,7 +39,7 @@ export class DetailsTabComponent implements AfterViewInit {
 
 
 
-  OpenDetailsPage(stId: string) {
+  openDetailsPage(stId: string) {
     const url = `${environment.host}/content/detail/${stId}`;
     window.open(url, '_blank');
   }

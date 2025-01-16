@@ -25,7 +25,7 @@
         <span class="name">{{ obj.displayName }}</span>
       </div>
       <div class="details-button">
-        <button mat-button (click)="OpenDetailsPage(obj.stId)">
+        <button mat-button (click)="openDetailsPage(obj.stId)">
           <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
           <span class="details-label"> Details page</span>
         </button>
@@ -52,11 +52,11 @@
     </div>
 
     <!-- References container-->
-    <div class="refs-container">
+    <div class="refs-container" *ngIf="obj.literatureReference">
       <div class="ref-row" *ngFor="let ref of obj.literatureReference">
         <div class="year-container">{{ ref.year }}</div>
         <div class="composition-container">
-          <cr-publication [publication]=ref></cr-publication>
+          <cr-publication [publication]=ref [showYear]="false"></cr-publication>
         </div>
       </div>
     </div>
