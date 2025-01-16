@@ -1,12 +1,12 @@
 <div id="tree-container">
   <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
     <!-- This is the tree node template for leaf nodes -->
-    <mat-tree-node *matTreeNodeDef="let node" [matTreeNodePadding]="0">
-      <cr-publication [publication]=node></cr-publication>
+    <mat-tree-node *matTreeNodeDef="let node" >
+      <cr-publication [publication]=node [showYear]="true"></cr-publication>
     </mat-tree-node>
 
     <!-- This is the tree node template for expandable nodes -->
-    <mat-tree-node *matTreeNodeDef="let node;when: hasChild" [matTreeNodePadding]="0" matTreeNodeToggle
+    <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodeToggle
                    [cdkTreeNodeTypeaheadLabel]="node.name" class="root">
       <button mat-icon-button matTreeNodeToggle class="button"
               [attr.aria-label]="'Toggle ' + node.name">
