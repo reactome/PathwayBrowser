@@ -91,6 +91,7 @@ export class IconService {
     {name: 'download-tab', tooltip: 'Download Tab', route: 'download-tab'},
     {name: 'double-arrow-right', tooltip: 'Double Arrow Right', route: 'double-arrow-right'},
     {name: 'reference', tooltip: 'References', route: 'reference'},
+    {name: 'orcid', tooltip: 'Orcid', route: 'orcid'},
   ];
 
   speciesIcons = [
