@@ -5,6 +5,7 @@ import {environment} from "../../../../environments/environment";
 import {DomSanitizer} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
 import {Router} from "@angular/router";
+import {sortByYearDescending} from "../../../services/utils";
 
 
 @Component({
@@ -59,6 +60,12 @@ export class DetailsTabComponent implements AfterViewInit {
         }
       });
     }
+
+    // Sort by year
+    if (this.obj && this.obj.literatureReference) {
+      this.obj.literatureReference = sortByYearDescending(this.obj.literatureReference);
+    }
+
   }
 
 

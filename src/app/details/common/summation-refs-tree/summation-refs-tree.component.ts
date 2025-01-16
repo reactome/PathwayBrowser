@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, Input} from '@angular/core';
 import {LiteratureReference, Summation} from "../../../model/event.model";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
+import {sortByYearDescending} from "../../../services/utils";
 
 
 @Component({
@@ -23,6 +24,9 @@ export class SummationRefsTreeComponent implements AfterViewInit {
   ngAfterViewInit(): void {
 
     if (this.summation) {
+
+      this.summation.literatureReference = sortByYearDescending(this.summation.literatureReference);
+
       this.dataSource.data = [this.summation];
       this.title = `${this.summation.literatureReference.length} references`
     }
