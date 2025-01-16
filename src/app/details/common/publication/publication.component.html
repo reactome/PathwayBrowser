@@ -1,19 +1,44 @@
 <div class="publication-container">
   <div class="left">
+
     <div class="title">
       <div class="ribbon"></div>
-      <span class="publication-name">{{ ref?.displayName }}</span>
+      <span class="publication-name">{{ ref.displayName }}</span>
     </div>
-    <div class="authors">
-      <span class="authors">authors</span>
+
+    <div class="authors" *ngIf="ref.author?.[0] as firstAuthor">
+      <!-- Show the first author -->
+      <div class="first-author">
+        <a [href]="environment + '/content/detail/person/'+ firstAuthor.dbId" target="_blank"> {{ firstAuthor.displayName }}</a>
+<!--        <span (click)="openPersonDetails(firstAuthor.dbId)">{{ firstAuthor.displayName }}</span>-->
+        <!--ORCID-->
+        <span *ngIf="firstAuthor.orcidId">
+          <a [href]="'https://orcid.org/' + firstAuthor.orcidId" target="_blank">
+          <mat-icon class="ref-icon" [svgIcon]="'orcid'"></mat-icon>
+          </a>
+        </span>
+        <!--et al.-->
+        <span *ngIf="!isExpanded">et al.</span>
+        <!--year-->
+        <span *ngIf="showYear">  - {{ ref?.year }}</span>
+        <!--icon-->
+        <mat-icon class="ref-icon" [svgIcon]="isExpanded ? 'expand' : 'collapse'" (click)="toggleAuthors()"></mat-icon>
+      </div>
+      <!-- Show the rest of the authors when expanded -->
+      <div *ngIf="isExpanded" class="additional-authors">
+        <div *ngFor="let author of ref.author.slice(1)" class="first-author">
+          <a [href]="environment + '/content/detail/person/'+ author.dbId" target="_blank"> {{ author.displayName }}</a>
+        </div>
+      </div>
     </div>
+
   </div>
   <div class="right">
     <div class="journal">
-      <span class="journal-name"> {{ ref?.journal }}</span>
+      <span class="journal-name"> {{ ref.journal }}</span>
     </div>
-    <div class="quote-container">
-      <a [href]="ref?.url" target="_blank">
+    <div class="quote-container" *ngIf="ref.url">
+      <a [href]="ref.url" target="_blank">
         <mat-icon class='quote-icon' [svgIcon]="'format-quote'">></mat-icon>
       </a>
     </div>

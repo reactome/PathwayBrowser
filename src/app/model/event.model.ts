@@ -71,18 +71,18 @@ export interface Summation{
 
 
 export interface LiteratureReference {
-  author?: Person;
+  author: Person[];
   displayName?: string;
   title?: string;
   journal?: string;
   year?: number;
   url?: string;
 
-  // Just for building tree structure
-  // name?: string;
-  // children?: LiteratureReference[];
+
 }
 
 export interface Person{
   displayName: string;
+  orcidId: string;
+  dbId: number;
 }
