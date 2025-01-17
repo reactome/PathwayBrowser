@@ -11,6 +11,7 @@
   gap: 20px;
   justify-content: space-between;
   width: 100%;
+  height: 100%;
   font-family: 'Roboto Flex', sans-serif;
 
   .left {
@@ -19,6 +20,8 @@
     align-items: flex-start;
     padding: 0px;
     flex: 1 1 auto;
+    height: 100%;
+    justify-content: space-between;
   }
 
   .right {
@@ -36,7 +39,7 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 0px;
+  padding: 0;
 
 
   position: relative;
@@ -44,6 +47,7 @@
 
   .publication-name {
     padding-left: 12px;
+    margin: -4px 0px -4px 0px; // To make the ribbon has the same height as the text,  needs improvement
   }
 }
 
@@ -94,45 +98,21 @@
   }
 }
 
-.authors {
+.authors-container {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   padding: 0 0 0 1.5px;
   gap: 5px;
 
-
-  & > :last-child {
-    // margin-left: 5px;
-  }
-
-  & > :only-child {
-    // margin-left: 0;
-  }
-
 }
 
-
-.first-author {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-
-  a {
-    text-decoration: none;
-    color: var(--on-surface);
-  }
-
-}
-
-
-.first-author:before {
+.authors-container:before {
   content: "•";
   vertical-align: middle;
   color: var(--primary);
 }
+
 
 .ref-icon {
   display: flex;
@@ -149,3 +129,18 @@
   gap: 5px;
 }
 
+.authors {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 0 0 1.5px;
+  flex-wrap: wrap;
+
+  & > :last-child {
+    margin-left: 5px;
+  }
+
+  & > :only-child {
+    margin-left: 0;
+  }
+}

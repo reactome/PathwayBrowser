@@ -6,37 +6,42 @@
       <span class="publication-name">{{ ref.displayName }}</span>
     </div>
 
-    <div class="authors" *ngIf="ref.author[0] as firstAuthor">
-      <!-- Show the first author -->
-      <div class="first-author">
+    <div class="authors-container" *ngIf="ref.author[0] as firstAuthor">
+
+      <div class="authors">
+        <!-- First author -->
         <!--        <a [href]="environment + '/content/detail/person/'+ firstAuthor.dbId" target="_blank"> -->
-        {{ firstAuthor.displayName }}
+        <span>{{ firstAuthor.surname }} {{ firstAuthor.initial }}</span>
         <!--        </a>-->
+
+        <!-- Show the rest of the authors when expanded -->
+        <ng-container *ngIf="isExpanded" class="additional-authors">
+            <span *ngFor="let author of ref.author.slice(1)">
+              <!--          <a [href]="environment + '/content/detail/person/'+ author.dbId" target="_blank">-->
+              , {{ author.surname }} {{ author.initial }}
+              <!--          </a>-->
+            </span>
+        </ng-container>
+
+        <!-- ORCID-->
         <span *ngIf="firstAuthor.orcidId">
           <a [href]="'https://orcid.org/' + firstAuthor.orcidId" target="_blank">
           <mat-icon class="ref-icon" [svgIcon]="'orcid'"></mat-icon>
           </a>
         </span>
+
         <!--et al.-->
         <span *ngIf="ref.author.length > 1 && !isExpanded">et al.</span>
-      </div>
-      <!-- Show the rest of the authors when expanded -->
-      <div *ngIf="isExpanded" class="additional-authors">
-        <ng-container *ngFor="let author of ref.author.slice(1)">
-          <!--          <a [href]="environment + '/content/detail/person/'+ author.dbId" target="_blank">-->
-          ,{{ author.displayName }}
-          <!--          </a>-->
-        </ng-container>
-      </div>
 
-      <!--year-->
-      <span *ngIf="showYear">  - {{ ref?.year }}</span>
-      <!--icon-->
-      <div *ngIf="ref.author.length > 1">
-        <mat-icon class="ref-icon" [svgIcon]="isExpanded ? 'expand' : 'collapse'" (click)="toggleAuthors()"></mat-icon>
+        <!--year-->
+        <span *ngIf="showYear">  - {{ ref?.year }}</span>
+
+        <!--icon-->
+        <span *ngIf="ref.author.length > 1">
+          <mat-icon class="ref-icon" [svgIcon]="isExpanded ? 'expand' : 'collapse'" (click)="toggleAuthors()"></mat-icon>
+        </span>
+
       </div>
-
-
     </div>
 
   </div>

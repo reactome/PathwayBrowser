@@ -85,4 +85,6 @@ export interface Person{
   displayName: string;
   orcidId: string;
   dbId: number;
+  surname: string;
+  initial:string
 }

@@ -7,7 +7,7 @@ import {environment} from "../../../../environments/environment";
   templateUrl: './publication.component.html',
   styleUrl: './publication.component.scss'
 })
-export class PublicationComponent {
+export class PublicationComponent{
   @Input('publication') ref!: LiteratureReference;
   @Input('showYear') showYear: boolean = false;
   isExpanded = false;
