@@ -5,11 +5,24 @@
 
 #tree-container {
   background: var(--surface);
+  font-family: 'Roboto Flex', sans-serif;
+
 
   .mat-tree {
     background: var(--surface);
   }
+
   .mat-tree-node {
+
+    &.root {
+      margin-top: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--surface);
+    }
+
+
     margin-top: 8px;
   }
 
@@ -19,12 +32,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   padding: 4px 4px 5px;
   gap: 10px;
-
-  width: 24px;
+  width: 100%;
   height: 24px;
+  border-radius: 50px;
 }
 
 .ref-icon {
@@ -44,9 +57,14 @@
   gap: 4px;
 }
 
-.root {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--surface);
+.title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  gap: 10px
 }

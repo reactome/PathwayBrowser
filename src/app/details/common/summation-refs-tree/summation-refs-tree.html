@@ -1,18 +1,20 @@
 <div id="tree-container">
   <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
     <!-- This is the tree node template for leaf nodes -->
-    <mat-tree-node *matTreeNodeDef="let node" >
+    <mat-tree-node *matTreeNodeDef="let node">
       <cr-publication [publication]=node [showYear]="true"></cr-publication>
     </mat-tree-node>
 
     <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodeToggle
                    [cdkTreeNodeTypeaheadLabel]="node.name" class="root">
-      <button mat-icon-button matTreeNodeToggle class="button"
-              [attr.aria-label]="'Toggle ' + node.name">
+      <button mat-button matTreeNodeToggle class="button" [attr.aria-label]="'Toggle ' + node.name">
+       <span class="title">
         <mat-icon class="ref-icon" [svgIcon]="tree.isExpanded(node) ? 'expand' : 'collapse'"></mat-icon>
+         {{ title }}
+        </span>
       </button>
-      {{ title }}
+
     </mat-tree-node>
   </mat-tree>
 </div>
