@@ -260,7 +260,7 @@ $small-breakpoint-width: 959px;
   align-items: flex-start;
   padding: 4px 0;
   gap: 10px;
-  width:100%;
+  width: 100%;
 
 
   .control-container {
@@ -284,7 +284,7 @@ $small-breakpoint-width: 959px;
 
   flex: 1;
 
-  .item{
+  .item {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -296,23 +296,27 @@ $small-breakpoint-width: 959px;
 
 }
 
-.refs-container{
+.refs-container {
+  min-height: 50px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.element-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0px;
+  padding: 0;
   gap: 8px;
-  width:100%;
- // max-height: 132px;
- // overflow-y: scroll;
+  width: 100%;
 }
 
 .ref-row {
   display: flex;
   flex-direction: row;
-  padding: 4px 0;
+  padding: 0;
   gap: 10px;
-  width:100%;
+  width: 100%;
 }
 
 .year-container {
