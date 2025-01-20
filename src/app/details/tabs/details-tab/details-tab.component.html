@@ -42,7 +42,7 @@
 
 
     <!-- References divider-->
-    <div class="divider-container">
+    <div class="divider-container" *ngIf="obj.literatureReference">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
       </div>
@@ -52,7 +52,7 @@
     </div>
 
     <!-- References container-->
-    <div class="refs-container" *ngIf="obj.literatureReference">
+    <div class="element-container refs-container" *ngIf="obj.literatureReference">
       <div class="ref-row" *ngFor="let ref of obj.literatureReference">
         <div class="year-container">{{ ref.year }}</div>
         <div class="composition-container">
