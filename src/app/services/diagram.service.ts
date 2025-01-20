@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {catchError, forkJoin, map, Observable, of, switchMap, tap} from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {Diagram, Edge, Node, NodeConnector, Position, Prop, Rectangle} from "../model/diagram.model";
 import {Graph} from "../model/graph.model";
 import Reactome, {Style} from "reactome-cytoscape-style";
@@ -88,12 +88,28 @@ export class DiagramService {
       ['ProteinDrug', ['Protein', 'PhysicalEntity', 'drug']],
       ['ComplexDrug', ['Complex', 'PhysicalEntity', 'drug']],
       ['ChemicalDrug', ['Molecule', 'PhysicalEntity', 'drug']],
+      ['RNADrug', ['RNA', 'PhysicalEntity', 'drug']],
       ['EntitySetDrug', ['EntitySet', 'PhysicalEntity', 'drug']],
 
       ['ProcessNode', ['SUB', 'Pathway']],
       ['EncapsulatedNode', ['Interacting', 'Pathway']]
     ]
   )
+
+  schemaClassToNodeTypeMap = new Map<string, string>([
+    ['SimpleEntity', 'Chemical'],
+    ['CandidateSet', 'EntitySet'],
+    ['DefinedSet', 'EntitySet'],
+    ['OtherEntity', 'Entity'],
+
+    ['ReferenceMolecule', 'Chemical'],
+    ['ReferenceDNASequence', 'Gene'],
+    ['ReferenceRNASequence', 'RNA'],
+    ['ReferenceGeneProduct', 'Protein'],
+    ['ReferenceIsoform', 'Protein'],
+    ['ReferenceTherapeutic', 'ChemicalDrug'],
+
+  ]);
 
   reactionTypeMap = new Map<string | undefined, ReactionDefinition>([
       [undefined, ['transition', 'reaction']],
@@ -369,7 +385,16 @@ export class DiagramService {
 
         //entity nodes
         const entityNodes: cytoscape.NodeDefinition[] = diagram?.nodes.flatMap(item => {
-          const classes = [...this.nodeTypeMap.get(item.renderableClass)!] || [item.renderableClass.toLowerCase()];
+          let classes = [...this.nodeTypeMap.get(item.renderableClass)!] || [item.renderableClass.toLowerCase()];
+          if (item.schemaClass === "Polymer") {
+            const polymerGraphNode = dbIdToGraphNode.get(item.reactomeId)!;
+            console.log(polymerGraphNode);
+            const unitGraph = dbIdToGraphNode.get(polymerGraphNode.children[0])!;
+
+            const unitClass = this.nodeTypeMap.get(unitGraph.schemaClass) || this.nodeTypeMap.get(this.schemaClassToNodeTypeMap.get(unitGraph.schemaClass === 'EntityWithAccessionedSequence' ? unitGraph.referenceType : unitGraph.schemaClass)!) || ['GenomeEncodedEntity', 'PhysicalEntity'];
+            classes = [...unitClass, "Polymer"]
+            console.log(classes)
+          }
           let replacedBy: string | undefined;
           let replacement: string | undefined;
           if (item.isDisease) classes.push('disease');
@@ -389,7 +414,6 @@ export class DiagramService {
           if (!item.isFadeOut) replacement = posToNormalNode.get(pointToStr(item.position))?.id.toString() //|| normalNodes.find(node => overlap(item, node))?.id.toString();
           if (classes.some(clazz => clazz === 'RNA')) item.prop.height -= 10;
           if (classes.some(clazz => clazz === 'Cell')) item.prop.height /= 2;
-
           const isBackground = item.isFadeOut || classes.some(clazz => clazz === 'Pathway') || item.connectors.some(connector => connector.isFadeOut);
           item.isBackground = isBackground;
           let html = undefined;
@@ -792,7 +816,7 @@ export class DiagramService {
   }
 
   getEHLDSvg(id: number | string): Observable<string> {
-    return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, { responseType: 'text' });
+    return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
   }
 }
 

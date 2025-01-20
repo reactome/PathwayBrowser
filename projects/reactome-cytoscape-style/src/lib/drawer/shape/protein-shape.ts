@@ -13,6 +13,10 @@ export const protein: DrawerProvider = (properties, {width, height, drug}) => {
   const iR = radius - thick;
 
   return {
+    background: {
+      optional: true,
+      "background-image": `<rect width="${width}" height="${height}" fill="${fill}" rx="${radius}"/>`,
+    },
     hover: {
       "background-image": `
           <path fill="${hover}" stroke-linejoin="round" stroke-linecap="round"  d="
