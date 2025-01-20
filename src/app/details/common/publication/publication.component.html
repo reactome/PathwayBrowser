@@ -31,7 +31,7 @@
         </span>
 
         <!--et al.-->
-        <span *ngIf="ref.author.length > 1 && !isExpanded">et al.</span>
+        <span *ngIf="ref.author.length > 1 && !isExpanded">&nbsp;et al.</span>
 
         <!--year-->
         <span *ngIf="showYear">  - {{ ref?.year }}</span>
