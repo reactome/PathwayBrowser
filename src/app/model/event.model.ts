@@ -38,6 +38,8 @@ export interface Event extends DatabaseObject {
   output: Event[];
   [key: string]: any;
   literatureReference?: LiteratureReference[];
+  authored: InstanceEdit[];
+  reviewed: InstanceEdit[];
 }
 
 export interface Compartment{

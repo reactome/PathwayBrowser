@@ -1,5 +1,5 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Input} from '@angular/core';
-import {Event} from "../../../model/event.model";
+import {Event, InstanceEdit} from "../../../model/event.model";
 import {Analysis} from "../../../model/analysis.model";
 import {environment} from "../../../../environments/environment";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -17,27 +17,25 @@ export class DetailsTabComponent implements AfterViewInit {
 
   @Input('event') obj?: Event;
   @Input('analysisResult') analysisResult?: Analysis.Result;
-  iconContent: string = '';
-  currentUrl!: string;
-
   @Input('tabWidth') tabWidth?: number;
 
+  iconContent: string = '';
+  currentUrl!: string;
+  authorship: { label: string, data: InstanceEdit[] }[] = []
 
   elements = [
-    { key: 'input', label: 'Inputs' },
-    { key: 'output', label: 'Outputs' },
-    { key: 'catalystActivity', label: 'Catalyst Activity' },
-    { key: 'inferredFrom', label: 'Inferred From' }
+    {key: 'input', label: 'Inputs'},
+    {key: 'output', label: 'Outputs'},
+    {key: 'catalystActivity', label: 'Catalyst Activity'},
+    {key: 'inferredFrom', label: 'Inferred From'}
   ]
-
 
   constructor(private iconService: IconService,
               private sanitizer: DomSanitizer,
               private cdr: ChangeDetectorRef,
               private router: Router
-              ) {
+  ) {
   }
-
 
 
   openDetailsPage(stId: string) {
@@ -47,9 +45,11 @@ export class DetailsTabComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
 
+    if (!this.obj) return;
+
     this.currentUrl = this.router.url
 
-    if (this.obj && this.obj.referenceEntity) {
+    if (this.obj.referenceEntity) {
       const identifier = this.obj.referenceEntity.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
         if (icon && this.obj) {
@@ -61,10 +61,17 @@ export class DetailsTabComponent implements AfterViewInit {
       });
     }
 
+    this.authorship = [
+      ...(this.obj.authored?.length >0 ? [{label: 'Author', data: this.obj.authored}] : []),
+      ...(this.obj.reviewed?.length> 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
+    ];
+
+
     // Sort by year
     if (this.obj && this.obj.literatureReference) {
       this.obj.literatureReference = sortByYearDescending(this.obj.literatureReference);
     }
+
 
   }
 
@@ -75,8 +82,8 @@ export class DetailsTabComponent implements AfterViewInit {
 
   scrollToSection(sectionId: string) {
     const section = document.getElementById(sectionId);
-    if(section){
-      section.scrollIntoView({behavior:'smooth'});
+    if (section) {
+      section.scrollIntoView({behavior: 'smooth'});
     }
   }
 
