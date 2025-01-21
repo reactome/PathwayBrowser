@@ -34,7 +34,7 @@
 
 
     <div class="overview" [ngClass]="{'update-layout': obj.referenceEntity}">
-      <cr-details-overview [obj]="obj"></cr-details-overview>
+      <cr-details-tab-overview [obj]="obj"></cr-details-tab-overview>
       <div *ngIf="obj.hasIcon" class="icon-container">
         <div class="icon" [innerHTML]="iconContent"></div>
       </div>

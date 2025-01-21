@@ -42,7 +42,7 @@ import {DiagramHomeComponent} from './diagram-home/diagram-home.component';
 import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details/details.component";
-import {DetailsOverviewComponent} from "./details/common/details-overview/details-overview.component";
+import {DetailsTabOverviewComponent} from "./details/common/details-tab-overview/details-tab-overview.component";
 import {DetailsTabComponent} from "./details/tabs/details-tab/details-tab.component";
 import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/summation-refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
@@ -61,7 +61,7 @@ import {PublicationComponent} from "./details/common/publication/publication.com
     DiagramHomeComponent,
     DetailsComponent,
     DetailsTabComponent,
-    DetailsOverviewComponent,
+    DetailsTabOverviewComponent,
     SummationRefsTreeComponent,
     PublicationComponent,
 
