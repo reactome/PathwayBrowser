@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
+ import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
 import {EventService} from "../services/event.service";
 import {Event} from "../model/event.model";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
