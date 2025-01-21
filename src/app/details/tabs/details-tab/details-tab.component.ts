@@ -62,8 +62,8 @@ export class DetailsTabComponent implements AfterViewInit {
     }
 
     this.authorship = [
-      ...(this.obj.authored?.length >0 ? [{label: 'Author', data: this.obj.authored}] : []),
-      ...(this.obj.reviewed?.length> 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
+      ...(this.obj.authored?.length > 0 ? [{label: 'Author', data: this.obj.authored}] : []),
+      ...(this.obj.reviewed?.length > 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
     ];
 
 
@@ -71,7 +71,6 @@ export class DetailsTabComponent implements AfterViewInit {
     if (this.obj && this.obj.literatureReference) {
       this.obj.literatureReference = sortByYearDescending(this.obj.literatureReference);
     }
-
 
   }
 

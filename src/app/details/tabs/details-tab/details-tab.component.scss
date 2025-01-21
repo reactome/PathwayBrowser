@@ -29,8 +29,6 @@ $small-breakpoint-width: 959px;
   height: 100%;
   margin-left: var(--padding);
 
-  //background: #0C9509;
-
   @media (max-width: $small-breakpoint-width) {
     width: calc(100% - 2 * var(--padding));
   }
@@ -81,7 +79,6 @@ $small-breakpoint-width: 959px;
     padding: 0px;
     gap: 5px;
     height: 40px;
-    //background: #145b99;
 
 
     .details-label {
