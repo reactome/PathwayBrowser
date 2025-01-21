@@ -13,6 +13,7 @@
   width: 100%;
   height: 100%;
   font-family: 'Roboto Flex', sans-serif;
+  line-height: normal;
 
   .left {
     display: flex;
@@ -28,9 +29,10 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    padding: 0px;
+    padding: 0;
     gap: 4px;
     min-width: fit-content;
+    height: 20px; // Fake height smaller than reality to ignore this section height (better looking)
   }
 }
 
@@ -44,10 +46,11 @@
 
   position: relative;
   min-height: fit-content;
+  line-height: normal;
 
   .publication-name {
     padding-left: 12px;
-    margin: -4px 0px -4px 0px; // To make the ribbon has the same height as the text,  needs improvement
+    margin: -2px 0px -2px 0px; // To make the ribbon has the same height as the text,  needs improvement
   }
 }
 
