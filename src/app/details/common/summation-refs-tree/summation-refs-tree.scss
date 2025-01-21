@@ -22,6 +22,9 @@
       background: var(--surface);
     }
 
+    &:last-child:not(:only-child) {
+      margin-bottom: 7px; // Compensate for section of citation button that gets eaten by forced parent height (20px instead of 27px)
+    }
 
     margin-top: 8px;
   }
@@ -37,6 +40,7 @@
   width: 100%;
   height: 24px;
   border-radius: 50px;
+  margin-left: -6px;
 }
 
 .ref-icon {
