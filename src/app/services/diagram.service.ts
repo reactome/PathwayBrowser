@@ -386,6 +386,7 @@ export class DiagramService {
         //entity nodes
         const entityNodes: cytoscape.NodeDefinition[] = diagram?.nodes.flatMap(item => {
           let classes = [...this.nodeTypeMap.get(item.renderableClass)!] || [item.renderableClass.toLowerCase()];
+          let unitId = undefined;
           if (item.schemaClass === "Polymer") {
             const polymerGraphNode = dbIdToGraphNode.get(item.reactomeId)!;
             console.log(polymerGraphNode);
@@ -393,7 +394,7 @@ export class DiagramService {
 
             const unitClass = this.nodeTypeMap.get(unitGraph.schemaClass) || this.nodeTypeMap.get(this.schemaClassToNodeTypeMap.get(unitGraph.schemaClass === 'EntityWithAccessionedSequence' ? unitGraph.referenceType : unitGraph.schemaClass)!) || ['GenomeEncodedEntity', 'PhysicalEntity'];
             classes = [...unitClass, "Polymer"]
-            console.log(classes)
+            unitId = unitGraph.identifier;
           }
           let replacedBy: string | undefined;
           let replacement: string | undefined;
@@ -419,7 +420,7 @@ export class DiagramService {
           let html = undefined;
           let width = scale(item.prop.width);
           let height = scale(item.prop.height);
-          let preferredId = idToGraphNodes.get(item.id)?.identifier;
+          let preferredId = unitId || idToGraphNodes.get(item.id)?.identifier;
           if (classes.some(clazz => clazz === 'Protein')) {
             html = this.getStructureVideoHtml({...item, type: 'Protein'}, width, height, preferredId);
           } else if (classes.some(clazz => clazz === 'Molecule')) {
