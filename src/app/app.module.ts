@@ -42,10 +42,10 @@ import {DiagramHomeComponent} from './diagram-home/diagram-home.component';
 import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details/details.component";
-import {DetailsTabOverviewComponent} from "./details/common/details-tab-overview/details-tab-overview.component";
-import {DetailsTabComponent} from "./details/tabs/details-tab/details-tab.component";
+import {DescriptionComponent} from "./details/tabs/description/description.component";
 import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/summation-refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
+import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
 
 @NgModule({
   declarations: [
@@ -60,8 +60,8 @@ import {PublicationComponent} from "./details/common/publication/publication.com
     EhldComponent,
     DiagramHomeComponent,
     DetailsComponent,
-    DetailsTabComponent,
-    DetailsTabOverviewComponent,
+    DescriptionComponent,
+    DescriptionOverviewComponent,
     SummationRefsTreeComponent,
     PublicationComponent,
 

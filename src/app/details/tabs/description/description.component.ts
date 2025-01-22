@@ -9,11 +9,11 @@ import {sortByYearDescending} from "../../../services/utils";
 
 
 @Component({
-  selector: 'cr-details-tab',
-  templateUrl: './details-tab.component.html',
-  styleUrl: './details-tab.component.scss'
+  selector: 'cr-description',
+  templateUrl: './description.component.html',
+  styleUrl: './description.component.scss'
 })
-export class DetailsTabComponent implements AfterViewInit {
+export class DescriptionComponent implements AfterViewInit {
 
   @Input('event') obj?: Event;
   @Input('analysisResult') analysisResult?: Analysis.Result;

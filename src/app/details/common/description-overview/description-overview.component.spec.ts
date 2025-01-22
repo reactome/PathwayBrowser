@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DetailsTabOverviewComponent } from './details-tab-overview.component';
+import { DescriptionOverviewComponent } from './description-overview.component';
 
 describe('OverviewBaseComponent', () => {
-  let component: DetailsTabOverviewComponent;
-  let fixture: ComponentFixture<DetailsTabOverviewComponent>;
+  let component: DescriptionOverviewComponent;
+  let fixture: ComponentFixture<DescriptionOverviewComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DetailsTabOverviewComponent]
+      imports: [DescriptionOverviewComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DetailsTabOverviewComponent);
+    fixture = TestBed.createComponent(DescriptionOverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

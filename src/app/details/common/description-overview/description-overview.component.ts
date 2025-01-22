@@ -2,11 +2,11 @@ import {Component, Input} from '@angular/core';
 import {Event} from "../../../model/event.model";
 
 @Component({
-  selector: 'cr-details-tab-overview',
-  templateUrl: './details-tab-overview.component.html',
-  styleUrl: './details-tab-overview.component.scss'
+  selector: 'cr-description-overview',
+  templateUrl: './description-overview.component.html',
+  styleUrl: './description-overview.component.scss'
 })
-export class DetailsTabOverviewComponent {
+export class DescriptionOverviewComponent {
 
   @Input('obj') obj?: Event;
 
