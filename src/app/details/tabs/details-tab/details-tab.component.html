@@ -11,11 +11,11 @@
 </ng-template>
 
 
-<div *ngIf="obj" id="details">
+<div *ngIf="obj" id="details" #details [style.--width.px]="details.clientWidth">
 
   <div class="content">
 
-    <div class="header">
+    <div class="header" id="overview">
       <div class="label">
         <mat-icon
           class="custom-icon"
@@ -42,7 +42,7 @@
 
 
     <!-- References divider-->
-    <div class="divider-container" *ngIf="obj.literatureReference">
+    <div class="divider-container" *ngIf="obj.literatureReference" id="literatureReference">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
       </div>
@@ -52,7 +52,7 @@
     </div>
 
     <!-- References container-->
-    <div class="element-container" *ngIf="obj.literatureReference">
+    <div class="element-container" *ngIf="obj.literatureReference" >
       <div class="ref-row" *ngFor="let ref of obj.literatureReference">
         <div class="year-container">{{ ref.year }}</div>
         <div class="composition-container">
@@ -63,7 +63,7 @@
 
 
     <!-- Authorship divider-->
-    <div class="divider-container" *ngIf="authorship.length > 0">
+    <div class="divider-container" *ngIf="authorship.length > 0" id="authorship">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Authorship' }"></ng-container>
       </div>
@@ -86,7 +86,7 @@
 
 
     <div class="elements-container" *ngFor="let element of elements">
-      <div *ngIf="obj[element.key]" [id]="element.key">
+      <div *ngIf="obj[element.key] && !element?.manual" [id]="element.key">
         <div class="divider-container">
           <div class="divider-name-container">
             <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
@@ -109,15 +109,10 @@
 
   <div class="toc">
     <ng-container *ngFor="let element of elements">
-      <nav>
-        <!--      <a *ngIf="obj[element.key]" (click)="scrollToSection(element.key)">{{ element.label }}</a>-->
-        <!-- Add href with '#' and section.key as the id -->
-        <a *ngIf="obj[element.key]" [href]="currentUrl + '#' + element.key">
+        <a *ngIf="obj[element.key]" [routerLink]="[]" [fragment]="element.key" [queryParamsHandling]="'preserve'">
           {{ element.label }}
         </a>
-      </nav>
     </ng-container>
-    <span>Test tissue: 9727355</span>
   </div>
 
 </div>

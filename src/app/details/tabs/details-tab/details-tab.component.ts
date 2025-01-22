@@ -1,11 +1,11 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Input} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, effect, Input} from '@angular/core';
 import {Event, InstanceEdit} from "../../../model/event.model";
 import {Analysis} from "../../../model/analysis.model";
-import {environment} from "../../../../environments/environment";
 import {DomSanitizer} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
-import {Router} from "@angular/router";
 import {sortByYearDescending} from "../../../services/utils";
+import {ActivatedRoute} from "@angular/router";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 
 @Component({
@@ -20,34 +20,35 @@ export class DetailsTabComponent implements AfterViewInit {
   @Input('tabWidth') tabWidth?: number;
 
   iconContent: string = '';
-  currentUrl!: string;
   authorship: { label: string, data: InstanceEdit[] }[] = []
 
   elements = [
+    {key: 'overview', label: 'Overview', manual: true},
+    {key: 'literatureReference', label: 'References', manual: true},
+    {key: 'authorship', label: 'Authorship', manual: true},
     {key: 'input', label: 'Inputs'},
     {key: 'output', label: 'Outputs'},
     {key: 'catalystActivity', label: 'Catalyst Activity'},
     {key: 'inferredFrom', label: 'Inferred From'}
   ]
 
+  section = toSignal(this.route.fragment)
+
   constructor(private iconService: IconService,
               private sanitizer: DomSanitizer,
               private cdr: ChangeDetectorRef,
-              private router: Router
+              private route: ActivatedRoute
   ) {
-  }
-
-
-  openDetailsPage(stId: string) {
-    const url = `${environment.host}/content/detail/${stId}`;
-    window.open(url, '_blank');
+    effect(() => {
+      !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'start'});
+    });
   }
 
   ngAfterViewInit(): void {
 
     if (!this.obj) return;
 
-    this.currentUrl = this.router.url
+    this.obj['overview'] = true;
 
     if (this.obj.referenceEntity) {
       const identifier = this.obj.referenceEntity.identifier;
@@ -66,6 +67,8 @@ export class DetailsTabComponent implements AfterViewInit {
       ...(this.obj.reviewed?.length > 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
     ];
 
+    this.obj['authorship'] = this.authorship.length > 0;
+
 
     // Sort by year
     if (this.obj && this.obj.literatureReference) {
@@ -77,13 +80,6 @@ export class DetailsTabComponent implements AfterViewInit {
 
   getIcon(obj: Event) {
     return this.iconService.getIconDetails(obj);
-  }
-
-  scrollToSection(sectionId: string) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({behavior: 'smooth'});
-    }
   }
 
 }

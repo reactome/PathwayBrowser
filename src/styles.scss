@@ -8,6 +8,18 @@ body {
   background: var(--surface);
 }
 
+a {
+  text-decoration: none;
+  color: var(--primary);
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: var(--tertiary);
+  }
+}
 
 .palette {
   //width: 100%;

@@ -43,7 +43,7 @@
   align-items: center;
   justify-content: flex-end;
 
-  width: 200px;
+  width: var(--column-width);
   padding-right: 10px;
   border-right: 2px solid var(--primary);
   font-weight: 600;
@@ -72,11 +72,6 @@
   .italic {
     font-style: italic;
     display: contents;
-  }
-
-  a {
-    text-decoration: none;
-    color: var(--primary);
   }
 
 }
@@ -119,18 +114,23 @@
   align-items: flex-start;
   gap: 20px;
   white-space: normal;
+
+  .left,
+  .right {
+    display: flex;
+    flex-direction: column;
+    text-align: justify;
+    flex: 1;
+  }
+
+  .left {
+    text-align-last: justify;
+  }
 }
 
-.summation-content-container .left,
-.summation-content-container .right {
-  display: flex;
-  flex-direction: column;
-  text-align: justify;
-  flex:1;
-}
 
 .summation-refs-container {
   display: flex;
   flex-direction: row;
-  width:100%;
+  width: 100%;
 }
