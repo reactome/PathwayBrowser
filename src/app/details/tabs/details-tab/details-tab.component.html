@@ -25,10 +25,10 @@
         <span class="name">{{ obj.displayName }}</span>
       </div>
       <div class="details-button">
-        <button mat-button (click)="openDetailsPage(obj.stId)">
+        <a mat-button [href]="'/content/detail/' + obj.stId" target="_blank">
           <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
           <span class="details-label"> Details page</span>
-        </button>
+        </a>
       </div>
     </div>
 
