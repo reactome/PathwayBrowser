@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 
@@ -11,7 +11,7 @@ import {DarkService} from "../services/dark.service";
 })
 export class DiagramHomeComponent {
 
-  @Input('id') diagramId: string = '';
+  readonly diagramId = input<string>('', { alias: "id" });
 
   constructor(public analysis: AnalysisService, public dark: DarkService) {
   }

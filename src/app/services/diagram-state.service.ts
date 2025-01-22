@@ -1,9 +1,11 @@
-import {Injectable} from '@angular/core';
+import {effect, Injectable, model, signal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {BehaviorSubject, distinctUntilChanged, firstValueFrom, map, Observable, tap} from "rxjs";
+import {BehaviorSubject, distinctUntilChanged, filter, firstValueFrom, map, Observable, tap} from "rxjs";
 import {isArray, isBoolean, isNumber} from "lodash";
-import { HttpClient } from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
+import {toSignal} from "@angular/core/rxjs-interop";
+import {isDefined} from "./utils";
 
 
 export interface UrlParam<T> {
@@ -31,6 +33,7 @@ export class DiagramStateService {
 
   private propagate = false;
 
+  diagramId = signal<string | undefined>(undefined)
 
   private state: State = {
     select: {otherTokens: ['SEL'], value: ''},
@@ -55,7 +58,18 @@ export class DiagramStateService {
       return properties;
     }, {} as ObservableState);
 
-  constructor(route: ActivatedRoute, private router: Router, private http: HttpClient) {
+  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {
+    effect(() => {
+      if (this.diagramId()) this.router.navigate([this.diagramId()], {
+        queryParamsHandling: 'preserve',
+        preserveFragment: true
+      })
+    });
+    this.route.paramMap.pipe(
+      map(params => params.get('id')),
+      filter(isDefined)
+    ).subscribe((id) => this.diagramId.set(id))
+
     route.queryParamMap.subscribe(async params => {
       for (const mainToken in this.state) {
         const param = this.state[mainToken];

@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 #hierarchy-container {
   display: flex;
   flex-direction: column;
@@ -129,11 +131,15 @@
   scrollbar-color: var(--primary) transparent;
 }
 
+
 .mat-tree {
   background: var(--surface);
   --mat-text-button-horizontal-padding: 5px;
   --mat-text-button-with-icon-horizontal-padding: 5px;
+  --mat-tree-node-min-height: 20px;
 }
+
+
 
 /*
  * Rename example-tree class will cause expand/collapse not working

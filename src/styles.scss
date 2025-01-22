@@ -1,6 +1,23 @@
-@use "reactome-cytoscape-style";
-@use "ngx-reactome-style";
+@forward "reactome-cytoscape-style";
+@forward "ngx-reactome-style";
+@use "@angular/material" as mat;
 
+html {
+  color-scheme: light;
+  @include mat.theme((
+    color: mat.$cyan-palette,
+    typography: Roboto,
+    density: 0
+  ));
+
+  @include mat.tabs-overrides((
+    container-height: 30px,
+  ));
+}
+
+.dark {
+  color-scheme: dark;
+}
 
 body {
   height: 100%;

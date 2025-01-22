@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {Event} from "../../../model/event.model";
+import {isDefined} from "../../../services/utils";
 
 @Component({
     selector: 'cr-description-overview',
@@ -9,8 +10,9 @@ import {Event} from "../../../model/event.model";
 })
 export class DescriptionOverviewComponent {
 
-  @Input('obj') obj?: Event;
+  readonly obj = input.required<Event>();
 
+  readonly allRefs = computed(() => [...this.obj().literatureReference || [], ...this.obj().summation.flatMap(s => s.literatureReference).filter(isDefined) || []] );
   reviewStar: { [key: string]: { percentage: number, score: number } } = {
     "five stars": {percentage: 100, score: 5},
     "four stars": {percentage: 80, score: 4},

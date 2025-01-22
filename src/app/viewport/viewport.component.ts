@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, OnChanges, SimpleChanges, ViewChild, input} from '@angular/core';
 import {DiagramComponent} from "../diagram/diagram.component";
 import {ResourceAndType} from "../interactors/model/interactor.model";
 import {InteractorsComponent} from "../interactors/interactors.component";
@@ -10,6 +10,7 @@ import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
+import {DiagramStateService} from "../services/diagram-state.service";
 
 
 @Component({
@@ -24,7 +25,6 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
 
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
-  @Input('id') diagramId: string = '';
   hasEHLD? : boolean;
 
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
@@ -42,6 +42,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
               public dark: DarkService,
               private ehldService: EhldService,
               private eventService: EventService,
+              public state: DiagramStateService
   ) {
   }
 
@@ -57,7 +58,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
       this.currentInteractorResource = resource;
     });
 
-    if (this.diagramId) {
+    if (this.state.diagramId()) {
       this.getEnhancedResult();
     }
 
@@ -79,7 +80,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   }
 
   private getEnhancedResult(): void {
-    this.eventService.fetchEnhancedEventData(this.diagramId)
+    this.eventService.fetchEnhancedEventData(this.state.diagramId()!)
       .subscribe((enhancedResult) => {
         this.eventService.setDiagramEvent(enhancedResult);
         const hasEHLD = enhancedResult.hasEHLD ? enhancedResult.hasEHLD : false;
@@ -91,7 +92,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.getEnhancedResult();
+    // if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.getEnhancedResult();
   }
 }
 

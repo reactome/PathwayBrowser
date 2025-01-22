@@ -15,7 +15,7 @@
   <mat-card class="card">
     <mat-card-content>
       <div class="button-container">
-        <button mat-raised-button class="raised-full-width-button" [disabled]="hasEHLD" (click)="clearInteractors()"
+        <button mat-raised-button class="raised-full-width-button" [disabled]="hasEHLD()" (click)="clearInteractors()"
                 [ngClass]="{'active-button': clear}">
           <mat-icon [ngClass]="{'active-icon': clear}" color="primary">clear</mat-icon>
           Clear overlays
@@ -26,11 +26,11 @@
       <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Main' }"></ng-container>
 
       <div class="main-resource">
-        <button class="full-width" mat-button  [disabled]="hasEHLD" (click)="getInteractors(INTACT_RESOURCE)"
+        <button class="full-width" mat-button  [disabled]="hasEHLD()" (click)="getInteractors(INTACT_RESOURCE)"
                 [ngClass]="{'active-button': currentResource?.type === ResourceType.STATIC}">IntAct
         </button>
 
-        <button class="full-width" mat-button [disabled]="hasEHLD" (click)="getInteractors(DISEASE_RESOURCE)"
+        <button class="full-width" mat-button [disabled]="hasEHLD()" (click)="getInteractors(DISEASE_RESOURCE)"
                 [ngClass]="{'active-button': currentResource?.type === ResourceType.DISGENET}">DisGeNet
         </button>
       </div>
@@ -39,7 +39,7 @@
 
       <mat-grid-list cols="2" rowHeight="28px" [gutterSize]="'5px'">
         <mat-grid-tile *ngFor="let resource of psicquicResources" class="rounded-corner">
-          <button class="full-width psicquic-button" mat-button [disabled]="hasEHLD"
+          <button class="full-width psicquic-button" mat-button [disabled]="hasEHLD()"
                   (click)="getInteractors(resource.name)"
                   [ngClass]="{'active-button': currentResource?.name === resource.name}">
             <div class="resource-name">
@@ -60,7 +60,7 @@
                          class="full-width">
           <div class="resource-name surface-variant">
             <div>{{ resourceToken.summary.name }}</div>
-            <button mat-icon-button  [disabled]="hasEHLD" (click)="deleteCustomResource(resourceToken)">
+            <button mat-icon-button  [disabled]="hasEHLD()" (click)="deleteCustomResource(resourceToken)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -68,7 +68,7 @@
       </mat-selection-list>
 
       <div class="button-container">
-        <button mat-raised-button class="raised-full-width-button" [disabled]="hasEHLD" (click)="openCustomInteractorDialog()">
+        <button mat-raised-button class="raised-full-width-button" [disabled]="hasEHLD()" (click)="openCustomInteractorDialog()">
           <mat-icon color="primary">add</mat-icon>
           Add overlay resource
         </button>

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnChanges, Output, SimpleChanges, ViewChild, input} from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
 import {extract, ReactomeEvent, ReactomeEventTypes, Style} from "reactome-cytoscape-style";
 import cytoscape, {ElementsDefinition} from "cytoscape";
@@ -51,8 +51,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
   @ViewChild('cytoscape') cytoscapeContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('cytoscapeCompare') compareContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
-  @Input('interactor') interactorsComponent?: InteractorsComponent;
-  @Input('id') diagramId: string = '';
+  readonly interactorsComponent = input<InteractorsComponent>(undefined, { alias: "interactor" });
 
 
   comparing: boolean = false;
@@ -149,7 +148,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     if (!this.cytoscapeContainer) return EMPTY; // Prevent execution if the container is not present
 
     const container = this.cytoscapeContainer.nativeElement;
-    return this.diagram.getDiagram(this.diagramId).pipe(
+    return this.diagram.getDiagram(this.state.diagramId()!).pipe(
       tap(elements => {
         this.comparing = elements.nodes.some(node => node.data['isFadeOut']) ||
           elements.edges.some(edge => edge.data['isFadeOut']);
@@ -181,15 +180,16 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
   }
 
   loadSubpathwayWithDiagram(event: Event) {
-    return this.event.fetchEventAncestors(this.diagramId).pipe(
+    return this.event.fetchEventAncestors(this.state.diagramId()!).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
         const pathwayWithDiagram = [...ancestors].reverse().find(p => p.hasDiagram);
         if (pathwayWithDiagram) {
           const newDiagramId = pathwayWithDiagram.stId;
-          if (newDiagramId !== this.diagramId) {
-            this.diagramId = newDiagramId;
-            this.router.navigate(['PathwayBrowser', this.diagramId], {
+          const diagramId = this.state.diagramId();
+          if (newDiagramId !== diagramId) {
+            this.state.diagramId.set(newDiagramId);
+            this.router.navigate(['PathwayBrowser', diagramId], {
               queryParamsHandling: "preserve"
             }).then(() => {
               this.state.set('select', event.stId);
@@ -479,8 +479,9 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
 
 
   private loadAnalysis(token: string | null) {
-    console.log(token, this.diagramId)
-    if (!token || !this.diagramId) {
+    const diagramId = this.state.diagramId();
+    console.log(token, diagramId)
+    if (!token || !diagramId) {
       this.cys.forEach(cy => {
         cy.batch(() => {
           cy.nodes().removeData('exp');
@@ -498,7 +499,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     }
 
     forkJoin({
-      entities: this.analysis.foundEntities(this.diagramId, token),
+      entities: this.analysis.foundEntities(diagramId, token),
       pathways: this.analysis.pathwaysResults(this.cy.nodes('.Pathway').map(p => p.data('reactomeId')), token),
       result: this.analysis.result$.pipe(filter(isDefined), take(1))
     }).subscribe(({entities, result, pathways}) => {
@@ -644,7 +645,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     const resource = this.state.get('overlay');
     if (resource) {
       console.log('Resource not null', resource)
-      this.interactorsComponent?.getInteractors(resource)
+      this.interactorsComponent()?.getInteractors(resource)
     }
 
     this.loadAnalysis(this.state.get('analysis'))

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input} from '@angular/core';
+import {AfterViewInit, Component, input} from '@angular/core';
 import {Species} from "../model/species.model";
 import {SpeciesService} from "../services/species.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -19,11 +19,11 @@ export class SpeciesComponent implements AfterViewInit {
   allSpecies: Species[] = [];
   currentSpecies!: Species;
 
-  @Input('id') diagramId: string = '';
-  @Input('visibility') visibility = {
+  readonly diagramId = input<string>('', { alias: "id" });
+  readonly visibility = input({
     species: false,
     interactor: false
-  }
+});
 
   selectedTreeEvent?: Event;
   selectedObj?: Event;
@@ -35,8 +35,9 @@ export class SpeciesComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.getSpecies();
 
-    if (this.diagramId) {
-      this.speciesService.setSpeciesFromDiagramId(this.diagramId);
+    const diagramId = this.diagramId();
+    if (diagramId) {
+      this.speciesService.setSpeciesFromDiagramId(diagramId);
     }
 
     this.speciesService.currentSpecies$.pipe(untilDestroyed(this)).subscribe(species => {
@@ -64,13 +65,13 @@ export class SpeciesComponent implements AfterViewInit {
   }
 
   onSpeciesChange(species: Species) {
-    const ids = this.speciesService.getIdsFromURL(this.diagramId);
+    const ids = this.speciesService.getIdsFromURL(this.diagramId());
 
     this.currentSpecies = species;
     this.speciesService.setCurrentSpecies(species);
 
     const abbreviation = species.abbreviation;
-    this.diagramId = this.diagramId.replace(/-(.*?)-/, `-${abbreviation}-`);
+    let diagramId = this.diagramId().replace(/-(.*?)-/, `-${abbreviation}-`);
 
     // Include entity to ancestors list when selecting entity in the URL
     const ancestors = this.selectedTreeEvent?.ancestors || [];
@@ -83,7 +84,7 @@ export class SpeciesComponent implements AfterViewInit {
       .subscribe((newSelectedStId) => {
 
         const updatedParams = this.speciesService.updateQueryParams(['select', 'flag', 'path'], newSelectedStId, abbreviation!, this.route);
-        this.router.navigate(['PathwayBrowser', this.diagramId], {
+        this.router.navigate(['PathwayBrowser', diagramId], {
           queryParamsHandling: "preserve"
         }).then(() => {
           if (updatedParams['select']) {
@@ -95,7 +96,7 @@ export class SpeciesComponent implements AfterViewInit {
           if (updatedParams['flag']) this.state.set('flag', updatedParams['flag']);
           if (updatedParams['path']) this.state.set('path', updatedParams['path'].split(','));
           // Close the species panel after navigating
-          setTimeout(() => this.visibility.species = false, 600);
+          setTimeout(() => this.visibility().species = false, 600);
         });
       });
   }

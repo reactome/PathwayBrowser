@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
 import {filter, forkJoin, Observable, take, tap} from "rxjs";
 import {EhldService, LegendGroup} from "../services/ehld.service";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -25,7 +25,6 @@ import {SpeciesService} from "../services/species.service";
 export class EhldComponent implements AfterViewInit {
 
   @ViewChild('ehld') ehldContainer?: ElementRef<HTMLDivElement>;
-  @Input('id') diagramId: string = '';
 
   style!: Style;
   ratio = 0.384;
@@ -46,7 +45,8 @@ export class EhldComponent implements AfterViewInit {
               private stateService: DiagramStateService,
               private router: Router,
               private analysisService: AnalysisService,
-              private speciesService: SpeciesService) {
+              private speciesService: SpeciesService,
+              public state: DiagramStateService,) {
   }
 
   selecting = this.stateService.onChange.select$.pipe(
@@ -65,7 +65,7 @@ export class EhldComponent implements AfterViewInit {
     this.legendItems = this.ehldService.legendItems;
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
-      if (this.diagramId && hasEHLD) {
+      if (this.state.diagramId() && hasEHLD) {
         this.loadEhldSvg().subscribe({
           next: () => {
             this.initializePanAndZoom();
@@ -102,7 +102,7 @@ export class EhldComponent implements AfterViewInit {
 
 
   private loadEhldSvg(): Observable<{ svg: string; graphData: Graph.Data }> {
-    return this.ehldService.getSVGData(this.diagramId).pipe(
+    return this.ehldService.getSVGData(this.state.diagramId()!).pipe(
       tap(result => {
         if (result.svg) {
           const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(result.svg);
@@ -180,12 +180,7 @@ export class EhldComponent implements AfterViewInit {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
             this.speciesService.setIgnore(false);
-            this.diagramId = stId;
-            this.router.navigate(['PathwayBrowser', this.diagramId], {
-              queryParamsHandling: "preserve"
-            }).then(() => {
-              this.stateService.set('select', '');
-            });
+            this.state.diagramId.set(stId);
           }
         }
       })
@@ -194,11 +189,12 @@ export class EhldComponent implements AfterViewInit {
 
 
   private loadAnalysis(token: string | null) {
-    if (!token || !this.diagramId) {
+    const diagramId = this.state.diagramId();
+    if (!token || !diagramId) {
       return;
     }
     forkJoin({
-      entities: this.analysisService.foundEntities(this.diagramId, token),
+      entities: this.analysisService.foundEntities(diagramId, token),
       pathways: this.analysisService.pathwaysResults([...this.stIdToSVGGElement.keys()], token),
       result: this.analysisService.result$.pipe(filter(isDefined), take(1))
     }).subscribe(({entities, result, pathways}) => {

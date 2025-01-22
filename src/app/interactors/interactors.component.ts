@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output, input} from '@angular/core';
 import {InteractorToken, PsicquicResource, ResourceAndType, ResourceType} from "./model/interactor.model";
 import cytoscape from "cytoscape";
 import {DiagramService} from "../services/diagram.service";
@@ -29,9 +29,9 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
   INTACT_RESOURCE = 'IntAct';
   protected readonly ResourceType = ResourceType;
 
-  @Input('hasEHLD') hasEHLD: boolean | undefined = undefined;
-  @Input('cy') cy: cytoscape.Core | undefined;
-  @Input('cys') cys: cytoscape.Core[] | undefined = [];
+  readonly hasEHLD = input<boolean>();
+  readonly cy = input<cytoscape.Core>();
+  readonly cys = input<cytoscape.Core[] | undefined>([]);
   @Output('initialiseReplaceElements') initialiseReplaceElements: EventEmitter<any> = new EventEmitter();
 
   constructor(private diagram: DiagramService, public dark: DarkService, private interactorsService: InteractorService, private state: DiagramStateService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
@@ -85,7 +85,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
     } else {
       return;
     }
-    this.cys?.forEach(cy => {
+    this.cys()?.forEach(cy => {
       this.interactorsService.getInteractorData(cy, resource).subscribe(interactors => {
         this.interactorsService.addInteractorOccurrenceNode(interactors, cy, resource);
         this.initialiseReplaceElements.emit();
@@ -98,7 +98,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
     this.isDataFromPsicquicLoading = true;
     this.clear = false;
     this.updateCurrentResource(selectedResource, ResourceType.PSICQUIC);
-    this.cys?.forEach(cy => {
+    this.cys()?.forEach(cy => {
       this.interactorsService.getInteractorData(cy, selectedResource).subscribe(interactors => {
         this.interactorsService.addInteractorOccurrenceNode(interactors, cy, selectedResource);
         this.isDataFromPsicquicLoading = false;
@@ -108,7 +108,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
   }
 
   openCustomInteractorDialog() {
-    this.cys?.forEach(cy => {
+    this.cys()?.forEach(cy => {
       // Avoid multiple opening dialogs
       if (this.dialog.openDialogs.length === 1) {
         return
@@ -139,7 +139,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
 
     if (!resource.summary) return
 
-    this.cys?.forEach(cy => {
+    this.cys()?.forEach(cy => {
       this.interactorsService.fetchCustomInteractors(resource, cy).subscribe((result) => {
         this.interactorsService.addInteractorOccurrenceNode(result.interactors, cy, result.interactors.resource);
         this.clear = false;
@@ -153,7 +153,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
     const index = this.resourceTokens!.indexOf(resource);
     if (index !== -1) {
       this.resourceTokens!.splice(index, 1);
-      this.cys?.forEach(cy => {
+      this.cys()?.forEach(cy => {
         cy.elements(`[resource = '${resource}']`).remove();
         this.state.set('overlay', null);
       })
@@ -161,7 +161,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
   }
 
   clearInteractors() {
-    this.cys?.forEach(cy => {
+    this.cys()?.forEach(cy => {
       this.interactorsService.clearAllInteractorNodes(cy);
       this.clear = true;
       this.updateCurrentResource(null, null);

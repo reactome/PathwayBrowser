@@ -11,7 +11,7 @@
 </ng-template>
 
 
-<div *ngIf="obj" id="details" #details [style.--width.px]="details.clientWidth">
+<div *ngIf="obj()" id="details" #details [style.--width.px]="details.clientWidth">
 
   <div class="content">
 
@@ -19,13 +19,13 @@
       <div class="label">
         <mat-icon
           class="custom-icon"
-          [matTooltip]="getIcon(obj).tooltip"
-          [svgIcon]="getIcon(obj).name">
+          [matTooltip]="icon().tooltip"
+          [svgIcon]="icon().name">
         </mat-icon>
-        <span class="name">{{ obj.displayName }}</span>
+        <span class="name">{{ obj().displayName }}</span>
       </div>
       <div class="details-button">
-        <a mat-button [href]="'/content/detail/' + obj.stId" target="_blank">
+        <a mat-button [href]="'/content/detail/' + obj().stId" target="_blank">
           <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
           <span class="details-label"> Details page</span>
         </a>
@@ -33,16 +33,16 @@
     </div>
 
 
-    <div class="overview" [ngClass]="{'update-layout': obj.referenceEntity}">
-      <cr-description-overview [obj]="obj"></cr-description-overview>
-      <div *ngIf="obj.hasIcon" class="icon-container">
+    <div class="overview" [ngClass]="{'update-layout': obj().referenceEntity}">
+      <cr-description-overview [obj]="obj()"></cr-description-overview>
+      <div *ngIf="obj().hasIcon" class="icon-container">
         <div class="icon" [innerHTML]="iconContent"></div>
       </div>
     </div>
 
 
     <!-- References divider-->
-    <div class="divider-container" *ngIf="obj.literatureReference" id="literatureReference">
+    <div class="divider-container" *ngIf="obj().literatureReference" id="literatureReference">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
       </div>
@@ -52,8 +52,8 @@
     </div>
 
     <!-- References container-->
-    <div class="element-container" *ngIf="obj.literatureReference">
-      <div class="ref-row" *ngFor="let ref of obj.literatureReference">
+    <div class="element-container" *ngIf="obj().literatureReference">
+      <div class="ref-row" *ngFor="let ref of obj().literatureReference">
         <div class="year-container">{{ ref.year }}</div>
         <div class="composition-container">
           <cr-publication [publication]=ref [showYear]="false"></cr-publication>
@@ -86,7 +86,7 @@
 
 
     @for (element of elements; track element.key) {
-      @if (obj[element.key] && !element?.manual) {
+      @if (obj()[element.key] && !element.manual) {
         <div [id]="element.key" class="elements-container">
           <div class="divider-container">
             <div class="divider-name-container">
@@ -111,7 +111,7 @@
 
   <div class="toc">
     <ng-container *ngFor="let element of elements">
-      <a *ngIf="obj[element.key]" [routerLink]="[]" [fragment]="element.key" [queryParamsHandling]="'preserve'">
+      <a *ngIf="obj()[element.key]" [routerLink]="[]" [fragment]="element.key" [queryParamsHandling]="'preserve'">
         {{ element.label }}
       </a>
     </ng-container>

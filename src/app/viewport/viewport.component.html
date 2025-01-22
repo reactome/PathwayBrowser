@@ -31,14 +31,14 @@
         </div>
 
         <div [style.display]="visibility.species ? 'block':'none'">
-          <cr-species [id]="diagramId" [visibility]="visibility"></cr-species>
+          <cr-species  [visibility]="visibility"></cr-species>
         </div>
         <div [style.display]="visibility.interactor ? 'block':'none'">
           <cr-interactors #interactors [cy]="diagram?.cy" [cys]="diagram?.cys"  [hasEHLD]="hasEHLD"
                           (initialiseReplaceElements)="diagram?.initialiseReplaceElements()"></cr-interactors>
         </div>
         <div class="event-hierarchy">
-          <cr-event-hierarchy [id]="diagramId" [eventSplit]="sideSplit"></cr-event-hierarchy>
+          <cr-event-hierarchy  [eventSplit]="sideSplit"></cr-event-hierarchy>
         </div>
       </div>
       <!--      </div>-->
@@ -62,8 +62,8 @@
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
             <as-split-area [size]="80">
 
-              <cr-ehld *ngIf="hasEHLD" [id]="diagramId"></cr-ehld>
-              <cr-diagram *ngIf="!hasEHLD && hasEHLD !== undefined " #diagram [id]="diagramId" [interactor]="interactors"></cr-diagram>
+              <cr-ehld *ngIf="hasEHLD" [id]="state.diagramId()"></cr-ehld>
+              <cr-diagram *ngIf="!hasEHLD && hasEHLD !== undefined " #diagram [id]="state.diagramId()" [interactor]="interactors"></cr-diagram>
 
             </as-split-area>
             <as-split-area [size]="20">

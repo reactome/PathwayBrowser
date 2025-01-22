@@ -8,6 +8,7 @@
 
 .group-tab {
   height: 100%;
+  padding: 0 20px;
 
   .mat-mdc-tab-body-wrapper {
     height: 100%;
@@ -15,7 +16,7 @@
 
   /* Tab header height */
   & .mat-mdc-tab-header {
-    height: 30px;
+    //height: 30px;
 
     & .mat-mdc-tab-list {
       display: flex;

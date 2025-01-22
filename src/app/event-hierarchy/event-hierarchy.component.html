@@ -9,7 +9,7 @@
       <ng-container *ngFor="let breadcrumb of breadcrumbs; let last = last">
         <!--        <span class="gutter">></span>-->
         <ng-container *ngIf="!last">
-          <a class="breadcrumb-item" queryParamsHandling="preserve" [routerLink]="['/PathwayBrowser', this.diagramId]"
+          <a class="breadcrumb-item" queryParamsHandling="preserve" [routerLink]="['/PathwayBrowser', this.state.diagramId()]"
              (click)="onBreadcrumbSelect(breadcrumb)">
             <span>{{ breadcrumb.displayName }}</span>
           </a>
@@ -133,7 +133,7 @@
                 <span class="body">NFERRED</span>
               </div>
               <!--Only provide this subpathway tag for the first layer, ignore the nested subpathways-->
-              <div class="subpathway" *ngIf="!node.hasDiagram && node.parent.stId === this.diagramId"
+              <div class="subpathway" *ngIf="!node.hasDiagram && node.parent.stId === this.state.diagramId()"
                    [style.background]="node.subpathwayColor" (mouseover)="onTagHover(node)"
                    (mouseleave)="onTagHoverLeave(node)">
               </div>

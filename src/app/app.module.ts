@@ -46,6 +46,7 @@ import {DescriptionComponent} from "./details/tabs/description/description.compo
 import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/summation-refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
 import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
+import {IncludeRefPipe} from "./details/common/include-ref.pipe";
 
 @NgModule({
   declarations: [
@@ -97,7 +98,7 @@ import {DescriptionOverviewComponent} from "./details/common/description-overvie
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode], providers: [provideHttpClient(withInterceptorsFromDi())]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, IncludeRefPipe], providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule {
 }

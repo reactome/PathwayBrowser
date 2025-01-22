@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {LiteratureReference} from "../../../model/event.model";
 import {environment} from "../../../../environments/environment";
 
@@ -9,8 +9,8 @@ import {environment} from "../../../../environments/environment";
     standalone: false
 })
 export class PublicationComponent{
-  @Input('publication') ref!: LiteratureReference;
-  @Input('showYear') showYear: boolean = false;
+  readonly ref = input.required<LiteratureReference>({ alias: "publication" });
+  readonly showYear = input<boolean>(false);
   isExpanded = false;
 
   environment = environment.host

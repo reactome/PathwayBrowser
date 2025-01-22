@@ -1,5 +1,7 @@
 $small-breakpoint-width: 959px;
 
+
+
 #details {
 
   display: flex;
@@ -14,7 +16,7 @@ $small-breakpoint-width: 959px;
   --gap: 20px;
   --half-gap: calc(var(--gap) / 2);
   --padding: 20px;
-  --column-width: max(100px, calc((var(--width) + var(--gap) - 2 * var(--padding)) / var(--columns) - var(--gap)));
+  --column-width: max(100px, calc((var(--width) + var(--gap)) / var(--columns) - var(--gap)));
   --icon-width: 182px;
   --icon-height: 84px;
 
@@ -33,8 +35,7 @@ $small-breakpoint-width: 959px;
   gap: 10px;
   width: 85%;
   height: 100%;
-  margin-left: calc(var(--padding) - var(--half-gap));
-  padding: 0 var(--half-gap);
+  padding-right: var(--half-gap);
 
   @media (max-width: $small-breakpoint-width) {
     width: calc(100% - 2 * var(--padding));
@@ -112,12 +113,11 @@ $small-breakpoint-width: 959px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 5px var(--half-gap);
+  padding: 5px 0 5px var(--half-gap);
   gap: 8px;
   width: var(--column-width);
   height: 100%;
   overflow-y: auto;
-  margin-right: calc(var(--padding) - var(--half-gap));
   font-size: 16px;
   font-weight: 600;
   text-align: right;

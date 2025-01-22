@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, effect, Input} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, computed, effect, input} from '@angular/core';
 import {Event, InstanceEdit} from "../../../model/event.model";
 import {Analysis} from "../../../model/analysis.model";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -16,14 +16,15 @@ import {toSignal} from "@angular/core/rxjs-interop";
 })
 export class DescriptionComponent implements AfterViewInit {
 
-  @Input('event') obj?: Event;
-  @Input('analysisResult') analysisResult?: Analysis.Result;
-  @Input('tabWidth') tabWidth?: number;
+  readonly obj = input.required<Event>();
+  readonly analysisResult = input<Analysis.Result>();
+  readonly tabWidth = input<number>();
+  readonly icon = computed(() => this.getIcon(this.obj()))
 
   iconContent: string = '';
   authorship: { label: string, data: InstanceEdit[] }[] = []
 
-  elements = [
+  elements: {key:string, label: string, manual?: boolean}[] = [
     {key: 'overview', label: 'Overview', manual: true},
     {key: 'literatureReference', label: 'References', manual: true},
     {key: 'authorship', label: 'Authorship', manual: true},
@@ -47,33 +48,35 @@ export class DescriptionComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
 
-    if (!this.obj) return;
+    const obj = this.obj();
+    if (!obj) return;
 
-    this.obj['overview'] = true;
+    obj['overview'] = true;
 
-    if (this.obj.referenceEntity) {
-      const identifier = this.obj.referenceEntity.identifier;
+    if (obj.referenceEntity) {
+      const identifier = obj.referenceEntity.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
-        if (icon && this.obj) {
+        const objValue = this.obj();
+        if (icon && objValue) {
           const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(icon);
           this.iconContent = sanitizedSvg as string;
-          this.obj.hasIcon = true;
+          objValue.hasIcon = true;
           this.cdr.detectChanges();
         }
       });
     }
 
     this.authorship = [
-      ...(this.obj.authored?.length > 0 ? [{label: 'Author', data: this.obj.authored}] : []),
-      ...(this.obj.reviewed?.length > 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
+      ...(obj.authored?.length > 0 ? [{label: 'Author', data: obj.authored}] : []),
+      ...(obj.reviewed?.length > 0 ? [{label: 'Reviewer', data: obj.reviewed}] : []),
     ];
 
-    this.obj['authorship'] = this.authorship.length > 0;
+    obj['authorship'] = this.authorship.length > 0;
 
 
     // Sort by year
-    if (this.obj && this.obj.literatureReference) {
-      this.obj.literatureReference = sortByYearDescending(this.obj.literatureReference);
+    if (obj && obj.literatureReference) {
+      obj.literatureReference = sortByYearDescending(obj.literatureReference);
     }
 
   }
