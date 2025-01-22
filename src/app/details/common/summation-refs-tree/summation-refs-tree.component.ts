@@ -17,7 +17,8 @@ export class SummationRefsTreeComponent implements AfterViewInit {
 
   dataSource = new MatTreeNestedDataSource<Summation>();
 
-  childrenAccessor = (summation: Summation): LiteratureReference[] => summation.literatureReference ?? [];
+  //@ts-ignore
+  childrenAccessor = (summation: Summation): Summation[] => summation.literatureReference ?? [];
 
   hasChild = (_: number, summation: Summation) => !!summation.literatureReference && summation.literatureReference.length > 0;
 
