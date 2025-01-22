@@ -52,7 +52,7 @@
     </div>
 
     <!-- References container-->
-    <div class="element-container" *ngIf="obj.literatureReference" >
+    <div class="element-container" *ngIf="obj.literatureReference">
       <div class="ref-row" *ngFor="let ref of obj.literatureReference">
         <div class="year-container">{{ ref.year }}</div>
         <div class="composition-container">
@@ -85,34 +85,35 @@
     </div>
 
 
-    <div class="elements-container" *ngFor="let element of elements">
-      <div *ngIf="obj[element.key] && !element?.manual" [id]="element.key">
-        <div class="divider-container">
-          <div class="divider-name-container">
-            <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
+    @for (element of elements; track element.key) {
+      @if (obj[element.key] && !element?.manual) {
+        <div [id]="element.key" class="elements-container">
+          <div class="divider-container">
+            <div class="divider-name-container">
+              <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
+            </div>
+            <div class="divider-line-container">
+              <mat-divider class="divider"></mat-divider>
+            </div>
           </div>
-          <div class="divider-line-container">
-            <mat-divider class="divider"></mat-divider>
+          <!--        todo: use shared element-container?-->
+          <div class="content-container">
+            <div class="control-container">this is navigation control</div>
+            <div class="composition-container">
+              <div class="item">this is test content</div>
+            </div>
           </div>
         </div>
-<!--        todo: use shared element-container?-->
-        <div class="content-container">
-          <div class="control-container">this is navigation control</div>
-          <div class="composition-container">
-            <div class="item">this is test content</div>
-          </div>
-        </div>
-      </div>
+      }
+    }
 
-    </div>
-  </div>
 
-  <div class="toc">
-    <ng-container *ngFor="let element of elements">
+    <div class="toc">
+      <ng-container *ngFor="let element of elements">
         <a *ngIf="obj[element.key]" [routerLink]="[]" [fragment]="element.key" [queryParamsHandling]="'preserve'">
           {{ element.label }}
         </a>
-    </ng-container>
-  </div>
+      </ng-container>
+    </div>
 
-</div>
+  </div>
