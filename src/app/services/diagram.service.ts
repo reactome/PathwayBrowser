@@ -253,7 +253,7 @@ export class DiagramService {
         const subpathwayIdToEventIds = new Map<number, number[]>(graph.subpathways?.map(subpathway => [subpathway.dbId, subpathway.events]));
         const subpathwayStIdToEventIds = new Map<string, number[]>(graph.subpathways?.map(subpathway => [subpathway.stId, subpathway.events]));
         // create a node id - graph node mapping
-        const dbIdToGraphNode = new Map<number, Graph.Node>(graph.nodes.map(node => ([node.dbId, node]) || []))
+        const dbIdToGraphNode = new Map<number, Graph.Node>(graph.nodes.map(node => ([node.dbId, node])))
         const mappingList: [number, Graph.Node][] = graph.nodes.flatMap(node => {
           if (node.children && node.children.length === 1 && node.diagramIds?.length !== 1) { // Consider homomer complex like their constituents for interactors
             return node.diagramIds?.map(id => [id, dbIdToGraphNode.get(node.children[0])])
@@ -283,7 +283,7 @@ export class DiagramService {
           node.leaves = [...leaves];
         })
 
-        const dbIdToGraphEdge = new Map<number, Graph.Edge>(graph.edges.map(edge => ([edge.dbId, edge]) || []))
+        const dbIdToGraphEdge = new Map<number, Graph.Edge>(graph.edges.map(edge => ([edge.dbId, edge])))
 
         const hasFadeOut = diagram.nodes.some(node => node.isFadeOut);
         const normalNodes = diagram.nodes.filter(node => node.isFadeOut);
@@ -385,7 +385,7 @@ export class DiagramService {
 
         //entity nodes
         const entityNodes: cytoscape.NodeDefinition[] = diagram?.nodes.flatMap(item => {
-          let classes = [...this.nodeTypeMap.get(item.renderableClass)!] || [item.renderableClass.toLowerCase()];
+          let classes = [...this.nodeTypeMap.get(item.renderableClass) || item.renderableClass.toLowerCase()];
           let unitId = undefined;
           if (item.schemaClass === "Polymer") {
             const polymerGraphNode = dbIdToGraphNode.get(item.reactomeId)!;
