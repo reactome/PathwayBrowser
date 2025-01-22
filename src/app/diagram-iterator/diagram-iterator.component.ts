@@ -5,9 +5,10 @@ import {DiagramComponent} from "../diagram/diagram.component";
 import {combineLatest} from "rxjs";
 
 @Component({
-  selector: 'cr-diagram-iterator',
-  templateUrl: './diagram-iterator.component.html',
-  styleUrls: ['./diagram-iterator.component.scss']
+    selector: 'cr-diagram-iterator',
+    templateUrl: './diagram-iterator.component.html',
+    styleUrls: ['./diagram-iterator.component.scss'],
+    standalone: false
 })
 export class DiagramIteratorComponent implements AfterViewInit {
 

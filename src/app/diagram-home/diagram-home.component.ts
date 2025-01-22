@@ -4,9 +4,10 @@ import {DarkService} from "../services/dark.service";
 
 
 @Component({
-  selector: 'cr-diagram-home',
-  templateUrl: './diagram-home.component.html',
-  styleUrls: ['./diagram-home.component.scss'],
+    selector: 'cr-diagram-home',
+    templateUrl: './diagram-home.component.html',
+    styleUrls: ['./diagram-home.component.scss'],
+    standalone: false
 })
 export class DiagramHomeComponent {
 

@@ -9,9 +9,10 @@ import {toSignal} from "@angular/core/rxjs-interop";
 
 
 @Component({
-  selector: 'cr-description',
-  templateUrl: './description.component.html',
-  styleUrl: './description.component.scss'
+    selector: 'cr-description',
+    templateUrl: './description.component.html',
+    styleUrl: './description.component.scss',
+    standalone: false
 })
 export class DescriptionComponent implements AfterViewInit {
 

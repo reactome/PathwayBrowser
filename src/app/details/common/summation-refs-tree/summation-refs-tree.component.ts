@@ -5,9 +5,10 @@ import {sortByYearDescending} from "../../../services/utils";
 
 
 @Component({
-  selector: 'cr-summation-refs-tree',
-  templateUrl: './summation-refs-tree.html',
-  styleUrl: './summation-refs-tree.scss'
+    selector: 'cr-summation-refs-tree',
+    templateUrl: './summation-refs-tree.html',
+    styleUrl: './summation-refs-tree.scss',
+    standalone: false
 })
 export class SummationRefsTreeComponent implements AfterViewInit {
 

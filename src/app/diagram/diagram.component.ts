@@ -41,9 +41,10 @@ import {DarkService} from "../services/dark.service";
 
 @UntilDestroy({checkProperties: true})
 @Component({
-  selector: 'cr-diagram',
-  templateUrl: './diagram.component.html',
-  styleUrls: ['./diagram.component.scss']
+    selector: 'cr-diagram',
+    templateUrl: './diagram.component.html',
+    styleUrls: ['./diagram.component.scss'],
+    standalone: false
 })
 export class DiagramComponent implements AfterViewInit, OnChanges {
   title = 'pathway-browser';

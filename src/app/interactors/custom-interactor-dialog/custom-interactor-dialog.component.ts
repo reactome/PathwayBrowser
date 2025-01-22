@@ -19,9 +19,10 @@ import {InputCategory, InteractorToken} from "../model/interactor.model";
 
 
 @Component({
-  selector: 'cr-custom-interactor-dialog',
-  templateUrl: './custom-interactor-dialog.component.html',
-  styleUrls: ['./custom-interactor-dialog.component.scss']
+    selector: 'cr-custom-interactor-dialog',
+    templateUrl: './custom-interactor-dialog.component.html',
+    styleUrls: ['./custom-interactor-dialog.component.scss'],
+    standalone: false
 })
 export class CustomInteractorDialogComponent implements OnInit {
 

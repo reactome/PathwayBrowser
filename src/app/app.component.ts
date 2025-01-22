@@ -4,9 +4,10 @@ import {MatIconRegistry} from "@angular/material/icon";
 import {IconService} from "./services/icon.service";
 
 @Component({
-  selector: 'cr-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'cr-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent implements OnInit {
   title = 'PathwayBrowser'

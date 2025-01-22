@@ -3,9 +3,10 @@ import {LiteratureReference} from "../../../model/event.model";
 import {environment} from "../../../../environments/environment";
 
 @Component({
-  selector: 'cr-publication',
-  templateUrl: './publication.component.html',
-  styleUrl: './publication.component.scss'
+    selector: 'cr-publication',
+    templateUrl: './publication.component.html',
+    styleUrl: './publication.component.scss',
+    standalone: false
 })
 export class PublicationComponent{
   @Input('publication') ref!: LiteratureReference;

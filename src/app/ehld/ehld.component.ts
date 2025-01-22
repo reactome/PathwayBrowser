@@ -15,9 +15,10 @@ import {SpeciesService} from "../services/species.service";
 
 
 @Component({
-  selector: 'cr-ehld',
-  templateUrl: './ehld.component.html',
-  styleUrls: ['./ehld.component.scss']
+    selector: 'cr-ehld',
+    templateUrl: './ehld.component.html',
+    styleUrls: ['./ehld.component.scss'],
+    standalone: false
 })
 
 @UntilDestroy()

@@ -11,9 +11,10 @@ import {Subscription} from "rxjs";
 
 
 @Component({
-  selector: 'cr-interactors',
-  templateUrl: './interactors.component.html',
-  styleUrls: ['./interactors.component.scss']
+    selector: 'cr-interactors',
+    templateUrl: './interactors.component.html',
+    styleUrls: ['./interactors.component.scss'],
+    standalone: false
 })
 export class InteractorsComponent implements AfterViewInit, OnDestroy {
 

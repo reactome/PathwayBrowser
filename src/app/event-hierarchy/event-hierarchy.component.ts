@@ -14,9 +14,10 @@ import {IconService} from "../services/icon.service";
 
 
 @Component({
-  selector: 'cr-event-hierarchy',
-  templateUrl: './event-hierarchy.component.html',
-  styleUrls: ['./event-hierarchy.component.scss']
+    selector: 'cr-event-hierarchy',
+    templateUrl: './event-hierarchy.component.html',
+    styleUrls: ['./event-hierarchy.component.scss'],
+    standalone: false
 })
 @UntilDestroy()
 export class EventHierarchyComponent implements AfterViewInit, OnDestroy {

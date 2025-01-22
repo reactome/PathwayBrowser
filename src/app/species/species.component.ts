@@ -9,9 +9,10 @@ import {Event} from "../model/event.model";
 
 
 @Component({
-  selector: 'cr-species',
-  templateUrl: './species.component.html',
-  styleUrls: ['./species.component.scss']
+    selector: 'cr-species',
+    templateUrl: './species.component.html',
+    styleUrls: ['./species.component.scss'],
+    standalone: false
 })
 @UntilDestroy()
 export class SpeciesComponent implements AfterViewInit {

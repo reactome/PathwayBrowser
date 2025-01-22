@@ -2,9 +2,10 @@ import {Component, Input} from '@angular/core';
 import {Event} from "../../../model/event.model";
 
 @Component({
-  selector: 'cr-description-overview',
-  templateUrl: './description-overview.component.html',
-  styleUrl: './description-overview.component.scss'
+    selector: 'cr-description-overview',
+    templateUrl: './description-overview.component.html',
+    styleUrl: './description-overview.component.scss',
+    standalone: false
 })
 export class DescriptionOverviewComponent {
 

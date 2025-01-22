@@ -13,9 +13,10 @@ import {EventService} from "../services/event.service";
 
 
 @Component({
-  selector: 'cr-viewport',
-  templateUrl: './viewport.component.html',
-  styleUrls: ['./viewport.component.scss']
+    selector: 'cr-viewport',
+    templateUrl: './viewport.component.html',
+    styleUrls: ['./viewport.component.scss'],
+    standalone: false
 })
 @UntilDestroy()
 export class ViewportComponent implements AfterViewInit, OnChanges {
