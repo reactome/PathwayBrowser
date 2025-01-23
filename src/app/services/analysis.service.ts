@@ -6,6 +6,7 @@ import {Analysis} from "../model/analysis.model";
 import {DiagramStateService} from "./diagram-state.service";
 import {brewer, Scale, scale} from "chroma-js";
 import {extract, Style} from "reactome-cytoscape-style";
+import {toObservable} from "@angular/core/rxjs-interop";
 
 
 export type Palette = keyof typeof brewer;
@@ -71,7 +72,7 @@ export class AnalysisService {
 
   result?: Analysis.Result;
 
-  result$ = this.state.onChange.analysis$.pipe(
+  result$ = toObservable(this.state.analysis).pipe(
     switchMap(token =>
       token !== null ?
         (
@@ -109,26 +110,26 @@ export class AnalysisService {
 
   clearAnalysis() {
     this.result = undefined;
-    this.state.set('analysis', null);
+    this.state.analysis.set(null);
   }
 
   analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
     return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/projection`, data, {params}).pipe(
       tap(result => this.result = result),
-      tap(result => this.state.set('analysis', result.summary.token)),
+      tap(result => this.state.analysis.set(result.summary.token)),
     )
   }
 
   loadAnalysis(token?: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
     console.log('load analysis')
-    if (token) this.state.set('analysis', token);
-    return this.http.get<Analysis.Result>(`${environment.host}/AnalysisService/token/${token || this.state.get('analysis')}`, {params}).pipe(
+    if (token) this.state.analysis.set(token);
+    return this.http.get<Analysis.Result>(`${environment.host}/AnalysisService/token/${token || this.state.analysis()}`, {params}).pipe(
       tap(result => this.result = result)
     )
   }
 
   foundEntities(pathway: string, token?: string, resource: Analysis.Resource = 'TOTAL'): Observable<Analysis.FoundEntities> {
-    return this.http.get<Analysis.FoundEntities>(`${environment.host}/AnalysisService/token/${token || this.state.get('analysis')}/found/all/${pathway}`, {
+    return this.http.get<Analysis.FoundEntities>(`${environment.host}/AnalysisService/token/${token || this.state.analysis()}/found/all/${pathway}`, {
       params: {
         resource
       }
@@ -147,7 +148,7 @@ export class AnalysisService {
 
   pathwaysResults(pathwayIds: number[] | string[], token?: string, resource: Analysis.Resource = 'TOTAL'): Observable<Analysis.Pathway[]> {
     if (pathwayIds.length === 0) return of([]);
-    return this.http.post<Analysis.Pathway[]>(`${environment.host}/AnalysisService/token/${token || this.state.get('analysis')}/filter/pathways`, pathwayIds.join(','), {
+    return this.http.post<Analysis.Pathway[]>(`${environment.host}/AnalysisService/token/${token || this.state.analysis()}/filter/pathways`, pathwayIds.join(','), {
       params: {resource}
     }).pipe(
       catchError(() => of([]))

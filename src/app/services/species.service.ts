@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {BehaviorSubject, map, Observable, of, tap} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
@@ -127,11 +127,11 @@ export class SpeciesService {
   getIdsFromURL(diagramId: string) {
     let ids: string[] = []
     ids.push(diagramId);
-    if (this.state.get('select')) {
-      ids.push(this.state.get('select'));
+    if (this.state.select()) {
+      ids.push(this.state.select());
     }
-    if (this.state.get('path')) {
-      ids = ids.concat(this.state.get('path'));
+    if (this.state.path()) {
+      ids = ids.concat(this.state.path());
     }
     return ids;
   }

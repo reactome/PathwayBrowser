@@ -1,9 +1,17 @@
-import {AfterViewInit, Component, ElementRef, OnChanges, Output, SimpleChanges, ViewChild, input} from '@angular/core';
+import {
+  AfterViewInit,
+  Component, effect,
+  ElementRef,
+  input,
+  model,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
 import {extract, ReactomeEvent, ReactomeEventTypes, Style} from "reactome-cytoscape-style";
 import cytoscape, {ElementsDefinition} from "cytoscape";
-// @ts-ignore
-// import {DarkService} from "../services/dark.service";
 import {InteractorService} from "../interactors/services/interactor.service";
 import {
   catchError,
@@ -23,7 +31,7 @@ import {
 } from "rxjs";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
-import {AnalysisService, Examples, PaletteGroup} from "../services/analysis.service";
+import {AnalysisService, Examples} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
 import {isDefined} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
@@ -33,7 +41,7 @@ import {EventService} from "../services/event.service";
 import {Event} from "../model/event.model";
 
 
-import {brewer, scale} from "chroma-js";
+import {brewer} from "chroma-js";
 import {group, style} from "@angular/animations";
 import {MatFormField} from "@angular/material/form-field";
 import {DarkService} from "../services/dark.service";
@@ -52,6 +60,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
   @ViewChild('cytoscapeCompare') compareContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
   readonly interactorsComponent = input<InteractorsComponent>(undefined, { alias: "interactor" });
+  readonly stId = model.required<string>();
 
 
   comparing: boolean = false;
@@ -67,6 +76,9 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
               private route: ActivatedRoute
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
+    effect(() => this.state.flag() && this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.state.flag(), cy))));
+    effect(() => this.state.select() && this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select(), cy))));
+    effect(() => this.state.analysis() && this.avoidSideEffect(() => this.loadAnalysis(this.state.analysis())));
   }
 
   cy!: cytoscape.Core;
@@ -148,7 +160,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     if (!this.cytoscapeContainer) return EMPTY; // Prevent execution if the container is not present
 
     const container = this.cytoscapeContainer.nativeElement;
-    return this.diagram.getDiagram(this.state.diagramId()!).pipe(
+    return this.diagram.getDiagram(this.stId()!).pipe(
       tap(elements => {
         this.comparing = elements.nodes.some(node => node.data['isFadeOut']) ||
           elements.edges.some(edge => edge.data['isFadeOut']);
@@ -180,19 +192,19 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
   }
 
   loadSubpathwayWithDiagram(event: Event) {
-    return this.event.fetchEventAncestors(this.state.diagramId()!).pipe(
+    return this.event.fetchEventAncestors(this.stId()!).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
         const pathwayWithDiagram = [...ancestors].reverse().find(p => p.hasDiagram);
         if (pathwayWithDiagram) {
           const newDiagramId = pathwayWithDiagram.stId;
-          const diagramId = this.state.diagramId();
+          const diagramId = this.stId();
           if (newDiagramId !== diagramId) {
-            this.state.diagramId.set(newDiagramId);
+            this.stId.set(newDiagramId);
             this.router.navigate(['PathwayBrowser', diagramId], {
               queryParamsHandling: "preserve"
             }).then(() => {
-              this.state.set('select', event.stId);
+              this.state.select.set(event.stId);
             });
 
             return this.loadElvDiagram();
@@ -479,7 +491,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
 
 
   private loadAnalysis(token: string | null) {
-    const diagramId = this.state.diagramId();
+    const diagramId = this.stId();
     console.log(token, diagramId)
     if (!token || !diagramId) {
       this.cys.forEach(cy => {
@@ -504,7 +516,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
       result: this.analysis.result$.pipe(filter(isDefined), take(1))
     }).subscribe(({entities, result, pathways}) => {
       // TODO Make switching profile work without reloading whole data
-      const analysisProfile = this.state.get('analysisProfile');
+      const analysisProfile = this.state.analysisProfile();
       let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
       if (analysisIndex === -1) analysisIndex = 0;
 
@@ -628,27 +640,19 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     share()
   );
 
-  flagging = this.state.onChange.flag$.subscribe((value) => this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(value, cy))));
-  selecting = this.state.onChange.select$.subscribe((value) => this.avoidSideEffect(() => this.cys.forEach(cy => this.select(value, cy))));
-  //interactoring = this.state.onChange.overlay$.subscribe((value) => this.interactorsComponent?.getInteractors(value));
-  analysing = this.state.onChange.analysis$.subscribe((value) => this.avoidSideEffect(() => this.loadAnalysis(value)));
-
-
-  // stateToDiagramSub = this.state.state$.subscribe(() => this.stateToDiagram());
-
   private stateToDiagram() {
     for (let cy of this.cys) {
-      this.flag(this.state.get('flag'), cy);
-      this.select(this.state.get("select"), cy);
+      this.flag(this.state.flag(), cy);
+      this.select(this.state.select(), cy);
     }
 
-    const resource = this.state.get('overlay');
+    const resource = this.state.overlay();
     if (resource) {
       console.log('Resource not null', resource)
       this.interactorsComponent()?.getInteractors(resource)
     }
 
-    this.loadAnalysis(this.state.get('analysis'))
+    this.loadAnalysis(this.state.analysis())
   }
 
   compareBackgroundSync = this.reactomeEvents$.pipe(
@@ -730,7 +734,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
         elements = e.detail.cy.elements('node.reaction:selected')
       }
       const reactomeIds = elements.map(el => el.data('graph.stId'));
-      this.state.set('select', reactomeIds[0])
+    this.state.select.set(reactomeIds[0]);
     }
   );
 
@@ -756,10 +760,10 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
 
       switch (event.type) {
         case ReactomeEventTypes.select:
-          this.state.set('flag', ['class:' + classes[0] + (event.detail.type === 'reaction' ? '' : ((classes.includes('drug') ? '.' : '!') + 'drug'))])
+          this.state.flag.set(['class:' + classes[0] + (event.detail.type === 'reaction' ? '' : ((classes.includes('drug') ? '.' : '!') + 'drug'))]);
           break;
         case ReactomeEventTypes.unselect:
-          this.state.set('flag', []);
+          this.state.flag.set([]);
           break;
         case ReactomeEventTypes.hover:
           matchingElement.addClass('hover')

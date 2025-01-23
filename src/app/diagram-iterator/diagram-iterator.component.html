@@ -1,5 +1,5 @@
 <div class="diagram-container">
-  <cr-diagram #diagram [id]="diagramId"></cr-diagram>
+  <cr-diagram #diagram [(stId)]="diagramId"></cr-diagram>
 </div>
 
 <div (keydown.arrowLeft)="previous()" (keydown.arrowRight)="next()">

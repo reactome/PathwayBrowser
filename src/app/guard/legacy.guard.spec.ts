@@ -46,9 +46,9 @@ describe('legacyGuard', () => {
     );
 
     setTimeout(() => {
-      expect(state.get('select')).toEqual(['R-HSA-109797']);
-      expect(state.get('flag')).toEqual(['R-HSA-1637910']);
-      expect(state.get('flagInteractors')).toEqual(true);
+      expect(state.select()).toEqual(['R-HSA-109797']);
+      expect(state.flag()).toEqual(['R-HSA-1637910']);
+      expect(state.flagInteractors()).toEqual(true);
     })
   });
 });

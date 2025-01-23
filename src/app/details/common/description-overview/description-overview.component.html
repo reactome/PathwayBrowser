@@ -65,16 +65,7 @@
   <div *ngIf="obj().summation" class="row">
     <div class="label">Summation</div>
     <div class="value" *ngIf="obj().summation[0].text as summationText">
-      <!-- Short content layout, place the content in a row-->
-      <div [innerHTML]="summationText | includeRef: allRefs()"></div>
-
-      <!-- Long content layout, place content in left and right columns-->
-<!--      <div *ngIf="!isShortContent(summationText)" class="summation-content-container">-->
-<!--        <div class="left" [innerHTML]="getLeftColumnContent(summationText) | includeRef: allRefs() ">-->
-<!--        </div>-->
-<!--        <div class="right" [innerHTML]="getRightColumnContent(summationText) | includeRef: allRefs()">-->
-<!--        </div>-->
-<!--      </div>-->
+      <div [innerHTML]="summationText | includeRef: allRefs()" [class.columns]="summationText.length > 500"></div>
 
       <!--Display summation refs if is available-->
       <div class="summation-refs-container" *ngIf="obj().summation[0].literatureReference">

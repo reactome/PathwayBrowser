@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnChanges, SimpleChanges, ViewChild, input} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  model,
+  OnChanges,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {DiagramComponent} from "../diagram/diagram.component";
 import {ResourceAndType} from "../interactors/model/interactor.model";
 import {InteractorsComponent} from "../interactors/interactors.component";
@@ -23,11 +32,14 @@ import {DiagramStateService} from "../services/diagram-state.service";
 export class ViewportComponent implements AfterViewInit, OnChanges {
 
 
+  readonly stId = model.required<string>();
+
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
-  hasEHLD? : boolean;
 
+  hasEHLD? : boolean;
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
+
   currentSpecies: Species | undefined = undefined;
 
   visibility = {
@@ -44,6 +56,9 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
               private eventService: EventService,
               public state: DiagramStateService
   ) {
+    effect(() => {
+        this.getEnhancedResult();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -57,10 +72,6 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
     this.interactorService.currentInteractorResource$.pipe(untilDestroyed(this)).subscribe(resource => {
       this.currentInteractorResource = resource;
     });
-
-    if (this.state.diagramId()) {
-      this.getEnhancedResult();
-    }
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this),).subscribe((hasEHLD) => {
       this.hasEHLD = hasEHLD;
@@ -80,7 +91,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   }
 
   private getEnhancedResult(): void {
-    this.eventService.fetchEnhancedEventData(this.state.diagramId()!)
+    this.eventService.fetchEnhancedEventData(this.stId())
       .subscribe((enhancedResult) => {
         this.eventService.setDiagramEvent(enhancedResult);
         const hasEHLD = enhancedResult.hasEHLD ? enhancedResult.hasEHLD : false;

@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output, input} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, input, OnDestroy, Output} from '@angular/core';
 import {InteractorToken, PsicquicResource, ResourceAndType, ResourceType} from "./model/interactor.model";
 import cytoscape from "cytoscape";
 import {DiagramService} from "../services/diagram.service";
@@ -90,7 +90,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
         this.interactorsService.addInteractorOccurrenceNode(interactors, cy, resource);
         this.initialiseReplaceElements.emit();
       });
-      this.state.set('overlay', resource)
+        this.state.overlay.set(resource);
     })
   }
 
@@ -102,7 +102,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
       this.interactorsService.getInteractorData(cy, selectedResource).subscribe(interactors => {
         this.interactorsService.addInteractorOccurrenceNode(interactors, cy, selectedResource);
         this.isDataFromPsicquicLoading = false;
-        this.state.set('overlay', selectedResource);
+          this.state.overlay.set(selectedResource);
       });
     });
   }
@@ -124,7 +124,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
           this.resourceTokens!.push(resource);
           this.clear = false;
           this.updateCurrentResource(resource.summary.name, ResourceType.CUSTOM);
-          this.state.set('overlay', resource.summary.token);
+            this.state.overlay.set(resource.summary.token);
         }
         this.cdr.detectChanges();
       })
@@ -144,7 +144,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
         this.interactorsService.addInteractorOccurrenceNode(result.interactors, cy, result.interactors.resource);
         this.clear = false;
         this.updateCurrentResource(resource!.summary.name, ResourceType.CUSTOM);
-        this.state.set('overlay', resource.summary.token);
+          this.state.overlay.set(resource.summary.token);
       })
     })
   }
@@ -155,7 +155,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
       this.resourceTokens!.splice(index, 1);
       this.cys()?.forEach(cy => {
         cy.elements(`[resource = '${resource}']`).remove();
-        this.state.set('overlay', null);
+          this.state.overlay.set(null);
       })
     }
   }
@@ -165,7 +165,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
       this.interactorsService.clearAllInteractorNodes(cy);
       this.clear = true;
       this.updateCurrentResource(null, null);
-      this.state.set('overlay', null);
+        this.state.overlay.set(null);
     })
   }
 

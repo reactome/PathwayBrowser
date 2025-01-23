@@ -515,7 +515,7 @@ export class EventService {
   }
 
   getFinalAncestor(ancestors: Event[][]): Event[] {
-    const pathIds = this.state.get('path');
+    const pathIds = this.state.path();
     let finalAncestor: Event[];
     // When path is given through URL, this link is from Location in PWB on detail page
     if (pathIds && ancestors.length > 1) {
@@ -561,7 +561,7 @@ export class EventService {
 
   setPath(diagramId: string, ancestors: Event[]) {
     const ids = this.getPathIds(diagramId, ancestors);
-    this.state.set('path', ids);
+    this.state.path.set(ids);
   }
 
 

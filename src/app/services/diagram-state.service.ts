@@ -1,102 +1,82 @@
-import {effect, Injectable, model, signal} from '@angular/core';
+import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {BehaviorSubject, distinctUntilChanged, filter, firstValueFrom, map, Observable, tap} from "rxjs";
+import {firstValueFrom} from "rxjs";
 import {isArray, isBoolean, isNumber} from "lodash";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {environment} from "../../environments/environment";
-import {toSignal} from "@angular/core/rxjs-interop";
-import {isDefined} from "./utils";
 
 
-export interface UrlParam<T> {
-  value: T
-  otherTokens?: string[]
+type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T };
+
+export function urlParam<T>(initialValue: T, otherTokens?: string[]): UrlParam<T> {
+  const writableSignal = signal<T>(initialValue) as UrlParam<T>;
+  writableSignal.otherTokens = otherTokens;
+  writableSignal.initialValue = initialValue;
+  return writableSignal;
 }
 
-export type State = {
-  [token: string]: UrlParam<any>
-  select: UrlParam<string>
-  flag: UrlParam<string[]>
-  path: UrlParam<string[]>
-  flagInteractors: UrlParam<boolean>
-  overlay: UrlParam<string | null>
-  analysis: UrlParam<string | null>
-  analysisProfile: UrlParam<string | null>
-};
 
-type ObservableState = { [K in keyof State as `${K & string}$`]: Observable<State[K]['value']> };
+type State = DiagramStateService['values']
 
 @Injectable({
   providedIn: 'root'
 })
-export class DiagramStateService {
+export class DiagramStateService implements State {
 
-  private propagate = false;
-
-  diagramId = signal<string | undefined>(undefined)
-
-  private state: State = {
-    select: {otherTokens: ['SEL'], value: ''},
-    flag: {otherTokens: ['FLG'], value: []},
-    path: {otherTokens: ['PATH'], value: []},
-    flagInteractors: {otherTokens: ['FLGINT'], value: false},
-    overlay: {value: ''},
-    analysis: {value: null, otherTokens: ['ANALYSIS']},
-    analysisProfile: {value: null},
+  private readonly values = {
+    select: urlParam<string>('', ['SEL']),
+    flag: urlParam<string[]>([], ['FLG']),
+    path: urlParam<string[]>([], ['PATH']),
+    flagInteractors: urlParam<boolean>(false, ['FLGINT']),
+    overlay: urlParam<string | null>(''),
+    analysis: urlParam<string | null>(null, ['ANALYSIS']),
+    analysisProfile: urlParam<string | null>(null),
   };
 
-  private _state$ = new BehaviorSubject<State>(this.state);
-  public state$ = this._state$.asObservable();
-  public onChange: ObservableState = Object.keys(this.state)
-    .reduce((properties, prop: keyof State) => {
-      properties[`${prop}$`] = this.state$.pipe(
-        map(state => state[prop].value),
-        distinctUntilChanged((v1, v2) => v1?.toString() === v2?.toString()),
-        tap(v => console.log(`${prop} has been updated to ${v}`)),
-        // share()
-      )
-      return properties;
-    }, {} as ObservableState);
+  public readonly select = this.values.select
+  public readonly flag = this.values.flag
+  public readonly path = this.values.path
+  public readonly flagInteractors = this.values.flagInteractors
+  public readonly overlay = this.values.overlay
+  public readonly analysis = this.values.analysis
+  public readonly analysisProfile = this.values.analysisProfile
 
-  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {
-    effect(() => {
-      if (this.diagramId()) this.router.navigate([this.diagramId()], {
-        queryParamsHandling: 'preserve',
-        preserveFragment: true
-      })
-    });
-    this.route.paramMap.pipe(
-      map(params => params.get('id')),
-      filter(isDefined)
-    ).subscribe((id) => this.diagramId.set(id))
 
+  constructor(route: ActivatedRoute, private router: Router, private http: HttpClient) {
     route.queryParamMap.subscribe(async params => {
-      for (const mainToken in this.state) {
-        const param = this.state[mainToken];
+      for (const mainToken in this.values) {
+        const param = this.values[mainToken as keyof State] as UrlParam<any>;
         const tokens: string[] = [mainToken, ...param.otherTokens || []];
         const token = tokens.find(token => params.has(token));
         if (token) {
-          const formerValue = param.value;
+          const formerValue = param();
           let value = params.get(token)!;
-          if (isArray(param.value)) {
-            const rawValue = value!;
-            param.value = rawValue.split(',').map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
-            const hasDbIds = param.value.some(isNumber);
-            if (hasDbIds) {
-              param.value = await Promise.all(param.value.map((v: string | number) => this.ensureStId(v)));
-              this.set(mainToken, param.value);
+          if (isArray(formerValue)) {
+            let values = value.split(',').map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
+            if (values.some(isNumber)) {
+              values = await Promise.all(values.map((v: string | number) => this.ensureStId(v)));
             }
-          } else if (isBoolean(param.value)) {
-            param.value = value === 'true';
+            param.set(values);
+          } else if (isBoolean(formerValue)) {
+            param.set(value === 'true');
           } else if (value.charAt(0).match(/\d/)) {
-            this.set(mainToken, await this.dbIdToStId(parseInt(value)))
+            param.set(await this.dbIdToStId(parseInt(value)))
           } else {
-            param.value = value
+            param.set(value)
           }
         }
       }
-      if (this.propagate) this._state$.next(this.state);
     })
+    effect(() => {
+      const queryParams = {} as any;
+      for (const key in this.values) {
+        let param = this.values[key as keyof State]();
+        if (!param || (isArray(param) && param.length === 0)) continue;
+        queryParams[key] = isArray(param) ? param.join(',') : param;
+      }
+      console.log(queryParams)
+      this.router.navigate([], {queryParams});
+    });
   }
 
   async ensureStId(id: string | number): Promise<string> {
@@ -106,30 +86,5 @@ export class DiagramStateService {
   async dbIdToStId(dbId: number): Promise<string> {
     return firstValueFrom(this.http.get(`${environment.host}/ContentService/data/query/${dbId}/stId`, {responseType: "text"}))
   }
-
-  get<T extends keyof State>(token: T): State[T]['value'] {
-    return this.state[token].value
-  }
-
-  set<T extends keyof State>(token: T, value: State[T]["value"], propagate = true): void {
-    this.state[token].value = value;
-    this.propagate = propagate;
-    this.onPropertyModified();
-  }
-
-  // TODO make unselect remove select from state
-  onPropertyModified() {
-    return this.router.navigate([], {
-      queryParams: {
-        ...Object.entries(this.state)
-          .filter(([token, param]) => param.value && param.value.length !== 0)
-          .reduce((acc, [token, param]) => ({
-            ...acc,
-            [token]: Array.isArray(param.value) ? param.value.join(',') : param.value
-          }), {})
-      }
-    })
-  }
-
 
 }

@@ -1,10 +1,9 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, effect, ElementRef, model, ViewChild} from '@angular/core';
 import {filter, forkJoin, Observable, take, tap} from "rxjs";
 import {EhldService, LegendGroup} from "../services/ehld.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {DiagramStateService} from "../services/diagram-state.service";
-import {Router} from "@angular/router";
 import SvgPanZoom from 'svg-pan-zoom';
 import {Graph} from "../model/graph.model";
 import {AnalysisService} from "../services/analysis.service";
@@ -25,6 +24,8 @@ import {SpeciesService} from "../services/species.service";
 export class EhldComponent implements AfterViewInit {
 
   @ViewChild('ehld') ehldContainer?: ElementRef<HTMLDivElement>;
+  readonly stId = model.required<string>();
+
 
   style!: Style;
   ratio = 0.384;
@@ -42,22 +43,13 @@ export class EhldComponent implements AfterViewInit {
   constructor(private ehldService: EhldService,
               private sanitizer: DomSanitizer,
               private cdr: ChangeDetectorRef,
-              private stateService: DiagramStateService,
-              private router: Router,
               private analysisService: AnalysisService,
               private speciesService: SpeciesService,
               public state: DiagramStateService,) {
+    effect(() => this.selectedIdFromUrl = this.state.select());
+    effect(() => this.flaggedIdFromUrl = this.state.flag());
+    effect(() => this.loadAnalysis(this.state.analysis()));
   }
-
-  selecting = this.stateService.onChange.select$.pipe(
-    tap(value => this.selectedIdFromUrl = value))
-    .subscribe();
-
-  flagging = this.stateService.onChange.flag$.pipe(
-    tap(value => this.flaggedIdFromUrl = value))
-    .subscribe();
-
-  analysing = this.stateService.onChange.analysis$.subscribe((value) => this.loadAnalysis(value));
 
   ngAfterViewInit(): void {
     this.style = new Style(this.ehldContainer!.nativeElement);
@@ -65,11 +57,11 @@ export class EhldComponent implements AfterViewInit {
     this.legendItems = this.ehldService.legendItems;
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
-      if (this.state.diagramId() && hasEHLD) {
+      if (this.stId() && hasEHLD) {
         this.loadEhldSvg().subscribe({
           next: () => {
             this.initializePanAndZoom();
-            this.loadAnalysis(this.stateService.get('analysis'))
+            this.loadAnalysis(this.state.analysis())
           },
           error: () => {
             console.error('Error loading EHLD SVG');
@@ -102,7 +94,7 @@ export class EhldComponent implements AfterViewInit {
 
 
   private loadEhldSvg(): Observable<{ svg: string; graphData: Graph.Data }> {
-    return this.ehldService.getSVGData(this.state.diagramId()!).pipe(
+    return this.ehldService.getSVGData(this.stId()!).pipe(
       tap(result => {
         if (result.svg) {
           const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(result.svg);
@@ -168,7 +160,7 @@ export class EhldComponent implements AfterViewInit {
         const idAttr = this.selectedElement?.getAttribute('id');
         if (idAttr) {
           const stId = this.ehldService.getStableId(idAttr);
-          if (stId) this.stateService.set('select', stId);
+          if (stId) this.state.select.set(stId);
         }
 
         this.ehldService.applyOutline(element, this.flaggedElements);
@@ -180,7 +172,7 @@ export class EhldComponent implements AfterViewInit {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
             this.speciesService.setIgnore(false);
-            this.state.diagramId.set(stId);
+            this.stId.set(stId);
           }
         }
       })
@@ -189,7 +181,7 @@ export class EhldComponent implements AfterViewInit {
 
 
   private loadAnalysis(token: string | null) {
-    const diagramId = this.state.diagramId();
+    const diagramId = this.stId();
     if (!token || !diagramId) {
       return;
     }
@@ -205,7 +197,7 @@ export class EhldComponent implements AfterViewInit {
       this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
       this.ehldService.clearAnalysisInfo(this.stIdToSVGGElement);
 
-      const analysisProfile = this.stateService.get('analysisProfile');
+      const analysisProfile = this.state.analysisProfile();
       let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
       if (analysisIndex === -1) analysisIndex = 0;
 

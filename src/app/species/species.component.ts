@@ -88,13 +88,13 @@ export class SpeciesComponent implements AfterViewInit {
           queryParamsHandling: "preserve"
         }).then(() => {
           if (updatedParams['select']) {
-            this.state.set('select', updatedParams['select']);
+            this.state.select.set(updatedParams['select']);
           } else {
-            this.state.set('select', '');
+            this.state.select.set('');
           }
           this.speciesService.setIgnore(true);
-          if (updatedParams['flag']) this.state.set('flag', updatedParams['flag']);
-          if (updatedParams['path']) this.state.set('path', updatedParams['path'].split(','));
+          if (updatedParams['flag']) this.state.flag.set(updatedParams['flag']);
+          if (updatedParams['path']) this.state.path.set(updatedParams['path'].split(','));
           // Close the species panel after navigating
           setTimeout(() => this.visibility().species = false, 600);
         });
