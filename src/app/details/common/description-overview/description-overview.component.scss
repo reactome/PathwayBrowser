@@ -108,29 +108,14 @@
   }
 }
 
-.summation-content-container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 20px;
-  white-space: normal;
-
-  .left,
-  .right {
-    //display: flex;
-    flex-direction: column;
-    text-align: justify;
-    flex: 1;
-  }
-
-  .left {
-    text-align-last: justify;
-  }
+.columns {
+  columns: 2 25em;
 }
-
 
 .summation-refs-container {
   display: flex;
   flex-direction: row;
   width: 100%;
 }
+
+
