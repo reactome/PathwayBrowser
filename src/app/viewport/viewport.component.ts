@@ -10,6 +10,8 @@ import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
+import {isEvent, isPathway} from "../services/utils";
+import {DatabaseObjectService} from "../services/database-object.service";
 
 
 @Component({
@@ -24,7 +26,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
   @Input('id') diagramId: string = '';
-  hasEHLD? : boolean;
+  hasEHLD?: boolean;
 
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
   currentSpecies: Species | undefined = undefined;
@@ -41,6 +43,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
               public dark: DarkService,
               private ehldService: EhldService,
               private eventService: EventService,
+              private dboService: DatabaseObjectService
   ) {
   }
 
@@ -78,13 +81,21 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   }
 
   private getEnhancedResult(): void {
-    this.eventService.fetchEnhancedEventData(this.diagramId)
-      .subscribe((enhancedResult) => {
-        this.eventService.setDiagramEvent(enhancedResult);
-        const hasEHLD = enhancedResult.hasEHLD ? enhancedResult.hasEHLD : false;
-        this.hasEHLD = hasEHLD;
-        this.ehldService.setHasEHLD(hasEHLD);
-        this.cdRef.detectChanges();
+    this.dboService.fetchEnhancedEventData(this.diagramId)
+      .subscribe((databaseObject) => {
+        if (isEvent(databaseObject)) {
+          // Type guards to pass Event safely
+          this.eventService.setDiagramEvent(databaseObject);
+          if (isPathway(databaseObject)) {
+            const hasEHLD = databaseObject.hasEHLD ? databaseObject.hasEHLD : false;
+            this.hasEHLD = hasEHLD;
+            this.ehldService.setHasEHLD(hasEHLD);
+          }
+          this.cdRef.detectChanges();
+        } else {
+          // Handle case where enhancedResult is not an Event
+          console.error('Received data is not an Event:', databaseObject);
+        }
       })
   }
 

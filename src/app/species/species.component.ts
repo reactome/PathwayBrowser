@@ -5,7 +5,10 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {EventService} from "../services/event.service";
-import {Event} from "../model/event.model";
+import {Event} from "../model/graph/event.model";
+import {DatabaseObject} from "../model/graph/database-object.model";
+import {isEvent} from "../services/utils";
+import {DatabaseObjectService} from "../services/database-object.service";
 
 
 @Component({
@@ -25,9 +28,14 @@ export class SpeciesComponent implements AfterViewInit {
   }
 
   selectedTreeEvent?: Event;
-  selectedObj?: Event;
+  selectedObj?: DatabaseObject;
 
-  constructor(private speciesService: SpeciesService, private router: Router, private route: ActivatedRoute, private state: DiagramStateService, private eventService: EventService) {
+  constructor(private speciesService: SpeciesService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private state: DiagramStateService,
+              private eventService: EventService,
+              private dboService: DatabaseObjectService) {
 
   }
 
@@ -46,7 +54,7 @@ export class SpeciesComponent implements AfterViewInit {
       this.selectedTreeEvent = event;
     });
 
-    this.eventService.selectedObj$.pipe(untilDestroyed(this)).subscribe(event => {
+    this.dboService.selectedObj$.pipe(untilDestroyed(this)).subscribe(event => {
       this.selectedObj = event;
     });
 
@@ -74,7 +82,7 @@ export class SpeciesComponent implements AfterViewInit {
     // Include entity to ancestors list when selecting entity in the URL
     const ancestors = this.selectedTreeEvent?.ancestors || [];
     const stIdSet = new Set(ancestors.map(obj => obj.stId));
-    if (this.selectedObj?.stId && !stIdSet.has(this.selectedObj.stId)) {
+    if (this.selectedObj?.stId && !stIdSet.has(this.selectedObj.stId) && isEvent(this.selectedObj)) {
       ancestors.push(this.selectedObj);
     }
 

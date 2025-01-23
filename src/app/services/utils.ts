@@ -1,4 +1,12 @@
-import {LiteratureReference} from "../model/event.model";
+import {Event} from "../model/graph/event.model";
+import {DatabaseObject} from "../model/graph/database-object.model";
+import {Pathway} from "../model/graph/pathway.model";
+import {ReactionLikeEvent} from "../model/graph/reaction-like-event.model";
+import {PhysicalEntity} from "../model/graph/physical-entity.model";
+import {TopLevelPathway} from "../model/graph/top-level-pathway.model";
+import {CellLineagePath} from "../model/graph/cell-lineage-path.model";
+import {EntityWithAccessionedSequence} from "../model/graph/entity-with-accessioned-sequence.model";
+import {LiteratureReference} from "../model/graph/literature-reference.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -13,3 +21,52 @@ export function sortByYearDescending(refs: LiteratureReference[]) {
   });
 }
 
+// Type guards to narrow the type
+export function isEvent(obj: DatabaseObject): obj is Event {
+  return (obj as Event).summation !== undefined;
+}
+
+export function isPathway(obj: DatabaseObject): obj is Pathway {
+  return (obj as Pathway).hasEvent !== undefined;
+}
+
+export function isTLP(obj: DatabaseObject): obj is TopLevelPathway {
+  return obj.schemaClass === "TopLevelPathway";
+}
+
+export function isCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
+  return obj.schemaClass === "CellLineagePathway";
+}
+
+export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPathway {
+  return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
+}
+
+
+export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
+  return obj.schemaClass === "PhysicalEntity";
+}
+
+export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
+  return obj.schemaClass === "EntityWithAccessionedSequence";
+}
+
+export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
+  return ['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction', 'CellDevelopmentStep'].includes(obj.schemaClass);
+}
+
+export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
+  return isPathway(obj) && (obj as Pathway).hasDiagram !== undefined;
+}
+
+
+/** Generic function to dynamic access child property
+ *  T represents the type of the obj parameter, which must extend DatabaseObject.
+ *  K is constrained to the keys of T, ensuring only valid keys of the given object type can be accessed.
+ *  The function uses key in obj to check if the property exists on the object at runtime.
+ *  If it does, it returns the value of the property. Otherwise, it returns undefined.
+ */
+
+export function getProperty<T extends DatabaseObject, K extends keyof T>(obj: T, key: K): T[K] | undefined {
+  return key in obj ? obj[key] : undefined;
+}

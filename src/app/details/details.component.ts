@@ -1,9 +1,10 @@
- import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
 import {EventService} from "../services/event.service";
-import {Event} from "../model/event.model";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {Analysis} from "../model/analysis.model";
+import {DatabaseObject} from "../model/graph/database-object.model";
+import {DatabaseObjectService} from "../services/database-object.service";
 
 
 @Component({
@@ -16,21 +17,22 @@ import {Analysis} from "../model/analysis.model";
 @UntilDestroy()
 export class DetailsComponent implements AfterViewInit {
 
-  obj?: Event;
+  obj?: DatabaseObject;
   analysisResult?: Analysis.Result;
 
 
-  @ViewChild('tabGroup', { read: ElementRef }) tabGroup?: ElementRef;
+  @ViewChild('tabGroup', {read: ElementRef}) tabGroup?: ElementRef;
   firstTabWidth?: number;
 
-  constructor(private eventService: EventService,
-              private analysis: AnalysisService) {
+  constructor(
+    private analysis: AnalysisService,
+    private dboService: DatabaseObjectService) {
   }
 
   ngAfterViewInit(): void {
 
-    this.eventService.selectedObj$.pipe(untilDestroyed(this)).subscribe(event => {
-      this.obj = event;
+    this.dboService.selectedObj$.pipe(untilDestroyed(this)).subscribe(obj => {
+      this.obj = obj;
     });
 
     this.analysis.result$.pipe(untilDestroyed(this)).subscribe(result => {
@@ -46,7 +48,7 @@ export class DetailsComponent implements AfterViewInit {
 
   private getFirstTabWidth() {
 
-    if (this.tabGroup){
+    if (this.tabGroup) {
       const firstTab = this.tabGroup.nativeElement.querySelector('#firstTab');
       if (firstTab) {
         this.firstTabWidth = firstTab.offsetWidth;

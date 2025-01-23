@@ -1,11 +1,15 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Input} from '@angular/core';
-import {Event, InstanceEdit} from "../../../model/event.model";
 import {Analysis} from "../../../model/analysis.model";
 import {environment} from "../../../../environments/environment";
 import {DomSanitizer} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
 import {Router} from "@angular/router";
-import {sortByYearDescending} from "../../../services/utils";
+import {getProperty, sortByYearDescending} from "../../../services/utils";
+import {DatabaseObject} from "../../../model/graph/database-object.model";
+import {InstanceEdit} from "../../../model/graph/instance-edit.model";
+import {LiteratureReference} from "../../../model/graph/literature-reference.model";
+import {ReferenceEntity} from "../../../model/graph/reference-entity.model";
+import {Person} from "../../../model/graph/person.model";
 
 
 @Component({
@@ -15,13 +19,19 @@ import {sortByYearDescending} from "../../../services/utils";
 })
 export class DescriptionComponent implements AfterViewInit {
 
-  @Input('event') obj?: Event;
+  @Input('event') obj?: DatabaseObject;
   @Input('analysisResult') analysisResult?: Analysis.Result;
   @Input('tabWidth') tabWidth?: number;
 
   iconContent: string = '';
   currentUrl!: string;
-  authorship: { label: string, data: InstanceEdit[] }[] = []
+  authorship: { label: string, data: InstanceEdit[] | undefined }[] = []
+  refs?: LiteratureReference[];
+  referenceEntity?: ReferenceEntity;
+
+  authored?: InstanceEdit[];
+  reviewed?: InstanceEdit[];
+
 
   elements = [
     {key: 'input', label: 'Inputs'},
@@ -49,8 +59,10 @@ export class DescriptionComponent implements AfterViewInit {
 
     this.currentUrl = this.router.url
 
-    if (this.obj.referenceEntity) {
-      const identifier = this.obj.referenceEntity.identifier;
+    this.referenceEntity = getProperty(this.obj, 'referenceEntity');
+
+    if (this.referenceEntity) {
+      const identifier = this.referenceEntity.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
         if (icon && this.obj) {
           const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(icon);
@@ -61,21 +73,25 @@ export class DescriptionComponent implements AfterViewInit {
       });
     }
 
+    this.authored = getProperty(this.obj, 'authored');
+    this.reviewed = getProperty(this.obj, 'reviewed');
+
+
     this.authorship = [
-      ...(this.obj.authored?.length > 0 ? [{label: 'Author', data: this.obj.authored}] : []),
-      ...(this.obj.reviewed?.length > 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
+      ...((this.authored || []).length > 0 ? [{label: 'Author', data: this.authored}] : []),
+      ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: this.reviewed}] : []),
     ];
 
-
+    const refs = getProperty(this.obj, 'literatureReference');
     // Sort by year
-    if (this.obj && this.obj.literatureReference) {
-      this.obj.literatureReference = sortByYearDescending(this.obj.literatureReference);
+    if (refs) {
+      this.refs = sortByYearDescending(refs);
     }
 
   }
 
 
-  getIcon(obj: Event) {
+  getIcon(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
   }
 

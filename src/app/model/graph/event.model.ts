@@ -1,0 +1,43 @@
+import {DatabaseObject} from "./database-object.model";
+import {ReferenceEntity} from "./reference-entity.model";
+import {Summation} from "./summation.model";
+import {ReviewStatus} from "./review-status.model";
+import {LiteratureReference} from "./literature-reference.model";
+import {InstanceEdit} from "./instance-edit.model";
+import {Compartment} from "./compartment.model";
+
+export interface Event extends DatabaseObject {
+  authored: InstanceEdit[];
+  reviewed: InstanceEdit[];
+  literatureReference?: LiteratureReference[];
+  isInferred: boolean;
+  releaseStatus: string;
+  isInDisease: boolean;
+  summation: Summation[];
+  reviewStatus: ReviewStatus;
+  name: string[];
+
+
+  // not from API endpoint but are needed in the tree view
+  isSelected?: boolean;
+  isHovered?: boolean;
+  ancestors: Event[];
+  parent: Event;
+
+
+  // Not in the date model
+  speciesName?: string;
+  compartment?: Compartment[];
+
+
+  referenceEntity: ReferenceEntity;
+
+}
+
+
+
+
+
+
+
+
