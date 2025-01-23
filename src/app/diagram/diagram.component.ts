@@ -54,7 +54,7 @@ import {DarkService} from "../services/dark.service";
     styleUrls: ['./diagram.component.scss'],
     standalone: false
 })
-export class DiagramComponent implements AfterViewInit, OnChanges {
+export class DiagramComponent implements AfterViewInit {
   title = 'pathway-browser';
   @ViewChild('cytoscape') cytoscapeContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('cytoscapeCompare') compareContainer?: ElementRef<HTMLDivElement>;
@@ -76,6 +76,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
               private route: ActivatedRoute
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
+    effect(() => this.stId() && this.loadDiagram());
     effect(() => this.state.flag() && this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.state.flag(), cy))));
     effect(() => this.state.select() && this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select(), cy))));
     effect(() => this.state.analysis() && this.avoidSideEffect(() => this.loadAnalysis(this.state.analysis())));
@@ -88,12 +89,6 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
   legend!: cytoscape.Core;
   cys: cytoscape.Core[] = [];
 
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) {
-      this.loadDiagram();
-    }
-  }
 
 
   ngAfterViewInit(): void {
