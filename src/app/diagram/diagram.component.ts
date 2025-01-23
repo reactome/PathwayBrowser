@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component, effect,
-  ElementRef,
-  input,
-  model,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, Component, effect, ElementRef, input, model, Output, ViewChild} from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
 import {extract, ReactomeEvent, ReactomeEventTypes, Style} from "reactome-cytoscape-style";
 import cytoscape, {ElementsDefinition} from "cytoscape";
@@ -49,17 +39,17 @@ import {DarkService} from "../services/dark.service";
 
 @UntilDestroy({checkProperties: true})
 @Component({
-    selector: 'cr-diagram',
-    templateUrl: './diagram.component.html',
-    styleUrls: ['./diagram.component.scss'],
-    standalone: false
+  selector: 'cr-diagram',
+  templateUrl: './diagram.component.html',
+  styleUrls: ['./diagram.component.scss'],
+  standalone: false
 })
 export class DiagramComponent implements AfterViewInit {
   title = 'pathway-browser';
   @ViewChild('cytoscape') cytoscapeContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('cytoscapeCompare') compareContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
-  readonly interactorsComponent = input<InteractorsComponent>(undefined, { alias: "interactor" });
+  readonly interactorsComponent = input<InteractorsComponent>(undefined, {alias: "interactor"});
   readonly stId = model.required<string>();
 
 
@@ -77,8 +67,14 @@ export class DiagramComponent implements AfterViewInit {
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
     effect(() => this.stId() && this.loadDiagram());
-    effect(() => this.state.flag() && this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.state.flag(), cy))));
-    effect(() => this.state.select() && this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select(), cy))));
+    effect(() => {
+      if (this.state.flag() && !this.flagging) this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.state.flag(), cy)))
+      this.flagging = false;
+    }, {debugName: 'diagram flagging'});
+    effect(() => {
+      if (this.state.select() && !this.selecting) this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select(), cy)))
+      this.selecting = false;
+    }, {debugName: 'diagram selecting'});
     effect(() => this.state.analysis() && this.avoidSideEffect(() => this.loadAnalysis(this.state.analysis())));
   }
 
@@ -89,7 +85,8 @@ export class DiagramComponent implements AfterViewInit {
   legend!: cytoscape.Core;
   cys: cytoscape.Core[] = [];
 
-
+  selecting = false // Avoid zooming in diagram when selection came from in diagram
+  flagging = false // Avoid flagging in diagram when flagging came from in diagram
 
   ngAfterViewInit(): void {
     this.dark.$dark.subscribe(this.updateStyle.bind(this))
@@ -720,22 +717,23 @@ export class DiagramComponent implements AfterViewInit {
   });
 
   diagramSelect2state = this.reactomeEvents$.pipe(
-    filter((e) => e.detail.cy !== this.legend),
-    delay(0)
+    filter((e) => e.detail.cy !== this.legend && e.type === ReactomeEventTypes.select),
+    distinctUntilChanged((previous, next) => next.detail.element.data('id') === previous.detail.element.data('id')),
   ).subscribe(e => {
-      if (e.type !== ReactomeEventTypes.select) return;
       let elements: cytoscape.NodeSingular = e.detail.element;
       if (e.detail.type === 'reaction') {
         elements = e.detail.cy.elements('node.reaction:selected')
       }
       const reactomeIds = elements.map(el => el.data('graph.stId'));
-    this.state.select.set(reactomeIds[0]);
+      this.selecting = true
+      this.state.select.set(reactomeIds[0]);
     }
   );
 
   legend2state = this.reactomeEvents$.pipe(
     filter((e) => e.detail.cy === this.legend),
     filter(() => !this._ignore),
+    distinctUntilChanged((previous, next) => next.detail.element.$id === previous.detail.element.$id),
   ).subscribe((e) => {
     const event = e as ReactomeEvent;
     const classes = event.detail.element.classes();
@@ -755,9 +753,11 @@ export class DiagramComponent implements AfterViewInit {
 
       switch (event.type) {
         case ReactomeEventTypes.select:
+          this.flagging = true
           this.state.flag.set(['class:' + classes[0] + (event.detail.type === 'reaction' ? '' : ((classes.includes('drug') ? '.' : '!') + 'drug'))]);
           break;
         case ReactomeEventTypes.unselect:
+          this.flagging = true
           this.state.flag.set([]);
           break;
         case ReactomeEventTypes.hover:
