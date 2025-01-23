@@ -2,16 +2,15 @@ import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {firstValueFrom} from "rxjs";
 import {isArray, isBoolean, isNumber} from "lodash";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 
 
-type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T };
+type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[]};
 
 export function urlParam<T>(initialValue: T, otherTokens?: string[]): UrlParam<T> {
   const writableSignal = signal<T>(initialValue) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
-  writableSignal.initialValue = initialValue;
   return writableSignal;
 }
 
