@@ -10,7 +10,7 @@ import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
-import {isEvent, isPathway} from "../services/utils";
+import {isEvent, isPathwayOrTLP} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 
 
@@ -60,7 +60,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
     });
 
     if (this.diagramId) {
-      this.getEnhancedResult();
+      this.getDiagramObjectResult();
     }
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this),).subscribe((hasEHLD) => {
@@ -80,28 +80,28 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  private getEnhancedResult(): void {
-    this.dboService.fetchEnhancedEventData(this.diagramId)
-      .subscribe((databaseObject) => {
-        if (isEvent(databaseObject)) {
-          // Type guards to pass Event safely
-          this.eventService.setDiagramEvent(databaseObject);
-          if (isPathway(databaseObject)) {
-            const hasEHLD = databaseObject.hasEHLD ? databaseObject.hasEHLD : false;
-            this.hasEHLD = hasEHLD;
-            this.ehldService.setHasEHLD(hasEHLD);
-          }
-          this.cdRef.detectChanges();
-        } else {
-          // Handle case where enhancedResult is not an Event
-          console.error('Received data is not an Event:', databaseObject);
+  // To determine loading diagram or EHLD
+  private getDiagramObjectResult(): void {
+    this.dboService.fetchEnhancedEntry(this.diagramId).subscribe((databaseObject) => {
+      if (isEvent(databaseObject)) {
+        // Type guards to pass Event safely
+        this.eventService.setDiagramEvent(databaseObject);
+        if (isPathwayOrTLP(databaseObject)) {
+          const hasEHLD = databaseObject.hasEHLD ? databaseObject.hasEHLD : false;
+          this.hasEHLD = hasEHLD;
+          this.ehldService.setHasEHLD(hasEHLD);
         }
-      })
+        this.cdRef.detectChanges();
+      } else {
+        // Handle case where enhancedResult is not an Event
+        console.error('Received data is not an Event:', databaseObject);
+      }
+    })
   }
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.getEnhancedResult();
+    if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.getDiagramObjectResult();
   }
 }
 

@@ -30,7 +30,7 @@ export class DatabaseObjectService {
 
 
 
-  fetchEnhancedEventData(stId: string): Observable<DatabaseObject> {
+  fetchEnhancedEntry(stId: string): Observable<DatabaseObject> {
     let url = `${this._ENHANCED_QUERY}${stId}?includeRef=true`;
     return this.http.get<DatabaseObject>(url).pipe(
       map((response: DatabaseObject) => {
