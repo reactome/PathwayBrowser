@@ -1,8 +1,8 @@
-import {AfterViewInit, Component, Input} from '@angular/core';
+import {AfterViewInit, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {sortByYearDescending} from "../../../services/utils";
 import {Summation} from "../../../model/graph/summation.model";
-import {LiteratureReference} from "../../../model/graph/literature-reference.model";
+import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 
 
 @Component({

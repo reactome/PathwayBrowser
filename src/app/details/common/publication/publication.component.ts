@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {environment} from "../../../../environments/environment";
-import {LiteratureReference} from "../../../model/graph/literature-reference.model";
+import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 
 @Component({
   selector: 'cr-publication',

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input} from '@angular/core';
+import {AfterViewInit, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {getProperty} from "../../../services/utils";
 import {Compartment} from "../../../model/graph/compartment.model";
@@ -12,7 +12,7 @@ import {Summation} from 'src/app/model/graph/summation.model';
   templateUrl: './description-overview.component.html',
   styleUrl: './description-overview.component.scss'
 })
-export class DescriptionOverviewComponent implements AfterViewInit {
+export class DescriptionOverviewComponent implements AfterViewInit, OnChanges {
 
   @Input('obj') obj?: DatabaseObject;
 
@@ -37,16 +37,26 @@ export class DescriptionOverviewComponent implements AfterViewInit {
   ngAfterViewInit(): void {
 
     if (!this.obj) return;
-    this.category = getProperty(this.obj, 'category');
-    this.className = getProperty(this.obj, 'className');
-    this.speciesName = getProperty(this.obj, 'speciesName');
-    this.compartment = getProperty(this.obj, 'compartment');
-    this.name = getProperty(this.obj, 'name');
-    this.tissue = getProperty(this.obj, 'tissue');
-    this.reviewStatus = getProperty(this.obj, 'reviewStatus');
-    this.summation = getProperty(this.obj, 'summation');
-
+    this.getAllProperties(this.obj)
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['obj'] && changes['obj'].currentValue && this.obj) {
+      this.getAllProperties(this.obj)
+    }
+  }
+
+  getAllProperties(obj: DatabaseObject) {
+    this.category = getProperty(obj, 'category');
+    this.className = getProperty(obj, 'className');
+    this.speciesName = getProperty(obj, 'speciesName');
+    this.compartment = getProperty(obj, 'compartment');
+    this.name = getProperty(obj, 'name');
+    this.tissue = getProperty(obj, 'tissue');
+    this.reviewStatus = getProperty(obj, 'reviewStatus');
+    this.summation = getProperty(obj, 'summation');
+  }
+
 
   isShortContent(text: string): boolean {
     // Consider content "short" if it has 500 characters or less

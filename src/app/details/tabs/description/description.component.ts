@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Input} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {environment} from "../../../../environments/environment";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -7,9 +7,8 @@ import {Router} from "@angular/router";
 import {getProperty, sortByYearDescending} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
-import {LiteratureReference} from "../../../model/graph/literature-reference.model";
+import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity.model";
-import {Person} from "../../../model/graph/person.model";
 
 
 @Component({
@@ -17,9 +16,9 @@ import {Person} from "../../../model/graph/person.model";
   templateUrl: './description.component.html',
   styleUrl: './description.component.scss'
 })
-export class DescriptionComponent implements AfterViewInit {
+export class DescriptionComponent implements AfterViewInit, OnChanges {
 
-  @Input('event') obj?: DatabaseObject;
+  @Input('obj') obj?: DatabaseObject;
   @Input('analysisResult') analysisResult?: Analysis.Result;
   @Input('tabWidth') tabWidth?: number;
 
@@ -59,7 +58,24 @@ export class DescriptionComponent implements AfterViewInit {
 
     this.currentUrl = this.router.url
 
-    this.referenceEntity = getProperty(this.obj, 'referenceEntity');
+    this.setIcon(this.obj);
+    this.getRefs(this.obj);
+    this.getAuthorship(this.obj)
+
+  }
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['obj'] && changes['obj'].currentValue && this.obj) {
+      this.setIcon(this.obj);
+      this.getRefs(this.obj)
+      this.getAuthorship(this.obj);
+    }
+  }
+
+  setIcon(obj: DatabaseObject) {
+
+    this.referenceEntity = getProperty(obj, 'referenceEntity');
 
     if (this.referenceEntity) {
       const identifier = this.referenceEntity.identifier;
@@ -72,24 +88,25 @@ export class DescriptionComponent implements AfterViewInit {
         }
       });
     }
+  }
 
-    this.authored = getProperty(this.obj, 'authored');
-    this.reviewed = getProperty(this.obj, 'reviewed');
-
+  getAuthorship(obj: DatabaseObject) {
+    this.authored = getProperty(obj, 'authored');
+    this.reviewed = getProperty(obj, 'reviewed');
 
     this.authorship = [
       ...((this.authored || []).length > 0 ? [{label: 'Author', data: this.authored}] : []),
       ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: this.reviewed}] : []),
     ];
+  }
 
-    const refs = getProperty(this.obj, 'literatureReference');
+  getRefs(obj: DatabaseObject) {
+    const refs = getProperty(obj, 'literatureReference');
     // Sort by year
     if (refs) {
       this.refs = sortByYearDescending(refs);
     }
-
   }
-
 
   getIcon(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
