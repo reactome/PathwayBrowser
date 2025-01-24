@@ -1,5 +1,5 @@
 import {Publication} from "./publication.model";
-import {Person} from "./person.model";
+import {Person} from "../person.model";
 
 export interface LiteratureReference extends Publication {
   author: Person[];
