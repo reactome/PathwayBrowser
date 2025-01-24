@@ -2,11 +2,11 @@ import {Event} from "../model/graph/event.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {Pathway} from "../model/graph/pathway.model";
 import {ReactionLikeEvent} from "../model/graph/reaction-like-event.model";
-import {PhysicalEntity} from "../model/graph/physical-entity.model";
+import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 import {TopLevelPathway} from "../model/graph/top-level-pathway.model";
 import {CellLineagePath} from "../model/graph/cell-lineage-path.model";
-import {EntityWithAccessionedSequence} from "../model/graph/entity-with-accessioned-sequence.model";
-import {LiteratureReference} from "../model/graph/literature-reference.model";
+import {EntityWithAccessionedSequence} from "../model/graph/physical-entity/entity-with-accessioned-sequence.model";
+import {LiteratureReference} from "../model/graph/publication/literature-reference.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -27,7 +27,7 @@ export function isEvent(obj: DatabaseObject): obj is Event {
 }
 
 export function isPathway(obj: DatabaseObject): obj is Pathway {
-  return (obj as Pathway).hasEvent !== undefined;
+  return obj.schemaClass === "Pathway";
 }
 
 export function isTLP(obj: DatabaseObject): obj is TopLevelPathway {
@@ -42,9 +42,11 @@ export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPa
   return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
 }
 
+const physicalEntityClasses = ['PhysicalEntity', 'Complex', 'Drug', 'ChemicalDrug', 'ProteinDrug', 'RNADrug', 'EntitySet', 'CandidateSet', 'GenomeEncodedEntity', 'EntityWithAccessionedSequence',
+  'EntityWithAccessionedSequence', 'OtherEntity', 'Polymer', 'SimpleEntity'];
 
 export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
-  return obj.schemaClass === "PhysicalEntity";
+  return physicalEntityClasses.includes(obj.schemaClass);
 }
 
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
@@ -56,7 +58,7 @@ export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
 }
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
-  return isPathway(obj) && (obj as Pathway).hasDiagram !== undefined;
+  return isPathwayOrTLP(obj) && obj.hasDiagram;
 }
 
 
