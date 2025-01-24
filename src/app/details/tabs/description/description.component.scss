@@ -116,7 +116,7 @@ $small-breakpoint-width: 959px;
   padding: 5px 0 5px var(--half-gap);
   gap: 8px;
   width: var(--column-width);
-  height: 100%;
+  height: calc(100% - 10px);
   overflow-y: auto;
   font-size: 16px;
   font-weight: 600;
