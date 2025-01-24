@@ -718,7 +718,8 @@ export class DiagramComponent implements AfterViewInit {
 
   diagramSelect2state = this.reactomeEvents$.pipe(
     filter((e) => e.detail.cy !== this.legend && e.type === ReactomeEventTypes.select),
-    distinctUntilChanged((previous, next) => next.detail.element.data('id') === previous.detail.element.data('id')),
+    delay(0), // Requirre for reaction to have time to select the reaction node
+    distinctUntilChanged((previous, next) => next.detail.reactomeId === previous.detail.reactomeId),
   ).subscribe(e => {
       let elements: cytoscape.NodeSingular = e.detail.element;
       if (e.detail.type === 'reaction') {
