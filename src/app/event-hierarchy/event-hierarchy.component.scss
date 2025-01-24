@@ -121,6 +121,7 @@
   width: 18px;
   height: 18px;
   margin-left: 9px;
+  color: var(--primary);
 }
 
 
@@ -135,7 +136,7 @@
 .mat-tree {
   background: var(--surface);
   --mat-text-button-horizontal-padding: 5px;
-  --mat-text-button-with-icon-horizontal-padding: 5px;
+  --mat-text-button-with-icon-horizontal-padding: 8px;
   --mat-tree-node-min-height: 20px;
 }
 
@@ -216,14 +217,24 @@
   color: var(--on-primary-container) !important;
 }
 
+.ehld {
+  color: var(--primary);
+}
+
 .selected {
   background: var(--primary);
   border-radius: 50px;;
   color: var(--on-primary) !important;
 
-  .custom-icon::ng-deep svg * {
-    fill: var(--on-primary);
+  .ehld {
+    color: var(--on-primary);
   }
+}
+
+:host {
+  @include mat.button-overrides((
+    text-label-text-color: var(--on-surface),
+  ));
 }
 
 .custom-icon {

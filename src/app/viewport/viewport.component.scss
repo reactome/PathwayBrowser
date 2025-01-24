@@ -1,3 +1,34 @@
+@use "@angular/material" as mat;
+
+:host {
+  @include mat.slide-toggle-overrides((
+    track-outline-color: var(--surface2),
+    selected-track-outline-color: var(--surface2),
+
+    selected-track-color: var(--on-primary),
+    selected-focus-track-color: var(--on-primary),
+    selected-hover-track-color: var(--on-primary),
+    selected-pressed-track-color: var(--on-primary),
+
+    unselected-track-color: var(--on-primary),
+    unselected-focus-track-color: var(--on-primary),
+    unselected-hover-track-color: var(--on-primary),
+    unselected-pressed-track-color: var(--on-primary),
+
+    selected-handle-color: var(--primary),
+    selected-focus-handle-color: var(--primary),
+    selected-hover-handle-color: var(--primary),
+    selected-pressed-handle-color: var(--primary),
+
+    unselected-handle-color: var(--primary),
+    unselected-focus-handle-color: var(--primary),
+    unselected-hover-handle-color: var(--primary),
+    unselected-pressed-handle-color: var(--primary),
+
+    selected-icon-color: var(--on-primary),
+    unselected-icon-color: var(--on-primary),
+  ));
+}
 
 #container {
   position: absolute;

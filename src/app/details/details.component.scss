@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 #details-container {
   color: var(--on-surface);
   width: 100%;
@@ -6,63 +8,9 @@
   font-family: 'Roboto Flex', sans-serif;
 }
 
-.group-tab {
+.custom-tab-group {
   height: 100%;
   padding: 0 20px;
-
-  .mat-mdc-tab-body-wrapper {
-    height: 100%;
-  }
-
-  /* Tab header height */
-  & .mat-mdc-tab-header {
-    //height: 30px;
-
-    & .mat-mdc-tab-list {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      padding: 0 20px;
-      gap: 20px;
-
-    }
-
-    & .mat-mdc-tab-labels {
-      align-items: center;
-      border-bottom: 1px solid var(--outline); // Style for the tab divider
-      height: 28px;
-    }
-
-    & .mat-mdc-tab-labels .mat-mdc-tab {
-      height: 100%;
-    }
-  }
-
-  /* Remove default tab divider */
-  .mat-mdc-tab-label-container {
-    border-bottom: none;
-  }
-
-  /* Style for active tabs */
-  .mdc-tab--active {
-
-    .label-text {
-      color: var(--primary);
-    }
-
-    .tab-icon {
-      svg * {
-        fill: var(--primary) !important;
-      }
-    }
-
-  }
-
-  /* Style for active indicator */
-  .mat-mdc-tab .mdc-tab-indicator__content {
-    border: 1px solid var(--primary) !important;
-  }
-
 }
 
 /* Tab Label Contents */
@@ -84,7 +32,6 @@
     display: flex;
     align-items: center;
     letter-spacing: 0.1px;
-    color: var(--on-surface-variant);
     font-style: normal;
     font-weight: 500;
     font-size: 14px;

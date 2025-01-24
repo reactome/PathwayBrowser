@@ -1,8 +1,8 @@
-import {AfterViewInit, Component, effect, ElementRef, input, model, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, model, OnDestroy, ViewChild} from '@angular/core';
 import {Event} from "../model/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatestWith, debounceTime, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
+import {combineLatestWith, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {SplitComponent} from "angular-split";

@@ -1,18 +1,25 @@
-@forward "reactome-cytoscape-style";
-@forward "ngx-reactome-style";
 @use "@angular/material" as mat;
+@forward "reactome-cytoscape-style";
+@use "ngx-reactome-style";
 
-html {
-  color-scheme: light;
-  @include mat.theme((
-    color: mat.$cyan-palette,
-    typography: Roboto,
-    density: 0
-  ));
+@include ngx-reactome-style.theme();
 
+// Custom TABS
+.custom-tab-group {
   @include mat.tabs-overrides((
     container-height: 30px,
+    active-label-text-color: var(--primary),
+    active-focus-label-text-color: var(--primary),
+    active-hover-label-text-color: var(--primary),
   ));
+
+  .mat-mdc-tab {
+    flex: 1 1 0; // equal width column
+  }
+
+  .mat-mdc-tab-labels {
+    gap: 20px;
+  }
 }
 
 .dark {
