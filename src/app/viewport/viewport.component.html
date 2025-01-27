@@ -31,14 +31,14 @@
         </div>
 
         <div [style.display]="visibility.species ? 'block':'none'">
-          <cr-species  [visibility]="visibility"></cr-species>
+          <cr-species [(pathwayId)]="pathwayId" [visibility]="visibility"></cr-species>
         </div>
         <div [style.display]="visibility.interactor ? 'block':'none'">
           <cr-interactors #interactors [cy]="diagram?.cy" [cys]="diagram?.cys"  [hasEHLD]="hasEHLD"
                           (initialiseReplaceElements)="diagram?.initialiseReplaceElements()"></cr-interactors>
         </div>
         <div class="event-hierarchy">
-          <cr-event-hierarchy [(stId)]="stId" [eventSplit]="sideSplit"></cr-event-hierarchy>
+          <cr-event-hierarchy [(pathwayId)]="pathwayId" [eventSplit]="sideSplit"></cr-event-hierarchy>
         </div>
       </div>
       <!--      </div>-->
@@ -62,8 +62,8 @@
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
             <as-split-area [size]="80">
 
-              <cr-ehld [(stId)]="stId" *ngIf="hasEHLD"></cr-ehld>
-              <cr-diagram [(stId)]="stId" *ngIf="!hasEHLD && hasEHLD !== undefined " #diagram [interactor]="interactors"></cr-diagram>
+              <cr-ehld [(pathwayId)]="pathwayId" *ngIf="hasEHLD"></cr-ehld>
+              <cr-diagram [(pathwayId)]="pathwayId" *ngIf="!hasEHLD && hasEHLD !== undefined " #diagram [interactor]="interactors"></cr-diagram>
 
             </as-split-area>
             <as-split-area [size]="20">

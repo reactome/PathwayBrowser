@@ -8,10 +8,10 @@ import {DiagramHomeComponent} from "./diagram-home/diagram-home.component";
 
 export const routes: Routes = [
   {path: 'iterate', component: DiagramIteratorComponent},
-  {path: 'iterate/:stId', component: DiagramIteratorComponent},
-  {path: 'diagram/:stId', component: DiagramHomeComponent},
-  {path: 'PathwayBrowser/:stId', component: ViewportComponent},
-  {path: ':stId', component: ViewportComponent},
+  {path: 'iterate/:pathwayId', component: DiagramIteratorComponent},
+  {path: 'diagram/:pathwayId', component: DiagramHomeComponent},
+  {path: 'PathwayBrowser/:pathwayId', component: ViewportComponent},
+  {path: ':pathwayId', component: ViewportComponent},
   {path: '**', component: ViewportComponent, canActivate: [legacyGuard], runGuardsAndResolvers: 'always'}
 ]
 

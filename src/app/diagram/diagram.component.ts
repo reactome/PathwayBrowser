@@ -50,7 +50,7 @@ export class DiagramComponent implements AfterViewInit {
   @ViewChild('cytoscapeCompare') compareContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
   readonly interactorsComponent = input<InteractorsComponent>(undefined, {alias: "interactor"});
-  readonly stId = model.required<string>();
+  readonly pathwayId = model.required<string>();
 
 
   comparing: boolean = false;
@@ -66,7 +66,7 @@ export class DiagramComponent implements AfterViewInit {
               private route: ActivatedRoute
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
-    effect(() => this.stId() && this.loadDiagram());
+    effect(() => this.pathwayId() && this.loadDiagram());
     effect(() => {
       if (this.state.flag() && !this.flagging) this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.state.flag(), cy)))
       this.flagging = false;
@@ -152,7 +152,7 @@ export class DiagramComponent implements AfterViewInit {
     if (!this.cytoscapeContainer) return EMPTY; // Prevent execution if the container is not present
 
     const container = this.cytoscapeContainer.nativeElement;
-    return this.diagram.getDiagram(this.stId()!).pipe(
+    return this.diagram.getDiagram(this.pathwayId()!).pipe(
       tap(elements => {
         this.comparing = elements.nodes.some(node => node.data['isFadeOut']) ||
           elements.edges.some(edge => edge.data['isFadeOut']);
@@ -184,15 +184,15 @@ export class DiagramComponent implements AfterViewInit {
   }
 
   loadSubpathwayWithDiagram(event: Event) {
-    return this.event.fetchEventAncestors(this.stId()!).pipe(
+    return this.event.fetchEventAncestors(this.pathwayId()!).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
         const pathwayWithDiagram = [...ancestors].reverse().find(p => p.hasDiagram);
         if (pathwayWithDiagram) {
           const newDiagramId = pathwayWithDiagram.stId;
-          const diagramId = this.stId();
+          const diagramId = this.pathwayId();
           if (newDiagramId !== diagramId) {
-            this.stId.set(newDiagramId);
+            this.pathwayId.set(newDiagramId);
             this.router.navigate(['PathwayBrowser', diagramId], {
               queryParamsHandling: "preserve"
             }).then(() => {
@@ -483,7 +483,7 @@ export class DiagramComponent implements AfterViewInit {
 
 
   private loadAnalysis(token: string | null) {
-    const diagramId = this.stId();
+    const diagramId = this.pathwayId();
     console.log(token, diagramId)
     if (!token || !diagramId) {
       this.cys.forEach(cy => {

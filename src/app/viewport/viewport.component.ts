@@ -32,7 +32,7 @@ import {DiagramStateService} from "../services/diagram-state.service";
 export class ViewportComponent implements AfterViewInit, OnChanges {
 
 
-  readonly stId = model.required<string>();
+  readonly pathwayId = model.required<string>();
 
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
@@ -91,7 +91,7 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
   }
 
   private getEnhancedResult(): void {
-    this.eventService.fetchEnhancedEventData(this.stId())
+    this.eventService.fetchEnhancedEventData(this.pathwayId())
       .subscribe((enhancedResult) => {
         this.eventService.setDiagramEvent(enhancedResult);
         const hasEHLD = enhancedResult.hasEHLD ? enhancedResult.hasEHLD : false;

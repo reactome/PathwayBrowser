@@ -24,7 +24,7 @@ import {SpeciesService} from "../services/species.service";
 export class EhldComponent implements AfterViewInit {
 
   @ViewChild('ehld') ehldContainer?: ElementRef<HTMLDivElement>;
-  readonly stId = model.required<string>();
+  readonly pathwayId = model.required<string>();
 
 
   style!: Style;
@@ -57,7 +57,7 @@ export class EhldComponent implements AfterViewInit {
     this.legendItems = this.ehldService.legendItems;
 
     this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
-      if (this.stId() && hasEHLD) {
+      if (this.pathwayId() && hasEHLD) {
         this.loadEhldSvg().subscribe({
           next: () => {
             this.initializePanAndZoom();
@@ -94,7 +94,7 @@ export class EhldComponent implements AfterViewInit {
 
 
   private loadEhldSvg(): Observable<{ svg: string; graphData: Graph.Data }> {
-    return this.ehldService.getSVGData(this.stId()!).pipe(
+    return this.ehldService.getSVGData(this.pathwayId()!).pipe(
       tap(result => {
         if (result.svg) {
           const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(result.svg);
@@ -172,7 +172,7 @@ export class EhldComponent implements AfterViewInit {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
             this.speciesService.setIgnore(false);
-            this.stId.set(stId);
+            this.pathwayId.set(stId);
           }
         }
       })
@@ -181,7 +181,7 @@ export class EhldComponent implements AfterViewInit {
 
 
   private loadAnalysis(token: string | null) {
-    const diagramId = this.stId();
+    const diagramId = this.pathwayId();
     if (!token || !diagramId) {
       return;
     }

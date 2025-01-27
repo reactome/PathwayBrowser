@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, input} from '@angular/core';
+import {AfterViewInit, Component, input, model} from '@angular/core';
 import {Species} from "../model/species.model";
 import {SpeciesService} from "../services/species.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -19,7 +19,7 @@ export class SpeciesComponent implements AfterViewInit {
   allSpecies: Species[] = [];
   currentSpecies!: Species;
 
-  readonly diagramId = input<string>('', { alias: "id" });
+  readonly pathwayId = model.required<string>();
   readonly visibility = input({
     species: false,
     interactor: false
@@ -35,7 +35,7 @@ export class SpeciesComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.getSpecies();
 
-    const diagramId = this.diagramId();
+    const diagramId = this.pathwayId();
     if (diagramId) {
       this.speciesService.setSpeciesFromDiagramId(diagramId);
     }
@@ -65,13 +65,15 @@ export class SpeciesComponent implements AfterViewInit {
   }
 
   onSpeciesChange(species: Species) {
-    const ids = this.speciesService.getIdsFromURL(this.diagramId());
+    const ids = this.speciesService.getIdsFromURL(this.pathwayId());
 
     this.currentSpecies = species;
     this.speciesService.setCurrentSpecies(species);
 
     const abbreviation = species.abbreviation;
-    let diagramId = this.diagramId().replace(/-(.*?)-/, `-${abbreviation}-`);
+    let stId = this.pathwayId().replace(/-(.*?)-/, `-${abbreviation}-`);
+
+    console.log("new stId", stId);
 
     // Include entity to ancestors list when selecting entity in the URL
     const ancestors = this.selectedTreeEvent?.ancestors || [];
@@ -84,7 +86,7 @@ export class SpeciesComponent implements AfterViewInit {
       .subscribe((newSelectedStId) => {
 
         const updatedParams = this.speciesService.updateQueryParams(['select', 'flag', 'path'], newSelectedStId, abbreviation!, this.route);
-        this.router.navigate(['PathwayBrowser', diagramId], {
+        this.router.navigate(['PathwayBrowser', stId], {
           queryParamsHandling: "preserve"
         }).then(() => {
           if (updatedParams['select']) {
