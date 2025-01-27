@@ -237,7 +237,9 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
                  }) => this.eventService.buildTree(enhancedEvent, this.diagramId, this.tree, hitReactions))
     ).subscribe({
       next: () => {
-        document.querySelector(`[st-id='${idToUse}']`)?.scrollIntoView({behavior: 'smooth'});
+        // Give pathway id when idToUse is PEs
+        const element = document.querySelector(`[st-id='${idToUse}']`) || document.querySelector(`[st-id='${this.diagramId}']`);
+        element?.scrollIntoView({behavior: 'smooth'});
       },
       error: (err) => {
         throw new Error('Error in building the tree:', err);
