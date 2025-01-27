@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {filter, forkJoin, Observable, take, tap} from "rxjs";
 import {EhldService, LegendGroup} from "../services/ehld.service";
-import {DomSanitizer} from "@angular/platform-browser";
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {Router} from "@angular/router";
@@ -29,7 +29,7 @@ export class EhldComponent implements AfterViewInit {
   style!: Style;
   ratio = 0.384;
 
-  svgContent: string = '';
+  svgContent?: SafeHtml;
   selectedElement?: SVGGElement;
   selectedIdFromUrl?: string;
   flaggedIdFromUrl?: string[];
@@ -104,8 +104,7 @@ export class EhldComponent implements AfterViewInit {
     return this.ehldService.getSVGData(this.diagramId).pipe(
       tap(result => {
         if (result.svg) {
-          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(result.svg);
-          this.svgContent = sanitizedSvg as string;
+          this.svgContent = this.sanitizer.bypassSecurityTrustHtml(result.svg);
           if (this.svgContent) {
             this.cdr.detectChanges();
             this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer);

@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {environment} from "../../../../environments/environment";
-import {DomSanitizer} from "@angular/platform-browser";
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
 import {Router} from "@angular/router";
 import {getProperty, sortByYearDescending} from "../../../services/utils";
@@ -22,7 +22,8 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
   @Input('analysisResult') analysisResult?: Analysis.Result;
   @Input('tabWidth') tabWidth?: number;
 
-  iconContent: string = '';
+
+  iconContent?: SafeHtml;
   currentUrl!: string;
   authorship: { label: string, data: InstanceEdit[] | undefined }[] = []
   refs?: LiteratureReference[];
@@ -81,8 +82,7 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
       const identifier = this.referenceEntity.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
         if (icon && this.obj) {
-          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(icon);
-          this.iconContent = sanitizedSvg as string;
+          this.iconContent = this.sanitizer.bypassSecurityTrustHtml(icon) ;
           this.obj.hasIcon = true;
           this.cdr.detectChanges();
         }
