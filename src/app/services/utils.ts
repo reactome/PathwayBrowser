@@ -23,7 +23,7 @@ export function sortByYearDescending(refs: LiteratureReference[]) {
 
 // Type guards to narrow the type
 export function isEvent(obj: DatabaseObject): obj is Event {
-  return (obj as Event).summation !== undefined;
+  return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj) || isRLE(obj);
 }
 
 export function isPathway(obj: DatabaseObject): obj is Pathway {
@@ -38,23 +38,25 @@ export function isCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
   return obj.schemaClass === "CellLineagePathway";
 }
 
-export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPathway {
+export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPathway | CellLineagePath {
   return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
 }
 
-const physicalEntityClasses = ['PhysicalEntity', 'Complex', 'Drug', 'ChemicalDrug', 'ProteinDrug', 'RNADrug', 'EntitySet', 'CandidateSet', 'GenomeEncodedEntity', 'EntityWithAccessionedSequence',
-  'EntityWithAccessionedSequence', 'OtherEntity', 'Polymer', 'SimpleEntity'];
+const physicalEntityClasses = new Set(['PhysicalEntity', 'Complex', 'Drug', 'ChemicalDrug', 'ProteinDrug', 'RNADrug', 'EntitySet', 'CandidateSet', 'GenomeEncodedEntity', 'EntityWithAccessionedSequence',
+  'EntityWithAccessionedSequence', 'OtherEntity', 'Polymer', 'SimpleEntity']);
 
 export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
-  return physicalEntityClasses.includes(obj.schemaClass);
+  return physicalEntityClasses.has(obj.schemaClass);
 }
 
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
   return obj.schemaClass === "EntityWithAccessionedSequence";
 }
 
+const reactionLikeEventClasses = new Set(['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction', 'CellDevelopmentStep']);
+
 export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
-  return ['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction', 'CellDevelopmentStep'].includes(obj.schemaClass);
+  return reactionLikeEventClasses.has(obj.schemaClass);
 }
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
