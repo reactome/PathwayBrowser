@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {map, Observable, Subject} from "rxjs";
-import {Event} from "../model/graph/event.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {JSOGDeserializer} from "../utils/JSOGDeserializer";
 import {environment} from "../../environments/environment";
@@ -27,28 +26,25 @@ export class DatabaseObjectService {
     this._selectedObj.next(obj);
   }
 
-
-
-
-  fetchEnhancedEntry(stId: string): Observable<DatabaseObject> {
+  fetchEnhancedEntry<T extends DatabaseObject>(stId: string): Observable<T> {
     let url = `${this._ENHANCED_QUERY}${stId}?includeRef=true`;
-    return this.http.get<DatabaseObject>(url).pipe(
-      map((response: DatabaseObject) => {
+    return this.http.get<T>(url).pipe(
+      map((response: T) => {
         const deserializer = new JSOGDeserializer();
         const resolvedResponse = deserializer.deserialize(response);
-        return resolvedResponse as unknown as DatabaseObject;
+        return resolvedResponse as unknown as T;
       })
     )
   }
 
 
-  fetchEventData(stId: string): Observable<DatabaseObject> {
+  fetchSimpleData<T extends DatabaseObject>(stId: string): Observable<T> {
     let url = `${this._DATA_QUERY}${stId}`;
-    return this.http.get<Event>(url).pipe(
-      map((response: Event) => {
+    return this.http.get<T>(url).pipe(
+      map((response: T) => {
         const deserializer = new JSOGDeserializer();
         const resolvedResponse = deserializer.deserialize(response);
-        return resolvedResponse as unknown as Event;
+        return resolvedResponse as unknown as T;
       })
     )
   }

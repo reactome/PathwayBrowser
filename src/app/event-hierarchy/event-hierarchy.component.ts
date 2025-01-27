@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from 
 import {Event} from "../model/graph/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatestWith, debounceTime, filter, fromEvent, map, of, skip, switchMap, take, tap} from "rxjs";
+import {combineLatestWith, debounceTime, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {DiagramStateService} from "../services/diagram-state.service";
 import {SplitComponent} from "angular-split";
@@ -167,7 +167,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     // Conditionally fetch or reuse enhanced event data
     const enhancedEventData$ = this.eventService.diagramEvent$.pipe(
       // filter( event => event !== null),
-      skip(1),
       take(1),
       switchMap(diagramEvent => {
         if (diagramEvent && diagramEvent.stId === idToUse) {
@@ -348,7 +347,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     } else {
       treeEvent.isSelected = false;
       this.tree.toggle(treeEvent);
-      this.dboService.fetchEnhancedEntry(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
+      this.dboService.fetchEnhancedEntry<Event>(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
         this.dboService.setCurrentObj(result);
       })
     }

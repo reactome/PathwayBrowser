@@ -2,21 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Event} from "../model/graph/event.model";
-import {
-  BehaviorSubject,
-  concatMap,
-  EMPTY,
-  from,
-  last,
-  map,
-  Observable,
-  of,
-  skip,
-  Subject,
-  switchMap,
-  take,
-  tap
-} from "rxjs";
+import {BehaviorSubject, concatMap, EMPTY, from, last, map, Observable, of, Subject, switchMap, tap} from "rxjs";
 import {DiagramStateService} from "./diagram-state.service";
 import {MatTree} from "@angular/material/tree";
 import {Analysis} from "../model/analysis.model";
@@ -137,8 +123,8 @@ export class EventService {
   }
 
 
-  fetchEventChildren(tree: Event): Observable<DatabaseObject> {
-    return this.dboService.fetchEnhancedEntry(tree.stId).pipe(
+  fetchEventChildren(tree: Event): Observable<Event> {
+    return this.dboService.fetchEnhancedEntry<Event>(tree.stId).pipe(
       switchMap(result => {
 
         if (isPathwayOrTLP(result) && result.hasEvent && isPathwayOrTLP(tree)) {
