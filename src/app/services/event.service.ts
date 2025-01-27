@@ -91,10 +91,7 @@ export class EventService {
         // If hasDiagram is true, wait for the latest color map from subpathwaysColors$
         if (isPathwayOrTLP(dbo) && dbo.hasDiagram && !dbo.hasEHLD) {
           return this.subpathwayColors$.pipe(
-            skip(1), // Skip initial undefined
-            take(1),
             map(colors => ({dbo: dbo, treeEvent: event, colors})),
-            tap((colors) => (console.log("colors ", colors))),
           );
         } else {
           // If hasDiagram is false, color is undefined. for instance: /R-HSA-9612973/R-HSA-1632852
