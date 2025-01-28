@@ -3,7 +3,9 @@ import {map, Observable, of, switchMap, tap} from "rxjs";
 import {SearchResult} from "../model/search-results.model";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Event} from "../model/event.model";
+import {Event} from "../model/graph/event.model";
+import {isCellLineagePath, isEWAS, isRLE} from "./utils";
+import {DatabaseObject} from "../model/graph/database-object.model";
 
 @Injectable({
   providedIn: 'root'
@@ -141,10 +143,10 @@ export class IconService {
     );
   }
 
-  getIconDetails(obj: Event): { name: string; tooltip?: string; route?: string } {
+  getIconDetails(obj: DatabaseObject): { name: string; tooltip?: string; route?: string } {
     const defaultIcon = {name: 'pathway', tooltip: 'Unknown Event'};
     // PE
-    if (obj.schemaClass === 'EntityWithAccessionedSequence') {
+    if (isEWAS(obj)) {
       if (obj.className !== 'Protein' && obj.referenceType) {
         return this.reactomeSubjectIcons[obj.referenceType];
       } else {
@@ -152,14 +154,14 @@ export class IconService {
       }
     }
     // Reaction
-    if (['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction', 'CellDevelopmentStep'].includes(obj.schemaClass)) {
+    if (isRLE(obj)) {
       if (obj.category) {
         return this.reactomeSubjectIcons[obj.category];
       }
     }
 
     // Cell
-    if (obj.schemaClass === 'CellLineagePath') {
+    if (isCellLineagePath(obj)) {
       return this.reactomeSubjectIcons[obj.schemaClass];
     }
 

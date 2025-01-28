@@ -25,12 +25,12 @@ import {DiagramStateService} from "../services/diagram-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService, Examples, PaletteGroup} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
-import {isDefined} from "../services/utils";
+import {isDefined, isPathway, isPathwayWithDiagram} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
 import {ActivatedRoute, Router} from "@angular/router";
 import {InteractorsComponent} from "../interactors/interactors.component";
 import {EventService} from "../services/event.service";
-import {Event} from "../model/event.model";
+import {Event} from "../model/graph/event.model";
 
 
 import {brewer, scale} from "chroma-js";
@@ -131,7 +131,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
       switchMap((event) => {
         // If the diagramId is a subpathway without diagram, and it is a first load then load parent diagram
         // For instance: ../PathwayBrowser/R-HSA-69541
-        if (!this.event.isPathwayWithDiagram(event) && this.isInitialLoad) {
+        if (!isPathwayWithDiagram(event) && this.isInitialLoad) {
           return this.loadSubpathwayWithDiagram(event);
         }
         // Pathway with a diagram
@@ -183,7 +183,7 @@ export class DiagramComponent implements AfterViewInit, OnChanges {
     return this.event.fetchEventAncestors(this.diagramId).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
-        const pathwayWithDiagram = [...ancestors].reverse().find(p => p.hasDiagram);
+        const pathwayWithDiagram = this.event.getPathwayWithDiagram(event);
         if (pathwayWithDiagram) {
           const newDiagramId = pathwayWithDiagram.stId;
           if (newDiagramId !== this.diagramId) {

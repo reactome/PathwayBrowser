@@ -33,7 +33,7 @@
     </div>
 
 
-    <div class="overview" [ngClass]="{'update-layout': obj.referenceEntity}">
+    <div class="overview" [ngClass]="{'update-layout': referenceEntity}">
       <cr-description-overview [obj]="obj"></cr-description-overview>
       <div *ngIf="obj.hasIcon" class="icon-container">
         <div class="icon" [innerHTML]="iconContent"></div>
@@ -42,7 +42,7 @@
 
 
     <!-- References divider-->
-    <div class="divider-container" *ngIf="obj.literatureReference" id="literatureReference">
+    <div class="divider-container" *ngIf="refs" id="literatureReference">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
       </div>
@@ -52,8 +52,8 @@
     </div>
 
     <!-- References container-->
-    <div class="element-container" *ngIf="obj.literatureReference">
-      <div class="ref-row" *ngFor="let ref of obj.literatureReference">
+    <div class="element-container" *ngIf="refs">
+      <div class="ref-row" *ngFor="let ref of refs">
         <div class="year-container">{{ ref.year }}</div>
         <div class="composition-container">
           <cr-publication [publication]=ref [showYear]="false"></cr-publication>

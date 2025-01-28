@@ -1,11 +1,14 @@
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {AfterViewInit, ChangeDetectorRef, Component, effect, Input} from '@angular/core';
 import {Event, InstanceEdit} from "../../../model/event.model";
 import {Analysis} from "../../../model/analysis.model";
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {DomSanitizer} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
+import {getProperty, sortByYearDescending} from "../../../services/utils";
+import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {sortByYearDescending} from "../../../services/utils";
-import {ActivatedRoute} from "@angular/router";
-import {toSignal} from "@angular/core/rxjs-interop";
+
 
 
 @Component({
@@ -13,13 +16,19 @@ import {toSignal} from "@angular/core/rxjs-interop";
   templateUrl: './description.component.html',
   styleUrl: './description.component.scss'
 })
-export class DescriptionComponent implements AfterViewInit {
+export class DescriptionComponent implements AfterViewInit, OnChanges {
 
-  @Input('event') obj?: Event;
+  @Input('obj') obj?: DatabaseObject;
   @Input('analysisResult') analysisResult?: Analysis.Result;
-  @Input('tabWidth') tabWidth?: number;
 
-  iconContent: string = '';
+
+  iconContent?: SafeHtml;
+  refs?: LiteratureReference[];
+  referenceEntity?: ReferenceEntity;
+
+  authored?: InstanceEdit[];
+  reviewed?: InstanceEdit[];
+
   authorship: { label: string, data: InstanceEdit[] }[] = []
 
   elements = [
@@ -50,35 +59,57 @@ export class DescriptionComponent implements AfterViewInit {
 
     this.obj['overview'] = true;
 
-    if (this.obj.referenceEntity) {
-      const identifier = this.obj.referenceEntity.identifier;
+    this.setIcon(this.obj);
+    this.getRefs(this.obj);
+    this.getAuthorship(this.obj)
+
+  }
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['obj'] && changes['obj'].currentValue && this.obj) {
+      this.setIcon(this.obj);
+      this.getRefs(this.obj)
+      this.getAuthorship(this.obj);
+    }
+  }
+
+  setIcon(obj: DatabaseObject) {
+
+    this.referenceEntity = getProperty(obj, 'referenceEntity');
+
+    if (this.referenceEntity) {
+      const identifier = this.referenceEntity.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
         if (icon && this.obj) {
-          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(icon);
-          this.iconContent = sanitizedSvg as string;
+          this.iconContent = this.sanitizer.bypassSecurityTrustHtml(icon) ;
           this.obj.hasIcon = true;
           this.cdr.detectChanges();
         }
       });
     }
-
-    this.authorship = [
-      ...(this.obj.authored?.length > 0 ? [{label: 'Author', data: this.obj.authored}] : []),
-      ...(this.obj.reviewed?.length > 0 ? [{label: 'Reviewer', data: this.obj.reviewed}] : []),
-    ];
-
-    this.obj['authorship'] = this.authorship.length > 0;
-
-
-    // Sort by year
-    if (this.obj && this.obj.literatureReference) {
-      this.obj.literatureReference = sortByYearDescending(this.obj.literatureReference);
-    }
-
   }
 
+  getAuthorship(obj: DatabaseObject) {
+    this.authored = getProperty(obj, 'authored');
+    this.reviewed = getProperty(obj, 'reviewed');
 
-  getIcon(obj: Event) {
+    this.authorship = [
+      ...((this.authored || []).length > 0 ? [{label: 'Author', data: this.authored}] : []),
+      ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: this.reviewed}] : []),
+    ];
+    this.obj['authorship'] = this.authorship.length > 0;
+  }
+
+  getRefs(obj: DatabaseObject) {
+    const refs = getProperty(obj, 'literatureReference');
+    // Sort by year
+    if (refs) {
+      this.refs = sortByYearDescending(refs);
+    }
+  }
+
+  getIcon(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
   }
 
