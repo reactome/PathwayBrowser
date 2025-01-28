@@ -21,9 +21,6 @@ export class DetailsComponent implements AfterViewInit {
   analysisResult?: Analysis.Result;
 
 
-  @ViewChild('tabGroup', {read: ElementRef}) tabGroup?: ElementRef;
-  firstTabWidth?: number;
-
   constructor(
     private analysis: AnalysisService,
     private dboService: DatabaseObjectService) {
@@ -39,22 +36,6 @@ export class DetailsComponent implements AfterViewInit {
       this.analysisResult = result;
     })
 
-
-    if (this.tabGroup) {
-      this.getFirstTabWidth();
-    }
-
   }
-
-  private getFirstTabWidth() {
-
-    if (this.tabGroup) {
-      const firstTab = this.tabGroup.nativeElement.querySelector('#firstTab');
-      if (firstTab) {
-        this.firstTabWidth = firstTab.offsetWidth;
-      }
-    }
-
-  }
-
+  
 }

@@ -20,7 +20,6 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
 
   @Input('obj') obj?: DatabaseObject;
   @Input('analysisResult') analysisResult?: Analysis.Result;
-  @Input('tabWidth') tabWidth?: number;
 
 
   iconContent?: SafeHtml;
