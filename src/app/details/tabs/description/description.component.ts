@@ -1,14 +1,14 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {AfterViewInit, ChangeDetectorRef, Component, effect, Input} from '@angular/core';
-import {Event, InstanceEdit} from "../../../model/event.model";
+import {AfterViewInit, ChangeDetectorRef, Component, effect, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
-import {DomSanitizer} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
 import {getProperty, sortByYearDescending} from "../../../services/utils";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
-import {sortByYearDescending} from "../../../services/utils";
-
+import {DatabaseObject} from "../../../model/graph/database-object.model";
+import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
+import {ReferenceEntity} from "../../../model/graph/reference-entity.model";
+import {ActivatedRoute} from "@angular/router";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 
 @Component({
@@ -25,11 +25,10 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
   iconContent?: SafeHtml;
   refs?: LiteratureReference[];
   referenceEntity?: ReferenceEntity;
-
   authored?: InstanceEdit[];
   reviewed?: InstanceEdit[];
 
-  authorship: { label: string, data: InstanceEdit[] }[] = []
+  authorship: { label: string, data: InstanceEdit[] | undefined }[] = []
 
   elements = [
     {key: 'overview', label: 'Overview', manual: true},
@@ -68,6 +67,7 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['obj'] && changes['obj'].currentValue && this.obj) {
+      this.obj['overview'] = true;
       this.setIcon(this.obj);
       this.getRefs(this.obj)
       this.getAuthorship(this.obj);
@@ -82,7 +82,7 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
       const identifier = this.referenceEntity.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
         if (icon && this.obj) {
-          this.iconContent = this.sanitizer.bypassSecurityTrustHtml(icon) ;
+          this.iconContent = this.sanitizer.bypassSecurityTrustHtml(icon);
           this.obj.hasIcon = true;
           this.cdr.detectChanges();
         }
@@ -98,7 +98,8 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
       ...((this.authored || []).length > 0 ? [{label: 'Author', data: this.authored}] : []),
       ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: this.reviewed}] : []),
     ];
-    this.obj['authorship'] = this.authorship.length > 0;
+
+    obj['authorship'] = this.authorship.length > 0;
   }
 
   getRefs(obj: DatabaseObject) {
