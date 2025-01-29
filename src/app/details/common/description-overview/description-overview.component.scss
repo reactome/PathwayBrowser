@@ -115,6 +115,9 @@
   gap: 20px;
   white-space: normal;
 
+  flex-wrap: wrap; // prevent overflowing
+
+  // todo: no need to have this left and right column if we prevent elements from Overflowing
   .left,
   .right {
     display: flex;
