@@ -321,7 +321,7 @@ $small-breakpoint-width: 959px;
   width: 100%;
 }
 
-.year-container {
+.label-container {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -332,4 +332,25 @@ $small-breakpoint-width: 959px;
   gap: 5px;
   flex-shrink: 0;
 
+  // text style, an extra span?
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  letter-spacing: 0.5px;
+  color: var(--on-surface);
+
+}
+
+.orcid-icon {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+}
+
+.authorship-item{
+  display: flex;
+  align-items: center;
 }

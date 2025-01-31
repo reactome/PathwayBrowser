@@ -2,7 +2,7 @@ import {AfterViewInit, ChangeDetectorRef, Component, effect, Input, OnChanges, S
 import {Analysis} from "../../../model/analysis.model";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
-import {getProperty, sortByYearDescending} from "../../../services/utils";
+import {getProperty} from "../../../services/utils";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
