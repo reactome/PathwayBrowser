@@ -53,13 +53,14 @@
   height: var(--top-bar-height);
   background: light-dark(var(--primary), var(--primary-container));
   color: light-dark(var(--on-primary), var(--on-primary-container));
-  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 8px 0 20px;
 
   .top-left {
+    flex: 0;
     display: flex;
     gap: 20px;
     button {
@@ -68,7 +69,14 @@
   }
 
   .title {
-    font: var(--mat-sys-headline-small)
+    padding: 0 20px;
+    font: var(--mat-sys-headline-small);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 0;
+    flex: 1;
+    text-align: center ;
   }
 
   .top-right {
@@ -78,13 +86,17 @@
     flex-direction: row;
     align-items: center;
     font: var(--mat-sys-label-large);
+    flex: 0;
 
     .logo {
+      display: flex;
+      //height: 100%;
+      width: fit-content;
       mat-icon {
         height: 44px;
         margin-left: -6px;
         color: light-dark(var(--on-primary), var(--primary));
-        width: auto;
+        width: max-content;
       }
       .version {
         vertical-align: top;
