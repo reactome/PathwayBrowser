@@ -42,7 +42,7 @@
 
 
     <!-- References divider-->
-    <div class="divider-container" *ngIf="refs" id="literatureReference">
+    <div class="divider-container" *ngIf="literatureRefs" id="literatureReference">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
       </div>
@@ -52,9 +52,9 @@
     </div>
 
     <!-- References container-->
-    <div class="element-container" *ngIf="refs">
-      <div class="ref-row" *ngFor="let ref of refs">
-        <div class="year-container">{{ ref.year }}</div>
+    <div class="element-container" *ngIf="literatureRefs">
+      <div class="ref-row" *ngFor="let ref of literatureRefs | customSortBy:'year'">
+        <div class="label-container">{{ ref.year }}</div>
         <div class="composition-container">
           <cr-publication [publication]=ref [showYear]="false"></cr-publication>
         </div>
@@ -75,10 +75,18 @@
     <!-- Authorship-->
     <div class="element-container" *ngIf="authorship.length > 0">
       <div class="ref-row" *ngFor="let item of authorship">
-        <div class="year-container">{{ item.label }}</div>
+        <div class="label-container">{{ item.label }}</div>
         <div class="composition-container">
-          <div *ngFor="let ie of item.data">
-            {{ ie.displayName }}
+          <div *ngFor="let ie of item.data | customSortBy:'dateTime'" class="authorship-item">
+            <a [href]="'/content/detail/' + ie.author[0].dbId"
+               target="_blank">{{ ie.displayName | authorshipNameFormat }}</a>
+
+            <ng-container *ngIf="ie.author[0].orcidId as orcid">
+              <a [href]="'https://orcis.org/' + orcid" target="_blank">
+                <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
+              </a>
+            </ng-container>
+            - {{ ie.dateTime | authorshipDateFormat }}
           </div>
         </div>
       </div>

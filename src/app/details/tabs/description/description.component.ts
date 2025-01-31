@@ -23,12 +23,11 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
 
 
   iconContent?: SafeHtml;
-  refs?: LiteratureReference[];
-  referenceEntity?: ReferenceEntity;
+  literatureRefs?: LiteratureReference[];
   authored?: InstanceEdit[];
   reviewed?: InstanceEdit[];
 
-  authorship: { label: string, data: InstanceEdit[] | undefined }[] = []
+  authorship: { label: string, data: InstanceEdit[]}[] = []
 
   elements = [
     {key: 'overview', label: 'Overview', manual: true},
@@ -95,19 +94,27 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
     this.reviewed = getProperty(obj, 'reviewed');
 
     this.authorship = [
-      ...((this.authored || []).length > 0 ? [{label: 'Author', data: this.authored}] : []),
-      ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: this.reviewed}] : []),
+      ...((this.authored || []).length > 0 ? [{label: 'Author', data: (this.authored || [])}] : []),
+      ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: (this.reviewed || [])}] : []),
     ];
 
     obj['authorship'] = this.authorship.length > 0;
   }
 
-  getRefs(obj: DatabaseObject) {
+  getLiteratureRefs(obj: DatabaseObject) {
     const refs = getProperty(obj, 'literatureReference');
     // Sort by year
-    if (refs) {
-      this.refs = sortByYearDescending(refs);
+    if (refs && refs.length > 0) {
+      this.literatureRefs = refs
     }
+  }
+
+  getExternalRef(obj: DatabaseObject) {
+
+    if (this.externalRef) {
+      obj['referenceEntity'] = true;
+    }
+
   }
 
   getIcon(obj: DatabaseObject) {

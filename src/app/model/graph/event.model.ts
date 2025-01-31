@@ -1,5 +1,5 @@
 import {DatabaseObject} from "./database-object.model";
-import {ReferenceEntity} from "./reference-entity.model";
+import {ReferenceEntity} from "./reference-entity/reference-entity.model";
 import {Summation} from "./summation.model";
 import {ReviewStatus} from "./review-status.model";
 import {LiteratureReference} from "./publication/literature-reference.model";
@@ -33,11 +33,3 @@ export interface Event extends DatabaseObject {
   referenceEntity: ReferenceEntity;
 
 }
-
-
-
-
-
-
-
-
