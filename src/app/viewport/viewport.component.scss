@@ -16,8 +16,8 @@
 
 .search {
   height: var(--top-bar-height);
-  background: var(--primary);
-  color: var(--on-primary);
+  background: light-dark(var(--primary), var(--primary-container));
+  color: light-dark(var(--on-primary), var(--on-primary-container));
 
   // TODO remove this after demo
   display: flex;
