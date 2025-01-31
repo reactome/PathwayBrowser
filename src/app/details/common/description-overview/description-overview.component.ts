@@ -41,7 +41,8 @@ export class DescriptionOverviewComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['obj'] && changes['obj'].currentValue && this.obj) {
+    if (!this.obj) return;
+    if (changes['obj'] && !changes['obj'].firstChange && changes['obj'].previousValue !== this.obj) {
       this.getAllProperties(this.obj)
     }
   }
