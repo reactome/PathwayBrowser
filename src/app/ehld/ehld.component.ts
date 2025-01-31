@@ -1,36 +1,38 @@
-import {AfterViewInit, ChangeDetectorRef, Component, effect, ElementRef, model, ViewChild} from '@angular/core';
-import {filter, forkJoin, Observable, take, tap} from "rxjs";
+import {AfterViewInit, Component, effect, ElementRef, model, viewChild} from '@angular/core';
+import {filter, forkJoin, take} from "rxjs";
 import {EhldService, LegendGroup} from "../services/ehld.service";
-import {DomSanitizer} from "@angular/platform-browser";
-import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+import {UntilDestroy} from "@ngneat/until-destroy";
 import {DiagramStateService} from "../services/diagram-state.service";
 import SvgPanZoom from 'svg-pan-zoom';
-import {Graph} from "../model/graph.model";
 import {AnalysisService} from "../services/analysis.service";
 import {isDefined} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
 import {Style} from "reactome-cytoscape-style";
 import {SpeciesService} from "../services/species.service";
+import {rxResource} from "@angular/core/rxjs-interop";
 
 
 @Component({
-    selector: 'cr-ehld',
-    templateUrl: './ehld.component.html',
-    styleUrls: ['./ehld.component.scss'],
-    standalone: false
+  selector: 'cr-ehld',
+  templateUrl: './ehld.component.html',
+  styleUrls: ['./ehld.component.scss'],
+  standalone: false
 })
 
 @UntilDestroy()
 export class EhldComponent implements AfterViewInit {
 
-  @ViewChild('ehld') ehldContainer?: ElementRef<HTMLDivElement>;
+  ehldContainer = viewChild.required<ElementRef<HTMLDivElement>>('ehld');
   readonly pathwayId = model.required<string>();
 
+  readonly svgData = rxResource({
+    request: () => ({id: this.pathwayId()}),
+    loader: params => this.ehldService.getSVGData(params.request.id)
+  })
 
   style!: Style;
   ratio = 0.384;
 
-  svgContent: string = '';
   selectedElement?: SVGGElement;
   selectedIdFromUrl?: string;
   flaggedIdFromUrl?: string[];
@@ -41,41 +43,37 @@ export class EhldComponent implements AfterViewInit {
   legendItems: LegendGroup[] = [];
 
   constructor(private ehldService: EhldService,
-              private sanitizer: DomSanitizer,
-              private cdr: ChangeDetectorRef,
               private analysisService: AnalysisService,
               private speciesService: SpeciesService,
               public state: DiagramStateService,) {
     effect(() => this.selectedIdFromUrl = this.state.select());
     effect(() => this.flaggedIdFromUrl = this.state.flag());
     effect(() => this.loadAnalysis(this.state.analysis()));
+    effect(() => {
+      if (this.svgData.value()?.svg && this.ehldContainer()) {
+        this.ehldContainer().nativeElement.innerHTML = this.svgData.value()!.svg
+        this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer());
+        this.setInitialSelection();
+        this.setInitialFlag();
+        this.addEventListenerToSvg();
+
+        this.initializePanAndZoom();
+        this.loadAnalysis(this.state.analysis())
+      }
+    });
   }
 
   ngAfterViewInit(): void {
-    this.style = new Style(this.ehldContainer!.nativeElement);
+    this.style = new Style(this.ehldContainer().nativeElement);
 
     this.legendItems = this.ehldService.legendItems;
-
-    this.ehldService.hasEHLD$.pipe(untilDestroyed(this)).subscribe((hasEHLD) => {
-      if (this.pathwayId() && hasEHLD) {
-        this.loadEhldSvg().subscribe({
-          next: () => {
-            this.initializePanAndZoom();
-            this.loadAnalysis(this.state.analysis())
-          },
-          error: () => {
-            console.error('Error loading EHLD SVG');
-          }
-        })
-      }
-    });
 
   }
 
   // Example of zooming: https://stackblitz.com/edit/svg-pan-zoom?file=src%2Fapp%2Fapp.component.html,src%2Fapp%2Fapp.component.ts,src%2Fapp%2Fapp.module.ts
   // SVG pan zoom documentation: https://github.com/bumbu/svg-pan-zoom?tab=readme-ov-file
   initializePanAndZoom() {
-    const svgElement = this.ehldContainer!.nativeElement.querySelector('svg');
+    const svgElement = this.ehldContainer().nativeElement.querySelector('svg');
     if (svgElement) {
       // Disable default tooltips to be shown when hovering on svg element
       svgElement.querySelectorAll('title').forEach(item => {
@@ -90,28 +88,6 @@ export class EhldComponent implements AfterViewInit {
         dblClickZoomEnabled: false
       });
     }
-  }
-
-
-  private loadEhldSvg(): Observable<{ svg: string; graphData: Graph.Data }> {
-    return this.ehldService.getSVGData(this.pathwayId()!).pipe(
-      tap(result => {
-        if (result.svg) {
-          const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(result.svg);
-          this.svgContent = sanitizedSvg as string;
-          if (this.svgContent) {
-            this.cdr.detectChanges();
-            this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer);
-            //this.dbIdToSVGGElement = this.ehldService.setDbIdToSVGGElementMap(this.ehldContainer);
-            this.setInitialSelection();
-            this.setInitialFlag();
-            this.addEventListenerToSvg();
-          }
-        } else {
-          throw new Error('Error loading EHLD SVG');
-        }
-      })
-    )
   }
 
   private setInitialSelection() {
@@ -136,7 +112,7 @@ export class EhldComponent implements AfterViewInit {
   }
 
   private addEventListenerToSvg(): void {
-    const svgElement = this.ehldContainer!.nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
+    const svgElement = this.ehldContainer().nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
 
     svgElement.forEach((element: SVGGElement) => {
       element.addEventListener('mouseover', () => {
@@ -182,9 +158,8 @@ export class EhldComponent implements AfterViewInit {
 
   private loadAnalysis(token: string | null) {
     const diagramId = this.pathwayId();
-    if (!token || !diagramId) {
-      return;
-    }
+    if (!token || !diagramId) return;
+
     forkJoin({
       entities: this.analysisService.foundEntities(diagramId, token),
       pathways: this.analysisService.pathwaysResults([...this.stIdToSVGGElement.keys()], token),
@@ -193,7 +168,7 @@ export class EhldComponent implements AfterViewInit {
 
       console.log("result", entities, result, pathways);
 
-      this.ehldService.clearExistingPatterns(this.stIdToSVGGElement, this.ehldContainer!.nativeElement.querySelector('svg'))
+      this.ehldService.clearExistingPatterns(this.stIdToSVGGElement, this.ehldContainer().nativeElement.querySelector('svg'))
       this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
       this.ehldService.clearAnalysisInfo(this.stIdToSVGGElement);
 

@@ -163,9 +163,9 @@ export class EhldService {
   }
 
 
-  setStIdToSVGGElementMap(container: ElementRef<HTMLDivElement> | undefined) {
+  setStIdToSVGGElementMap(container: ElementRef<HTMLDivElement> ) {
     const map = new Map<string, SVGGElement>();
-    const svgElement = container!.nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
+    const svgElement = container.nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
     svgElement.forEach(svgElement => {
       const idAttr = svgElement.getAttribute('id');
       if (idAttr) {

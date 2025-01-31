@@ -73,6 +73,8 @@ export class IconService {
 
 
   generalIcons = [
+    {name: 'logo', route: 'logo'},
+
     {name: 'species', route: 'species-icon'},
     {name: 'overlay', route: 'overlay-icon'},
     {name: 'arrow-down', route: 'arrow-down'},

@@ -1,35 +1,5 @@
 @use "@angular/material" as mat;
 
-:host {
-  @include mat.slide-toggle-overrides((
-    track-outline-color: var(--surface2),
-    selected-track-outline-color: var(--surface2),
-
-    selected-track-color: var(--on-primary),
-    selected-focus-track-color: var(--on-primary),
-    selected-hover-track-color: var(--on-primary),
-    selected-pressed-track-color: var(--on-primary),
-
-    unselected-track-color: var(--on-primary),
-    unselected-focus-track-color: var(--on-primary),
-    unselected-hover-track-color: var(--on-primary),
-    unselected-pressed-track-color: var(--on-primary),
-
-    selected-handle-color: var(--primary),
-    selected-focus-handle-color: var(--primary),
-    selected-hover-handle-color: var(--primary),
-    selected-pressed-handle-color: var(--primary),
-
-    unselected-handle-color: var(--primary),
-    unselected-focus-handle-color: var(--primary),
-    unselected-hover-handle-color: var(--primary),
-    unselected-pressed-handle-color: var(--primary),
-
-    selected-icon-color: var(--on-primary),
-    unselected-icon-color: var(--on-primary),
-  ));
-}
-
 #container {
   position: absolute;
   inset: 0 0 0 0;
@@ -81,13 +51,103 @@
 
 .top {
   height: var(--top-bar-height);
-  background: var(--primary);
-  color: var(--on-primary);
+  background: light-dark(var(--primary), var(--primary-container));
+  color: light-dark(var(--on-primary), var(--on-primary-container));
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 8px 0 20px;
+
+  .top-left {
+    display: flex;
+    gap: 20px;
+    button {
+      background: var(--surface);
+    }
+  }
+
+  .title {
+    font: var(--mat-sys-headline-small)
+  }
+
+  .top-right {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    font: var(--mat-sys-label-large);
+
+    .logo {
+      mat-icon {
+        height: 44px;
+        margin-left: -6px;
+        color: light-dark(var(--on-primary), var(--primary));
+        width: auto;
+      }
+      .version {
+        vertical-align: top;
+        text-decoration: underline;
+      }
+    }
+
+    .quote {
+      background: light-dark(var(--surface), var(--primary));
+      @include mat.icon-button-overrides((
+        icon-color: light-dark(var(--primary), var(--surface)),
+        state-layer-size: 36px,
+      ));
+
+    }
+
+    #dark-toggle {
+      transform: rotate(90deg);
+      margin-right: -12px;
+      margin-left: -12px;
+      margin-top: 4px;
+
+      ::ng-deep svg {
+        transform: rotate(-90deg);
+      }
+
+      @include mat.slide-toggle-overrides((
+        track-width: 38px,
+        track-height: 26px,
+        with-icon-handle-size: 18px,
+        pressed-handle-size: 18px,
+        selected-with-icon-handle-horizontal-margin: 0 16px,
+        selected-pressed-handle-horizontal-margin: 0 16px,
+
+        track-outline-color: var(--primary),
+        selected-track-outline-color: var(--primary-container),
+
+        selected-track-color: var(--surface),
+        selected-focus-track-color: var(--surface),
+        selected-hover-track-color: var(--surface),
+        selected-pressed-track-color: var(--surface),
+
+        unselected-track-color: var(--surface),
+        unselected-focus-track-color: var(--surface),
+        unselected-hover-track-color: var(--surface),
+        unselected-pressed-track-color: var(--surface)
+      ,
+        selected-handle-color: var(--primary),
+        selected-focus-handle-color: var(--primary),
+        selected-hover-handle-color: var(--primary),
+        selected-pressed-handle-color: var(--primary),
+
+        unselected-handle-color: var(--primary),
+        unselected-focus-handle-color: var(--primary),
+        unselected-hover-handle-color: var(--primary),
+        unselected-pressed-handle-color: var(--primary),
+
+        selected-icon-color: var(--surface),
+        unselected-icon-color: var(--surface),
+      ));
+    }
+
+  }
 }
 
 .content {

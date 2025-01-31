@@ -34,7 +34,7 @@
           <cr-species [(pathwayId)]="pathwayId" [visibility]="visibility"></cr-species>
         </div>
         <div [style.display]="visibility.interactor ? 'block':'none'">
-          <cr-interactors #interactors [cy]="diagram?.cy" [cys]="diagram?.cys"  [hasEHLD]="hasEHLD"
+          <cr-interactors #interactors [cy]="diagram?.cy" [cys]="diagram?.cys" [hasEHLD]="hasEHLD()"
                           (initialiseReplaceElements)="diagram?.initialiseReplaceElements()"></cr-interactors>
         </div>
         <div class="event-hierarchy">
@@ -47,24 +47,42 @@
     <as-split-area [size]="80">
       <div class="right-panel">
         <div class="top">
-          <button mat-flat-button [matMenuTriggerFor]="an" >Analysis</button>
-          <mat-menu #an="matMenu">
-            <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
-            <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
-            <button mat-menu-item (click)="analysis.loadAnalysis('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
-          </mat-menu>
+          <div class="top-left">
+            <button mat-stroked-button [matMenuTriggerFor]="an" [color]="'primary'">Analysis</button>
+            <mat-menu #an="matMenu">
+              <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
+              <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
+              <button mat-menu-item (click)="analysis.loadAnalysis('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
+            </mat-menu>
+            <button mat-stroked-button [color]="'primary'">Compare</button>
+          </div>
 
-          <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark"><span class="on-primary">Dark mode</span></mat-slide-toggle>
+          <div class="title">
+            {{ title() }}
+          </div>
 
+          <div class="top-right">
+            <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle
+                              id="dark-toggle"></mat-slide-toggle>
+            <button mat-icon-button [color]="'primary'" class="quote">
+              <mat-icon [svgIcon]="'format-quote'"></mat-icon>
+            </button>
+            <span class="logo">
+              <a href="/" id="main"><mat-icon [svgIcon]="'logo'"></mat-icon></a>
+              <span class="version">v{{ general.version$ | async }}</span>
+            </span>
+          </div>
         </div>
         <div class="content">
           <as-split direction="vertical" gutterSize="4">
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
             <as-split-area [size]="80">
-
-              <cr-ehld [(pathwayId)]="pathwayId" *ngIf="hasEHLD"></cr-ehld>
-              <cr-diagram [(pathwayId)]="pathwayId" *ngIf="!hasEHLD && hasEHLD !== undefined " #diagram [interactor]="interactors"></cr-diagram>
-
+              @if (hasEHLD()) {
+                <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
+              } @else {
+                <cr-diagram [(pathwayId)]="pathwayId" #diagram
+                            [interactor]="interactors"></cr-diagram>
+              }
             </as-split-area>
             <as-split-area [size]="20">
               <cr-details-panel></cr-details-panel>
