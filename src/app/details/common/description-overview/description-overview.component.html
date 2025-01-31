@@ -12,7 +12,7 @@
       <div class="value">
          <!-- Display category for RLE -->
         <ng-container *ngIf="category; else showClassName">
-      {{ category.charAt(0).toUpperCase() + category.slice(1) }} {{ className }}
+          {{ category | titlecase }} {{ className }}
           <ng-container *ngIf="obj.schemaClass === 'Polymerisation' || obj.schemaClass === 'Depolymerisation'">
         &middot; <span class='italic'>{{ obj.schemaClass }}</span>
           </ng-container>
