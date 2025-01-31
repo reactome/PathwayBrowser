@@ -40,6 +40,8 @@ export interface Event extends DatabaseObject {
   literatureReference?: LiteratureReference[];
   authored: InstanceEdit[];
   reviewed: InstanceEdit[];
+  diseasePathways?: Event[]
+  normalPathway?: Event
 }
 
 export interface Compartment{

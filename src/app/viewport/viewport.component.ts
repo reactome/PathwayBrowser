@@ -1,7 +1,8 @@
 import {
   AfterViewInit,
   ChangeDetectorRef,
-  Component, computed,
+  Component,
+  computed,
   effect,
   model,
   OnChanges,
@@ -32,7 +33,7 @@ import {Event} from "../model/event.model";
   standalone: false
 })
 @UntilDestroy()
-export class ViewportComponent implements AfterViewInit, OnChanges {
+export class ViewportComponent implements AfterViewInit {
 
 
   readonly pathwayId = model.required<string>();
@@ -42,12 +43,15 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
     loader: (params) => this.eventService.fetchEnhancedEventData(params.request.id)
   })
 
+
   hasEHLD = computed(() => {
     const hasEHLD = this.currentPathway.value()?.hasEHLD;
     return hasEHLD === undefined ? true : hasEHLD;
   })
   title = computed(() => this.currentPathway.value()?.displayName)
 
+  diseasePathways = computed(() => this.currentPathway.value()?.diseasePathways || [])
+  normalPathway = computed(() => this.currentPathway.value()?.normalPathway)
 
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
@@ -72,13 +76,9 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
               private cdRef: ChangeDetectorRef,
               public analysis: AnalysisService,
               public dark: DarkService,
-              private ehldService: EhldService,
               public eventService: EventService,
               public state: DiagramStateService,
               public general: GeneralService,) {
-    // effect(() => this.getEnhancedResult());
-    // effect(() => this.ehldService.setHasEHLD(this.hasEHLD()));
-    effect(() => console.log('hasEHLD', this.hasEHLD()));
     effect(() => this.currentPathway.value() && this.eventService.setDiagramEvent(this.currentPathway.value()!));
   }
 
@@ -94,9 +94,6 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
       this.currentInteractorResource = resource;
     });
 
-    // this.ehldService.hasEHLD$.pipe(untilDestroyed(this),).subscribe((hasEHLD) => {
-    //   this.hasEHLD = hasEHLD;
-    // });
 
 
     this.darkToggle?._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
@@ -112,22 +109,6 @@ export class ViewportComponent implements AfterViewInit, OnChanges {
       this.visibility.interactor = !this.visibility.interactor;
       this.visibility.species = false;
     }
-  }
-
-  private getEnhancedResult(): void {
-    this.eventService.fetchEnhancedEventData(this.pathwayId())
-      .subscribe((enhancedResult) => {
-        this.eventService.setDiagramEvent(enhancedResult);
-        // const hasEHLD = enhancedResult.hasEHLD ? enhancedResult.hasEHLD : false;
-        // this.hasEHLD = hasEHLD;
-        // this.ehldService.setHasEHLD(hasEHLD);
-        // this.cdRef.detectChanges();
-      })
-  }
-
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // if (changes['diagramId'] && !changes['diagramId'].isFirstChange()) this.getEnhancedResult();
   }
 }
 

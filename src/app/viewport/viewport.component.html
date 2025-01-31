@@ -54,7 +54,21 @@
               <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
               <button mat-menu-item (click)="analysis.loadAnalysis('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
             </mat-menu>
-            <button mat-stroked-button [color]="'primary'">Compare</button>
+            @if (normalPathway()) {
+              <button mat-stroked-button [routerLink]="['/PathwayBrowser', normalPathway()?.stId]" queryParamsHandling="preserve">
+                <mat-icon fontIcon="check"/> Variants
+              </button>
+            } @else {
+              <button mat-stroked-button [disabled]="diseasePathways().length === 0" [matMenuTriggerFor]="compare">
+                Variants
+              </button>
+              <mat-menu #compare="matMenu">
+                @for (comparablePathway of diseasePathways(); track comparablePathway.stId) {
+                  <a mat-menu-item [routerLink]="['/PathwayBrowser', comparablePathway.stId]"
+                     queryParamsHandling="preserve">{{ comparablePathway.displayName }}</a>
+                }
+              </mat-menu>
+            }
           </div>
 
           <div class="title">
