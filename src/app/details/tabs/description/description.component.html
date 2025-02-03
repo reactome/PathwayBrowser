@@ -82,7 +82,7 @@
                target="_blank">{{ ie.displayName | authorshipNameFormat }}</a>
 
             <ng-container *ngIf="ie.author[0].orcidId as orcid">
-              <a [href]="'https://orcis.org/' + orcid" target="_blank">
+              <a [href]="'https://orcid.org/' + orcid" target="_blank">
                 <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
               </a>
             </ng-container>
