@@ -93,10 +93,14 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
   getAuthorship(obj: DatabaseObject) {
     this.authored = getProperty(obj, 'authored');
     this.reviewed = getProperty(obj, 'reviewed');
+    this.edited = getProperty(obj, 'edited');
+    this.revised = getProperty(obj, 'revised');
 
     this.authorship = [
       ...((this.authored || []).length > 0 ? [{label: 'Author', data: (this.authored || [])}] : []),
       ...((this.reviewed || []).length > 0 ? [{label: 'Reviewer', data: (this.reviewed || [])}] : []),
+      ...((this.edited || []).length > 0 ? [{label: 'Editor', data: (this.edited || [])}] : []),
+      ...((this.revised || []).length > 0 ? [{label: 'Reviser', data: (this.revised || [])}] : []),
     ];
 
     obj['authorship'] = this.authorship.length > 0;
