@@ -122,8 +122,6 @@ $small-breakpoint-width: 959px;
   font-weight: 600;
   text-align: right;
 
-  //border: 1px solid var(--primary);
-
   // Sticky
   position: sticky;
   top: 0;
@@ -189,13 +187,6 @@ $small-breakpoint-width: 959px;
     height: var(--icon-height);
 
   }
-}
-
-
-.elements-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
 }
 
 .divider-container {
@@ -289,6 +280,7 @@ $small-breakpoint-width: 959px;
   align-items: flex-start;
   padding-left: 10px;
   border-left: 2px solid var(--outline-variant);
+  overflow: hidden;
 
   flex: 1;
 
@@ -301,7 +293,21 @@ $small-breakpoint-width: 959px;
 
     width: 100%;
   }
+}
 
+// A grid layout
+.columns-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap:wrap;
+}
+
+.column-item {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex: 1 1 25%; //each item takes exactly 25% of the container width
+  max-width: 25%; //ensures all items have the same width
 }
 
 .element-container {

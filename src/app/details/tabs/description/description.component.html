@@ -33,10 +33,43 @@
     </div>
 
 
-    <div class="overview" [ngClass]="{'update-layout': referenceEntity}">
+    <div class="overview" [ngClass]="{'update-layout': externalRef}">
       <cr-description-overview [obj]="obj"></cr-description-overview>
       <div *ngIf="obj.hasIcon" class="icon-container">
         <div class="icon" [innerHTML]="iconContent"></div>
+      </div>
+    </div>
+
+    <!-- External Reference divider-->
+    <div class="divider-container" *ngIf="externalRef" id="externalReferences">
+      <div class="divider-name-container">
+        <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'External Reference' }"></ng-container>
+      </div>
+      <div class="divider-line-container">
+        <mat-divider class="divider"></mat-divider>
+      </div>
+    </div>
+
+    <div class="element-container" *ngIf="externalRef">
+      <div class="ref-row" *ngFor="let property of externalRef">
+        <div class="label-container">{{ property.key | titlecase}}</div>
+
+        <div class="composition-container" [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}" >
+
+            <ng-container *ngIf="isArray(property.value) && !isString(property.value[0]); else singleValue">
+              <span class="column-item" *ngFor="let item of property.value"> <a [href]="item.url" target="_blank"> {{ item.displayName }}</a></span>
+            </ng-container>
+
+          <ng-template #singleValue>
+            <ng-container *ngIf="property.key === 'External Reference'; else noLink">
+              <a [href]="property.value" target="_blank">{{ property.value }}</a>
+            </ng-container>
+            <ng-template #noLink>
+              <span>{{ property.value }}</span>
+            </ng-template>
+          </ng-template>
+
+        </div>
       </div>
     </div>
 
@@ -101,7 +134,7 @@
 
     @for (element of elements; track element.key) {
       @if (obj[element.key] && !element?.manual) {
-        <div [id]="element.key" class="elements-container">
+        <div [id]="element.key" class="element-container">
           <div class="divider-container">
             <div class="divider-name-container">
               <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>

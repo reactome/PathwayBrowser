@@ -6,9 +6,11 @@ import {getProperty} from "../../../services/utils";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
-import {ReferenceEntity} from "../../../model/graph/reference-entity.model";
+import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {isArray, isString} from "lodash";
+import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 
 
 @Component({
@@ -26,12 +28,16 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
   literatureRefs?: LiteratureReference[];
   authored?: InstanceEdit[];
   reviewed?: InstanceEdit[];
-
-  authorship: { label: string, data: InstanceEdit[]}[] = []
+  edited?: InstanceEdit[];
+  revised?: InstanceEdit[];
+  rawExternalRef?: ReferenceEntity;
+  externalRef?: { key: string; value: any }[];
+  authorship: { label: string, data: InstanceEdit[] }[] = [];
 
   elements = [
     {key: 'overview', label: 'Overview', manual: true},
     {key: 'literatureReference', label: 'References', manual: true},
+    {key: 'referenceEntity', label: 'External Reference', manual: true},
     {key: 'authorship', label: 'Authorship', manual: true},
     {key: 'input', label: 'Inputs'},
     {key: 'output', label: 'Outputs'},
@@ -58,8 +64,9 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
     this.obj['overview'] = true;
 
     this.setIcon(this.obj);
-    this.getRefs(this.obj);
-    this.getAuthorship(this.obj)
+    this.getLiteratureRefs(this.obj);
+    this.getExternalRef(this.obj);
+    this.getAuthorship(this.obj);
 
   }
 
@@ -69,17 +76,21 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
     if (changes['obj'] && !changes['obj'].firstChange && changes['obj'].previousValue !== this.obj) {
       this.obj['overview'] = true;
       this.setIcon(this.obj);
-      this.getRefs(this.obj)
+      this.getLiteratureRefs(this.obj);
+      this.getExternalRef(this.obj);
       this.getAuthorship(this.obj);
     }
   }
 
+  protected readonly isArray = isArray;
+  protected readonly isString = isString;
+
   setIcon(obj: DatabaseObject) {
 
-    this.referenceEntity = getProperty(obj, 'referenceEntity');
+    this.rawExternalRef = getProperty(obj, 'referenceEntity');
 
-    if (this.referenceEntity) {
-      const identifier = this.referenceEntity.identifier;
+    if (this.rawExternalRef) {
+      const identifier = this.rawExternalRef.identifier;
       this.iconService.fetchIcon(identifier).subscribe(icon => {
         if (icon && this.obj) {
           this.iconContent = this.sanitizer.bypassSecurityTrustHtml(icon);
@@ -114,16 +125,42 @@ export class DescriptionComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  getExternalRef(obj: DatabaseObject) {
 
-    if (this.externalRef) {
+  getExternalRef(obj: DatabaseObject) {
+    if (this.rawExternalRef) {
+      this.externalRef = this.getTransformedExternalRef(this.rawExternalRef);
       obj['referenceEntity'] = true;
     }
-
   }
 
   getIcon(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
   }
+
+  getTransformedExternalRef(refEntity: ReferenceEntity) {
+    if (!refEntity) return [];
+    const externalRef = {...refEntity};
+    const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene', 'crossReference'];
+    const labels = new Map<string, string>([
+      ['displayName', 'External Reference'],
+      ['geneName', 'Gene Names'],
+      ['referenceGene', 'Reference Genes'],
+      ['crossReference', 'Reference Transcript'],
+    ]);
+    const results: { key: string, value: any }[] = [];
+
+    for (const key of propertyToShowAndOrder) {
+      let value = externalRef[key];
+      if (key === 'crossReference') {
+        value = value.filter((n: DatabaseIdentifier) => n.databaseName === 'RefSeq');
+      }
+      results.push({
+        key: labels.get(key) || key,
+        value: value
+      });
+    }
+    return results;
+  }
+
 
 }
