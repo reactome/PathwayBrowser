@@ -38,7 +38,7 @@ import {Event} from "../model/event.model";
 @UntilDestroy()
 export class ViewportComponent implements AfterViewInit, OnChanges {
 
-  readonly pathwayId = model.required<string>();
+  readonly pathwayId = this.state.pathwayId;
 
   currentPathway = rxResource<DatabaseObject, { id: string }>({
     request: () => ({id: this.pathwayId()}),

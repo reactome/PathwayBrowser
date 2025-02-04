@@ -1,6 +1,6 @@
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
-import {firstValueFrom} from "rxjs";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isBoolean, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
@@ -40,8 +40,24 @@ export class DiagramStateService implements State {
   public readonly analysis = this.values.analysis
   public readonly analysisProfile = this.values.analysisProfile
 
+  public readonly pathwayId = signal<string>('');
+
 
   constructor(route: ActivatedRoute, private router: Router, private http: HttpClient) {
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      switchMap(() => this.router.routerState.root.firstChild?.params || of()),
+      map( params  => params['pathwayId'])
+    ).subscribe((id) => {
+      this.pathwayId.set(id)
+    });
+
+    effect(() => {
+      this.router.navigate(['/PathwayBrowser', this.pathwayId()], {queryParamsHandling:'preserve', preserveFragment: true});
+    });
+
+
     route.queryParamMap.subscribe(async params => {
       for (const mainToken in this.values) {
         const param = this.values[mainToken as keyof State] as UrlParam<any>;
