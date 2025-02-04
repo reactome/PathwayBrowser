@@ -7,9 +7,7 @@ import {HttpClient} from "@angular/common/http";
 })
 export class GeneralService {
 
-  private readonly versionURL = `${environment.host}/ContentService/data/database/version`;
-
   constructor(private http: HttpClient) { }
 
-  version$ = this.http.get<number>(this.versionURL);
+  version$ = this.http.get<number>(`${environment.host}/ContentService/data/database/version`);
 }
