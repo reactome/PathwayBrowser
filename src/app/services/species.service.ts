@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {BehaviorSubject, map, Observable, of, tap} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
-import {Event} from "../model/event.model";
+import {Event} from "../model/graph/event.model";
 import {DiagramStateService} from "./diagram-state.service";
 import {ActivatedRoute} from "@angular/router";
 

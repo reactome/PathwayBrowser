@@ -20,6 +20,9 @@ import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
+import {isEvent, isPathwayOrTLP} from "../services/utils";
+import {DatabaseObjectService} from "../services/database-object.service";
+
 import {DiagramStateService} from "../services/diagram-state.service";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GeneralService} from "../services/general.service";
@@ -33,14 +36,13 @@ import {Event} from "../model/event.model";
   standalone: false
 })
 @UntilDestroy()
-export class ViewportComponent implements AfterViewInit {
-
+export class ViewportComponent implements AfterViewInit, OnChanges {
 
   readonly pathwayId = model.required<string>();
 
-  currentPathway = rxResource<Event, { id: string }>({
+  currentPathway = rxResource<DatabaseObject, { id: string }>({
     request: () => ({id: this.pathwayId()}),
-    loader: (params) => this.eventService.fetchEnhancedEventData(params.request.id)
+    loader: (params) => this.dboService.fetchEnhancedEntry(params.request.id)
   })
 
 
@@ -78,7 +80,8 @@ export class ViewportComponent implements AfterViewInit {
               public dark: DarkService,
               public eventService: EventService,
               public state: DiagramStateService,
-              public general: GeneralService,) {
+              public general: GeneralService,
+              public dboService: DatabaseObjectService) {
     effect(() => this.currentPathway.value() && this.eventService.setDiagramEvent(this.currentPathway.value()!));
   }
 

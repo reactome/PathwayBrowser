@@ -2,33 +2,27 @@
   width: 100%;
 }
 
-
 #tree-container {
   background: var(--surface);
   font-family: 'Roboto Flex', sans-serif;
 
+  .refs-tree-invisible {
+    display: none;
+  }
 
   .mat-tree {
     background: var(--surface);
   }
 
-  .mat-tree-node {
+  .custom-margin {
+    margin-bottom: 8px;
+  }
 
-    &.root {
-      margin-top: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: var(--surface);
-    }
-
+  .mat-nested-tree-node {
     &:last-child:not(:only-child) {
       margin-bottom: 7px; // Compensate for section of citation button that gets eaten by forced parent height (20px instead of 27px)
     }
-
-    margin-top: 8px;
   }
-
 }
 
 .button {

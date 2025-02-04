@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppComponent} from './app.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {CommonModule} from "@angular/common";
+import {CommonModule, DatePipe} from "@angular/common";
 import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 import {DiagramComponent} from './diagram/diagram.component';
 import {RouterOutlet} from "@angular/router";
@@ -47,6 +47,9 @@ import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/s
 import {PublicationComponent} from "./details/common/publication/publication.component";
 import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
 import {IncludeRefPipe} from "./details/common/include-ref.pipe";
+import {AuthorshipNameFormatPipe} from "./pipes/authorship-name-format.pipe";
+import {AuthorshipDateFormatPipe} from "./pipes/authorship-date-format.pipe";
+import {CustomSortByPipe} from "./pipes/custom-sort-by.pipe";
 
 @NgModule({
   declarations: [
@@ -98,7 +101,7 @@ import {IncludeRefPipe} from "./details/common/include-ref.pipe";
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, IncludeRefPipe], providers: [provideHttpClient(withInterceptorsFromDi())]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipNameFormatPipe, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })
 export class AppModule {
 }

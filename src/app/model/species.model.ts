@@ -1,4 +1,4 @@
-import {Event} from "./event.model";
+import {Event} from "./graph/event.model";
 
 export interface Species {
   dbId: number;
