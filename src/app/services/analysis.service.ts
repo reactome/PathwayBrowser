@@ -3,7 +3,7 @@ import {catchError, Observable, of, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {Analysis} from "../model/analysis.model";
-import {DiagramStateService} from "./diagram-state.service";
+import {UrlStateService} from "./url-state.service";
 import {brewer, Scale, scale} from "chroma-js";
 import {extract, Style} from "reactome-cytoscape-style";
 import {toObservable} from "@angular/core/rxjs-interop";
@@ -105,7 +105,7 @@ export class AnalysisService {
     })
   )
 
-  constructor(private http: HttpClient, private state: DiagramStateService) {
+  constructor(private http: HttpClient, private state: UrlStateService) {
   }
 
   clearAnalysis() {

@@ -1,26 +1,15 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  computed,
-  effect,
-  model,
-  OnChanges,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, computed, effect, ViewChild} from '@angular/core';
 import {DiagramComponent} from "../diagram/diagram.component";
 import {ResourceAndType} from "../interactors/model/interactor.model";
 import {InteractorsComponent} from "../interactors/interactors.component";
 import {Species} from "../model/species.model";
 import {SpeciesService} from "../services/species.service";
 import {InteractorService} from "../interactors/services/interactor.service";
-import {EhldService} from "../services/ehld.service";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GeneralService} from "../services/general.service";
 import {rxResource} from "@angular/core/rxjs-interop";

@@ -15,12 +15,12 @@ export function urlParam<T>(initialValue: T, otherTokens?: string[]): UrlParam<T
 }
 
 
-type State = DiagramStateService['values']
+type State = UrlStateService['values']
 
 @Injectable({
   providedIn: 'root'
 })
-export class DiagramStateService implements State {
+export class UrlStateService implements State {
 
   private readonly values = {
     select: urlParam<string>('', ['SEL']),

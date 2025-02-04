@@ -4,7 +4,7 @@ import {BehaviorSubject, map, Observable, of, tap} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
 import {Event} from "../model/event.model";
-import {DiagramStateService} from "./diagram-state.service";
+import {UrlStateService} from "./url-state.service";
 import {ActivatedRoute} from "@angular/router";
 
 @Injectable({
@@ -46,7 +46,7 @@ export class SpeciesService {
   ]);
 
 
-  constructor(private http: HttpClient, private state: DiagramStateService) {
+  constructor(private http: HttpClient, private state: UrlStateService) {
   }
 
   setIgnore(value: boolean) {

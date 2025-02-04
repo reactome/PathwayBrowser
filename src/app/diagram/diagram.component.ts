@@ -19,7 +19,7 @@ import {
   take,
   tap
 } from "rxjs";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService, Examples} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
@@ -59,7 +59,7 @@ export class DiagramComponent implements AfterViewInit {
   constructor(private diagram: DiagramService,
               public dark: DarkService,
               private interactorsService: InteractorService,
-              private state: DiagramStateService,
+              private state: UrlStateService,
               private analysis: AnalysisService,
               private event: EventService,
               private router: Router,

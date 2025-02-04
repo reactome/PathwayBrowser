@@ -4,7 +4,7 @@ import cytoscape from "cytoscape";
 import {DiagramService} from "../services/diagram.service";
 import {DarkService} from "../services/dark.service";
 import {InteractorService} from "./services/interactor.service";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {MatDialog} from "@angular/material/dialog";
 import {CustomInteractorDialogComponent} from "./custom-interactor-dialog/custom-interactor-dialog.component";
 import {Subscription} from "rxjs";
@@ -34,7 +34,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
   readonly cys = input<cytoscape.Core[] | undefined>([]);
   @Output('initialiseReplaceElements') initialiseReplaceElements: EventEmitter<any> = new EventEmitter();
 
-  constructor(private diagram: DiagramService, public dark: DarkService, private interactorsService: InteractorService, private state: DiagramStateService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
+  constructor(private diagram: DiagramService, public dark: DarkService, private interactorsService: InteractorService, private state: UrlStateService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
 
   }
 

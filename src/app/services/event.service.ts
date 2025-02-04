@@ -18,7 +18,7 @@ import {
   tap
 } from "rxjs";
 import {JSOGDeserializer} from "../utils/JSOGDeserializer";
-import {DiagramStateService} from "./diagram-state.service";
+import {UrlStateService} from "./url-state.service";
 import {MatTree} from "@angular/material/tree";
 import {Analysis} from "../model/analysis.model";
 import {AnalysisService} from "./analysis.service";
@@ -55,7 +55,7 @@ export class EventService {
   diagramEvent?: Event;
 
   constructor(private http: HttpClient,
-              private state: DiagramStateService,
+              private state: UrlStateService,
               private analysisService: AnalysisService,
               private ehldService : EhldService) {
   }

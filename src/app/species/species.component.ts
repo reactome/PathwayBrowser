@@ -2,7 +2,7 @@ import {AfterViewInit, Component, input, model} from '@angular/core';
 import {Species} from "../model/species.model";
 import {SpeciesService} from "../services/species.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {EventService} from "../services/event.service";
 import {Event} from "../model/event.model";
@@ -28,7 +28,7 @@ export class SpeciesComponent implements AfterViewInit {
   selectedTreeEvent?: Event;
   selectedObj?: Event;
 
-  constructor(private speciesService: SpeciesService, private router: Router, private route: ActivatedRoute, private state: DiagramStateService, private eventService: EventService) {
+  constructor(private speciesService: SpeciesService, private router: Router, private route: ActivatedRoute, private state: UrlStateService, private eventService: EventService) {
 
   }
 

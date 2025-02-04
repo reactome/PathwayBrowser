@@ -4,7 +4,7 @@ import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
 import {combineLatestWith, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {SplitComponent} from "angular-split";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {NavigationEnd, Router} from "@angular/router";
@@ -50,7 +50,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   constructor(protected eventService: EventService,
               private speciesService: SpeciesService,
-              public state: DiagramStateService,
+              public state: UrlStateService,
               private el: ElementRef,
               private router: Router,
               private ehldService: EhldService,
