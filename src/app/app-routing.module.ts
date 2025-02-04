@@ -1,6 +1,5 @@
 import {RouterModule, Routes} from "@angular/router";
 import {NgModule} from "@angular/core";
-import {DiagramComponent} from "./diagram/diagram.component";
 import {DiagramIteratorComponent} from "./diagram-iterator/diagram-iterator.component";
 import {legacyGuard} from "./guard/legacy.guard";
 import {ViewportComponent} from "./viewport/viewport.component";
@@ -17,7 +16,7 @@ export const routes: Routes = [
 
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {bindToComponentInputs: true})],
+  imports: [RouterModule.forRoot(routes, {bindToComponentInputs: false})],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

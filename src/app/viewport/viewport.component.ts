@@ -36,7 +36,7 @@ import {Event} from "../model/event.model";
 export class ViewportComponent implements AfterViewInit {
 
 
-  readonly pathwayId = model.required<string>();
+  readonly pathwayId = this.state.pathwayId;
 
   currentPathway = rxResource<Event, { id: string }>({
     request: () => ({id: this.pathwayId()}),
