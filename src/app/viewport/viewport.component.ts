@@ -46,7 +46,7 @@ export class ViewportComponent implements AfterViewInit {
 
   hasEHLD = computed(() => {
     const hasEHLD = this.currentPathway.value()?.hasEHLD;
-    return hasEHLD === undefined ? true : hasEHLD;
+    return hasEHLD === undefined ? true : hasEHLD; // Avoid flickering of diagram to EHLD
   })
   title = computed(() => this.currentPathway.value()?.displayName)
 
@@ -77,7 +77,7 @@ export class ViewportComponent implements AfterViewInit {
               public analysis: AnalysisService,
               public dark: DarkService,
               public eventService: EventService,
-              public state: DiagramStateService,
+              public state: UrlStateService,
               public general: GeneralService,) {
     effect(() => this.currentPathway.value() && this.eventService.setDiagramEvent(this.currentPathway.value()!));
   }
