@@ -48,5 +48,5 @@ Thumbs.db
 # Ignore npm lock file
 package-lock.json
 
-# Ignore Yarn lock file 
+# Ignore Yarn lock file
 yarn.lock
