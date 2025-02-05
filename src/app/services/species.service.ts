@@ -4,7 +4,7 @@ import {catchError, map, Observable, of} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
 import {Event} from "../model/event.model";
-import {UrlParam, UrlStateService} from "./url-state.service";
+import {UrlStateService} from "./url-state.service";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {isDefined} from "./utils";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -21,7 +21,7 @@ export class SpeciesService {
     displayName: 'Homo sapiens',
     taxId: '9606',
     dbId: 48887,
-    shortName: 'H.sapiens',
+    shortName: 'H. sapiens',
     abbreviation: 'HSA'
   };
 
