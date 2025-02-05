@@ -16,6 +16,7 @@ export interface Event extends DatabaseObject {
   summation: Summation[];
   reviewStatus: ReviewStatus;
   name: string[];
+  compartment?: Compartment[];
 
 
   // not from API endpoint but are needed in the tree view
@@ -25,11 +26,8 @@ export interface Event extends DatabaseObject {
   parent: Event;
 
 
-  // Not in the date model
+  //todo: where is it from
   speciesName?: string;
-  compartment?: Compartment[];
 
-
-  referenceEntity: ReferenceEntity;
 
 }
