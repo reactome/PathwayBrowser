@@ -46,7 +46,7 @@ export class EhldComponent implements AfterViewInit {
               private analysisService: AnalysisService,
               private speciesService: SpeciesService,
               public state: UrlStateService,) {
-    effect(() => this.selectedIdFromUrl = this.state.select());
+    effect(() => this.selectedIdFromUrl = this.state.select()!);
     effect(() => this.flaggedIdFromUrl = this.state.flag());
     effect(() => this.loadAnalysis(this.state.analysis()));
     effect(() => {
@@ -147,7 +147,7 @@ export class EhldComponent implements AfterViewInit {
         if (idAttr) {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
-            this.speciesService.setIgnore(false);
+            // this.speciesService.setIgnore(false);
             this.pathwayId.set(stId);
           }
         }

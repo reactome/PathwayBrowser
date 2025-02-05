@@ -6,11 +6,12 @@ import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 
 
-type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[]};
+export type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T};
 
 export function urlParam<T>(initialValue: T, otherTokens?: string[]): UrlParam<T> {
   const writableSignal = signal<T>(initialValue) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
+  writableSignal.initialValue = initialValue;
   return writableSignal;
 }
 
@@ -22,12 +23,12 @@ type State = UrlStateService['values']
 })
 export class UrlStateService implements State {
 
-  private readonly values = {
-    select: urlParam<string>('', ['SEL']),
+  readonly values = {
+    select: urlParam<string | null>(null, ['SEL']),
     flag: urlParam<string[]>([], ['FLG']),
     path: urlParam<string[]>([], ['PATH']),
     flagInteractors: urlParam<boolean>(false, ['FLGINT']),
-    overlay: urlParam<string | null>(''),
+    overlay: urlParam<string | null>(null),
     analysis: urlParam<string | null>(null, ['ANALYSIS']),
     analysisProfile: urlParam<string | null>(null),
   };
@@ -40,7 +41,7 @@ export class UrlStateService implements State {
   public readonly analysis = this.values.analysis
   public readonly analysisProfile = this.values.analysisProfile
 
-  public readonly pathwayId = signal<string>('');
+  public readonly pathwayId = signal<string | undefined>(undefined);
 
 
   constructor(route: ActivatedRoute, private router: Router, private http: HttpClient) {
@@ -54,6 +55,7 @@ export class UrlStateService implements State {
     });
 
     effect(() => {
+      console.log('Updating patwhayId to ',  this.pathwayId())
       this.router.navigate(['/PathwayBrowser', this.pathwayId()], {queryParamsHandling:'preserve', preserveFragment: true});
     });
 
@@ -89,7 +91,7 @@ export class UrlStateService implements State {
         if (!param || (isArray(param) && param.length === 0)) continue;
         queryParams[key] = isArray(param) ? param.join(',') : param;
       }
-      console.log(queryParams)
+      console.log('Updating URL from state', queryParams)
       this.router.navigate([], {queryParams});
     });
   }

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, input, model, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, effect, ElementRef, input, model, OnDestroy, ViewChild} from '@angular/core';
 import {Event} from "../model/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
@@ -56,12 +56,19 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
               private ehldService: EhldService,
               private analysis: AnalysisService,
               private iconService: IconService) {
+    effect(() => {
+      this.buildInitialTreeWithTlps(this.speciesService.currentSpecies().taxId);
+    });
   }
 
+  //TODO check how species ignore is important
   selecting = toObservable(this.state.select).pipe(
-    tap(value => this.selectedIdFromUrl = value),
+    tap(value => this.selectedIdFromUrl = value!),
     //todo: revisit here to check the logic
-    filter(value => !this._ignore && !this._isInitialLoad && !this.speciesService.getIgnore()),// Ignore the changes from Tree itself , first load and species changes
+    filter(value => !this._ignore
+        && !this._isInitialLoad
+      // && !this.speciesService.getIgnore()
+    ),// Ignore the changes from Tree itself , first load and species changes
     // debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
       const idToUse = id ? id : this.pathwayId()!;
@@ -106,11 +113,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     setTimeout(() => {
       this._isInitialLoad = false; // Allow future changes to be processed after first load
     }, 100);
-
-    this.speciesService.currentSpecies$.pipe(untilDestroyed(this)).subscribe(species => {
-      const taxId = species ? species.taxId : '9606';
-      this.buildInitialTreeWithTlps(taxId);
-    });
 
     this.eventService.treeData$.pipe(untilDestroyed(this)).subscribe(events => {
       // @ts-ignore
@@ -411,7 +413,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     // Determine if we should include the selectedEventId in the URL
     const selectedEventId = this.eventService.eventHasChild(treeEvent) && treeEvent.hasDiagram ? '' : treeEvent.stId;
     this._ignore = true;
-    this.speciesService.setIgnore(true);
+    // this.speciesService.setIgnore(true);
     this.router.navigate(['PathwayBrowser', diagramId], {
       queryParamsHandling: "preserve" // Keep existing query params
     }).then(() => {
@@ -423,7 +425,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         take(1) // Take the first NavigationEnd event and unsubscribe automatically
       ).subscribe(() => {
         this._ignore = false;
-        this.speciesService.setIgnore(false);
+        // this.speciesService.setIgnore(false);
       });
 
     }).catch(err => {

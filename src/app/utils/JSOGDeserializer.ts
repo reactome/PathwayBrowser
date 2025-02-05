@@ -36,11 +36,11 @@ export interface JSOGObject {
 export class JSOGDeserializer {
   private objectMap: { [id: string]: JSOGObject } = {};
 
-  public deserialize(jsog: JSOGObject): Event {
+  public deserialize<T>(jsog: JSOGObject): T {
     // Build @id and object map
     this.buildIdToObjectMap(jsog);
     // Resolve all @ref
-    return this.resolveReferences(jsog) as Event;
+    return this.resolveReferences(jsog) as T;
   }
 
   private buildIdToObjectMap(jsogObject: JSOGObject) {

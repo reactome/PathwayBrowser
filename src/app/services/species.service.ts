@@ -1,11 +1,13 @@
-import {Injectable} from '@angular/core';
+import {computed, effect, Injectable, signal} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {BehaviorSubject, map, Observable, of, tap} from "rxjs";
+import {catchError, map, Observable, of} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
 import {Event} from "../model/event.model";
-import {UrlStateService} from "./url-state.service";
-import {ActivatedRoute} from "@angular/router";
+import {UrlParam, UrlStateService} from "./url-state.service";
+import {rxResource} from "@angular/core/rxjs-interop";
+import {isDefined} from "./utils";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -15,154 +17,93 @@ export class SpeciesService {
   private readonly _MAIN_SPECIES = `${environment.host}/ContentService/data/species/main`;
   private readonly _ORTHOLOGIES = `${environment.host}/ContentService/data/orthologies/ids/species/`
 
-  defaultSpecies = {displayName: 'Homo sapiens', taxId: '9606', dbId: 48887, shortName: 'H.sapiens'};
-  private _currentSpeciesSubject = new BehaviorSubject<Species>(this.defaultSpecies);
-  public currentSpecies$ = this._currentSpeciesSubject.asObservable();
+  defaultSpecies: Species = {
+    displayName: 'Homo sapiens',
+    taxId: '9606',
+    dbId: 48887,
+    shortName: 'H.sapiens',
+    abbreviation: 'HSA'
+  };
 
-  orthologousMap: OrthologousMap = {};
-
-  private _ignore = false; // ignore the changes from species
-  /**
-   * This map is to help get current species value from the diagramId string when loading data. For instance:
-   *  diagramId = R-HSA-4090294 then current species is H.sapiens, and then it will be selected in the species list
-   */
-  readonly abbreviationToSpecies: Map<string, Species> = new Map<string, Species>([
-    ['HSA', {displayName: 'Homo sapiens', taxId: '9606', dbId: 48887, shortName: 'H.sapiens'}],
-    ['BTA', {displayName: 'Bos taurus', taxId: '9913', dbId: 48898, shortName: 'B.taurus'}],
-    ['CEL', {displayName: 'Caenorhabditis elegans', taxId: '6239', dbId: 68320, shortName: 'C.elegans'}],
-    ['CFA', {displayName: 'Canis familiaris', taxId: '9615', dbId: 49646, shortName: 'C.familiaris'}],
-    ['DRE', {displayName: 'Danio rerio', taxId: '7955', dbId: 68323, shortName: 'D.rerio'}],
-    ['DDI', {displayName: 'Dictyostelium discoideum', taxId: '44689', dbId: 170941, shortName: 'D.discoideum'}],
-    ['DME', {displayName: 'Drosophila melanogaster', taxId: '7227', dbId: 56210, shortName: 'D.melanogaster'}],
-    ['GGA', {displayName: 'Gallus gallus', taxId: '9031', dbId: 49591, shortName: 'G.gallus'}],
-    ['MMU', {displayName: 'Mus musculus', taxId: '10090', dbId: 48892, shortName: 'M.musculus'}],
-    ['MTU', {displayName: 'Mycobacterium tuberculosis', taxId: '1773', dbId: 176806, shortName: 'M.tuberculosis'}],
-    ['PFA', {displayName: 'Plasmodium falciparum', taxId: '5833', dbId: 170928, shortName: 'P.falciparum'}],
-    ['RNO', {displayName: 'Rattus norvegicus', taxId: '10116', dbId: 48895, shortName: 'R.Rorvegicus'}],
-    ['SCE', {displayName: 'Saccharomyces cerevisiae', taxId: '4932', dbId: 68322, shortName: 'S.cerevisiae'}],
-    ['SPO', {displayName: 'Schizosaccharomyces pombe', taxId: '4896', dbId: 68324, shortName: 'S.pombe'}],
-    ['SSC', {displayName: 'Sus scrofa', taxId: '99823', dbId: 49633, shortName: 'S.scrofa'}],
-    ['XTR', {displayName: 'Xenopus tropicalis', taxId: '8364', dbId: 205621, shortName: 'X.tropicalis'}]
-  ]);
+  currentSpecies = signal<Species>(this.defaultSpecies)
 
 
-  constructor(private http: HttpClient, private state: UrlStateService) {
-  }
+  private allSpecies = rxResource({
+      request: () => null,
+      loader: () => this.http.get<Species[]>(this._MAIN_SPECIES)
+    }
+  )
 
-  setIgnore(value: boolean) {
-    this._ignore = value;
-  }
+  allShortenSpecies = computed(() => this.allSpecies.value()
+    ?.map(this.setShortName)
+    .sort((s1, s2) => s1.displayName.localeCompare(s2.shortName))
+  )
 
-  getIgnore(): boolean {
-    return this._ignore;
-  }
+  // TODO use this but with a good backend endpoint to have the avilable alternative species for any given pathway
+  // availableSpecies = computed(() => {
+  //   const speciesList = this.allShortenSpecies();
+  //   const currentPathway = this.dataState.currentPathway.value();
+  //   if (!currentPathway) return speciesList;
+  //   const orthologs = new Set(currentPathway.orthologousEvent?.map(ortholog => ortholog.speciesName!) || []);
+  //   return speciesList?.filter((specie: Species) => orthologs.has(specie.displayName)) || []
+  // })
 
-  getSpecies(): Observable<Species[]> {
-    return this.http.get<Species[]>(this._MAIN_SPECIES, {
-      headers: new HttpHeaders({'Content-Type': 'application/json;charset=UTF-8'})
+  abbreviationToSpecies = computed(() => new Map(this.allShortenSpecies()?.map(s => ([s.abbreviation, s]))))
+
+  constructor(private http: HttpClient, private state: UrlStateService, private router: Router, private route: ActivatedRoute) {
+    effect(() => {
+      const newSpecies = this.abbreviationToSpecies().get(this.state.pathwayId()?.substring(2, 5) || '');
+      if (newSpecies) this.currentSpecies.set(newSpecies);
     });
   }
 
-  getOrthologousMap(identifiers: string, speciesDbId: number): Observable<OrthologousMap> {
+  getClosestOrthologPathway(ancestors: Event[], newSpecies: Species): Observable<{
+    pathway: Event | undefined,
+    map: OrthologousMap,
+  }> {
+    return this.getOrthologousMap(
+      ancestors.map((a) => a.stId),
+      newSpecies.dbId)
+      .pipe(map(orthologousMap => {
+          for (const ancestor of ancestors.reverse()) { // Start from the end of ancestry, and gradually go up if there is no equivalent pathway
+            if (orthologousMap[ancestor.stId]) return {
+              pathway: orthologousMap[ancestor.stId],
+              map: orthologousMap
+            };
+          }
+          return {pathway: undefined, map: orthologousMap}; // If selection has no ortholog, it might be because it's a molecule, if so return initial
+        })
+      )
+  }
+
+  private getOrthologousMap(identifiers: string[], speciesDbId: number): Observable<OrthologousMap> {
     const url = `${this._ORTHOLOGIES}${speciesDbId}`;
-    return this.http.post<OrthologousMap>(url, identifiers, {headers: new HttpHeaders({'Content-Type': 'text/plain'})});
-  }
-
-
-  setShortName(s: Species) {
-    const parts = s.displayName.split(' ');
-    // If there are not exactly two parts, return the original string
-    if (parts.length !== 2) {
-      throw new Error('Invalid species name format. Expected "Genus species".');
-    }
-    const genus = parts[0];
-    const species = parts[1];
-    s.shortName = `${genus.charAt(0)}.${species}`;
-  }
-
-  setCurrentSpecies(species: Species) {
-    this._currentSpeciesSubject.next(species);
-  }
-
-  public setSpeciesFromDiagramId(diagramId: string) {
-    // Find the value between the hyphens
-    const speciesTerm = diagramId.match(/-(.*?)-/);
-    let species;
-    if (speciesTerm) {
-      // speciesTerm[0] = -HSA-, speciesTerm[0] = HSA
-      species = this.abbreviationToSpecies.get(`${speciesTerm[1]}`)
-      if (species) {
-        this.setCurrentSpecies(species);
-      }
-    }
-  }
-
-
-  getOrthologyEventStId(species: Species, selectedId: number | undefined, ancestors: Event[], ids: string[]): Observable<string> {
-
-    if (!selectedId) return of('');
-    // Only need to post all ids from URL, however the API call requires dbId as content, that's why ancestors is here
-    const idsToPost: number[] = [];
-    ancestors.forEach(a => {
-      if (ids.includes(a.stId)) {
-        idsToPost.push(a.dbId);
-      }
-    });
-
-    const speciesDbId = species.dbId;
-    let newSelectedId: string = '';
-    return this.getOrthologousMap(idsToPost.join(','), speciesDbId).pipe( // can't send array to API call
-      tap(response => {
-        this.orthologousMap = response;
-        if (this.orthologousMap[selectedId]) {
-          newSelectedId = this.orthologousMap[selectedId].stId;
-        } else {
-          newSelectedId = '';
-        }
-      }),
-      map(() => newSelectedId)
+    return this.http.post<OrthologousMap>(url, identifiers.join(','), {headers: new HttpHeaders({'Content-Type': 'text/plain'})}).pipe(
+      catchError(e => of({}))
     );
   }
 
-  getIdsFromURL(diagramId: string) {
-    let ids: string[] = []
-    ids.push(diagramId);
-    if (this.state.select()) {
-      ids.push(this.state.select());
-    }
-    if (this.state.path()) {
-      ids = ids.concat(this.state.path());
-    }
-    return ids;
+  getOrtholog(identifier: string | number | null, speciesDbID: number): Observable<Event | null> {
+    if (!identifier) return of(null);
+    return this.http.get<Event>(`${environment.host}/ContentService/data/orthology/${identifier}/species/${speciesDbID}`);
   }
 
 
-  updateQueryParams(paramNames: string[], selectedId: string, abbreviation: string, route: ActivatedRoute) {
-    // Create a new params object from the current query parameters
-    const newParams = {...route.snapshot.queryParams};
-    paramNames.forEach(param => {
-      const value = newParams[param];
-      const updateValue = (str: string) => str.replace(/-(.*?)-/, `-${abbreviation}-`);
-      if (value) {
-        if (param === 'select') {
-          if (selectedId) {
-            newParams[param] = updateValue(value);
-          } else {
-            // Remove 'select' if selectedId is empty
-            // delete newParams[param];
-            newParams[param] = '';
-          }
-        } else if (param === 'path') {
-          newParams[param] = value
-            .split(',')
-            .map((s: string) => updateValue(s))
-            .join(',');
-        } else {
-          newParams[param] = updateValue(value);
-        }
-      }
+  private setShortName(s: Species): Species {
+    const [genus, species, ..._] = s.displayName.split(' ');
+    return {...s, shortName: `${genus.charAt(0)}. ${species}`};
+  }
+
+  updateQueryParams(pathwayId: string | undefined, formerSpecies: Species, newSpecies: Species) {
+    const queryParams = JSON.parse(
+      JSON.stringify(this.route.snapshot.queryParams)
+        .replaceAll(`-${formerSpecies.abbreviation}-`, `-${newSpecies.abbreviation}-`)
+    );
+    this.router.navigate(['/PathwayBrowser', pathwayId].filter(isDefined), {
+      queryParams,
+      queryParamsHandling: "replace",
+      preserveFragment: true
     });
-    return newParams;
   }
 
 }

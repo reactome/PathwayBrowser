@@ -42,6 +42,7 @@ export interface Event extends DatabaseObject {
   reviewed: InstanceEdit[];
   diseasePathways?: Event[]
   normalPathway?: Event
+  orthologousEvent?: Event[]
 }
 
 export interface Compartment{
