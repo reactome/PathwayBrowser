@@ -281,8 +281,14 @@ $small-breakpoint-width: 959px;
   padding-left: 10px;
   border-left: 2px solid var(--outline-variant);
   overflow: hidden;
-
   flex: 1;
+
+  font-family: 'Roboto Flex', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
 
   .item {
     display: flex;
