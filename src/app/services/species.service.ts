@@ -2,7 +2,7 @@ import {computed, effect, Injectable, signal} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {catchError, map, Observable, of} from "rxjs";
 import {environment} from "../../environments/environment";
-import {OrthologousMap, Species} from "../model/species.model";
+import {OrthologousMap, Species} from "../model/graph/species.model";
 import {Event} from "../model/graph/event/event.model";
 import {ActivatedRoute, Router} from "@angular/router";
 import {UrlStateService} from "./url-state.service";
@@ -22,7 +22,8 @@ export class SpeciesService {
     taxId: '9606',
     dbId: 48887,
     shortName: 'H.sapiens',
-    abbreviation: 'HSA'
+    abbreviation: 'HSA',
+    schemaClass:'Species'
   };
 
   currentSpecies = signal<Species>(this.defaultSpecies)

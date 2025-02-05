@@ -12,7 +12,10 @@ import {TopLevelPathway} from "../model/graph/event/top-level-pathway.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {isEntity, isEvent, isPathwayOrTLP, isPathwayWithDiagram, isRLE} from "./utils";
 import {DatabaseObjectService} from "./database-object.service";
+import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 
+
+export type SelectableObject = Event | PhysicalEntity;
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +38,7 @@ export class EventService {
   subpathwayColors$ = this._subpathwayColors.asObservable();
   subpathwayColors?: Map<number, string>;
 
-  private _diagramEvent = new BehaviorSubject<Event | undefined>(undefined);
+  private _diagramEvent = new BehaviorSubject<SelectableObject | undefined>(undefined);
   diagramEvent$ = this._diagramEvent.asObservable();
   diagramEvent?: Event;
 
@@ -183,7 +186,7 @@ export class EventService {
     }
   }
 
-  private handleReactionSelectionFromDiagram(event: DatabaseObject, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
+  private handleReactionSelectionFromDiagram(event: SelectableObject, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
       return this.handleExistingEventSelection(treeNode, tree, allVisibleTreeNodes).pipe(
@@ -205,7 +208,7 @@ export class EventService {
   }
 
   // Subpathway and interacting pathway
-  private handlePathwaySelectionFromDiagram(event: DatabaseObject, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, treeNodes: Event[], hitReactions: number[]): Observable<Event[]> {
+  private handlePathwaySelectionFromDiagram(event: SelectableObject, diagramId: string, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, treeNodes: Event[], hitReactions: number[]): Observable<Event[]> {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
       // Subpathway, already in the tree view
@@ -236,7 +239,7 @@ export class EventService {
     });
   }
 
-  buildTree(obj: DatabaseObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
+  buildTree(obj: SelectableObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     if (isEntity(obj)) {
       return this.buildTreeWithSelectedEntity(obj, diagramId, tree, hitReactions);
     } else {
@@ -249,7 +252,7 @@ export class EventService {
   }
 
   // Build tree with diagram event ancestors
-  private buildTreeWithSelectedEntity(object: DatabaseObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
+  private buildTreeWithSelectedEntity(object: SelectableObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     this.dboService.setCurrentObj(object);
 
     return this.dboService.fetchEnhancedEntry(diagramId).pipe(
@@ -271,7 +274,7 @@ export class EventService {
    * @param isFromDiagram  Behaves differently based on the calling method, avoid the check for isPathwayWithDiagram(event) when calling it from handlePathwaySelectionFromDiagram,
    *                       we want to open the ancestors in the tree view when select an interacting pathway in diagram, but not when first load for an interacting pathway from URL.
    */
-  private buildTreeWithSelectedEvent(object: DatabaseObject, diagramId: string, isFromDiagram: boolean, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
+  private buildTreeWithSelectedEvent(object: SelectableObject, diagramId: string, isFromDiagram: boolean, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     // When selected event is a subpathway or interacting pathway
     const idToBuild = isFromDiagram ? object.stId : (isPathwayWithDiagram(object) && object.stId != diagramId ? diagramId : object.stId);
     this.dboService.setCurrentObj(object);

@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, input, model} from '@angular/core';
-import {Species} from "../model/species.model";
+import {Species} from "../model/graph/species.model";
 import {SpeciesService} from "../services/species.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {DataStateService} from "../services/data-state.service";
