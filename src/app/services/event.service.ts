@@ -1,6 +1,24 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {Event} from "../model/event.model";
+import {
+  BehaviorSubject,
+  concatMap,
+  EMPTY,
+  from,
+  last,
+  map,
+  Observable,
+  of,
+  skip,
+  Subject,
+  switchMap,
+  take,
+  tap
+} from "rxjs";
+import {JSOGDeserializer} from "../utils/JSOGDeserializer";
+import {UrlStateService} from "./url-state.service";
 import {Event} from "../model/graph/event.model";
 import {BehaviorSubject, concatMap, EMPTY, from, last, map, Observable, of, Subject, switchMap, tap} from "rxjs";
 import {DiagramStateService} from "./diagram-state.service";
@@ -40,7 +58,7 @@ export class EventService {
   diagramEvent?: Event;
 
   constructor(private http: HttpClient,
-              private state: DiagramStateService,
+              private state: UrlStateService,
               private analysisService: AnalysisService,
               private ehldService: EhldService,
               private dboService: DatabaseObjectService,) {

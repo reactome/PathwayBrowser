@@ -2,7 +2,7 @@ import {AfterViewInit, Component, effect, ElementRef, model, viewChild} from '@a
 import {filter, forkJoin, take} from "rxjs";
 import {EhldService, LegendGroup} from "../services/ehld.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import SvgPanZoom from 'svg-pan-zoom';
 import {AnalysisService} from "../services/analysis.service";
 import {isDefined} from "../services/utils";
@@ -45,8 +45,8 @@ export class EhldComponent implements AfterViewInit {
   constructor(private ehldService: EhldService,
               private analysisService: AnalysisService,
               private speciesService: SpeciesService,
-              public state: DiagramStateService,) {
-    effect(() => this.selectedIdFromUrl = this.state.select());
+              public state: UrlStateService,) {
+    effect(() => this.selectedIdFromUrl = this.state.select()!);
     effect(() => this.flaggedIdFromUrl = this.state.flag());
     effect(() => this.loadAnalysis(this.state.analysis()));
     effect(() => {
@@ -147,7 +147,7 @@ export class EhldComponent implements AfterViewInit {
         if (idAttr) {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
-            this.speciesService.setIgnore(false);
+            // this.speciesService.setIgnore(false);
             this.pathwayId.set(stId);
           }
         }

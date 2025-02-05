@@ -19,7 +19,7 @@ import {
   take,
   tap
 } from "rxjs";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService, Examples} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
@@ -59,7 +59,7 @@ export class DiagramComponent implements AfterViewInit {
   constructor(private diagram: DiagramService,
               public dark: DarkService,
               private interactorsService: InteractorService,
-              private state: DiagramStateService,
+              private state: UrlStateService,
               private analysis: AnalysisService,
               private event: EventService,
               private router: Router,
@@ -72,7 +72,7 @@ export class DiagramComponent implements AfterViewInit {
       this.flagging = false;
     }, {debugName: 'diagram flagging'});
     effect(() => {
-      if (this.state.select() && !this.selecting) this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select(), cy)))
+      if (this.state.select() && !this.selecting) this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select()!, cy)))
       this.selecting = false;
     }, {debugName: 'diagram selecting'});
     effect(() => this.state.analysis() && this.avoidSideEffect(() => this.loadAnalysis(this.state.analysis())));
@@ -635,7 +635,7 @@ export class DiagramComponent implements AfterViewInit {
   private stateToDiagram() {
     for (let cy of this.cys) {
       this.flag(this.state.flag(), cy);
-      this.select(this.state.select(), cy);
+      this.select(this.state.select()!, cy);
     }
 
     const resource = this.state.overlay();

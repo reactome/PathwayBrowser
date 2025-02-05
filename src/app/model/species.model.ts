@@ -7,7 +7,7 @@ export interface Species {
   taxId: string;
   name?: string[];
   schemaClass?: string;
-  abbreviation?: string
+  abbreviation: string
   className?: string;
 }
 

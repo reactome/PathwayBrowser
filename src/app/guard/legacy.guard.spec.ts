@@ -3,7 +3,7 @@ import {ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot} from
 
 import {legacyGuard} from './legacy.guard';
 import {RouterTestingModule} from "@angular/router/testing";
-import {DiagramStateService} from "../services/diagram-state.service";
+import {UrlStateService} from "../services/url-state.service";
 import {DiagramComponent} from "../diagram/diagram.component";
 
 
@@ -12,7 +12,7 @@ describe('legacyGuard', () => {
     TestBed.runInInjectionContext(() => legacyGuard(...guardParameters));
 
   let router: Router;
-  let state: DiagramStateService;
+  let state: UrlStateService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -24,7 +24,7 @@ describe('legacyGuard', () => {
     });
 
     router = TestBed.inject(Router);
-    state = TestBed.inject(DiagramStateService);
+    state = TestBed.inject(UrlStateService);
   });
 
   it('should be convert legacy url to new one', async () => {
