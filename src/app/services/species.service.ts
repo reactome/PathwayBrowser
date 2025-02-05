@@ -3,13 +3,11 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {catchError, map, Observable, of} from "rxjs";
 import {environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/species.model";
-import {Event} from "../model/graph/event.model";
-import {DiagramStateService} from "./diagram-state.service";
-import {ActivatedRoute} from "@angular/router";
-import {UrlParam, UrlStateService} from "./url-state.service";
+import {Event} from "../model/graph/event/event.model";
+import {ActivatedRoute, Router} from "@angular/router";
+import {UrlStateService} from "./url-state.service";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {isDefined} from "./utils";
-import {ActivatedRoute, Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'

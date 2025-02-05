@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
-import {map, Observable, of, switchMap, tap} from "rxjs";
+import {map, Observable, of, switchMap} from "rxjs";
 import {SearchResult} from "../model/search-results.model";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Event} from "../model/graph/event.model";
 import {isCellLineagePath, isEWAS, isRLE} from "./utils";
 import {DatabaseObject} from "../model/graph/database-object.model";
 

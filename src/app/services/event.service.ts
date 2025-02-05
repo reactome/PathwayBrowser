@@ -1,32 +1,14 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Event} from "../model/event.model";
-import {
-  BehaviorSubject,
-  concatMap,
-  EMPTY,
-  from,
-  last,
-  map,
-  Observable,
-  of,
-  skip,
-  Subject,
-  switchMap,
-  take,
-  tap
-} from "rxjs";
-import {JSOGDeserializer} from "../utils/JSOGDeserializer";
-import {UrlStateService} from "./url-state.service";
-import {Event} from "../model/graph/event.model";
 import {BehaviorSubject, concatMap, EMPTY, from, last, map, Observable, of, Subject, switchMap, tap} from "rxjs";
-import {DiagramStateService} from "./diagram-state.service";
+import {UrlStateService} from "./url-state.service";
+import {Event} from "../model/graph/event/event.model";
 import {MatTree} from "@angular/material/tree";
 import {Analysis} from "../model/analysis.model";
 import {AnalysisService} from "./analysis.service";
 import {EhldService} from "./ehld.service";
-import {TopLevelPathway} from "../model/graph/top-level-pathway.model";
+import {TopLevelPathway} from "../model/graph/event/top-level-pathway.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {isEntity, isEvent, isPathwayOrTLP, isPathwayWithDiagram, isRLE} from "./utils";
 import {DatabaseObjectService} from "./database-object.service";

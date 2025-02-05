@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, effect, ElementRef, input, model, OnDestroy, ViewChild} from '@angular/core';
-import {Event} from "../model/event.model";
+import {Event} from "../model/graph/event/event.model";
 import {EventService} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
 import {combineLatestWith, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
@@ -83,7 +83,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     // debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
       const idToUse = id ? id : this.pathwayId()!;
-      return this.dboService.fetchEnhancedEventData(idToUse).pipe(
+      return this.dboService.fetchEnhancedEntry(idToUse).pipe(
         map(enhancedEvent => ({idToUse, enhancedEvent}))
       )
     }),
@@ -242,7 +242,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     ).subscribe({
       next: () => {
         // Give pathway id when idToUse is PEs
-        const element = document.querySelector(`[st-id='${idToUse}']`) || document.querySelector(`[st-id='${this.diagramId}']`);
+        const element = document.querySelector(`[st-id='${idToUse}']`) || document.querySelector(`[st-id='${this.pathwayId}']`);
         element?.scrollIntoView({behavior: 'smooth'});
       },
       error: (err) => {
@@ -364,7 +364,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   private selectAllParents(selectedEvent: Event, events: Event[]) {
     events.forEach(event => {
-      event.isSelected = selectedEvent.ancestors?.some(parent => parent.stId === event.stId) || false;
+      event.isSelected = selectedEvent.ancestors?.some((parent: Event) => parent.stId === event.stId) || false;
       if (isPathwayOrTLP(event) && event.hasEvent) {
         this.selectAllParents(selectedEvent, event.hasEvent);
       }

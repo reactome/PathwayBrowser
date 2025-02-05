@@ -4,13 +4,7 @@ import {SpeciesService} from "../services/species.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {DataStateService} from "../services/data-state.service";
 import {isDefined} from "../services/utils";
-import {ActivatedRoute, Router} from "@angular/router";
-import {DiagramStateService} from "../services/diagram-state.service";
-import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {EventService} from "../services/event.service";
-import {Event} from "../model/graph/event.model";
-import {DatabaseObject} from "../model/graph/database-object.model";
-import {isEvent} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 
 

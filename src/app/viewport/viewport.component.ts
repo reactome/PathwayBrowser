@@ -9,13 +9,10 @@ import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
 import {UrlStateService} from "../services/url-state.service";
-import {isEvent, isPathwayOrTLP} from "../services/utils";
-import {DatabaseObjectService} from "../services/database-object.service";
-
-import {DiagramStateService} from "../services/diagram-state.service";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GeneralService} from "../services/general.service";
 import {DataStateService} from "../services/data-state.service";
+import {isPathwayOrTLP} from "../services/utils";
 
 @Component({
   selector: 'cr-viewport',
@@ -28,19 +25,34 @@ export class ViewportComponent implements AfterViewInit {
   readonly pathwayId = this.state.pathwayId as WritableSignal<string>;
 
   hasEHLD = computed(() => {
-    const hasEHLD = this.dataState.currentPathway()?.hasEHLD;
-    return hasEHLD === undefined ? true : hasEHLD; // Avoid flickering of diagram to EHLD
+    const pathway = this.dataState.currentPathway();
+    if (pathway && isPathwayOrTLP(pathway)) {
+      const hasEHLD = pathway.hasEHLD;
+      return hasEHLD === undefined ? true : hasEHLD; // Avoid flickering of diagram to EHLD
+    }
+    return false;
   })
   title = computed(() => this.dataState.currentPathway()?.displayName)
 
-  diseasePathways = computed(() => this.dataState.currentPathway()?.diseasePathways || [])
-  normalPathway = computed(() => this.dataState.currentPathway()?.normalPathway)
+  diseasePathways = computed(() => {
+    const pathway = this.dataState.currentPathway();
+    if (pathway && isPathwayOrTLP(pathway)) {
+      return pathway.diseasePathways;
+    }
+    return [];
+  })
+  normalPathway = computed(() => {
+    const pathway = this.dataState.currentPathway();
+    if (pathway && isPathwayOrTLP(pathway)) {
+     return  pathway.normalPathway
+    }
+    return undefined;
+  })
 
   @ViewChild('diagram') diagram: DiagramComponent | undefined;
   @ViewChild('interactors') interactors!: InteractorsComponent;
   @ViewChild('darkToggle') darkToggle: MatSlideToggle | undefined;
 
-  // hasEHLD?: boolean;
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
 
 
