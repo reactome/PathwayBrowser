@@ -47,7 +47,6 @@ import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/s
 import {PublicationComponent} from "./details/common/publication/publication.component";
 import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
 import {IncludeRefPipe} from "./details/common/include-ref.pipe";
-import {AuthorshipNameFormatPipe} from "./pipes/authorship-name-format.pipe";
 import {AuthorshipDateFormatPipe} from "./pipes/authorship-date-format.pipe";
 import {CustomSortByPipe} from "./pipes/custom-sort-by.pipe";
 
@@ -101,7 +100,7 @@ import {CustomSortByPipe} from "./pipes/custom-sort-by.pipe";
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipNameFormatPipe, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })
 export class AppModule {
 }

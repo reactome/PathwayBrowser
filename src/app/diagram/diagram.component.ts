@@ -28,7 +28,7 @@ import {Analysis} from "../model/analysis.model";
 import {ActivatedRoute, Router} from "@angular/router";
 import {InteractorsComponent} from "../interactors/interactors.component";
 import {EventService} from "../services/event.service";
-import {Event} from "../model/graph/event.model";
+import {Event} from "../model/graph/event/event.model";
 
 
 import {brewer} from "chroma-js";

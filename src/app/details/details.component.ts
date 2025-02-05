@@ -1,5 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
-import {EventService} from "../services/event.service";
+import {AfterViewInit, Component} from '@angular/core';
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {Analysis} from "../model/analysis.model";
@@ -38,5 +37,5 @@ export class DetailsComponent implements AfterViewInit {
     })
 
   }
-  
+
 }

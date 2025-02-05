@@ -1,6 +1,6 @@
-import {AfterViewInit, Component,computed, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, computed, input, Signal} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
-import {getProperty} from "../../../services/utils";
+import {getProperty, isDefined} from "../../../services/utils";
 import {Compartment} from "../../../model/graph/compartment.model";
 import {Anatomy} from "../../../model/graph/anatomy.model";
 import {ReviewStatus} from "../../../model/graph/review-status.model";
@@ -8,25 +8,31 @@ import {Summation} from 'src/app/model/graph/summation.model';
 
 
 @Component({
-    selector: 'cr-description-overview',
-    templateUrl: './description-overview.component.html',
-    styleUrl: './description-overview.component.scss',
-    standalone: false
+  selector: 'cr-description-overview',
+  templateUrl: './description-overview.component.html',
+  styleUrl: './description-overview.component.scss',
+  standalone: false
 })
-export class DescriptionOverviewComponent implements AfterViewInit, OnChanges {
+export class DescriptionOverviewComponent {
 
   readonly obj = input.required<DatabaseObject>();
 
-  category?: string;
-  className?: string;
-  speciesName?: string;
-  compartment?: Compartment[];
-  name?: string;
-  tissue?: Anatomy;
-  reviewStatus?: ReviewStatus;
-  summation?: Summation[];
+  readonly allRefs = computed(() => {
+    const literatureRefs = getProperty(this.obj(), 'literatureReference');
+    const summation = getProperty(this.obj(), 'summation');
+    return [...literatureRefs || [], ...summation.flatMap((s: Summation) => s.literatureReference).filter(isDefined) || []]
+  });
 
-  readonly allRefs = computed(() => [...this.obj().literatureReference || [], ...this.obj().summation.flatMap(s => s.literatureReference).filter(isDefined) || []] );
+  readonly category: Signal<string> = computed(() => getProperty(this.obj(), 'category'));
+  readonly className: Signal<string> = computed(() => getProperty(this.obj(), 'className'));
+  readonly speciesName: Signal<string> = computed(() => getProperty(this.obj(), 'speciesName'));
+  readonly compartment: Signal<Compartment[]> = computed(() => getProperty(this.obj(), 'compartment'));
+  readonly name: Signal<string> = computed(() => getProperty(this.obj(), 'name'));
+  readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), 'tissue'));
+  readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), 'reviewStatus'));
+  readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), 'summation'));
+
+
   reviewStar: { [key: string]: { percentage: number, score: number } } = {
     "five stars": {percentage: 100, score: 5},
     "four stars": {percentage: 80, score: 4},
@@ -34,31 +40,6 @@ export class DescriptionOverviewComponent implements AfterViewInit, OnChanges {
     "two stars": {percentage: 40, score: 2},
     "one stars": {percentage: 20, score: 1}
   };
-
-
-  ngAfterViewInit(): void {
-
-    if (!this.obj) return;
-    this.getAllProperties(this.obj)
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (!this.obj) return;
-    if (changes['obj'] && !changes['obj'].firstChange && changes['obj'].previousValue !== this.obj) {
-      this.getAllProperties(this.obj)
-    }
-  }
-
-  getAllProperties(obj: DatabaseObject) {
-    this.category = getProperty(obj, 'category');
-    this.className = getProperty(obj, 'className');
-    this.speciesName = getProperty(obj, 'speciesName');
-    this.compartment = getProperty(obj, 'compartment');
-    this.name = getProperty(obj, 'name');
-    this.tissue = getProperty(obj, 'tissue');
-    this.reviewStatus = getProperty(obj, 'reviewStatus');
-    this.summation = getProperty(obj, 'summation');
-  }
 
 
 }
