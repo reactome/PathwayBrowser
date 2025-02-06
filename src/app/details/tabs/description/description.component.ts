@@ -109,8 +109,9 @@ export class DescriptionComponent {
 
     for (const key of propertyToShowAndOrder) {
       let value = externalRef[key];
+      if (!value) continue;
       if (key === 'crossReference') {
-        value = value?.filter((n: DatabaseIdentifier) => n.databaseName === 'RefSeq');
+        value = value.filter((n: DatabaseIdentifier) => n.databaseName === 'RefSeq');
       }
       results.push({
         key: labels.get(key) || key,
