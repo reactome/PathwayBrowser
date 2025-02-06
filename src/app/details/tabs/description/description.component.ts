@@ -98,20 +98,20 @@ export class DescriptionComponent {
   getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {
     if (!refEntity) return [];
     const externalRef = {...refEntity};
-    const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene', 'crossReference'];
+    const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene','referenceTranscript', 'crossReference'];
     const labels = new Map<string, string>([
       ['displayName', 'External Reference'],
       ['geneName', 'Gene Names'],
       ['referenceGene', 'Reference Genes'],
-      ['crossReference', 'Reference Transcript'],
+      ['referenceTranscript', 'Reference Transcript'],
+      ['crossReference', 'Cross References'],
     ]);
     const results: { key: string, value: any }[] = [];
-
     for (const key of propertyToShowAndOrder) {
       let value = externalRef[key];
       if (!value) continue;
       if (key === 'crossReference') {
-        value = value.filter((n: DatabaseIdentifier) => n.databaseName === 'RefSeq');
+        value = value.filter((n: DatabaseIdentifier) => n.databaseName !== 'RefSeq');
       }
       results.push({
         key: labels.get(key) || key,

@@ -66,7 +66,7 @@
 
           <ng-template #singleValue>
             <ng-container *ngIf="property.key === 'External Reference'; else noLink">
-              <a [href]="property.value" target="_blank">{{ property.value }}</a>
+              <a [href]="referenceEntity()?.url" target="_blank">{{ referenceEntity()?.displayName }}</a>
             </ng-container>
             <ng-template #noLink>
               <span>{{ property.value }}</span>
