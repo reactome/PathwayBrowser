@@ -1,37 +1,42 @@
-import {ChangeDetectorRef, Component, computed, effect, input, Signal} from '@angular/core';
+import {Component, computed, effect, input, Signal} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
-import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {IconService} from "../../../services/icon.service";
 import {getProperty} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
-import {toSignal} from "@angular/core/rxjs-interop";
+import {rxResource, toSignal} from "@angular/core/rxjs-interop";
 import {isArray, isString} from "lodash";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {SelectableObject} from "../../../services/event.service";
+import {of} from "rxjs";
 
 
 @Component({
-    selector: 'cr-description',
-    templateUrl: './description.component.html',
-    styleUrl: './description.component.scss',
-    standalone: false
+  selector: 'cr-description',
+  templateUrl: './description.component.html',
+  styleUrl: './description.component.scss',
+  standalone: false
 })
-export class DescriptionComponent   {
+export class DescriptionComponent {
 
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
-  readonly icon = computed(() => this.getIcon(this.obj()))
+  readonly symbol = computed(() => this.getSymbol(this.obj()))
 
   protected readonly isArray = isArray;
   protected readonly isString = isString;
 
+  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), 'referenceEntity'))
 
-  iconContent?: SafeHtml;
-  elements: {key:string, label: string, manual?: boolean}[] = [
+  icon = rxResource({
+    request: () => this.referenceEntity()?.identifier,
+    loader: (param) => param.request ? this.iconService.fetchIcon(param.request) : of(null)
+  })
+
+  elements: { key: string, label: string, manual?: boolean }[] = [
     {key: 'overview', label: 'Overview', manual: true},
     {key: 'literatureReference', label: 'References', manual: true},
     {key: 'referenceEntity', label: 'External Reference', manual: true},
@@ -44,7 +49,7 @@ export class DescriptionComponent   {
 
   section = toSignal(this.route.fragment)
 
-  readonly literatureRefs:Signal<LiteratureReference[]> = computed(()=> getProperty(this.obj(), 'literatureReference'));
+  readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), 'literatureReference'));
 
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
 
@@ -55,31 +60,26 @@ export class DescriptionComponent   {
     const revised = getProperty(obj, 'revised') || [];
 
     return [
-      ...(authored.length > 0 ? [{ label: 'Author', data: authored }] : []),
-      ...(reviewed.length > 0 ? [{ label: 'Reviewer', data: reviewed }] : []),
-      ...(edited.length > 0 ? [{ label: 'Editor', data: edited }] : []),
-      ...(revised.length > 0 ? [{ label: 'Reviser', data: revised }] : []),
+      ...(authored.length > 0 ? [{label: 'Author', data: authored}] : []),
+      ...(reviewed.length > 0 ? [{label: 'Reviewer', data: reviewed}] : []),
+      ...(edited.length > 0 ? [{label: 'Editor', data: edited}] : []),
+      ...(revised.length > 0 ? [{label: 'Reviser', data: revised}] : []),
     ];
 
   })
 
- readonly externalRef = computed(() => {
-    const obj = this.obj();
-    const rawExternalRef = getProperty(obj,'referenceEntity');
-    return this.getTransformedExternalRef(rawExternalRef);
-
-  })
+  readonly externalRef = computed(() => this.getTransformedExternalRef(this.referenceEntity()))
 
 
   constructor(private iconService: IconService,
-              private sanitizer: DomSanitizer,
-              private cdr: ChangeDetectorRef,
               private route: ActivatedRoute
   ) {
     effect(() => {
-      !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'start'});
-
-      this.setIcon();
+      !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'start'
+      });
 
       const obj = this.obj();
       if (obj) {
@@ -90,29 +90,12 @@ export class DescriptionComponent   {
     });
   }
 
-  // Icon from Reactome Icon library, for instance R-ICO-013990
-  setIcon() {
-    const obj = this.obj();
-    const rawExternalRef = getProperty(obj, 'referenceEntity');
 
-    if (rawExternalRef) {
-      const identifier = rawExternalRef.identifier;
-      this.iconService.fetchIcon(identifier).subscribe(icon => {
-        if (icon && obj) {
-          this.iconContent = this.sanitizer.bypassSecurityTrustHtml(icon);
-          obj.hasIcon = true;
-          this.cdr.detectChanges();
-        }
-      });
-    }
-  }
-
-
-  getIcon(obj: DatabaseObject) {
+  getSymbol(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
   }
 
-  getTransformedExternalRef(refEntity: ReferenceEntity) {
+  getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {
     if (!refEntity) return [];
     const externalRef = {...refEntity};
     const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene', 'crossReference'];
@@ -127,7 +110,7 @@ export class DescriptionComponent   {
     for (const key of propertyToShowAndOrder) {
       let value = externalRef[key];
       if (key === 'crossReference') {
-        value = value.filter((n: DatabaseIdentifier) => n.databaseName === 'RefSeq');
+        value = value?.filter((n: DatabaseIdentifier) => n.databaseName === 'RefSeq');
       }
       results.push({
         key: labels.get(key) || key,

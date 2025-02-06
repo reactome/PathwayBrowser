@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
-import {LiteratureReference} from "../../model/graph/publication/literature-reference.model";
+import {LiteratureReference} from "../model/graph/publication/literature-reference.model";
 
 @Pipe({
   name: 'includeRef',
@@ -8,9 +8,7 @@ import {LiteratureReference} from "../../model/graph/publication/literature-refe
 })
 export class IncludeRefPipe implements PipeTransform {
 
-  constructor(private sanitizer: DomSanitizer) {
-  }
-
+  constructor(private sanitizer: DomSanitizer) {  }
 
   transform(text: string, refs: LiteratureReference[]): SafeHtml {
     refs

@@ -46,9 +46,10 @@ import {DescriptionComponent} from "./details/tabs/description/description.compo
 import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/summation-refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
 import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
-import {IncludeRefPipe} from "./details/common/include-ref.pipe";
+import {IncludeRefPipe} from "./pipes/include-ref.pipe";
 import {AuthorshipDateFormatPipe} from "./pipes/authorship-date-format.pipe";
 import {CustomSortByPipe} from "./pipes/custom-sort-by.pipe";
+import {SafePipe} from "./pipes/safe.pipe";
 
 @NgModule({
   declarations: [
@@ -100,7 +101,7 @@ import {CustomSortByPipe} from "./pipes/custom-sort-by.pipe";
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe, SafePipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })
 export class AppModule {
 }
