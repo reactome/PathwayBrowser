@@ -9,6 +9,4 @@ export interface DatabaseObject {
   schemaClass: string;
   modified?: InstanceEdit;
   created?: InstanceEdit;
-
-  hasIcon?: boolean //help to determine if we have icon from Icon library, for instance, PTEN has icon R-ICO-013990
 }

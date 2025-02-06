@@ -8,8 +8,4 @@ export interface ReferenceEntity extends DatabaseObject {
   url: string;
   crossReference: DatabaseIdentifier[];
 
-
-
-  // not from graph model
-  referenceGene: ReferenceDNASequence[];
 }
