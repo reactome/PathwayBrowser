@@ -81,6 +81,8 @@ export class UrlStateService implements State {
           } else {
             param.set(value)
           }
+        } else {
+          param.set(param.initialValue)
         }
       }
     })
