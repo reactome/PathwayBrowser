@@ -4,6 +4,6 @@ import {ReferenceRNASequence} from "./reference-rna-sequence.model";
 
 export interface ReferenceGeneProduct extends ReferenceSequence {
   chain?: string[]
-  referenceGene?: ReferenceDNASequence[]
-  referenceTranscript?: ReferenceRNASequence[]
+  referenceGene?: ReferenceDNASequence[];
+  referenceTranscript?: ReferenceRNASequence[];
 }

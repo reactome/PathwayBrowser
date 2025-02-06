@@ -25,9 +25,4 @@ export interface Event extends DatabaseObject {
   ancestors: Event[];
   parent: Event;
 
-
-  //todo: where is it from
-  speciesName?: string;
-
-
 }
