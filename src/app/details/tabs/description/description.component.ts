@@ -23,12 +23,32 @@ export class DescriptionComponent {
 
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
-  readonly symbol = computed(() => this.getSymbol(this.obj()))
+  readonly symbol = computed(() => this.getSymbol(this.obj()));
+  readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), 'literatureReference'));
+  readonly externalRef = computed(() => this.getTransformedExternalRef(this.referenceEntity()));
+  readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
+
+    const obj = this.obj();
+    const authored = getProperty(obj, 'authored') || [];
+    const reviewed = getProperty(obj, 'reviewed') || [];
+    const edited = getProperty(obj, 'edited') || [];
+    const revised = getProperty(obj, 'revised') || [];
+
+    return [
+      ...(authored.length > 0 ? [{label: 'Author', data: authored}] : []),
+      ...(reviewed.length > 0 ? [{label: 'Reviewer', data: reviewed}] : []),
+      ...(edited.length > 0 ? [{label: 'Editor', data: edited}] : []),
+      ...(revised.length > 0 ? [{label: 'Reviser', data: revised}] : []),
+    ];
+
+  });
+
+  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), 'referenceEntity'));
+  section = toSignal(this.route.fragment)
+
 
   protected readonly isArray = isArray;
   protected readonly isString = isString;
-
-  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), 'referenceEntity'))
 
   icon = rxResource({
     request: () => this.referenceEntity()?.identifier,
@@ -45,29 +65,6 @@ export class DescriptionComponent {
     {key: 'catalystActivity', label: 'Catalyst Activity'},
     {key: 'inferredFrom', label: 'Inferred From'}
   ]
-
-  section = toSignal(this.route.fragment)
-
-  readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), 'literatureReference'));
-
-  readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
-
-    const obj = this.obj();
-    const authored = getProperty(obj, 'authored') || [];
-    const reviewed = getProperty(obj, 'reviewed') || [];
-    const edited = getProperty(obj, 'edited') || [];
-    const revised = getProperty(obj, 'revised') || [];
-
-    return [
-      ...(authored.length > 0 ? [{label: 'Author', data: authored}] : []),
-      ...(reviewed.length > 0 ? [{label: 'Reviewer', data: reviewed}] : []),
-      ...(edited.length > 0 ? [{label: 'Editor', data: edited}] : []),
-      ...(revised.length > 0 ? [{label: 'Reviser', data: revised}] : []),
-    ];
-
-  })
-
-  readonly externalRef = computed(() => this.getTransformedExternalRef(this.referenceEntity()))
 
 
   constructor(private iconService: IconService,

@@ -60,8 +60,9 @@
              [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
 
           <ng-container *ngIf="isArray(property.value) && !isString(property.value[0]); else singleValue">
-            <span class="column-item" *ngFor="let item of property.value"> <a [href]="item.url"
-                                                                              target="_blank"> {{ item.displayName }}</a></span>
+            <span class="column-item" *ngFor="let item of property.value">
+              <a [href]="item.url" target="_blank">{{ item.displayName | removeProteinName }}</a>
+            </span>
           </ng-container>
 
           <ng-template #singleValue>

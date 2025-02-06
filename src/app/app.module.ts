@@ -50,6 +50,7 @@ import {IncludeRefPipe} from "./pipes/include-ref.pipe";
 import {AuthorshipDateFormatPipe} from "./pipes/authorship-date-format.pipe";
 import {CustomSortByPipe} from "./pipes/custom-sort-by.pipe";
 import {SafePipe} from "./pipes/safe.pipe";
+import {RemoveProteinNamePipe} from "./pipes/remove-protein-name.pipe";
 
 @NgModule({
   declarations: [
@@ -101,7 +102,7 @@ import {SafePipe} from "./pipes/safe.pipe";
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe, SafePipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
+    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipDateFormatPipe, CustomSortByPipe, IncludeRefPipe, SafePipe, RemoveProteinNamePipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })
 export class AppModule {
 }
