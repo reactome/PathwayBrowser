@@ -32,6 +32,7 @@ export class IconService {
     CandidateSet: {name: 'candidate-set', tooltip: 'Candidate Set', route: 'candidate-set'},
     ReferenceDNASequence: {name: 'gene', tooltip: 'Reference DNA Sequence', route: 'gene'},
     ReferenceRNASequence: {name: 'RNA', tooltip: 'Reference RNA Sequence', route: 'RNA'},
+    ReferenceGeneProduct: {name: 'protein', tooltip: 'Protein', route: 'protein'},
     GenomeEncodedEntity: {
       name: 'genome-encoded-entity',
       tooltip: 'Genome Encoded Entity',
@@ -148,11 +149,7 @@ export class IconService {
     const defaultIcon = {name: 'pathway', tooltip: 'Unknown Event'};
     // PE
     if (isEWAS(obj)) {
-      if (obj.className !== 'Protein' && obj.referenceType) {
-        return this.reactomeSubjectIcons[obj.referenceType];
-      } else {
-        return this.reactomeSubjectIcons[obj.schemaClass];
-      }
+      return this.reactomeSubjectIcons[obj.referenceType];
     }
     // Reaction
     if (isRLE(obj)) {
