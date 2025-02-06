@@ -1,18 +1,38 @@
-import {Component, computed, input} from '@angular/core';
-import {Event} from "../../../model/event.model";
-import {isDefined} from "../../../services/utils";
+import {Component, computed, input, Signal} from '@angular/core';
+import {DatabaseObject} from "../../../model/graph/database-object.model";
+import {getProperty, isDefined} from "../../../services/utils";
+import {Compartment} from "../../../model/graph/compartment.model";
+import {Anatomy} from "../../../model/graph/anatomy.model";
+import {ReviewStatus} from "../../../model/graph/review-status.model";
+import {Summation} from 'src/app/model/graph/summation.model';
+
 
 @Component({
-    selector: 'cr-description-overview',
-    templateUrl: './description-overview.component.html',
-    styleUrl: './description-overview.component.scss',
-    standalone: false
+  selector: 'cr-description-overview',
+  templateUrl: './description-overview.component.html',
+  styleUrl: './description-overview.component.scss',
+  standalone: false
 })
 export class DescriptionOverviewComponent {
 
-  readonly obj = input.required<Event>();
+  readonly obj = input.required<DatabaseObject>();
 
-  readonly allRefs = computed(() => [...this.obj().literatureReference || [], ...this.obj().summation.flatMap(s => s.literatureReference).filter(isDefined) || []] );
+  readonly allRefs = computed(() => {
+    const literatureRefs = getProperty(this.obj(), 'literatureReference');
+    const summation = getProperty(this.obj(), 'summation');
+    return [...literatureRefs || [], ...summation.flatMap((s: Summation) => s.literatureReference).filter(isDefined) || []]
+  });
+
+  readonly category: Signal<string> = computed(() => getProperty(this.obj(), 'category'));
+  readonly className: Signal<string> = computed(() => getProperty(this.obj(), 'className'));
+  readonly speciesName: Signal<string> = computed(() => getProperty(this.obj(), 'speciesName'));
+  readonly compartment: Signal<Compartment[]> = computed(() => getProperty(this.obj(), 'compartment'));
+  readonly name: Signal<string> = computed(() => getProperty(this.obj(), 'name'));
+  readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), 'tissue'));
+  readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), 'reviewStatus'));
+  readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), 'summation'));
+
+
   reviewStar: { [key: string]: { percentage: number, score: number } } = {
     "five stars": {percentage: 100, score: 5},
     "four stars": {percentage: 80, score: 4},
@@ -20,5 +40,6 @@ export class DescriptionOverviewComponent {
     "two stars": {percentage: 40, score: 2},
     "one stars": {percentage: 20, score: 1}
   };
+
 
 }

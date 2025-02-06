@@ -1,9 +1,11 @@
 import {AfterViewInit, Component, input, model} from '@angular/core';
-import {Species} from "../model/species.model";
+import {Species} from "../model/graph/species.model";
 import {SpeciesService} from "../services/species.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {DataStateService} from "../services/data-state.service";
 import {isDefined} from "../services/utils";
+import {EventService} from "../services/event.service";
+import {DatabaseObjectService} from "../services/database-object.service";
 
 
 @Component({
@@ -21,7 +23,7 @@ export class SpeciesComponent implements AfterViewInit {
     interactor: false
   });
 
-  constructor(public speciesService: SpeciesService, private dataState: DataStateService) {
+  constructor(public speciesService: SpeciesService, private dataState: DataStateService, private eventService: EventService,private dboService: DatabaseObjectService) {
 
   }
 

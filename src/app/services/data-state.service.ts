@@ -1,8 +1,8 @@
-import {computed, Injectable, Signal} from '@angular/core';
+import {computed, Injectable} from '@angular/core';
 import {UrlStateService} from "./url-state.service";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {Event} from "../model/event.model";
-import {map, Observable, of, tap} from "rxjs";
+import {Event} from "../model/graph/event/event.model";
+import {map, Observable, of} from "rxjs";
 import {JSOGDeserializer, JSOGObject} from "../utils/JSOGDeserializer";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";

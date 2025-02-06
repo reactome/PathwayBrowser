@@ -11,65 +11,65 @@
       <div class="label">Type</div>
       <div class="value">
         <!-- Display category for RLE -->
-        <ng-container *ngIf="obj().category; else showClassName">
-          {{ obj().category!.charAt(0)!.toUpperCase() + obj().category!.slice(1) }} {{ obj().className }}
+        <ng-container *ngIf="category; else showClassName">
+          {{ category() | titlecase  }} {{ className() }}
           <ng-container *ngIf="obj().schemaClass === 'Polymerisation' || obj().schemaClass === 'Depolymerisation'">
             &middot; <span class='italic'>{{ obj().schemaClass }}</span>
           </ng-container>
         </ng-container>
 
         <ng-template #showClassName>
-          {{ obj().className === 'TopLevelPathway' ? 'Pathway' : obj().className }}
-          <ng-container *ngIf="obj().schemaClass !== obj().className">
+          {{ className() === 'TopLevelPathway' ? 'Pathway' : className() }}
+          <ng-container *ngIf="obj().schemaClass !== className()">
             [{{ obj().schemaClass }}]
           </ng-container>
         </ng-template>
       </div>
     </div>
 
-    <div *ngIf="obj().speciesName" class="row">
+    <div *ngIf="speciesName()" class="row">
       <div class="label">Species</div>
-      <div class="value">{{ obj().speciesName }}</div>
+      <div class="value">{{ speciesName() }}</div>
     </div>
 
-    <div *ngIf="obj().compartment" class="row">
+    <div *ngIf="compartment()" class="row">
       <div class="label">Compartment</div>
-      <div class="value" *ngFor="let compartment of obj().compartment; let last =last">
+      <div class="value" *ngFor="let compartment of compartment(); let last =last">
         <a [href]="compartment.url" target="_blank">{{ compartment.displayName }}{{ !last ? ',' : '' }}</a>
       </div>
     </div>
 
-    <div *ngIf="(obj().name?.length || 0) > 1" class="row">
+    <div *ngIf="name().length > 1" class="row">
       <div class="label">Synonyms</div>
-      <div class="value">{{ obj().name?.slice(1) }}</div>
+      <div class="value">{{ name().slice(1) }}</div>
     </div>
 
-    <div *ngIf="['CellDevelopmentStep', 'CellLineagePath'].includes(obj().schemaClass) && obj().tissue" class="row">
+    <div *ngIf="['CellDevelopmentStep', 'CellLineagePath'].includes(obj().schemaClass) && tissue()" class="row">
       <div class="label">Tissue</div>
-      <div class="value"><a [href]="obj().tissue?.url" target="_blank">{{ obj().tissue?.displayName }}</a></div>
+      <div class="value"><a [href]="tissue().url" target="_blank">{{ tissue().displayName }}</a></div>
     </div>
   </div>
 
   <!-- Common info ends here-->
 
-  <div *ngIf="obj().reviewStatus" class="row">
+  <div *ngIf="reviewStatus()" class="row">
     <div class="label">Review Status</div>
     <div class="value spinner-container">
       <mat-progress-spinner color="primary" mode="determinate"
-                            [value]="reviewStar[obj().reviewStatus!.displayName!].percentage"></mat-progress-spinner>
-      <div class="score"> {{ reviewStar[obj().reviewStatus!.displayName!].score }}/5</div>
+                            [value]="reviewStar[reviewStatus()!.displayName!].percentage"></mat-progress-spinner>
+      <div class="score"> {{ reviewStar[reviewStatus()!.displayName!].score }}/5</div>
     </div>
   </div>
 
 
-  <div *ngIf="obj().summation" class="row">
+  <div *ngIf="summation()" class="row">
     <div class="label">Summation</div>
-    <div class="value" *ngIf="obj().summation[0].text as summationText">
+    <div class="value" *ngIf="summation() && summation()[0].text as summationText">
       <div [innerHTML]="summationText | includeRef: allRefs()" [class.columns]="summationText.length > 500"></div>
 
       <!--Display summation refs if is available-->
-      <div class="summation-refs-container" *ngIf="obj().summation[0].literatureReference">
-        <cr-summation-refs-tree [summation]=obj().summation[0]></cr-summation-refs-tree>
+      <div class="summation-refs-container" *ngIf="summation() && summation()[0].literatureReference">
+        <cr-summation-refs-tree [summation]=summation()[0]></cr-summation-refs-tree>
       </div>
     </div>
   </div>

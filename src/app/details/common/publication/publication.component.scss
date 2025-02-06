@@ -13,7 +13,11 @@
   width: 100%;
   height: 100%;
   font-family: 'Roboto Flex', sans-serif;
-  line-height: normal;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
 
   .left {
     display: flex;

@@ -1,9 +1,10 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {LiteratureReference} from "../../model/event.model";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {LiteratureReference} from "../../model/graph/publication/literature-reference.model";
 
 @Pipe({
-  name: 'includeRef'
+  name: 'includeRef',
+  standalone: true
 })
 export class IncludeRefPipe implements PipeTransform {
 

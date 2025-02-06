@@ -33,16 +33,49 @@
     </div>
 
 
-    <div class="overview" [ngClass]="{'update-layout': obj().referenceEntity}">
+    <div class="overview" [ngClass]="{'update-layout': externalRef}">
       <cr-description-overview [obj]="obj()"></cr-description-overview>
       <div *ngIf="obj().hasIcon" class="icon-container">
         <div class="icon" [innerHTML]="iconContent"></div>
       </div>
     </div>
 
+    <!-- External Reference divider-->
+    <div class="divider-container" *ngIf="externalRef() && externalRef().length >0" id="externalReferences">
+      <div class="divider-name-container">
+        <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'External Reference' }"></ng-container>
+      </div>
+      <div class="divider-line-container">
+        <mat-divider class="divider"></mat-divider>
+      </div>
+    </div>
+
+    <div class="element-container" *ngIf="externalRef() && externalRef().length >0">
+      <div class="ref-row" *ngFor="let property of externalRef()">
+        <div class="label-container">{{ property.key | titlecase}}</div>
+
+        <div class="composition-container" [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}" >
+
+            <ng-container *ngIf="isArray(property.value) && !isString(property.value[0]); else singleValue">
+              <span class="column-item" *ngFor="let item of property.value"> <a [href]="item.url" target="_blank"> {{ item.displayName }}</a></span>
+            </ng-container>
+
+          <ng-template #singleValue>
+            <ng-container *ngIf="property.key === 'External Reference'; else noLink">
+              <a [href]="property.value" target="_blank">{{ property.value }}</a>
+            </ng-container>
+            <ng-template #noLink>
+              <span>{{ property.value }}</span>
+            </ng-template>
+          </ng-template>
+
+        </div>
+      </div>
+    </div>
+
 
     <!-- References divider-->
-    <div class="divider-container" *ngIf="obj().literatureReference" id="literatureReference">
+    <div class="divider-container" *ngIf="literatureRefs()" id="literatureReference">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
       </div>
@@ -52,9 +85,9 @@
     </div>
 
     <!-- References container-->
-    <div class="element-container" *ngIf="obj().literatureReference">
-      <div class="ref-row" *ngFor="let ref of obj().literatureReference">
-        <div class="year-container">{{ ref.year }}</div>
+    <div class="element-container" *ngIf="literatureRefs()">
+      <div class="ref-row" *ngFor="let ref of literatureRefs() | customSortBy:'year'">
+        <div class="label-container">{{ ref.year }}</div>
         <div class="composition-container">
           <cr-publication [publication]=ref [showYear]="false"></cr-publication>
         </div>
@@ -63,7 +96,7 @@
 
 
     <!-- Authorship divider-->
-    <div class="divider-container" *ngIf="authorship.length > 0" id="authorship">
+    <div class="divider-container" *ngIf="authorship().length > 0" id="authorship">
       <div class="divider-name-container">
         <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Authorship' }"></ng-container>
       </div>
@@ -73,12 +106,26 @@
     </div>
 
     <!-- Authorship-->
-    <div class="element-container" *ngIf="authorship.length > 0">
-      <div class="ref-row" *ngFor="let item of authorship">
-        <div class="year-container">{{ item.label }}</div>
+    <div class="element-container" *ngIf="authorship().length > 0">
+      <div class="ref-row" *ngFor="let item of authorship()">
+        <div class="label-container">{{ item.label }}</div>
         <div class="composition-container">
-          <div *ngFor="let ie of item.data">
-            {{ ie.displayName }}
+          <div *ngFor="let ie of item.data | customSortBy:'dateTime'" class="authorship-item">
+            <ng-container *ngFor="let author of ie.author; let i = index">
+              <a [href]="'/content/detail/' + author.dbId" target="_blank">
+                {{ author.firstname }} {{ author.surname }}
+              </a>
+
+              <ng-container *ngIf="author.orcidId as orcid">
+                <a [href]="'https://orcid.org/' + orcid" target="_blank">
+                  <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
+                </a>
+              </ng-container>
+
+              <!-- Add separator except for last item -->
+              <span *ngIf="i < ie.author.length - 1">,&nbsp;</span>
+            </ng-container>
+             - {{ ie.dateTime | authorshipDateFormat }}
           </div>
         </div>
       </div>
@@ -86,8 +133,8 @@
 
 
     @for (element of elements; track element.key) {
-      @if (obj()[element.key] && !element.manual) {
-        <div [id]="element.key" class="elements-container">
+      @if (obj()[element.key] && !element?.manual) {
+        <div [id]="element.key" class="element-container">
           <div class="divider-container">
             <div class="divider-name-container">
               <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
