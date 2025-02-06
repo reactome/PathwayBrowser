@@ -13,7 +13,7 @@
         <button mat-button matTreeNodeToggle class="button" [attr.aria-label]="'Toggle ' + node.name">
        <span class="title">
         <mat-icon class="ref-icon" [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"></mat-icon>
-         {{ title }}
+         {{ title() }}
         </span>
         </button>
       </div>
