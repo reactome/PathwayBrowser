@@ -11,6 +11,7 @@ import {isArray, isString} from "lodash";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
+import {SelectableObject} from "../../../services/event.service";
 
 
 @Component({
@@ -21,7 +22,7 @@ import {LiteratureReference} from "../../../model/graph/publication/literature-r
 })
 export class DescriptionComponent   {
 
-  readonly obj = input.required<DatabaseObject>();
+  readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
   readonly icon = computed(() => this.getIcon(this.obj()))
 

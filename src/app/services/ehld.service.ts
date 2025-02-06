@@ -58,18 +58,6 @@ export class EhldService {
   constructor(private http: HttpClient, private analysis: AnalysisService) {
   }
 
-  setHasEHLD(value: boolean): void {
-    this._hasEHLD.next(value);
-  }
-
-  getHasEhldData(diagramId: string): Observable<boolean> {
-    let url = `${this._HAS_EHLD}${diagramId}/hasEHLD`;
-    return this.http.get<boolean>(url).pipe(
-      tap(result => this.hasEHLD = result),
-      catchError(() => of(false))
-    );
-  }
-
 
   getSVGData(id: string): Observable<{ svg: string; graphData: Graph.Data }> {
     const svgRequest = this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});

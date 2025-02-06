@@ -33,10 +33,12 @@
         <div [style.display]="visibility.species ? 'block':'none'">
           <cr-species [(pathwayId)]="pathwayId" [visibility]="visibility"></cr-species>
         </div>
+
         <div [style.display]="visibility.interactor ? 'block':'none'">
           <cr-interactors #interactors [cy]="diagram?.cy" [cys]="diagram?.cys" [hasEHLD]="hasEHLD()"
                           (initialiseReplaceElements)="diagram?.initialiseReplaceElements()"></cr-interactors>
         </div>
+
         <div class="event-hierarchy">
           <cr-event-hierarchy [(pathwayId)]="pathwayId" [eventSplit]="sideSplit"></cr-event-hierarchy>
         </div>
@@ -55,8 +57,10 @@
               <button mat-menu-item (click)="analysis.loadAnalysis('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
             </mat-menu>
             @if (normalPathway()) {
-              <button mat-stroked-button [routerLink]="['/PathwayBrowser', normalPathway()?.stId]" queryParamsHandling="preserve">
-                <mat-icon fontIcon="check"/> Variants
+              <button mat-stroked-button [routerLink]="['/PathwayBrowser', normalPathway()?.stId]"
+                      queryParamsHandling="preserve">
+                <mat-icon fontIcon="check"/>
+                Variants
               </button>
             } @else {
               <button mat-stroked-button [disabled]="diseasePathways()?.length === 0" [matMenuTriggerFor]="compare">
@@ -82,7 +86,9 @@
               <mat-icon [svgIcon]="'format-quote'"></mat-icon>
             </button>
             <div class="logo">
-              <a href="/" id="main"><mat-icon [svgIcon]="'logo'"></mat-icon></a>
+              <a href="/" id="main">
+                <mat-icon [svgIcon]="'logo'"></mat-icon>
+              </a>
               <span class="version">v{{ general.version$ | async }}</span>
             </div>
           </div>

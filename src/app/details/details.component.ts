@@ -4,6 +4,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {Analysis} from "../model/analysis.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {DatabaseObjectService} from "../services/database-object.service";
+import {DataStateService} from "../services/data-state.service";
 
 
 @Component({
@@ -17,20 +18,16 @@ import {DatabaseObjectService} from "../services/database-object.service";
 @UntilDestroy()
 export class DetailsComponent implements AfterViewInit {
 
-  obj?: DatabaseObject;
+  obj = this.dataState.selectedElement
   analysisResult?: Analysis.Result;
 
 
   constructor(
     private analysis: AnalysisService,
-    private dboService: DatabaseObjectService) {
+    private dataState: DataStateService,) {
   }
 
   ngAfterViewInit(): void {
-
-    this.dboService.selectedObj$.pipe(untilDestroyed(this)).subscribe(obj => {
-      this.obj = obj;
-    });
 
     this.analysis.result$.pipe(untilDestroyed(this)).subscribe(result => {
       this.analysisResult = result;

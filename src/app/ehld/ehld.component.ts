@@ -38,13 +38,11 @@ export class EhldComponent implements AfterViewInit {
   flaggedIdFromUrl?: string[];
   flaggedElements: (SVGGElement | undefined)[] = [];
   stIdToSVGGElement: Map<string, SVGGElement> = new Map<string, SVGGElement>();
-  //dbIdToSVGGElement: Map<number, SVGGElement> = new Map<number, SVGGElement>();
   panZoom?: SvgPanZoom.Instance;
-  legendItems: LegendGroup[] = [];
+  legendItems: LegendGroup[] = [...this.ehldService.legendItems];
 
   constructor(private ehldService: EhldService,
               private analysisService: AnalysisService,
-              private speciesService: SpeciesService,
               public state: UrlStateService,) {
     effect(() => this.selectedIdFromUrl = this.state.select()!);
     effect(() => this.flaggedIdFromUrl = this.state.flag());
@@ -65,8 +63,6 @@ export class EhldComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.style = new Style(this.ehldContainer().nativeElement);
-
-    this.legendItems = this.ehldService.legendItems;
 
   }
 
