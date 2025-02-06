@@ -2,23 +2,19 @@ import {AfterViewInit, Component} from '@angular/core';
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {Analysis} from "../model/analysis.model";
-import {DatabaseObject} from "../model/graph/database-object.model";
-import {DatabaseObjectService} from "../services/database-object.service";
 import {DataStateService} from "../services/data-state.service";
 
 
 @Component({
-    selector: 'cr-details-panel',
-    templateUrl: './details.component.html',
-    styleUrls: ['./details.component.scss'],
-    // Disabled the view encapsulation strategy by setting ViewEncapsulation.None to make sure that the component styles are exposed to be customizable.
-    // encapsulation: ViewEncapsulation.None,
-    standalone: false
+  selector: 'cr-details-panel',
+  templateUrl: './details.component.html',
+  styleUrls: ['./details.component.scss'],
+  standalone: false
 })
 @UntilDestroy()
 export class DetailsComponent implements AfterViewInit {
 
-  obj = this.dataState.selectedElement
+  obj = this.dataState.selectedElement;
   analysisResult?: Analysis.Result;
 
 

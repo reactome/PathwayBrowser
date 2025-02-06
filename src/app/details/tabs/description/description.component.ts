@@ -7,7 +7,6 @@ import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-e
 import {ActivatedRoute} from "@angular/router";
 import {rxResource, toSignal} from "@angular/core/rxjs-interop";
 import {isArray, isString} from "lodash";
-import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {SelectableObject} from "../../../services/event.service";
@@ -98,21 +97,17 @@ export class DescriptionComponent {
   getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {
     if (!refEntity) return [];
     const externalRef = {...refEntity};
-    const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene','referenceTranscript', 'crossReference'];
+    const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene', 'referenceTranscript'];
     const labels = new Map<string, string>([
       ['displayName', 'External Reference'],
       ['geneName', 'Gene Names'],
       ['referenceGene', 'Reference Genes'],
-      ['referenceTranscript', 'Reference Transcript'],
-      ['crossReference', 'Cross References'],
+      ['referenceTranscript', 'Reference Transcript']
     ]);
     const results: { key: string, value: any }[] = [];
     for (const key of propertyToShowAndOrder) {
       let value = externalRef[key];
       if (!value) continue;
-      if (key === 'crossReference') {
-        value = value.filter((n: DatabaseIdentifier) => n.databaseName !== 'RefSeq');
-      }
       results.push({
         key: labels.get(key) || key,
         value: value
