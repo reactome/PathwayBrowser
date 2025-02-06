@@ -4,8 +4,7 @@ import {SpeciesService} from "../services/species.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {DataStateService} from "../services/data-state.service";
 import {isDefined} from "../services/utils";
-import {EventService} from "../services/event.service";
-import {DatabaseObjectService} from "../services/database-object.service";
+import {UrlStateService} from "../services/url-state.service";
 
 
 @Component({
@@ -23,7 +22,7 @@ export class SpeciesComponent implements AfterViewInit {
     interactor: false
   });
 
-  constructor(public speciesService: SpeciesService, private dataState: DataStateService, private eventService: EventService,private dboService: DatabaseObjectService) {
+  constructor(public speciesService: SpeciesService, private dataState: DataStateService, private state: UrlStateService) {
 
   }
 
@@ -31,16 +30,16 @@ export class SpeciesComponent implements AfterViewInit {
   }
 
   onSpeciesChange(newSpecies: Species) {
-    const formerSpecies = this.speciesService.currentSpecies();
     this.speciesService.currentSpecies.set(newSpecies);
 
-    this.speciesService.getClosestOrthologPathway(
+    this.speciesService.getClosestOrthologPathwayWithSelect(
+      this.state.select(),
       [...(this.dataState.currentPathway()?.ancestors || []),
         this.dataState.currentPathway()
       ].filter(isDefined),
       newSpecies
-    ).subscribe(({pathway}) => {
-      this.speciesService.updateQueryParams(pathway?.stId, formerSpecies, newSpecies);
+    ).subscribe(({pathway, map}) => {
+      this.speciesService.updateQueryParams(map, pathway);
       this.visibility().species = false;
     })
 

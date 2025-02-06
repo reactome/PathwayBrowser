@@ -1,4 +1,3 @@
-import {Event} from "./event/event.model";
 import {Taxon} from "./taxon.model";
 
 export interface Species extends Taxon {
@@ -6,6 +5,4 @@ export interface Species extends Taxon {
   abbreviation: string;
 }
 
-export interface OrthologousMap {
-  [identifier: string]: Event;
-}
+export type OrthologousMap = Map<string, string | undefined>;

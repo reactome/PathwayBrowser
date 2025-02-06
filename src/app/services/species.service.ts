@@ -8,6 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {UrlStateService} from "./url-state.service";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {isDefined} from "./utils";
+import {SelectableObject} from "./event.service";
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class SpeciesService {
     dbId: 48887,
     shortName: 'H. sapiens',
     abbreviation: 'HSA',
-    schemaClass:'Species'
+    schemaClass: 'Species'
   };
 
   currentSpecies = signal<Species>(this.defaultSpecies)
@@ -58,29 +59,40 @@ export class SpeciesService {
     });
   }
 
-  getClosestOrthologPathway(ancestors: Event[], newSpecies: Species): Observable<{
-    pathway: Event | undefined,
+  getClosestOrthologPathwayWithSelect(select: string | null, ancestors: Event[], newSpecies: Species): Observable<{
+    pathway: string | undefined,
     map: OrthologousMap,
   }> {
     return this.getOrthologousMap(
-      ancestors.map((a) => a.stId),
+      [select, ...ancestors.map((a) => a.stId)].filter(isDefined),
       newSpecies.dbId)
       .pipe(map(orthologousMap => {
           for (const ancestor of ancestors.reverse()) { // Start from the end of ancestry, and gradually go up if there is no equivalent pathway
-            if (orthologousMap[ancestor.stId]) return {
-              pathway: orthologousMap[ancestor.stId],
-              map: orthologousMap
-            };
+            if (orthologousMap.get(ancestor.stId)) {
+              return {
+                pathway: orthologousMap.get(ancestor.stId),
+                map: orthologousMap
+              };
+            }
           }
-          return {pathway: undefined, map: orthologousMap}; // If selection has no ortholog, it might be because it's a molecule, if so return initial
+          return {
+            pathway: undefined,
+            map: orthologousMap
+          };
         })
       )
   }
 
   private getOrthologousMap(identifiers: string[], speciesDbId: number): Observable<OrthologousMap> {
     const url = `${this._ORTHOLOGIES}${speciesDbId}`;
-    return this.http.post<OrthologousMap>(url, identifiers.join(','), {headers: new HttpHeaders({'Content-Type': 'text/plain'})}).pipe(
-      catchError(e => of({}))
+    return this.http.post<{ [p: string]: SelectableObject }>(
+      url,
+      identifiers.filter(i => !i.startsWith("R-ALL")).join(','),
+      {headers: new HttpHeaders({'Content-Type': 'text/plain'})}
+    ).pipe(
+      map(mapping => new Map(identifiers.map(i => ([i, i.startsWith('R-ALL') ? i : mapping[i]?.stId])))),
+      catchError(e => of(new Map(identifiers.map(i => ([i, undefined]))))
+      )
     );
   }
 
@@ -95,14 +107,21 @@ export class SpeciesService {
     return {...s, shortName: `${genus.charAt(0)}. ${species}`};
   }
 
-  updateQueryParams(pathwayId: string | undefined, formerSpecies: Species, newSpecies: Species) {
-    const queryParams = JSON.parse(
-      JSON.stringify(this.route.snapshot.queryParams)
-        .replaceAll(`-${formerSpecies.abbreviation}-`, `-${newSpecies.abbreviation}-`)
-    );
+  updateQueryParams(map: OrthologousMap, pathwayId: string | undefined) {
+    const params = {...this.route.snapshot.queryParams};
+    for (const [key, value] of Object.entries(params)) {
+      let newValue = JSON.stringify(value);
+      for (let [initial, replacement] of map) {
+        newValue = newValue.replaceAll(initial, replacement || '');
+      }
+      newValue = newValue.replaceAll(',""', '').replaceAll('""', '').trim() // Remove trailing commas and quotes from lists
+      console.log(value, " => ", newValue);
+      if (newValue.length === 0) delete params[key];
+      else params[key] = JSON.parse(newValue);
+    }
+
     this.router.navigate(['/PathwayBrowser', pathwayId].filter(isDefined), {
-      queryParams,
-      queryParamsHandling: "replace",
+      queryParams: params,
       preserveFragment: true
     });
   }
