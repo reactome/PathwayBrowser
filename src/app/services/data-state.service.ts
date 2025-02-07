@@ -19,17 +19,17 @@ export class DataStateService {
     loader: (params) => this.fetchEnhancedData<Pathway>(params.request)
   })
 
-  private _ancestors = rxResource({
-    request: () => this.state.pathwayId(),
-    loader: (params) => this.fetchAncestors(params.request)
-  })
-
   public currentPathway = computed(() => {
     const currentPathway = this._currentPathway.value();
     if (currentPathway) {
       currentPathway.ancestors = this._ancestors.value() || [];
     }
     return currentPathway;
+  })
+
+  private _ancestors = rxResource({
+    request: () => this.state.pathwayId(),
+    loader: (params) => this.fetchAncestors(params.request)
   })
 
   private _selectedElement = rxResource({
