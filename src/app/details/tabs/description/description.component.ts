@@ -117,7 +117,7 @@ export class DescriptionComponent {
 
 
   getGroupedCrossReferences(refEntity: ReferenceEntity | undefined) {
-    if (!refEntity) return [];
+    if (!refEntity || !refEntity.crossReference) return [];
 
     const crossRefs = [...refEntity.crossReference];
     const dbNames = [...new Set(crossRefs.map(ref => ref.databaseName))];
