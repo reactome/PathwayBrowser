@@ -365,4 +365,8 @@ $small-breakpoint-width: 959px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+
+  & a:last-child:not(:only-child){
+    margin-right: 2px;
+  }
 }
