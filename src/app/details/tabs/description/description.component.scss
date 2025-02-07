@@ -19,6 +19,7 @@ $small-breakpoint-width: 959px;
   --column-width: max(100px, calc((var(--width) + var(--gap)) / var(--columns) - var(--gap)));
   --icon-width: 182px;
   --icon-height: 84px;
+  --margin-right: 2px;
 
 
   // Switch to vertical direction on small screens
@@ -32,7 +33,7 @@ $small-breakpoint-width: 959px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--half-gap);
   width: 85%;
   height: 100%;
   padding-right: var(--half-gap);
@@ -63,7 +64,7 @@ $small-breakpoint-width: 959px;
     flex-direction: row;
     align-items: center;
     padding: 0;
-    gap: 10px;
+    gap: var(--half-gap);
     overflow: hidden;
 
     & .name {
@@ -288,23 +289,30 @@ $small-breakpoint-width: 959px;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.25px;
-
-  .item {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 0;
-    gap: 4px;
-
-    width: 100%;
-  }
 }
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: flex-start;
+  //padding: 0;
+  // gap: 4px;
+
+  width: 100%;
+}
+
+
+.comma {
+  margin-right: var(--margin-right);
+}
+
 
 // A grid layout
 .columns-container {
   display: flex;
   flex-direction: row;
-  flex-wrap:wrap;
+  flex-wrap: wrap;
 }
 
 .column-item {
@@ -358,15 +366,15 @@ $small-breakpoint-width: 959px;
   display: flex;
   width: 12px;
   height: 12px;
-  margin-right: 2px;
+  margin-right: var(--margin-right);
 }
 
-.authorship-item{
+.authorship-item {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
 
-  & a:last-child:not(:only-child){
-    margin-right: 2px;
+  & a:last-child:not(:only-child) {
+    margin-right: var(--margin-right);
   }
 }

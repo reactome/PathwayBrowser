@@ -25,7 +25,10 @@ export class DescriptionComponent {
   readonly analysisResult = input<Analysis.Result>();
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), 'literatureReference'));
+  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), 'referenceEntity'));
   readonly externalRef = computed(() => this.getTransformedExternalRef(this.referenceEntity()));
+  readonly crossReferences = computed(() => this.getGroupedCrossReferences(this.referenceEntity()));
+
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
 
     const obj = this.obj();
@@ -43,9 +46,8 @@ export class DescriptionComponent {
 
   });
 
-  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), 'referenceEntity'));
-  section = toSignal(this.route.fragment)
 
+  section = toSignal(this.route.fragment)
 
   protected readonly isArray = isArray;
   protected readonly isString = isString;
@@ -59,6 +61,7 @@ export class DescriptionComponent {
     {key: 'overview', label: 'Overview', manual: true},
     {key: 'literatureReference', label: 'References', manual: true},
     {key: 'referenceEntity', label: 'External Reference', manual: true},
+    {key: 'crossReferences', label: 'Cross References', manual: true},
     {key: 'authorship', label: 'Authorship', manual: true},
     {key: 'input', label: 'Inputs'},
     {key: 'output', label: 'Outputs'},
@@ -94,23 +97,37 @@ export class DescriptionComponent {
   getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {
     if (!refEntity) return [];
     const externalRef = {...refEntity};
-    const propertyToShowAndOrder = ['displayName', 'geneName', 'chain', 'referenceGene', 'referenceTranscript'];
-    const labels = new Map<string, string>([
-      ['displayName', 'External Reference'],
-      ['geneName', 'Gene Names'],
-      ['referenceGene', 'Reference Genes'],
-      ['referenceTranscript', 'Reference Transcript']
-    ]);
-    const results: { key: string, value: any }[] = [];
-    for (const key of propertyToShowAndOrder) {
-      let value = externalRef[key];
+    const properties = [
+      {key: 'displayName', label: 'External Reference'},
+      {key: 'geneName', label: 'Gene Names'},
+      {key: 'referenceGene', label: 'Reference Genes'},
+      {key: 'referenceTranscript', label: 'Reference Transcript'}
+    ];
+    const results: { label: string, value: any }[] = [];
+    for (const property of properties) {
+      let value = externalRef[property.key];
       if (!value) continue;
       results.push({
-        key: labels.get(key) || key,
+        label: property.label || property.key,
         value: value
       });
     }
     return results;
   }
+
+
+  getGroupedCrossReferences(refEntity: ReferenceEntity | undefined) {
+    if (!refEntity) return [];
+
+    const crossRefs = [...refEntity.crossReference];
+    const dbNames = [...new Set(crossRefs.map(ref => ref.databaseName))];
+
+    return dbNames.map(dbName => ({
+      databaseName: dbName,
+      data: crossRefs.filter(ref => ref.databaseName === dbName)
+    }));
+
+  }
+
 
 }

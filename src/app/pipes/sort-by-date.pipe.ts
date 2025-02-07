@@ -1,10 +1,10 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'customSortBy',
+  name: 'sortByDate',
   standalone: true
 })
-export class CustomSortByPipe implements PipeTransform {
+export class SortByDatePipe implements PipeTransform {
 
   transform<T>(value: T[], property: keyof T, descending: boolean = true) {
     if (!value || !property) return;
