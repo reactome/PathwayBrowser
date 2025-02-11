@@ -34,8 +34,15 @@
 
     <div *ngIf="compartment()" class="row">
       <div class="label">Compartment</div>
-      <div class="value" *ngFor="let compartment of compartment(); let last =last">
-        <a [href]="compartment.url" target="_blank">{{ compartment.displayName }}{{ !last ? ',' : '' }}</a>
+      <div class="value compartment-row">
+        @for (item of compartment(); track item.dbId; let i = $index; ) {
+          <a [href]="item.url" target="_blank"
+             [matTooltip]="item.definition ? item.definition : null">{{ item.displayName }}</a>
+          <!-- Add comma separator except for last item -->
+          @if (i < compartment().length - 1) {
+            <span class="comma">,</span>
+          }
+        }
       </div>
     </div>
 

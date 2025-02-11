@@ -3,7 +3,8 @@ import {Summation} from "../summation.model";
 import {ReviewStatus} from "../review-status.model";
 import {LiteratureReference} from "../publication/literature-reference.model";
 import {InstanceEdit} from "../instance-edit.model";
-import {Compartment} from "../compartment.model";
+import {Compartment} from "../go-term/compartment.model";
+
 
 export interface Event extends DatabaseObject {
   stId: string;

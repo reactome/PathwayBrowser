@@ -33,7 +33,7 @@
     </div>
 
     <!-- Overview -->
-    <div class="overview" [ngClass]="{'update-layout': externalRef()}">
+    <div class="overview" [ngClass]="{'update-layout': !icon.isLoading() && icon.value()}">
       <cr-description-overview [obj]="obj()"></cr-description-overview>
       @if (!icon.isLoading() && icon.value()) {
         <div class="icon-container">
