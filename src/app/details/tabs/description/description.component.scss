@@ -1,7 +1,6 @@
 $small-breakpoint-width: 959px;
 
 
-
 #details {
 
   display: flex;
@@ -319,8 +318,8 @@ $small-breakpoint-width: 959px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  flex: 1 1 25%; //each item takes exactly 25% of the container width
-  max-width: 25%; //ensures all items have the same width
+  flex: 1 1 25%; // Each item takes exactly 25% of the container width
+  max-width: 25%; // Ensures all items have the same width
 }
 
 .element-container {
@@ -332,7 +331,7 @@ $small-breakpoint-width: 959px;
   width: 100%;
 }
 
-.ref-row {
+.row {
   display: flex;
   flex-direction: row;
   padding: 0;
@@ -383,7 +382,7 @@ $small-breakpoint-width: 959px;
   column-count: 2;
   display: block;
 
- .ref-row{
+ .padding{
    padding: 4px 0;
  }
 }

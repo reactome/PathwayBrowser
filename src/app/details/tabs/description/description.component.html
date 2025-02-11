@@ -56,7 +56,7 @@
 
       <div class="element-container">
         @for (property of externalRef(); track property.label) {
-          <div class="ref-row">
+          <div class="row">
             <div class="label-container">{{ property.label | titlecase }}</div>
             <div class="composition-container"
                  [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
@@ -93,7 +93,7 @@
 
       <div class="element-container">
         @for (ref of crossReferences() | sortByText :'databaseName'; track ref) {
-          <div class="ref-row">
+          <div class="row">
             <div class="label-container">{{ ref.databaseName }}</div>
             <div class="composition-container item">
               @for (item of ref.data; track item.dbId) {
@@ -122,7 +122,7 @@
 
       <div class="element-container">
         @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
-          <div class="ref-row">
+          <div class="row">
             <div class="label-container">{{ ref.year }}</div>
             <div class="composition-container">
               <cr-publication [publication]=ref [showYear]="false"></cr-publication>
@@ -146,7 +146,7 @@
 
       <div class="element-container">
         @for (item of authorship(); track item) {
-          <div class="ref-row">
+          <div class="row">
             <div class="label-container">{{ item.label }}</div>
             <div class="composition-container">
               @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
@@ -189,7 +189,7 @@
 
       <div class="element-container columns">
         @for (pe of inferences()! | sortByText :'speciesName'; track pe.dbId) {
-          <div class="ref-row">
+          <div class="row padding">
             <div class="label-container">{{ pe.speciesName }}</div>
             <div class="composition-container">
               <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
