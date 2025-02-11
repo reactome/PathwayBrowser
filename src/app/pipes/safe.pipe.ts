@@ -1,8 +1,8 @@
 import {Pipe, PipeTransform, SecurityContext} from '@angular/core';
 import {DomSanitizer, SafeHtml, SafeResourceUrl, SafeScript, SafeStyle, SafeUrl} from "@angular/platform-browser";
-import {by} from "ng-packagr/lib/graph/select";
 
 @Pipe({
+  standalone: true,
   name: 'safe'
 })
 export class SafePipe implements PipeTransform {

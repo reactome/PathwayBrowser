@@ -11,6 +11,8 @@ import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {SelectableObject} from "../../../services/event.service";
 import {of} from "rxjs";
+import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
+import {InteractorService} from "../../../interactors/services/interactor.service";
 
 
 @Component({
@@ -49,6 +51,8 @@ export class DescriptionComponent {
 
   section = toSignal(this.route.fragment)
 
+  readonly inferences: Signal<PhysicalEntity[] |undefined> = computed(()=>getProperty(this.obj(),'inferredTo'));
+
   protected readonly isArray = isArray;
   protected readonly isString = isString;
 
@@ -66,12 +70,14 @@ export class DescriptionComponent {
     {key: 'input', label: 'Inputs'},
     {key: 'output', label: 'Outputs'},
     {key: 'catalystActivity', label: 'Catalyst Activity'},
-    {key: 'inferredFrom', label: 'Inferred From'}
+    {key: 'inferredFrom', label: 'Inferred From'},
+    {key: 'inferredTo', label: 'Inferences', manual:true}
   ]
 
 
   constructor(private iconService: IconService,
-              private route: ActivatedRoute
+              private route: ActivatedRoute,
+              private interactorService: InteractorService,
   ) {
     effect(() => {
       !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({
@@ -100,6 +106,7 @@ export class DescriptionComponent {
     const properties = [
       {key: 'displayName', label: 'External Reference'},
       {key: 'geneName', label: 'Gene Names'},
+      {key: 'chain', label: 'Chain'},
       {key: 'referenceGene', label: 'Reference Genes'},
       {key: 'referenceTranscript', label: 'Reference Transcript'}
     ];

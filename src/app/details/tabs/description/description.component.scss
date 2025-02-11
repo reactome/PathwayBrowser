@@ -378,3 +378,12 @@ $small-breakpoint-width: 959px;
     margin-right: var(--margin-right);
   }
 }
+
+.columns{
+  column-count: 2;
+  display: block;
+
+ .ref-row{
+   padding: 4px 0;
+ }
+}

@@ -2,7 +2,7 @@ import {Component, computed, input, Signal} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {getProperty, isDefined} from "../../../services/utils";
 import {Compartment} from "../../../model/graph/compartment.model";
-import {Anatomy} from "../../../model/graph/anatomy.model";
+import {Anatomy} from "../../../model/graph/external-ontology/anatomy.model";
 import {ReviewStatus} from "../../../model/graph/review-status.model";
 import {Summation} from 'src/app/model/graph/summation.model';
 

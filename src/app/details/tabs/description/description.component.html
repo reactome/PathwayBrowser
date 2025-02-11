@@ -32,8 +32,8 @@
       </div>
     </div>
 
-
-    <div class="overview" [ngClass]="{'update-layout': externalRef}">
+    <!-- Overview -->
+    <div class="overview" [ngClass]="{'update-layout': externalRef()}">
       <cr-description-overview [obj]="obj()"></cr-description-overview>
       @if (!icon.isLoading() && icon.value()) {
         <div class="icon-container">
@@ -173,6 +173,31 @@
         </div>
       </div>
     }
+
+    <!-- Inferences(Inferred To)-->
+    @if (inferences()) {
+      <div class="divider-container" id="inferredTo">
+        <div class="divider-name-container">
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Inferences' }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+
+      <div class="element-container columns">
+        @for (pe of inferences()! | sortByText :'speciesName'; track pe.dbId) {
+          <div class="ref-row">
+            <div class="label-container">{{ pe.speciesName }}</div>
+            <div class="composition-container">
+              <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
 
     @for (element of elements; track element.key) {
       @if (obj()[element.key] && !element?.manual) {
