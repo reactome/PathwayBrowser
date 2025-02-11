@@ -60,23 +60,19 @@
             <div class="label-container">{{ property.label | titlecase }}</div>
             <div class="composition-container"
                  [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
-              <ng-container *ngIf="isArray(property.value) && !isString(property.value[0]); else singleValue">
+              @if (isArray(property.value) && !isString(property.value[0])) {
                 @for (item of property.value; track item.dbId) {
                   <span class="column-item">
                         <a [href]="item.url" target="_blank"> {{ item.databaseName }}:{{ item.identifier }}</a>
                       </span>
                 }
-              </ng-container>
-
-              <ng-template #singleValue>
-                <ng-container *ngIf="property.label === 'External Reference'; else noLink">
+              } @else {
+                @if (property.label === 'External Reference') {
                   <a [href]="referenceEntity()?.url" target="_blank">{{ referenceEntity()?.displayName }}</a>
-                </ng-container>
-                <ng-template #noLink>
+                } @else {
                   <span>{{ property.value }}</span>
-                </ng-template>
-              </ng-template>
-
+                }
+              }
             </div>
           </div>
         }
@@ -149,28 +145,33 @@
       </div>
 
       <div class="element-container">
-        <div class="ref-row" *ngFor="let item of authorship()">
-          <div class="label-container">{{ item.label }}</div>
-          <div class="composition-container">
-            <div *ngFor="let ie of item.data | sortByDate:'dateTime'" class="authorship-item">
-              <ng-container *ngFor="let author of ie.author; let i = index">
-                <a [href]="'/content/detail/' + author.dbId" target="_blank">
-                  {{ author.firstname }} {{ author.surname }}
-                </a>
+        @for (item of authorship(); track item) {
+          <div class="ref-row">
+            <div class="label-container">{{ item.label }}</div>
+            <div class="composition-container">
+              @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
+                <div class="authorship-item">
+                  @for (author of ie.author; let i = $index; track author.dbId) {
+                    <a [href]="'/content/detail/' + author.dbId" target="_blank">
+                      {{ author.firstname }} {{ author.surname }}
+                    </a>
 
-                <ng-container *ngIf="author.orcidId as orcid">
-                  <a [href]="'https://orcid.org/' + orcid" target="_blank">
-                    <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
-                  </a>
-                </ng-container>
-
-                <!-- Add separator except for last item -->
-                <span *ngIf="i < ie.author.length - 1">,&nbsp;</span>
-              </ng-container>
-              - {{ ie.dateTime | authorshipDateFormat }}
+                    @if (author.orcidId) {
+                      <a [href]="'https://orcid.org/' + author.orcidId" target="_blank">
+                        <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
+                      </a>
+                    }
+                    <!-- Add separator except for last item -->
+                    @if (i < ie.author.length - 1) {
+                      <span class="comma">,</span>
+                    }
+                  }
+                  - {{ ie.dateTime | authorshipDateFormat }}
+                </div>
+              }
             </div>
           </div>
-        </div>
+        }
       </div>
     }
 
@@ -225,7 +226,8 @@
 
   <div class="toc">
     <ng-container *ngFor="let element of elements">
-      <a *ngIf="(element.key === 'crossReferences' ? crossReferences() : obj()[element.key])" [routerLink]="[]" [fragment]="element.key" [queryParamsHandling]="'preserve'">
+      <a *ngIf="(element.key === 'crossReferences' ? crossReferences() && crossReferences().length >0 : obj()[element.key])" [routerLink]="[]"
+         [fragment]="element.key" [queryParamsHandling]="'preserve'">
         {{ element.label }}
       </a>
     </ng-container>
