@@ -5,6 +5,7 @@ import {Anatomy} from "../../../model/graph/external-ontology/anatomy.model";
 import {ReviewStatus} from "../../../model/graph/review-status.model";
 import {Summation} from 'src/app/model/graph/summation.model';
 import {Compartment} from "../../../model/graph/go-term/compartment.model";
+import {DataKeys} from "../../../constants/constants";
 
 
 
@@ -19,19 +20,19 @@ export class DescriptionOverviewComponent {
   readonly obj = input.required<DatabaseObject>();
 
   readonly allRefs = computed(() => {
-    const literatureRefs = getProperty(this.obj(), 'literatureReference');
-    const summation = getProperty(this.obj(), 'summation');
+    const literatureRefs = getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE);
+    const summation = getProperty(this.obj(), DataKeys.SUMMATION);
     return [...literatureRefs || [], ...summation.flatMap((s: Summation) => s.literatureReference).filter(isDefined) || []]
   });
 
-  readonly category: Signal<string> = computed(() => getProperty(this.obj(), 'category'));
-  readonly className: Signal<string> = computed(() => getProperty(this.obj(), 'className'));
-  readonly speciesName: Signal<string> = computed(() => getProperty(this.obj(), 'speciesName'));
-  readonly compartment: Signal<Compartment[]> = computed(() => getProperty(this.obj(), 'compartment'));
-  readonly name: Signal<string> = computed(() => getProperty(this.obj(), 'name'));
-  readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), 'tissue'));
-  readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), 'reviewStatus'));
-  readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), 'summation'));
+  readonly category: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.CATEGORY));
+  readonly className: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.CLASS_NAME));
+  readonly speciesName: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.SPECIES_NAME));
+  readonly compartment: Signal<Compartment[]> = computed(() => getProperty(this.obj(), DataKeys.COMPARTMENT));
+  readonly name: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.COMPARTMENT));
+  readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), DataKeys.TISSUE));
+  readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), DataKeys.REVIEW_STATUS));
+  readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), DataKeys.SUMMATION));
 
 
   reviewStar: { [key: string]: { percentage: number, score: number } } = {
