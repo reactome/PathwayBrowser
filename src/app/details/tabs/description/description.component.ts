@@ -64,9 +64,14 @@ export class DescriptionComponent {
   });
 
 
-  section = toSignal(this.route.fragment)
-
-  readonly inferences: Signal<PhysicalEntity[] |undefined> = computed(()=>getProperty(this.obj(),'inferredTo'));
+  otherForms = computed(() => {
+    const value = this._otherForms.value();
+    if (!value) return [];
+    return value.map(entity => ({
+      ...entity,
+      label: entity.displayName.match(/\[(.*?)\]/)?.[1] || '' // HSPA8 [plasma membrane] => plasma membrane
+    }))
+  })
 
   protected readonly isArray = isArray;
   protected readonly isString = isString;
@@ -77,6 +82,9 @@ export class DescriptionComponent {
   //   loader: (param) => param.request ? this.interactorService.getInteractorsByAcc(param.request) : of(null)
   // })
 
+  //interactors = this._interactors.value();
+
+  //todo get divider label from here
   elements: { key: string, label: string, manual?: boolean }[] = [
     {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
     {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},

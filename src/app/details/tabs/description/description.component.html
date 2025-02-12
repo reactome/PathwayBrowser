@@ -175,6 +175,30 @@
       </div>
     }
 
+    <!-- Other forms-->
+    @if (otherForms() && otherForms().length > 0) {
+      <div class="divider-container" id="otherForms">
+        <div class="divider-name-container">
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.OTHER_FORMS }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+
+      <div class="element-container columns">
+        @for (pe of otherForms()! | sortByText :'label'; track pe.dbId) {
+          <div class="row padding">
+            <div class="label-container">{{ pe.label }}</div>
+            <div class="composition-container">
+              <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
     <!-- Inferences(Inferred To)-->
     @if (inferences()) {
       <div class="divider-container" id="inferredTo">
