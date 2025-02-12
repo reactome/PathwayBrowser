@@ -250,10 +250,13 @@
 
   <div class="toc">
     <ng-container *ngFor="let element of elements">
-      <a *ngIf="(element.key === 'crossReferences' ? crossReferences() && crossReferences().length >0 : obj()[element.key])" [routerLink]="[]"
-         [fragment]="element.key" [queryParamsHandling]="'preserve'">
-        {{ element.label }}
-      </a>
+      @if (isTOCIncluded(element.key)) {
+        <a
+          [routerLink]="[]"
+          [fragment]="element.key" [queryParamsHandling]="'preserve'">
+          {{ element.label }}
+        </a>
+      }
     </ng-container>
   </div>
 

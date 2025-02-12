@@ -75,7 +75,7 @@ export class DescriptionComponent {
 
   protected readonly isArray = isArray;
   protected readonly isString = isString;
-
+  protected readonly Labels = Labels;
 
   // _interactors = rxResource({
   //   request: () => this.referenceEntity()?.identifier,
@@ -151,6 +151,23 @@ export class DescriptionComponent {
       data: crossRefs.filter(ref => ref.databaseName === dbName)
     }));
 
+  }
+
+  isTOCIncluded(key: string) {
+    const obj = this.obj();
+
+    switch (key) {
+      case DataKeys.OVERVIEW:
+        return obj;
+      case DataKeys.CROSS_REFERENCES:
+        return this.crossReferences() && this.crossReferences().length > 0;
+      case DataKeys.OTHER_FORMS:
+        return this.otherForms() && this.otherForms().length > 0;
+      case Labels.AUTHORSHIP:
+        return this.authorship() && this.authorship().length > 0;
+      default:
+        return obj[key] !== undefined && obj[key];
+    }
   }
 
 
