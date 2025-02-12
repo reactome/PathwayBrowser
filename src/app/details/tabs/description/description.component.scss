@@ -276,8 +276,9 @@ $small-breakpoint-width: 959px;
 
 .composition-container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
   padding-left: 10px;
   border-left: 2px solid var(--outline-variant);
   flex: 1;
@@ -290,16 +291,17 @@ $small-breakpoint-width: 959px;
   letter-spacing: 0.25px;
 }
 
-.item {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  align-items: flex-start;
-  //padding: 0;
-  // gap: 4px;
-
-  width: 100%;
-}
+//.item {
+//  display: flex;
+//  flex-wrap: wrap;
+//  flex-direction: row;
+//  align-items: flex-start;
+//  justify-content: flex-start;
+//  //padding: 0;
+//  // gap: 4px;
+//
+//  width: 100%;
+//}
 
 
 .comma {
@@ -312,6 +314,8 @@ $small-breakpoint-width: 959px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: start;
+  align-items: center;
 }
 
 .column-item {
@@ -378,11 +382,11 @@ $small-breakpoint-width: 959px;
   }
 }
 
-.columns{
+.columns {
   column-count: 2;
   display: block;
 
- .padding{
-   padding: 4px 0;
- }
+  .padding {
+    padding: 4px 0;
+  }
 }
