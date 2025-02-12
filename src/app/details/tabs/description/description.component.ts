@@ -13,6 +13,8 @@ import {SelectableObject} from "../../../services/event.service";
 import {of} from "rxjs";
 import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
 import {InteractorService} from "../../../interactors/services/interactor.service";
+import {EntitiesService} from "../../../services/entities.service";
+import {DataKeys, Labels} from "../../../constants/constants";
 
 
 @Component({
@@ -23,27 +25,40 @@ import {InteractorService} from "../../../interactors/services/interactor.servic
 })
 export class DescriptionComponent {
 
+  icon = rxResource({
+    request: () => this.referenceEntity()?.identifier,
+    loader: (param) => param.request ? this.iconService.fetchIcon(param.request) : of(null)
+  })
+
+  _otherForms = rxResource({
+    request: () => isEntity(this.obj()) && this.obj().stId,
+    loader: (param) => param.request ? this.entitiesService.getOtherForms(param.request) : of(null)
+  })
+
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
   readonly symbol = computed(() => this.getSymbol(this.obj()));
-  readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), 'literatureReference'));
-  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), 'referenceEntity'));
+  readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
+  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
   readonly externalRef = computed(() => this.getTransformedExternalRef(this.referenceEntity()));
   readonly crossReferences = computed(() => this.getGroupedCrossReferences(this.referenceEntity()));
-
-  readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
+  readonly inferences: Signal<PhysicalEntity[] | undefined> = computed(() => getProperty(this.obj(), DataKeys.INFERRED_TO));
+  section = toSignal(this.route.fragment)
+  readonly authorship: Signal<{ label:string, data: InstanceEdit[] }[]> = computed(() => {
 
     const obj = this.obj();
-    const authored = getProperty(obj, 'authored') || [];
-    const reviewed = getProperty(obj, 'reviewed') || [];
-    const edited = getProperty(obj, 'edited') || [];
-    const revised = getProperty(obj, 'revised') || [];
+    const authored = getProperty(obj, DataKeys.AUTHORED) || [];
+    //// Ensure it's an array, either returning the existing array or wrapping it in one, it complains without this line.
+    const finalAuthored = Array.isArray(authored) ? authored : authored ? [authored] : [];
+    const reviewed = getProperty(obj, DataKeys.REVIEWED) || [];
+    const edited = getProperty(obj, DataKeys.EDITED) || [];
+    const revised = getProperty(obj, DataKeys.REVISED) || [];
 
     return [
-      ...(authored.length > 0 ? [{label: 'Author', data: authored}] : []),
-      ...(reviewed.length > 0 ? [{label: 'Reviewer', data: reviewed}] : []),
-      ...(edited.length > 0 ? [{label: 'Editor', data: edited}] : []),
-      ...(revised.length > 0 ? [{label: 'Reviser', data: revised}] : []),
+      ...(authored.length > 0 ? [{label: Labels.AUTHOR, data: finalAuthored}] : []),
+      ...(reviewed.length > 0 ? [{label: Labels.REVIEWER, data: reviewed}] : []),
+      ...(edited.length > 0 ? [{label: Labels.EDITOR, data: edited}] : []),
+      ...(revised.length > 0 ? [{label: Labels.REVISER, data: revised}] : []),
     ];
 
   });
@@ -56,22 +71,23 @@ export class DescriptionComponent {
   protected readonly isArray = isArray;
   protected readonly isString = isString;
 
-  icon = rxResource({
-    request: () => this.referenceEntity()?.identifier,
-    loader: (param) => param.request ? this.iconService.fetchIcon(param.request) : of(null)
-  })
+
+  // _interactors = rxResource({
+  //   request: () => this.referenceEntity()?.identifier,
+  //   loader: (param) => param.request ? this.interactorService.getInteractorsByAcc(param.request) : of(null)
+  // })
 
   elements: { key: string, label: string, manual?: boolean }[] = [
-    {key: 'overview', label: 'Overview', manual: true},
-    {key: 'literatureReference', label: 'References', manual: true},
-    {key: 'referenceEntity', label: 'External Reference', manual: true},
-    {key: 'crossReferences', label: 'Cross References', manual: true},
-    {key: 'authorship', label: 'Authorship', manual: true},
-    {key: 'input', label: 'Inputs'},
-    {key: 'output', label: 'Outputs'},
-    {key: 'catalystActivity', label: 'Catalyst Activity'},
-    {key: 'inferredFrom', label: 'Inferred From'},
-    {key: 'inferredTo', label: 'Inferences', manual:true}
+    {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
+    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
+    {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true},
+    {key: DataKeys.CROSS_REFERENCES, label: Labels.CROSS_REFERENCES, manual: true},
+    {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
+    {key: DataKeys.INPUT, label: Labels.INPUTS},
+    {key: DataKeys.OUTPUT, label: Labels.OUTPUTS},
+    {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY},
+    {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
+    {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
   ]
 
 
@@ -85,13 +101,6 @@ export class DescriptionComponent {
         block: 'start',
         inline: 'start'
       });
-
-      const obj = this.obj();
-      if (obj) {
-        obj['overview'] = true;
-        obj['authorship'] = this.authorship().length > 0;
-      }
-
     });
   }
 

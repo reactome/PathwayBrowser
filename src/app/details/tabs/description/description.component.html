@@ -43,11 +43,11 @@
     </div>
 
     <!-- External Reference -->
-    @if (referenceEntity() && externalRef().length > 0) {
+    @if (externalRef() && externalRef().length > 0) {
       <div class="divider-container" id="referenceEntity">
         <div class="divider-name-container">
           <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'External Reference' }"></ng-container>
+            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.EXTERNAL_REFERENCE }"></ng-container>
         </div>
         <div class="divider-line-container">
           <mat-divider class="divider"></mat-divider>
@@ -84,7 +84,7 @@
       <div class="divider-container" id="crossReferences">
         <div class="divider-name-container">
           <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Cross References' }"></ng-container>
+            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CROSS_REFERENCES  }"></ng-container>
         </div>
         <div class="divider-line-container">
           <mat-divider class="divider"></mat-divider>
@@ -95,7 +95,7 @@
         @for (ref of crossReferences() | sortByText :'databaseName'; track ref) {
           <div class="row">
             <div class="label-container">{{ ref.databaseName }}</div>
-            <div class="composition-container item">
+            <div class="composition-container">
               @for (item of ref.data; track item.dbId) {
                 <a [href]="item.url" target="_blank">{{ item.identifier }}</a>
                 @if (item !== ref.data[ref.data.length - 1]) {
@@ -112,7 +112,7 @@
     @if (literatureRefs()) {
       <div class="divider-container" id="literatureReference">
         <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'References' }"></ng-container>
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REFERENCE }"></ng-container>
         </div>
         <div class="divider-line-container">
           <mat-divider class="divider"></mat-divider>
@@ -137,7 +137,7 @@
 
       <div class="divider-container" id="authorship">
         <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Authorship' }"></ng-container>
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.AUTHORSHIP }"></ng-container>
         </div>
         <div class="divider-line-container">
           <mat-divider class="divider"></mat-divider>
@@ -179,7 +179,7 @@
     @if (inferences()) {
       <div class="divider-container" id="inferredTo">
         <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Inferences' }"></ng-container>
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.INFERENCES }"></ng-container>
         </div>
         <div class="divider-line-container">
           <mat-divider class="divider"></mat-divider>
@@ -215,7 +215,7 @@
           <div class="content-container">
             <div class="control-container">this is navigation control</div>
             <div class="composition-container">
-              <div class="item">this is test content</div>
+              this is test content
             </div>
           </div>
         </div>
