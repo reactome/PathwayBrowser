@@ -29,7 +29,7 @@ export class DescriptionOverviewComponent {
   readonly className: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.CLASS_NAME));
   readonly speciesName: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.SPECIES_NAME));
   readonly compartment: Signal<Compartment[]> = computed(() => getProperty(this.obj(), DataKeys.COMPARTMENT));
-  readonly name: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.COMPARTMENT));
+  readonly name: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.NAME));
   readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), DataKeys.TISSUE));
   readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), DataKeys.REVIEW_STATUS));
   readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), DataKeys.SUMMATION));
