@@ -15,7 +15,7 @@
 
   <div class="content">
 
-    <div class="header" id="overview">
+    <div class="header" [id]=DataKeys.OVERVIEW>
       <div class="label">
         <mat-icon
           class="custom-icon"
@@ -177,7 +177,7 @@
 
     <!-- Other forms-->
     @if (otherForms() && otherForms().length > 0) {
-      <div class="divider-container" id="otherForms">
+      <div class="divider-container" [id]=DataKeys.OTHER_FORMS>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.OTHER_FORMS }"></ng-container>
         </div>

@@ -1,7 +1,7 @@
 import {Component, computed, effect, input, Signal} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
-import {getProperty} from "../../../services/utils";
+import {getProperty, isEntity} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
@@ -44,11 +44,11 @@ export class DescriptionComponent {
   readonly crossReferences = computed(() => this.getGroupedCrossReferences(this.referenceEntity()));
   readonly inferences: Signal<PhysicalEntity[] | undefined> = computed(() => getProperty(this.obj(), DataKeys.INFERRED_TO));
   section = toSignal(this.route.fragment)
-  readonly authorship: Signal<{ label:string, data: InstanceEdit[] }[]> = computed(() => {
+  readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
 
     const obj = this.obj();
     const authored = getProperty(obj, DataKeys.AUTHORED) || [];
-    //// Ensure it's an array, either returning the existing array or wrapping it in one, it complains without this line.
+    // Ensure it's an array, either returning the existing array or wrapping it in one, it complains without this line.
     const finalAuthored = Array.isArray(authored) ? authored : authored ? [authored] : [];
     const reviewed = getProperty(obj, DataKeys.REVIEWED) || [];
     const edited = getProperty(obj, DataKeys.EDITED) || [];
@@ -76,6 +76,7 @@ export class DescriptionComponent {
   protected readonly isArray = isArray;
   protected readonly isString = isString;
   protected readonly Labels = Labels;
+  protected readonly DataKeys = DataKeys;
 
   // _interactors = rxResource({
   //   request: () => this.referenceEntity()?.identifier,
@@ -101,6 +102,7 @@ export class DescriptionComponent {
 
   constructor(private iconService: IconService,
               private route: ActivatedRoute,
+              private entitiesService: EntitiesService,
               private interactorService: InteractorService,
   ) {
     effect(() => {
