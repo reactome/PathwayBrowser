@@ -1,0 +1,49 @@
+<div class="table-container mat-elevation-z8" tabindex="0">
+  <mat-table [dataSource]="interactors()!">
+
+    <!-- Gene Name Column -->
+    <ng-container matColumnDef="geneName">
+      <mat-header-cell *matHeaderCellDef>Gene name</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.finalGeneName }}</mat-cell>
+    </ng-container>
+
+    <!-- Identifier Column -->
+    <ng-container matColumnDef="identifier">
+      <mat-header-cell *matHeaderCellDef>Identifier</mat-header-cell>
+      <mat-cell *matCellDef="let element"><a [href]="element.url" target="_blank">{{ element.formattedIdentifier }}</a></mat-cell>
+    </ng-container>
+
+    <!-- Species Column -->
+    <ng-container matColumnDef="speciesName">
+      <mat-header-cell *matHeaderCellDef>Species</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.speciesName }}</mat-cell>
+    </ng-container>
+
+    <!-- Entities Column -->
+    <ng-container matColumnDef="entitiesCount">
+      <mat-header-cell *matHeaderCellDef>Reactome Entities</mat-header-cell>
+      <mat-cell *matCellDef="let element"><a
+        [href]="'content/query?q='+ element.finalGeneName +' &species=Homo+sapiens&types=Protein&cluster=true'">{{ element.entitiesCount }}</a>
+      </mat-cell>
+    </ng-container>
+
+    <!-- Evidences count Column -->
+    <ng-container matColumnDef="evidenceCount">
+      <mat-header-cell *matHeaderCellDef># Evidence</mat-header-cell>
+      <mat-cell *matCellDef="let element"><a [href]=element.evidenceURL target="_blank">{{ element.evidenceCount }}</a></mat-cell>
+    </ng-container>
+
+    <!-- Score Column -->
+    <ng-container matColumnDef="score">
+      <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.score }}</mat-cell>
+    </ng-container>
+
+
+    <!-- Header and Row Declarations -->
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="header-row"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"></mat-row>
+  </mat-table>
+</div>
+
+

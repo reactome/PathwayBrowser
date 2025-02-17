@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import cytoscape, {NodeCollection, NodeSingular} from "cytoscape";
 import {catchError, map, Observable, of, Subject, switchMap} from "rxjs";
 import {
+  CustomInteraction,
   Interactor,
   Interactors,
   InteractorToken,
@@ -91,7 +92,7 @@ export class InteractorService {
 
   }
 
-  public getInteractorData(cy: cytoscape.Core, resource: string): Observable<Interactors> {
+  public fetchInteractorData(cy: cytoscape.Core, resource: string): Observable<Interactors> {
     this.updateIdentifiers(cy);
     let url;
     if (resource === ResourceType.STATIC) {
@@ -107,6 +108,10 @@ export class InteractorService {
     });
   }
 
+  public getCustomInteractorsByAcc(acc: string) {
+    const url = `${environment.host}/ContentService/interactors/static/molecule/enhanced/${acc}/details`;
+    return this.http.get<CustomInteraction[]>(url, )
+  }
 
   public addInteractorOccurrenceNode(interactors: Interactors, cy: cytoscape.Core, resource: string) {
     if (this.cyToSelectedResource.has(cy) && this.cyToSelectedResource.get(cy) !== resource) {

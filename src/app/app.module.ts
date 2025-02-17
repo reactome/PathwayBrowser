@@ -51,6 +51,16 @@ import {AuthorshipDateFormatPipe} from "./pipes/authorship-date-format.pipe";
 import {SortByDatePipe} from "./pipes/sort-by-date.pipe";
 import {SafePipe} from "./pipes/safe.pipe";
 import {SortByTextPipe} from "./pipes/sort-by-text.pipe";
+import {InteractorsTableComponent} from "./details/common/interactors-table/interactors-table.component";
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatTable
+} from "@angular/material/table";
 
 @NgModule({
   declarations: [
@@ -69,6 +79,7 @@ import {SortByTextPipe} from "./pipes/sort-by-text.pipe";
     DescriptionOverviewComponent,
     SummationRefsTreeComponent,
     PublicationComponent,
+    InteractorsTableComponent,
 
   ],
   bootstrap: [AppComponent],
@@ -102,7 +113,26 @@ import {SortByTextPipe} from "./pipes/sort-by-text.pipe";
     MatRippleModule,
     MatTreeModule,
     MatTooltipModule,
-    MatMenuModule, MaterialFileInputModule, CdkNestedTreeNode, AuthorshipDateFormatPipe, SortByDatePipe, IncludeRefPipe, SafePipe, SortByTextPipe], providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
+    MatMenuModule,
+    MaterialFileInputModule,
+    CdkNestedTreeNode,
+    AuthorshipDateFormatPipe,
+    SortByDatePipe,
+    IncludeRefPipe,
+    SafePipe,
+    SortByTextPipe,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCell,
+    MatCell,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatHeaderRow,
+    MatRow,
+    MatHeaderRowDef,
+    MatRowDef
+  ],
+  providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })
 export class AppModule {
 }

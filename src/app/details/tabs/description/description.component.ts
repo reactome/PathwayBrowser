@@ -35,6 +35,11 @@ export class DescriptionComponent {
     loader: (param) => param.request ? this.entitiesService.getOtherForms(param.request) : of(null)
   })
 
+  _interactors = rxResource({
+    request: () => isEntity(this.obj()) && this.referenceEntity()?.identifier,
+    loader: (param) => param.request ? this.interactorService.getCustomInteractorsByAcc(param.request) : of(null)
+  })
+
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
   readonly symbol = computed(() => this.getSymbol(this.obj()));
@@ -73,17 +78,23 @@ export class DescriptionComponent {
     }))
   })
 
+
+  interactors = computed(() => {
+    const interactorsData = this._interactors.value();
+    return interactorsData || [];
+  });
+
+  interactorsLength = computed(() => {
+    const interactors = this._interactors.value();
+    return interactors ? interactors.length : 0;
+  });
+
+
   protected readonly isArray = isArray;
   protected readonly isString = isString;
   protected readonly Labels = Labels;
   protected readonly DataKeys = DataKeys;
 
-  // _interactors = rxResource({
-  //   request: () => this.referenceEntity()?.identifier,
-  //   loader: (param) => param.request ? this.interactorService.getInteractorsByAcc(param.request) : of(null)
-  // })
-
-  //interactors = this._interactors.value();
 
   //todo get divider label from here
   elements: { key: string, label: string, manual?: boolean }[] = [
@@ -97,6 +108,7 @@ export class DescriptionComponent {
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY},
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
+    {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
   ]
 
 
@@ -167,6 +179,8 @@ export class DescriptionComponent {
         return this.otherForms() && this.otherForms().length > 0;
       case Labels.AUTHORSHIP:
         return this.authorship() && this.authorship().length > 0;
+      case DataKeys.INTERACTORS:
+        return this.interactors()
       default:
         return obj[key] !== undefined && obj[key];
     }

@@ -22,6 +22,7 @@ export const DataKeys = {
   TISSUE: 'tissue',
   REVIEW_STATUS: 'reviewStatus',
   PUBLICATION: 'publication',
+  INTERACTORS: 'interactors',
 
 } as const;
 
@@ -41,5 +42,6 @@ export const Labels = {
   OUTPUTS: 'Outputs',
   CATALYST_ACTIVITY: 'Catalyst Activity',
   OTHER_FORMS: 'Other forms',
-  INFERENCES: 'Inferences'
+  INFERENCES: 'Inferences',
+  INTERACTORS: 'Interactors',
 } as const;

@@ -86,7 +86,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.cys()?.forEach(cy => {
-      this.interactorsService.getInteractorData(cy, resource).subscribe(interactors => {
+      this.interactorsService.fetchInteractorData(cy, resource).subscribe(interactors => {
         this.interactorsService.addInteractorOccurrenceNode(interactors, cy, resource);
         this.initialiseReplaceElements.emit();
       });
@@ -99,7 +99,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
     this.clear = false;
     this.updateCurrentResource(selectedResource, ResourceType.PSICQUIC);
     this.cys()?.forEach(cy => {
-      this.interactorsService.getInteractorData(cy, selectedResource).subscribe(interactors => {
+      this.interactorsService.fetchInteractorData(cy, selectedResource).subscribe(interactors => {
         this.interactorsService.addInteractorOccurrenceNode(interactors, cy, selectedResource);
         this.isDataFromPsicquicLoading = false;
           this.state.overlay.set(selectedResource);

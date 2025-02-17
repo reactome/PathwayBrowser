@@ -1,0 +1,64 @@
+:host {
+  width: 100%;
+}
+
+
+.table-container {
+  height: 400px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+mat-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+// Apply border radius for each mat row
+.element-row:hover {
+  .mat-mdc-cell:not(:first-child):not(:last-child) {
+    background: var(--surface2);
+  }
+
+  .mat-mdc-cell:first-child {
+    border-bottom-left-radius: 50px;
+    border-top-left-radius: 50px;
+    background: var(--surface2)
+  }
+
+  .mat-mdc-cell:last-child {
+    border-bottom-right-radius: 50px;
+    border-top-right-radius: 50px;
+    background: var(--surface2)
+  }
+}
+
+.header-row{
+  min-height: 27px !important;
+}
+
+.element-row{
+  min-height: 24px !important;
+}
+
+//tr.element-row:not(.example-expanded-row):hover {
+//  background: var(--surface2);
+//
+//  td.mat-mdc-cell:first-child {
+//    border-bottom-left-radius: 50px;
+//    border-top-left-radius: 50px;
+//  }
+//
+//  td.mat-mdc-cell:last-child {
+//    border-bottom-right-radius: 50px;
+//    border-top-right-radius: 50px;
+//  }
+//}
+
+// Remove the default border
+.mat-mdc-cell {
+  border-bottom-style: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
