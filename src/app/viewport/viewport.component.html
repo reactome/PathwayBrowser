@@ -63,8 +63,7 @@
                 Variants
               </button>
             } @else {
-              {{diseasePathways()}}
-              <button mat-stroked-button [disabled]="diseasePathways().length" [matMenuTriggerFor]="compare">
+              <button mat-stroked-button [disabled]="diseasePathways()?.length === 0" [matMenuTriggerFor]="compare">
                 Variants
               </button>
               <mat-menu #compare="matMenu">
