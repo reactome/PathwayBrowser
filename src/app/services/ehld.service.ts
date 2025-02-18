@@ -6,6 +6,7 @@ import {Graph} from "../model/graph.model";
 import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
+import {reportUnhandledError} from "rxjs/internal/util/reportUnhandledError";
 
 export interface LegendItem {
   name: string;
@@ -28,14 +29,14 @@ export class EhldService {
 
   private _hasEHLD = new BehaviorSubject<boolean | undefined>(undefined);
   hasEHLD$ = this._hasEHLD.asObservable();
-  hasEHLD? : boolean
+  hasEHLD?: boolean
 
   overlay = "OVERLAY-";
   analysisInfoId = "ANALINFO";
   analysisInfoContainer = "analysis-info-container";
   pattern = "pattern-";
 
-  legendItems : LegendGroup[] = [
+  legendItems: LegendGroup[] = [
     {
       type: "Arrow Type",
       items: [
@@ -151,7 +152,7 @@ export class EhldService {
   }
 
 
-  setStIdToSVGGElementMap(container: ElementRef<HTMLDivElement> ) {
+  setStIdToSVGGElementMap(container: ElementRef<HTMLDivElement>) {
     const map = new Map<string, SVGGElement>();
     const svgElement = container.nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
     svgElement.forEach(svgElement => {
@@ -201,6 +202,7 @@ export class EhldService {
 
     if (overlayElement) {
       const rect = overlayElement.getElementsByTagName('rect')[0]
+      if (!rect) return;
 
       this.createPattern(stId, exps, regionElement);
 
@@ -278,7 +280,7 @@ export class EhldService {
       const overlayElement = element.querySelector(`#${targetId}`);
       if (overlayElement) {
         const rect = overlayElement.getElementsByTagName('rect')[0];
-        rect.style.fill = "revert-layer";
+        if (rect) rect.style.fill = "revert-layer";
       }
     })
   }

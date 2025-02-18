@@ -564,10 +564,6 @@ export class DiagramComponent implements AfterViewInit {
             'text-outline-width': extract(style.properties.shadow.fontPadding) / 2
           })
 
-          this.analysis.palette = this.analysis.paletteOptions.get(hasExpression ? 'RdBu' : 'GnBu')!;
-          const notFound = extract(this.reactomeStyle.properties.analysis.notFound)
-          // @ts-ignore
-          this.analysis.palette.scale.nodata(notFound)
           this.reactomeStyle.loadAnalysis(cy, this.analysis.palette.scale);
         })
       })
