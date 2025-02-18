@@ -2,63 +2,102 @@
   width: 100%;
 }
 
-
-.table-container {
-  height: 400px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-mat-table {
-  width: 100%;
-  table-layout: fixed;
-}
-
-// Apply border radius for each mat row
+// Hover background
 .element-row:hover {
-  .mat-mdc-cell:not(:first-child):not(:last-child) {
-    background: var(--surface2);
-  }
+  background: var(--surface2);
+  border-radius: 50px;
 
-  .mat-mdc-cell:first-child {
-    border-bottom-left-radius: 50px;
-    border-top-left-radius: 50px;
-    background: var(--surface2)
-  }
-
-  .mat-mdc-cell:last-child {
-    border-bottom-right-radius: 50px;
-    border-top-right-radius: 50px;
-    background: var(--surface2)
+  * {
+    background: none;
   }
 }
 
-.header-row{
-  min-height: 27px !important;
+.header-row {
+  margin-bottom: 8px;
+  box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
 }
 
-.element-row{
+.element-row, .header-row {
   min-height: 24px !important;
+  gap: var(--gap);
+  align-content: center;
 }
 
-//tr.element-row:not(.example-expanded-row):hover {
-//  background: var(--surface2);
-//
-//  td.mat-mdc-cell:first-child {
-//    border-bottom-left-radius: 50px;
-//    border-top-left-radius: 50px;
-//  }
-//
-//  td.mat-mdc-cell:last-child {
-//    border-bottom-right-radius: 50px;
-//    border-top-right-radius: 50px;
-//  }
-//}
-
-// Remove the default border
 .mat-mdc-cell {
+  height: 20px !important;
+  min-height: 20px !important;
+  align-self: center;
+}
+
+// Remove the default border and use box-shadow
+.mat-mdc-header-cell,
+.mat-mdc-cell,
+.mat-mdc-cell > *,
+.mat-mdc-cell a {
   border-bottom-style: none;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
+.mat-column-geneName {
+  display: flex;
+  justify-content: flex-end;
+  overflow: visible;
+  background: none;
+  position: relative;
+  align-items: stretch;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: -11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--outline-variant);
+  }
+}
+
+
+.mat-column-speciesName {
+  justify-content: flex-end;
+}
+
+.mat-column-entitiesCount {
+  justify-content: flex-end;
+}
+
+.mat-column-score {
+  justify-content: flex-end;
+}
+
+.mat-column-geneName,
+.mat-column-identifier,
+.mat-column-speciesName,
+.mat-column-entitiesCount {
+  max-width: var(--column-width);
+  flex: 0 0 calc(var(--column-width));
+  padding: 0 0 !important;
+
+}
+
+.mat-column-evidenceCount,
+.mat-column-score {
+  max-width: calc(var(--column-width) / 2 - var(--half-gap));
+  flex: 0 0 calc(var(--column-width) / 2 - var(--half-gap));
+  padding: 0 0 !important;
+}
+
+.mat-row {
+  gap: var(--gap)
+}
+
+a.disabled {
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+

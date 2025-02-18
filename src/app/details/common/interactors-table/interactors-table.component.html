@@ -1,4 +1,4 @@
-<div class="table-container mat-elevation-z8" tabindex="0">
+<div class="table-container" tabindex="0">
   <mat-table [dataSource]="interactors()!">
 
     <!-- Gene Name Column -->
@@ -10,33 +10,35 @@
     <!-- Identifier Column -->
     <ng-container matColumnDef="identifier">
       <mat-header-cell *matHeaderCellDef>Identifier</mat-header-cell>
-      <mat-cell *matCellDef="let element"><a [href]="element.url" target="_blank">{{ element.formattedIdentifier }}</a></mat-cell>
+      <mat-cell *matCellDef="let element"><a [href]="element.url" target="_blank">{{ element.formattedIdentifier }}</a>
+      </mat-cell>
     </ng-container>
 
     <!-- Species Column -->
     <ng-container matColumnDef="speciesName">
       <mat-header-cell *matHeaderCellDef>Species</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.speciesName }}</mat-cell>
+      <mat-cell *matCellDef="let element"><span>{{ element.speciesName }}</span></mat-cell>
     </ng-container>
 
     <!-- Entities Column -->
     <ng-container matColumnDef="entitiesCount">
       <mat-header-cell *matHeaderCellDef>Reactome Entities</mat-header-cell>
-      <mat-cell *matCellDef="let element"><a
-        [href]="'content/query?q='+ element.finalGeneName +' &species=Homo+sapiens&types=Protein&cluster=true'">{{ element.entitiesCount }}</a>
+      <mat-cell *matCellDef="let element"><a [class.disabled]="element.entitiesCount === 0"
+                                             [href]="'content/query?q='+ element.identifier +'&types=Protein&cluster=false'">{{ element.entitiesCount }}</a>
       </mat-cell>
     </ng-container>
 
     <!-- Evidences count Column -->
     <ng-container matColumnDef="evidenceCount">
       <mat-header-cell *matHeaderCellDef># Evidence</mat-header-cell>
-      <mat-cell *matCellDef="let element"><a [href]=element.evidenceURL target="_blank">{{ element.evidenceCount }}</a></mat-cell>
+      <mat-cell *matCellDef="let element"><a [href]=element.evidenceURL target="_blank">{{ element.evidenceCount }}</a>
+      </mat-cell>
     </ng-container>
 
     <!-- Score Column -->
     <ng-container matColumnDef="score">
       <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.score }}</mat-cell>
+      <mat-cell *matCellDef="let element">{{ element.score | number : "1.2-2" }}</mat-cell>
     </ng-container>
 
 

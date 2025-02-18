@@ -180,7 +180,7 @@ export class DescriptionComponent {
       case Labels.AUTHORSHIP:
         return this.authorship() && this.authorship().length > 0;
       case DataKeys.INTERACTORS:
-        return this.interactors()
+        return this.interactors() && this.interactors.length > 0;
       default:
         return obj[key] !== undefined && obj[key];
     }
