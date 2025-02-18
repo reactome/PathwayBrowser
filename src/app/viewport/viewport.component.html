@@ -63,7 +63,8 @@
                 Variants
               </button>
             } @else {
-              <button mat-stroked-button [disabled]="diseasePathways()?.length === 0" [matMenuTriggerFor]="compare">
+              {{diseasePathways()}}
+              <button mat-stroked-button [disabled]="diseasePathways().length" [matMenuTriggerFor]="compare">
                 Variants
               </button>
               <mat-menu #compare="matMenu">
@@ -96,7 +97,7 @@
         <div class="content">
           <as-split direction="vertical" gutterSize="4">
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
-            <as-split-area [size]="20">
+            <as-split-area [size]="80">
               @if (pathwayId()) {
                 @if (hasEHLD()) {
                   <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
@@ -106,7 +107,7 @@
                 }
               }
             </as-split-area>
-            <as-split-area [size]="80">
+            <as-split-area [size]="20">
               <cr-details-panel></cr-details-panel>
             </as-split-area>
           </as-split>

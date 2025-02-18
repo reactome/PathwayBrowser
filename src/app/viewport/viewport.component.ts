@@ -13,6 +13,7 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GeneralService} from "../services/general.service";
 import {DataStateService} from "../services/data-state.service";
 import {isPathwayOrTLP} from "../services/utils";
+import {Pathway} from "../model/graph/event/pathway.model";
 
 @Component({
   selector: 'cr-viewport',
@@ -37,9 +38,9 @@ export class ViewportComponent implements AfterViewInit {
   diseasePathways = computed(() => {
     const pathway = this.dataState.currentPathway();
     if (pathway && isPathwayOrTLP(pathway)) {
-      return pathway.diseasePathways;
+      return pathway.diseasePathways || [];
     }
-    return [];
+    return [] as Pathway[];
   })
   normalPathway = computed(() => {
     const pathway = this.dataState.currentPathway();
