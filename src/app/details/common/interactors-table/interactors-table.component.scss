@@ -2,16 +2,6 @@
   width: 100%;
 }
 
-// Hover background
-.element-row:hover {
-  background: var(--surface2);
-  border-radius: 50px;
-
-  * {
-    background: none;
-  }
-}
-
 .header-row {
   margin-bottom: 8px;
   box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
@@ -48,7 +38,7 @@
   overflow: visible;
   background: none;
   position: relative;
-  align-items: stretch;
+  //align-items: stretch;
 
   &::after {
     content: "";
@@ -101,3 +91,26 @@ a.disabled {
 }
 
 
+.score{
+  --diameter: 16px;
+  --padding: 4px;
+  width: calc(var(--diameter) - 2 * var(--padding));
+  height: var(--diameter);
+  max-height: var(--diameter);
+  border-radius: var(--diameter);
+  padding: 0 var(--padding);
+  background: var(--primary);
+  flex-shrink: 0;
+  margin-left: var(--padding);
+}
+
+// Hover background
+.element-row:hover {
+  background: var(--surface2);
+  border-radius: 50px;
+
+  *:not(.score){
+    background: none;
+  }
+
+}

@@ -38,7 +38,9 @@
     <!-- Score Column -->
     <ng-container matColumnDef="score">
       <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.score | number : "1.2-2" }}</mat-cell>
+      <mat-cell *matCellDef="let element">{{ element.score | number : "1.2-2" }}
+        <span [ngStyle]="{'opacity': element.score}" class="score"></span>
+      </mat-cell>
     </ng-container>
 
 
