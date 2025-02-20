@@ -23,6 +23,7 @@ export const DataKeys = {
   REVIEW_STATUS: 'reviewStatus',
   PUBLICATION: 'publication',
   INTERACTORS: 'interactors',
+  AUTHORSHIP: 'authorship'
 
 } as const;
 

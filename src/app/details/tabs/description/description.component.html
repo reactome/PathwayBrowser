@@ -44,7 +44,7 @@
 
     <!-- External Reference -->
     @if (externalRef() && externalRef().length > 0) {
-      <div class="divider-container" id="referenceEntity">
+      <div class="divider-container" [id]= DataKeys.REFERENCE_ENTITY>
         <div class="divider-name-container">
           <ng-container
             *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.EXTERNAL_REFERENCE }"></ng-container>
@@ -81,7 +81,7 @@
 
     <!-- Cross References-->
     @if (crossReferences() && crossReferences().length > 0) {
-      <div class="divider-container" id="crossReferences">
+      <div class="divider-container" [id]=DataKeys.CROSS_REFERENCES>
         <div class="divider-name-container">
           <ng-container
             *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CROSS_REFERENCES  }"></ng-container>
@@ -110,7 +110,7 @@
 
     <!-- Literature References-->
     @if (literatureRefs()) {
-      <div class="divider-container" id="literatureReference">
+      <div class="divider-container" [id]=DataKeys.LITERATURE_REFERENCE>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REFERENCE }"></ng-container>
         </div>
@@ -135,7 +135,7 @@
     <!-- Authorship-->
     @if (authorship() && authorship().length > 0) {
 
-      <div class="divider-container" id="authorship">
+      <div class="divider-container" [id]=DataKeys.AUTHORSHIP>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.AUTHORSHIP }"></ng-container>
         </div>
@@ -201,7 +201,7 @@
 
     <!-- Inferences(Inferred To)-->
     @if (inferences()) {
-      <div class="divider-container" id="inferredTo">
+      <div class="divider-container" [id]=DataKeys.INFERRED_TO>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.INFERENCES }"></ng-container>
         </div>
@@ -251,6 +251,7 @@
               <mat-divider class="divider"></mat-divider>
             </div>
           </div>
+
           <!--        todo: use shared element-container?-->
           <div class="content-container">
             <div class="control-container">this is navigation control</div>
