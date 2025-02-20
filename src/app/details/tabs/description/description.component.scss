@@ -252,26 +252,12 @@ $small-breakpoint-width: 959px;
 
 }
 
-
-.content-container {
+.control-container {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 4px 0;
-  gap: 10px;
-  width: 100%;
-
-
-  .control-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
-    width: var(--column-width);
-
-    border-radius: 15px 0 0 15px;
-    gap: 5px;
-  }
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  width: var(--column-width);
 }
 
 .composition-container {
@@ -292,7 +278,7 @@ $small-breakpoint-width: 959px;
 }
 
 
-.comma {
+.margin-right {
   margin-right: var(--margin-right);
 }
 
@@ -329,6 +315,12 @@ $small-breakpoint-width: 959px;
   padding: 0;
   gap: 10px;
   width: 100%;
+}
+
+/* Multiple persons in a authorship row */
+.flex-column {
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .label-container {
