@@ -1,16 +1,15 @@
+@use '@angular/material' as mat;
+
 :host {
   width: 100%;
 }
 
-// Hover background
-.element-row:hover {
-  background: var(--surface2);
-  border-radius: 50px;
-
-  * {
-    background: none;
-  }
+.table-container {
+  @include mat.button-overrides((
+    text-label-text-color: var(--on-tertiary),
+  ));
 }
+
 
 .header-row {
   margin-bottom: 8px;
@@ -23,6 +22,13 @@
   min-height: 24px !important;
   gap: var(--gap);
   align-content: center;
+}
+
+
+// Font weight for gene name
+.element-row .mat-column-geneName {
+  font-weight: 599;
+  font-size: 12px;
 }
 
 .mat-mdc-cell {
@@ -48,8 +54,8 @@
   overflow: visible;
   background: none;
   position: relative;
-  align-items: stretch;
 
+  // Divider
   &::after {
     content: "";
     position: absolute;
@@ -62,15 +68,9 @@
 }
 
 
-.mat-column-speciesName {
-  justify-content: flex-end;
-}
-
+.mat-column-speciesName,
+.mat-column-score,
 .mat-column-entitiesCount {
-  justify-content: flex-end;
-}
-
-.mat-column-score {
   justify-content: flex-end;
 }
 
@@ -89,15 +89,92 @@
   max-width: calc(var(--column-width) / 2 - var(--half-gap));
   flex: 0 0 calc(var(--column-width) / 2 - var(--half-gap));
   padding: 0 0 !important;
+  min-width: fit-content;
 }
 
 .mat-row {
   gap: var(--gap)
 }
 
+
+// Score ellipse
+.score {
+  --diameter: 16px;
+  --padding: 4px;
+  width: calc(var(--diameter) - 2 * var(--padding));
+  height: var(--diameter);
+  max-height: var(--diameter);
+  border-radius: var(--diameter);
+  padding: 0 var(--padding);
+  background: var(--tertiary);
+  flex-shrink: 0;
+  margin-left: var(--padding);
+}
+
+// Hover background
+.element-row:hover {
+  background: var(--surface2);
+  border-radius: 50px;
+
+  *:not(.score, .entity-button, .evidence-button, .search-icon, .intact-icon) {
+    background: none;
+  }
+}
+
+
+// Buttons
 a.disabled {
   pointer-events: none;
   opacity: 0.2;
 }
 
+a {
+  text-decoration: none;
+}
 
+.evidence-button,
+.entity-button {
+  border-radius: 50px;
+  background: var(--outline);
+  height: 20px;
+}
+
+
+.entity-button:hover {
+  background: var(--primary);
+
+  // Fill the icon color when hovering
+  .search-icon {
+    color: var(--primary);
+  }
+
+}
+
+.evidence-button:hover {
+  background: var(--tertiary);
+
+  .intact-icon {
+    color: var(--tertiary);
+  }
+}
+
+.search-icon,
+.intact-icon {
+  height: 16px;
+  width: 16px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--on-tertiary);
+  border-radius: 50px;
+  color: var(--outline);
+}
+
+.search-icon {
+  margin-right: -14px !important; // Overwrite default margin-right
+}
+
+.intact-icon {
+  margin-left: -14px;
+  flex-shrink: 0;
+}

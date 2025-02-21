@@ -13,7 +13,7 @@ export const DataKeys = {
   CATALYST_ACTIVITY: 'catalystActivity',
   OTHER_FORMS: 'otherForms',
   INFERRED_TO: 'inferredTo',
-  SUMMATION: 'submission',
+  SUMMATION: 'summation',
   CATEGORY: 'category',
   CLASS_NAME: 'className',
   SPECIES_NAME: 'speciesName',
@@ -23,6 +23,7 @@ export const DataKeys = {
   REVIEW_STATUS: 'reviewStatus',
   PUBLICATION: 'publication',
   INTERACTORS: 'interactors',
+  AUTHORSHIP: 'authorship'
 
 } as const;
 

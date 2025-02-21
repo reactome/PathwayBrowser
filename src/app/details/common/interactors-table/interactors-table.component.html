@@ -23,22 +23,33 @@
     <!-- Entities Column -->
     <ng-container matColumnDef="entitiesCount">
       <mat-header-cell *matHeaderCellDef>Reactome Entities</mat-header-cell>
-      <mat-cell *matCellDef="let element"><a [class.disabled]="element.entitiesCount === 0"
-                                             [href]="'content/query?q='+ element.identifier +'&types=Protein&cluster=false'">{{ element.entitiesCount }}</a>
+      <mat-cell *matCellDef="let element">
+        <a mat-button class="entity-button"
+           [href]="'content/query?q='+ element.identifier +'&types=Protein&cluster=false'"
+           [class.disabled]="element.entitiesCount === 0">
+          {{ element.entitiesCount }}
+          <mat-icon iconPositionEnd class="search-icon" svgIcon='search'></mat-icon>
+        </a>
       </mat-cell>
     </ng-container>
 
     <!-- Evidences count Column -->
     <ng-container matColumnDef="evidenceCount">
       <mat-header-cell *matHeaderCellDef># Evidence</mat-header-cell>
-      <mat-cell *matCellDef="let element"><a [href]=element.evidenceURL target="_blank">{{ element.evidenceCount }}</a>
+      <mat-cell *matCellDef="let element">
+        <a mat-button class='evidence-button' [href]=element.evidenceURL target="_blank">
+          <mat-icon class="intact-icon" svgIcon='intact'></mat-icon>
+          {{ element.evidenceCount }}
+        </a>
       </mat-cell>
     </ng-container>
 
     <!-- Score Column -->
     <ng-container matColumnDef="score">
-      <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.score | number : "1.2-2" }}</mat-cell>
+      <mat-header-cell *matHeaderCellDef>MI Score</mat-header-cell>
+      <mat-cell *matCellDef="let element"><span>{{ element.score | number : "1.2-2" }}</span>
+        <span [ngStyle]="{'opacity': element.score}" class="score"></span>
+      </mat-cell>
     </ng-container>
 
 

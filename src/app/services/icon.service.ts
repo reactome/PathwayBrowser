@@ -96,6 +96,8 @@ export class IconService {
     {name: 'double-arrow-right', tooltip: 'Double Arrow Right', route: 'double-arrow-right'},
     {name: 'reference', tooltip: 'References', route: 'reference'},
     {name: 'orcid', tooltip: 'Orcid', route: 'orcid'},
+    {name: 'search', tooltip: 'Search', route: 'search'},
+    {name: 'intact', tooltip: 'IntAct', route: 'intact'},
   ];
 
   speciesIcons = [

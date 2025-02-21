@@ -15,6 +15,7 @@
 
   <div class="content">
 
+    <!-- Header -->
     <div class="header" [id]=DataKeys.OVERVIEW>
       <div class="label">
         <mat-icon
@@ -44,7 +45,7 @@
 
     <!-- External Reference -->
     @if (externalRef() && externalRef().length > 0) {
-      <div class="divider-container" id="referenceEntity">
+      <div class="divider-container" [id]= DataKeys.REFERENCE_ENTITY>
         <div class="divider-name-container">
           <ng-container
             *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.EXTERNAL_REFERENCE }"></ng-container>
@@ -81,7 +82,7 @@
 
     <!-- Cross References-->
     @if (crossReferences() && crossReferences().length > 0) {
-      <div class="divider-container" id="crossReferences">
+      <div class="divider-container" [id]=DataKeys.CROSS_REFERENCES>
         <div class="divider-name-container">
           <ng-container
             *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CROSS_REFERENCES  }"></ng-container>
@@ -99,7 +100,7 @@
               @for (item of ref.data; track item.dbId) {
                 <a [href]="item.url" target="_blank">{{ item.identifier }}</a>
                 @if (item !== ref.data[ref.data.length - 1]) {
-                  <span class="comma">,</span>
+                  <span class="margin-right">,</span>
                 }
               }
             </div>
@@ -110,7 +111,7 @@
 
     <!-- Literature References-->
     @if (literatureRefs()) {
-      <div class="divider-container" id="literatureReference">
+      <div class="divider-container" [id]=DataKeys.LITERATURE_REFERENCE>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REFERENCE }"></ng-container>
         </div>
@@ -135,7 +136,7 @@
     <!-- Authorship-->
     @if (authorship() && authorship().length > 0) {
 
-      <div class="divider-container" id="authorship">
+      <div class="divider-container" [id]=DataKeys.AUTHORSHIP>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.AUTHORSHIP }"></ng-container>
         </div>
@@ -148,11 +149,11 @@
         @for (item of authorship(); track item) {
           <div class="row">
             <div class="label-container">{{ item.label }}</div>
-            <div class="composition-container">
+            <div class="composition-container flex-column">
               @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
                 <div class="authorship-item">
                   @for (author of ie.author; let i = $index; track author.dbId) {
-                    <a [href]="'/content/detail/' + author.dbId" target="_blank">
+                    <a [href]="'/content/detail/' + author.dbId" target="_blank" [ngClass]="{'margin-right': !author.orcidId}">
                       {{ author.firstname }} {{ author.surname }}
                     </a>
 
@@ -163,7 +164,7 @@
                     }
                     <!-- Add separator except for last item -->
                     @if (i < ie.author.length - 1) {
-                      <span class="comma">,</span>
+                      <span class="margin-right">,</span>
                     }
                   }
                   - {{ ie.dateTime | authorshipDateFormat }}
@@ -201,7 +202,7 @@
 
     <!-- Inferences(Inferred To)-->
     @if (inferences()) {
-      <div class="divider-container" id="inferredTo">
+      <div class="divider-container" [id]=DataKeys.INFERRED_TO>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.INFERENCES }"></ng-container>
         </div>
@@ -242,7 +243,7 @@
 
     @for (element of elements; track element.key) {
       @if (obj()[element.key] && !element?.manual) {
-        <div [id]="element.key" class="element-container">
+
           <div class="divider-container">
             <div class="divider-name-container">
               <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
@@ -251,13 +252,12 @@
               <mat-divider class="divider"></mat-divider>
             </div>
           </div>
-          <!--        todo: use shared element-container?-->
-          <div class="content-container">
+
+        <div [id]="element.key" class="element-container row">
             <div class="control-container">this is navigation control</div>
             <div class="composition-container">
               this is test content
             </div>
-          </div>
         </div>
       }
     }
