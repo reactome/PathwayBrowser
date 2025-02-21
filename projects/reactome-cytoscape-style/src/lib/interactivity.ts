@@ -21,7 +21,7 @@ export class Interactivity {
     this.initSelect(cy);
     this.initClick(cy);
     this.initStructureVideo(cy);
-    this.initStructureMolecule(cy);
+    // this.initStructureMolecule(cy);
     this.initZoom(cy);
   }
 
@@ -346,7 +346,7 @@ export class Interactivity {
 
   updateProteins() {
     this.proteins = this.cy.nodes('.Protein')
-      .or('.Molecule');
+      // .or('.Molecule');
   }
 
   initZoom(cy: cytoscape.Core) {
