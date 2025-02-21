@@ -27,11 +27,7 @@ export class ViewportComponent implements AfterViewInit {
 
   hasEHLD = computed(() => {
     const pathway = this.dataState.currentPathway();
-    if (pathway && isPathwayOrTLP(pathway)) {
-      const hasEHLD = pathway.hasEHLD;
-      return hasEHLD === undefined ? true : hasEHLD; // Avoid flickering of diagram to EHLD
-    }
-    return false;
+    return pathway && isPathwayOrTLP(pathway) && (pathway?.hasEHLD !== undefined) ? pathway.hasEHLD : true;
   })
   title = computed(() => this.dataState.currentPathway()?.displayName)
 
@@ -45,7 +41,7 @@ export class ViewportComponent implements AfterViewInit {
   normalPathway = computed(() => {
     const pathway = this.dataState.currentPathway();
     if (pathway && isPathwayOrTLP(pathway)) {
-     return  pathway.normalPathway
+      return pathway.normalPathway
     }
     return undefined;
   })
@@ -75,7 +71,7 @@ export class ViewportComponent implements AfterViewInit {
               public state: UrlStateService,
               public general: GeneralService,
               public dataState: DataStateService,
-              ) {
+  ) {
     effect(() => this.dataState.currentPathway() && this.eventService.setDiagramEvent(this.dataState.currentPathway()!));
   }
 
@@ -90,7 +86,6 @@ export class ViewportComponent implements AfterViewInit {
     this.interactorService.currentInteractorResource$.pipe(untilDestroyed(this)).subscribe(resource => {
       this.currentInteractorResource = resource;
     });
-
 
 
     this.darkToggle?._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
