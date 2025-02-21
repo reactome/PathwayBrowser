@@ -1,0 +1,78 @@
+<!-- Template to know how much space to allocate to label -->
+<span class="label" style="visibility: hidden" #maxWidth>
+      {{ maxLengthProfile() || analysis.resultSignal()?.summary?.sampleName }}
+</span>
+
+<!-- Actual content -->
+<div class="container">
+  <div class="top">
+    <button mat-icon-button (click)="clear()" class="small">
+      <mat-icon>filter_alt</mat-icon>
+    </button>
+
+    @if (hasMultipleProfile()) {
+      <button mat-icon-button
+              [disabled]="analysis.profileIndex() === 0"
+              (click)="previousProfile()">
+        <mat-icon>navigate_before</mat-icon>
+      </button>
+    }
+
+
+    <span class="label" [style.width.px]="maxWidth?.offsetWidth">
+    {{ state.analysisProfile() || analysis.resultSignal()?.summary?.sampleName }}
+    </span>
+
+
+    @if (hasMultipleProfile()) {
+      <button mat-icon-button
+              [disabled]="analysis.profileIndex() === analysis.profiles().length - 1"
+              (click)="nextProfile()">
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+    }
+
+    <button mat-icon-button (click)="clear()" class="small">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  @if (analysis.type() !== 'OVERREPRESENTATION') {
+    <div (click)="selectingPalette = !selectingPalette">
+      <ng-container *ngTemplateOutlet="display; context: {$implicit: analysis.palette()}"/>
+    </div>
+    @if (selectingPalette) {
+      <div class="palette-selector" [@selectAnim]>
+        @for (group of analysis.palettes; track group.name) {
+          @if (group.valid) {
+            @for (pName of group.palettes; track pName) {
+              @let palette = analysis.paletteOptions.get(pName)!;
+              @if (palette !== analysis.palette()) {
+                <div (click)="selectPalette(palette)">
+                  <ng-container *ngTemplateOutlet="display; context: {$implicit: palette}"/>
+                </div>
+              }
+            }
+          }
+        }
+      </div>
+    }
+  }
+</div>
+
+<ng-template #display let-palette>
+  <div class="palette" [style.background]="palette.gradient">
+    @let result = analysis.resultSignal();
+    @if (result?.summary?.type === 'GSA_REGULATION') {
+      <span class="point even">↓↓</span>
+      <span class="point even">↓</span>
+      <span class="point even">-</span>
+      <span class="point even">↑</span>
+      <span class="point even">↑↑</span>
+    } @else {
+      <div class="space-between">
+        <span class="point">{{ result?.expression?.min | number :'1.2-2' }}</span>
+        <span class="point">{{ result?.expression?.max | number :'1.2-2' }}</span>
+      </div>
+    }
+  </div>
+</ng-template>

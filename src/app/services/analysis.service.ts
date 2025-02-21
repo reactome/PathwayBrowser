@@ -1,51 +1,72 @@
-import {computed, Injectable} from '@angular/core';
+import {computed, effect, Injectable, linkedSignal, signal, Signal, WritableSignal} from '@angular/core';
 import {catchError, Observable, of, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {Analysis} from "../model/analysis.model";
 import {UrlStateService} from "./url-state.service";
-import {brewer, Scale, scale} from "chroma-js";
+import chroma, {Color, Scale} from "chroma-js";
 import {extract, Style} from "reactome-cytoscape-style";
-import {toObservable} from "@angular/core/rxjs-interop";
+import {toObservable, toSignal} from "@angular/core/rxjs-interop";
+import {DarkService} from "./dark.service";
 
 
-export type StandardPalette = keyof typeof brewer;
+export type StandardPalette = keyof typeof chroma.brewer;
+
+export type CustomPalette = 'ancient' | 'primary';
+
+export type PaletteName = CustomPalette | StandardPalette;
 
 export type PaletteGroup = 'sequential' | 'diverging' | 'continuous';
 
-// type PaletteSummary = { name: Palette, scale: Scale, gradient: string };
-
 export class PaletteSummary {
 
-  colors: string[];
+  lightColors: Color[];
+  darkColors: Color[];
   scale: Scale;
-  gradient: string;
+  n = -1
+  isDark = false;
+  padding = 0
 
   constructor(private data: StandardPalette | string[]) {
     if (typeof data === "string") {
-      this.scale = scale(data).padding(0.25)
-      this.colors = brewer[data]
+      this.padding = 0.1;
+      this.scale = chroma.scale(data).padding(this.padding);
+      this.lightColors = this.scale.colors(20).map(s => chroma(s))
     } else { // Different functions being called, though same name according to typescript
-      this.scale = scale(data)
-      this.colors = data
+      this.scale = chroma.scale(data)
+      this.lightColors = data.map(s => chroma(s))
     }
-    this.scale.mode('oklab')
 
-    this.gradient = `linear-gradient(to right in oklab, ${this.colors.join(', ')})`
+
+    this.darkColors = this.lightColors.map(color => {
+      const [h, s, l] = color.hsl();
+      return chroma.hsl(h, s, 1 - l)
+    })
+    this.scale.mode('oklab')
   }
 
   classes(n: number) {
-    if (n > 0) {
-      this.scale.classes(n)
-      this.gradient = `linear-gradient(to right in oklab, ${this.scale.colors(n).map((c, i) => `${c} ${i / n * 100}%, ${c} ${(i + 1) / n * 100}%`).join(', ')})`
-    } else {
-      this.scale.classes(-1)
-      this.gradient = `linear-gradient(to right in oklab, ${this.colors.join(', ')})`
-    }
+    this.scale = this.scale.classes(n)
+    this.n = n
   }
 
   domain(min: number, max: number) {
     this.scale = this.scale.domain([min, max])
+  }
+
+  get gradient(): string {
+    return this.n === -1 ?
+      `linear-gradient(to right in oklab, ${this.colors.join(', ')})` :
+      `linear-gradient(to right in oklab, ${this.scale.colors(this.n).map((c, i) => `${c} ${i / this.n * 100}%, ${c} ${(i + 1) / this.n * 100}%`).join(', ')})`
+  }
+
+  get colors() {
+    return this.isDark ? this.darkColors : this.lightColors;
+  }
+
+  set dark(isDark:boolean) {
+    this.isDark = isDark;
+    this.scale = chroma.scale(this.colors).mode('oklab').classes(this.n).padding(this.padding)
   }
 }
 
@@ -56,31 +77,37 @@ export type Examples = 'uniprot' | 'microarray';
   providedIn: 'root'
 })
 export class AnalysisService {
+  style: Style = new Style(document.body);
 
-  paletteOptions: Map<string, PaletteSummary> = new Map([
-    ...Object.keys(brewer)
-    .filter(name => name.toLowerCase() !== name)
-    .map(name => ([name, new PaletteSummary(name as StandardPalette)] as [string, PaletteSummary])),
-    ['original', new PaletteSummary(['#1532b3','#808080','#e5e61d'])]
+  paletteOptions: Map<PaletteName, PaletteSummary> = new Map([
+    ...Object.keys(chroma.brewer)
+      .filter(name => name.toLowerCase() !== name)
+      .map(name => ([name, new PaletteSummary(name as StandardPalette)] as [StandardPalette, PaletteSummary])),
+    ['ancient', new PaletteSummary(['#1532b3', '#fff', '#e5e61d'])],
+    ['primary', new PaletteSummary(['#fff', extract(this.style.properties.global.primary)])]
   ]);
 
-  palette: PaletteSummary = this.paletteOptions.get('RdBu')!;
+  palette: WritableSignal<PaletteSummary> = signal(this.paletteOptions.get('primary')!);
 
-  palettes: { name: PaletteGroup, palettes: StandardPalette[], valid: boolean }[] = [
+  palettes: { name: PaletteGroup, palettes: PaletteName[], valid: boolean }[] = [
     {
       name: 'sequential', valid: false, palettes: [
+        'primary',
         'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
         'BuPu', 'RdPu', 'PuRd',
         'GnBu', 'YlGnBu', 'PuBu', 'PuBuGn',
         'BuGn', 'YlGn',
-        'YlOrBr', 'OrRd', 'YlOrRd'
+        'YlOrBr', 'OrRd', 'YlOrRd',
       ]
     },
-    {name: 'diverging', valid: true, palettes: ['RdYlGn', 'RdYlBu', 'RdGy', 'RdBu', 'PuOr', 'PRGn', 'PiYG', 'BrBG']},
+    {
+      name: 'diverging',
+      valid: true,
+      palettes: ['RdYlGn', 'RdYlBu', 'RdGy', 'RdBu', 'PuOr', 'PRGn', 'PiYG', 'BrBG', 'ancient']
+    },
     {name: 'continuous', valid: false, palettes: ['Spectral', 'Viridis']},
   ];
 
-  style: Style = new Style(document.body);
 
   result?: Analysis.Result;
 
@@ -100,35 +127,58 @@ export class AnalysisService {
       if (result.summary.type === 'GSA_REGULATION') {
         validGroups.add('diverging')
 
-        this.palette = this.paletteOptions.get('original')!
+        this.palette.set(this.paletteOptions.get('PiYG')!)
       } else if (result.summary.type === 'EXPRESSION') {
         validGroups.add('diverging')
         validGroups.add('sequential')
         validGroups.add('continuous')
 
-        this.palette = this.paletteOptions.get('Viridis')!
+        this.palette.set(this.paletteOptions.get('RdPu')!)
       } else if (result.summary.type === 'OVERREPRESENTATION') {
         validGroups.add('sequential')
 
-        this.palette = this.paletteOptions.get('RdBu')!
+        this.palette.set(this.paletteOptions.get('primary')!)
       }
       for (let summary of this.paletteOptions.values()) {
         //@ts-ignore
         summary.scale.nodata(extract(this.style.properties.analysis.notFound))
-        summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : 0);
+        summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : -1);
         summary.domain(result.expression.min || 0, result.expression.max || 1);
       }
+
+      this.state.analysisProfile.set(result?.expression.columnNames[0] || null)
 
       this.palettes.forEach(group => group.valid = validGroups.has(group.name))
     })
   )
 
-  constructor(private http: HttpClient, private state: UrlStateService) {
+  resultSignal = toSignal(this.result$)
+  type = computed(() => this.resultSignal()?.summary.type)
+  profiles = computed(() => this.resultSignal()?.expression.columnNames || [])
+  profileIndex = linkedSignal({
+    source: () => ({result: this.resultSignal(), profile: this.state.analysisProfile()}),
+    computation: ({result, profile}) =>
+      Math.max(// Avoid -1 value from indexOf
+        result &&
+        profile &&
+        result?.expression.columnNames?.indexOf(profile) ||
+        0, 0
+      )
+  })
+
+  dark = toSignal(this.darkS.$dark, {initialValue: false})
+
+  constructor(private http: HttpClient, private state: UrlStateService, private darkS: DarkService) {
+    effect(() => {
+      [...this.paletteOptions.values()].forEach(summary => summary.dark = this.dark())
+    });
+
   }
 
   clearAnalysis() {
     this.result = undefined;
     this.state.analysis.set(null);
+    this.state.analysisProfile.set(null);
   }
 
   analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {

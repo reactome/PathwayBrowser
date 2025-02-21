@@ -61,6 +61,7 @@ import {
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
   MatTable
 } from "@angular/material/table";
+import {AnalysisControlsComponent} from "./controls/analysis-controls/analysis-controls.component";
 
 @NgModule({
   declarations: [
@@ -130,7 +131,8 @@ import {
     MatHeaderRow,
     MatRow,
     MatHeaderRowDef,
-    MatRowDef
+    MatRowDef,
+    AnalysisControlsComponent
   ],
   providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })

@@ -234,7 +234,7 @@ export class EhldService {
           start: stops[p]?.stop || 0,
           stop: (stops[p]?.stop || 0) + delta * exp[1],
           width: delta * exp[1],
-          color: this.analysis.palette.scale(realExp).hex(),
+          color: this.analysis.palette().scale(realExp).hex(),
           exp: realExp
         })
       }

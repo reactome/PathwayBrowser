@@ -17,10 +17,10 @@
     <ng-container *ngIf="analysis.result">
       <mat-form-field style="width: 200px" appearance="outline" [subscriptSizing]="'dynamic'">
         <mat-label>Palette</mat-label>
-        <mat-select [(value)]="analysis.palette" (selectionChange)="diagram.changePalette()"
+        <mat-select [(value)]="analysis.palette"
                     [hideSingleSelectionIndicator]="true">
           <mat-select-trigger>
-            <div class="palette" [style.background]="analysis.palette.gradient" style="vertical-align: center">
+            <div class="palette" [style.background]="analysis.palette().gradient" style="vertical-align: center">
             </div>
           </mat-select-trigger>
           <ng-container *ngFor="let group of analysis.palettes ">

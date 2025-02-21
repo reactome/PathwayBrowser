@@ -76,10 +76,10 @@ export class UrlStateService implements State {
             param.set(values);
           } else if (isBoolean(formerValue)) {
             param.set(value === 'true');
-          } else if (value.charAt(0).match(/\d/)) {
-            param.set(await this.dbIdToStId(parseInt(value)))
+          } else if (!isNaN(+value)) {
+            param.set(await this.dbIdToStId(+value))
           } else {
-            param.set(value)
+            param.set(value.replaceAll('__', ' '))
           }
         } else {
           param.set(param.initialValue)
@@ -91,6 +91,7 @@ export class UrlStateService implements State {
       for (const key in this.values) {
         let param = this.values[key as keyof State]();
         if (!param || (isArray(param) && param.length === 0)) continue;
+        if (typeof param === 'string') param = param.replaceAll(' ', '__')
         queryParams[key] = isArray(param) ? param.join(',') : param;
       }
       console.log('Updating URL from state', queryParams)

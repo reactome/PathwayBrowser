@@ -63,6 +63,7 @@
     flex: 0;
     display: flex;
     gap: 20px;
+
     button {
       background: var(--surface);
     }
@@ -76,7 +77,7 @@
     overflow: hidden;
     min-width: 0;
     flex: 1;
-    text-align: center ;
+    text-align: center;
   }
 
   .top-right {
@@ -92,12 +93,14 @@
       display: flex;
       //height: 100%;
       width: fit-content;
+
       mat-icon {
         height: 44px;
         margin-left: -6px;
         color: light-dark(var(--on-primary), var(--primary));
         width: max-content;
       }
+
       .version {
         vertical-align: top;
         text-decoration: underline;
@@ -130,30 +133,24 @@
         pressed-handle-size: 18px,
         selected-with-icon-handle-horizontal-margin: 0 16px,
         selected-pressed-handle-horizontal-margin: 0 16px,
-
         track-outline-color: var(--primary),
         selected-track-outline-color: var(--primary-container),
-
         selected-track-color: var(--surface),
         selected-focus-track-color: var(--surface),
         selected-hover-track-color: var(--surface),
         selected-pressed-track-color: var(--surface),
-
         unselected-track-color: var(--surface),
         unselected-focus-track-color: var(--surface),
         unselected-hover-track-color: var(--surface),
-        unselected-pressed-track-color: var(--surface)
-      ,
+        unselected-pressed-track-color: var(--surface),
         selected-handle-color: var(--primary),
         selected-focus-handle-color: var(--primary),
         selected-hover-handle-color: var(--primary),
         selected-pressed-handle-color: var(--primary),
-
         unselected-handle-color: var(--primary),
         unselected-focus-handle-color: var(--primary),
         unselected-hover-handle-color: var(--primary),
         unselected-pressed-handle-color: var(--primary),
-
         selected-icon-color: var(--surface),
         unselected-icon-color: var(--surface),
       ));
@@ -258,4 +255,19 @@
 .event-hierarchy {
   height: 100%;
   overflow-x: hidden;
+}
+
+#view {
+  position: relative;
+}
+
+.floating {
+  position: absolute;
+  bottom: 0;
+
+  &.center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
 }

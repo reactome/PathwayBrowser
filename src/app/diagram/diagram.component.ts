@@ -31,7 +31,7 @@ import {EventService} from "../services/event.service";
 import {Event} from "../model/graph/event/event.model";
 
 
-import {brewer} from "chroma-js";
+import chroma from "chroma-js";
 import {group, style} from "@angular/animations";
 import {MatFormField} from "@angular/material/form-field";
 import {DarkService} from "../services/dark.service";
@@ -76,6 +76,12 @@ export class DiagramComponent implements AfterViewInit {
       this.selecting = false;
     }, {debugName: 'diagram selecting'});
     effect(() => this.state.analysis() && this.avoidSideEffect(() => this.loadAnalysis(this.state.analysis())));
+    effect(() => this.analysis.palette() && this.reactomeStyle?.loadAnalysis(this.cy, this.analysis.palette().scale));
+    effect(() =>
+      this.analysis.profileIndex() !== undefined &&
+      this._loadAnalysisFn &&
+      this._loadAnalysisFn(this.analysis.profileIndex())
+    );
   }
 
   cy!: cytoscape.Core;
@@ -497,7 +503,7 @@ export class DiagramComponent implements AfterViewInit {
           })
         })
       });
-      this.reactomeStyle?.loadAnalysis(this.cy, this.analysis.palette.scale);
+      this.reactomeStyle?.loadAnalysis(this.cy, this.analysis.palette().scale);
       return
     }
 
@@ -506,75 +512,72 @@ export class DiagramComponent implements AfterViewInit {
       pathways: this.analysis.pathwaysResults(this.cy.nodes('.Pathway').map(p => p.data('reactomeId')), token),
       result: this.analysis.result$.pipe(filter(isDefined), take(1))
     }).subscribe(({entities, result, pathways}) => {
-      // TODO Make switching profile work without reloading whole data
-      const analysisProfile = this.state.analysisProfile();
-      let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
-      if (analysisIndex === -1) analysisIndex = 0;
 
-      let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
-        entity.mapsTo
-          .flatMap(diagramEntity => diagramEntity.ids)
-          .map(id => [id, entity.exp[analysisIndex] || 1]))
-      )
-      console.log(analysisEntityMap)
+      this._loadAnalysisFn = (analysisIndex) => {
+        console.log('loading index', analysisIndex)
+        let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
+          entity.mapsTo
+            .flatMap(diagramEntity => diagramEntity.ids)
+            .map(id => [id, entity.exp[analysisIndex] || 1]))
+        )
+        console.log(analysisEntityMap)
 
-      let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
+        let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
 
-      console.log(analysisPathwayMap)
+        console.log(analysisPathwayMap)
 
-      const normalize = (x: number, min: number, max: number) => (x - min) / (max - min)
+        const normalize = (x: number, min: number, max: number) => (x - min) / (max - min)
 
-      this.cys.forEach(cy => {
-        cy.batch(() => {
-          const style: Style = cy.data('reactome');
-          const min = style.properties.analysis.min = result.expression.min || 0;
-          const max = style.properties.analysis.max = result.expression.max || 1;
+        this.cys.forEach(cy => {
+          cy.batch(() => {
+            const style: Style = cy.data('reactome');
+            const min = style.properties.analysis.min = result.expression.min || 0;
+            const max = style.properties.analysis.max = result.expression.max || 1;
 
-          const hasExpression = result.summary.type !== 'OVERREPRESENTATION';
+            const hasExpression = result.summary.type !== 'OVERREPRESENTATION';
 
 
-          cy.nodes('.PhysicalEntity').forEach(node => {
-            const leaves: Graph.Node[] = node.data('graph.leaves');
-            const exp = leaves
-              .map(leaf => analysisEntityMap.get(leaf.identifier))
-              .sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
+            cy.nodes('.PhysicalEntity').forEach(node => {
+              const leaves: Graph.Node[] = node.data('graph.leaves');
+              const exp = leaves
+                .map(leaf => analysisEntityMap.get(leaf.identifier))
+                .sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
 
-            // console.log(node.data('reactomeId'), leaves, exp)
+              // console.log(node.data('reactomeId'), leaves, exp)
 
-            // if (hasExpression) exp = exp.map(e => e !== undefined ? 1 - e : undefined);
-            node.data('exp', exp);
+              // if (hasExpression) exp = exp.map(e => e !== undefined ? 1 - e : undefined);
+              node.data('exp', exp);
+            })
+            cy.nodes('.Pathway').forEach(node => {
+              const dbId: number = node.data('reactomeId');
+              const pathwayData = analysisPathwayMap.get(dbId);
+              if (!pathwayData) {
+                node.data('exp', [undefined]);
+              } else {
+                console.log(dbId, normalize(pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, min, max))
+                node.data('exp', [
+                  [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
+                  [undefined, pathwayData.total - pathwayData.found]
+                ])
+              }
+            })
+
+            cy.edges('[?color]').style({'underlay-padding': 8});
+            cy.nodes('.Shadow').style({
+              'font-size': extract(style.properties.shadow.fontSize) / 2,
+              'text-outline-width': extract(style.properties.shadow.fontPadding) / 2
+            })
+
+            this.reactomeStyle.loadAnalysis(cy, this.analysis.palette().scale);
           })
-          cy.nodes('.Pathway').forEach(node => {
-            const dbId: number = node.data('reactomeId');
-            const pathwayData = analysisPathwayMap.get(dbId);
-            if (!pathwayData) {
-              node.data('exp', [undefined]);
-            } else {
-              console.log(dbId, normalize(pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, min, max))
-              node.data('exp', [
-                [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
-                [undefined, pathwayData.total - pathwayData.found]
-              ])
-            }
-          })
-
-          cy.edges('[?color]').style({'underlay-padding': 8});
-          cy.nodes('.Shadow').style({
-            'font-size': extract(style.properties.shadow.fontSize) / 2,
-            'text-outline-width': extract(style.properties.shadow.fontPadding) / 2
-          })
-
-          this.reactomeStyle.loadAnalysis(cy, this.analysis.palette.scale);
         })
-      })
+      }
 
+      this._loadAnalysisFn(this.analysis.profileIndex())
     })
   }
 
-  changePalette() {
-    console.log(this.analysis.palette)
-    if (this.analysis.palette) this.reactomeStyle.loadAnalysis(this.cy, this.analysis.palette.scale);
-  }
+  private _loadAnalysisFn: ((analysisIndex: number) => void) | undefined
 
   updateStyle() {
     this.cy ? setTimeout(() => this.reactomeStyle?.update(this.cy), 5) : null;
@@ -775,7 +778,7 @@ export class DiagramComponent implements AfterViewInit {
   }
 
   protected readonly style = style;
-  protected readonly brewer = brewer;
+  protected readonly brewer = chroma.brewer;
   protected readonly MatFormField = MatFormField;
   protected readonly group = group;
 }
