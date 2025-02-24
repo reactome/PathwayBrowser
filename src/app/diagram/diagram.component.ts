@@ -75,7 +75,10 @@ export class DiagramComponent implements AfterViewInit {
       if (this.state.select() && !this.selecting) this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select()!, cy)))
       this.selecting = false;
     }, {debugName: 'diagram selecting'});
-    effect(() => this.state.analysis() && this.avoidSideEffect(() => this.loadAnalysis(this.state.analysis())));
+    effect(() => {
+      const result = this.state.analysis(); // Not in one line to make sure to trigger the update
+      this.avoidSideEffect(() => this.loadAnalysis(result))
+    });
     effect(() => this.analysis.palette() && this.reactomeStyle?.loadAnalysis(this.cy, this.analysis.palette().scale));
     effect(() =>
       this.analysis.profileIndex() !== undefined &&
@@ -491,6 +494,8 @@ export class DiagramComponent implements AfterViewInit {
     const diagramId = this.pathwayId();
     console.log(token, diagramId)
     if (!token || !diagramId) {
+      this._loadAnalysisFn = undefined;
+
       this.cys.forEach(cy => {
         cy.batch(() => {
           cy.nodes().removeData('exp');
