@@ -6,13 +6,13 @@
 <!-- Actual content -->
 <div class="container">
   <div class="top">
-    <button mat-icon-button (click)="clear()" class="small">
-      <mat-icon>filter_alt</mat-icon>
+    <button mat-icon-button (click)="toggleIterate()" class="small">
+      <mat-icon [fontIcon]="interval ? 'pause' : 'play_arrow'" ></mat-icon>
     </button>
 
     @if (hasMultipleProfile()) {
       <button mat-icon-button
-              [disabled]="analysis.profileIndex() === 0"
+              [disabled]="isFirstProfile()"
               (click)="previousProfile()">
         <mat-icon>navigate_before</mat-icon>
       </button>
@@ -26,7 +26,7 @@
 
     @if (hasMultipleProfile()) {
       <button mat-icon-button
-              [disabled]="analysis.profileIndex() === analysis.profiles().length - 1"
+              [disabled]="isLastProfile()"
               (click)="nextProfile()">
         <mat-icon>navigate_next</mat-icon>
       </button>

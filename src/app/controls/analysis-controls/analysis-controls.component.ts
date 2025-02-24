@@ -34,6 +34,11 @@ export class AnalysisControlsComponent {
 
   selectingPalette = false;
 
+  interval?: number
+
+  isFirstProfile = computed(() => this.analysis.profileIndex() === 0)
+  isLastProfile = computed(() => this.analysis.profileIndex() >= this.analysis.profiles().length - 1)
+
   hasMultipleProfile = computed(() => this.analysis.profiles().length > 1);
 
   maxLengthProfile = computed(() => this.analysis.profiles().reduce((a, b) => a.length > b.length ? a : b, ''));
@@ -50,6 +55,7 @@ export class AnalysisControlsComponent {
   }
 
   clear() {
+    this.pause()
     this.analysis.clearAnalysis()
   }
 
@@ -61,7 +67,27 @@ export class AnalysisControlsComponent {
   selectPalette(palette: PaletteSummary) {
     this.analysis.palette.set(palette);
     this.selectingPalette = false;
+  }
 
-    console.table(palette.colors.map(c => c.oklch()))
+  toggleIterate() {
+    if (this.interval === undefined) {
+      this.play();
+    } else {
+      this.pause();
+    }
+  }
+
+  play() {
+    this.interval = window.setInterval(this.iterate.bind(this), 1000);
+  }
+
+  pause() {
+    window.clearInterval(this.interval);
+    this.interval = undefined;
+  }
+
+  iterate() {
+    if (!this.isLastProfile()) this.nextProfile();
+    else this.updateProfile(0)
   }
 }
