@@ -169,24 +169,19 @@ $small-breakpoint-width: 959px;
   align-items: center;
   padding: 8px;
   margin: 0 auto;
-  width: var(--icon-width);
-  height: 100px;
+  width: var(--column-width);
+  height: var(--icon-height);
 
   border: 1px solid #CAC4D0;
   border-radius: 16px;
 
 
   .icon {
-    width: var(--icon-width);
-    height: var(--icon-height);
+    width: 100%;
+    height: 100%;
     display: flex;
-
-  }
-
-  img {
-    width: var(--icon-width);
-    height: var(--icon-height);
-
+    justify-content: center;
+    align-items: stretch;
   }
 }
 

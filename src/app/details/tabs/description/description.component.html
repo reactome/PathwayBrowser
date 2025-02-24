@@ -34,10 +34,10 @@
     </div>
 
     <!-- Overview -->
-    <div class="overview" [ngClass]="{'update-layout': !icon.isLoading() && icon.value()}">
-      <cr-description-overview [obj]="obj()"></cr-description-overview>
+    <div class="overview" #overview [ngClass]="{'update-layout': !icon.isLoading() && icon.value()}" [style.--icon-height.px]="overview.offsetHeight">
+      <cr-description-overview  [obj]="obj()"></cr-description-overview>
       @if (!icon.isLoading() && icon.value()) {
-        <div class="icon-container">
+        <div class="icon-container" >
           <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
         </div>
       }
