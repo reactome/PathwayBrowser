@@ -2,16 +2,10 @@
   width: 100%;
 }
 
-#tree-container {
-  background: var(--surface);
-  font-family: 'Roboto Flex', sans-serif;
+.refs-tree {
 
   .refs-tree-invisible {
     display: none;
-  }
-
-  .mat-tree {
-    background: var(--surface);
   }
 
   .custom-margin {
