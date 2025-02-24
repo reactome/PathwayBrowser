@@ -5,6 +5,7 @@ import {MatIcon} from "@angular/material/icon";
 import {UrlStateService} from "../../services/url-state.service";
 import {DecimalPipe, NgTemplateOutlet} from "@angular/common";
 import {animate, style, transition, trigger} from "@angular/animations";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'cr-analysis-controls',
@@ -12,7 +13,8 @@ import {animate, style, transition, trigger} from "@angular/animations";
     MatIconButton,
     MatIcon,
     NgTemplateOutlet,
-    DecimalPipe
+    DecimalPipe,
+    MatTooltip
   ],
   templateUrl: './analysis-controls.component.html',
   styleUrl: './analysis-controls.component.scss',

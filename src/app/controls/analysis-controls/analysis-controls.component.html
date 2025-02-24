@@ -63,11 +63,11 @@
   <div class="palette" [style.background]="palette.gradient">
     @let result = analysis.resultSignal();
     @if (result?.summary?.type === 'GSA_REGULATION') {
-      <span class="point even">↓↓</span>
-      <span class="point even">↓</span>
-      <span class="point even">-</span>
-      <span class="point even">↑</span>
-      <span class="point even">↑↑</span>
+      <span class="point even" matTooltip="Significantly down regulated">↓↓</span>
+      <span class="point even" matTooltip="Non-significantly down regulated">↓</span>
+      <span class="point even" matTooltip="No regulation">-</span>
+      <span class="point even" matTooltip="Non-significantly up regulated">↑</span>
+      <span class="point even" matTooltip="Significantly up regulated">↑↑</span>
     } @else {
       <div class="space-between">
         <span class="point">{{ result?.expression?.min | number :'1.2-2' }}</span>
