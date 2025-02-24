@@ -13,7 +13,7 @@
 
 .header-row {
   margin-bottom: 8px;
-  box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 3px 3px -3px var(--on-surface);
   position: sticky;
   top: 0;
 }
@@ -108,7 +108,7 @@
   padding: 0 var(--padding);
   background: var(--tertiary);
   flex-shrink: 0;
-  margin-left: var(--padding);
+  margin: 0 var(--padding);
 }
 
 // Hover background
