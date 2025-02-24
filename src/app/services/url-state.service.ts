@@ -30,7 +30,7 @@ export class UrlStateService implements State {
     flagInteractors: urlParam<boolean>(false, ['FLGINT']),
     overlay: urlParam<string | null>(null),
     analysis: urlParam<string | null>(null, ['ANALYSIS']),
-    analysisProfile: urlParam<string | null>(null),
+    sample: urlParam<string | null>(null),
   };
 
   public readonly select = this.values.select
@@ -39,7 +39,7 @@ export class UrlStateService implements State {
   public readonly flagInteractors = this.values.flagInteractors
   public readonly overlay = this.values.overlay
   public readonly analysis = this.values.analysis
-  public readonly analysisProfile = this.values.analysisProfile
+  public readonly sample = this.values.sample
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 

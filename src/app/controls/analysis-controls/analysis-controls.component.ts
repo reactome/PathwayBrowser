@@ -35,23 +35,20 @@ export class AnalysisControlsComponent {
   selectingPalette = false;
 
   interval?: number
-
-  isFirstProfile = computed(() => this.analysis.profileIndex() === 0)
-  isLastProfile = computed(() => this.analysis.profileIndex() >= this.analysis.profiles().length - 1)
-
-  hasMultipleProfile = computed(() => this.analysis.profiles().length > 1);
-
-  maxLengthProfile = computed(() => this.analysis.profiles().reduce((a, b) => a.length > b.length ? a : b, ''));
+  isFirstProfile = computed(() => this.analysis.sampleIndex() === 0)
+  isLastProfile = computed(() => this.analysis.sampleIndex() >= this.analysis.samples().length - 1)
+  hasMultipleProfile = computed(() => this.analysis.samples().length > 1);
+  maxLengthProfile = computed(() => this.analysis.samples().reduce((a, b) => a.length > b.length ? a : b, ''));
 
   constructor(public analysis: AnalysisService, public state: UrlStateService) {
   }
 
   previousProfile() {
-    this.updateProfile(this.analysis.profileIndex() - 1)
+    this.updateProfile(this.analysis.sampleIndex() - 1)
   }
 
   nextProfile() {
-    this.updateProfile(this.analysis.profileIndex() + 1)
+    this.updateProfile(this.analysis.sampleIndex() + 1)
   }
 
   clear() {
@@ -60,8 +57,8 @@ export class AnalysisControlsComponent {
   }
 
   updateProfile(index: number) {
-    this.analysis.profileIndex.set(index)
-    this.state.analysisProfile.set(this.analysis.profiles()[index])
+    this.analysis.sampleIndex.set(index)
+    this.state.sample.set(this.analysis.samples()[index])
   }
 
   selectPalette(palette: PaletteSummary) {

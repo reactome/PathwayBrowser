@@ -81,9 +81,9 @@ export class DiagramComponent implements AfterViewInit {
     });
     effect(() => this.analysis.palette() && this.reactomeStyle?.loadAnalysis(this.cy, this.analysis.palette().scale));
     effect(() =>
-      this.analysis.profileIndex() !== undefined &&
+      this.analysis.sampleIndex() !== undefined &&
       this._loadAnalysisFn &&
-      this._loadAnalysisFn(this.analysis.profileIndex())
+      this._loadAnalysisFn(this.analysis.sampleIndex())
     );
   }
 
@@ -578,7 +578,7 @@ export class DiagramComponent implements AfterViewInit {
         })
       }
 
-      this._loadAnalysisFn(this.analysis.profileIndex())
+      this._loadAnalysisFn(this.analysis.sampleIndex())
     })
   }
 

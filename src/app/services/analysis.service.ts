@@ -92,18 +92,36 @@ export class AnalysisService {
   palettes: { name: PaletteGroup, palettes: PaletteName[], valid: boolean }[] = [
     {
       name: 'sequential', valid: false, palettes: [
-        'primary',
-        'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
-        'BuPu', 'RdPu', 'PuRd',
-        'GnBu', 'YlGnBu', 'PuBu', 'PuBuGn',
-        'BuGn', 'YlGn',
-        'YlOrBr', 'OrRd', 'YlOrRd',
+        // 'primary',
+        // 'Greys',
+        // 'Purples',
+        // 'Blues', 'Greens', 'Oranges', 'Reds',
+        // 'BuPu',
+        'RdPu',
+        // 'PuRd',
+        // 'GnBu', 'YlGnBu', 'PuBu',
+        'PuBuGn',
+        'BuGn',
+        // 'YlGn',
+        // 'YlOrBr',
+        'OrRd',
+        // 'YlOrRd',
       ]
     },
     {
       name: 'diverging',
       valid: true,
-      palettes: ['RdYlGn', 'RdYlBu', 'RdGy', 'RdBu', 'PuOr', 'PRGn', 'PiYG', 'BrBG', 'ancient']
+      palettes: [
+        'RdYlGn',
+        // 'RdYlBu',
+        // 'RdGy',
+        'RdBu',
+        // 'PuOr',
+        // 'PRGn',
+        'PiYG',
+        // 'BrBG',
+        // 'ancient'
+      ]
     },
     {name: 'continuous', valid: false, palettes: ['Spectral', 'Viridis']},
   ];
@@ -129,7 +147,7 @@ export class AnalysisService {
 
         this.palette.set(this.paletteOptions.get('PiYG')!)
       } else if (result.summary.type === 'EXPRESSION') {
-        validGroups.add('diverging')
+        // validGroups.add('diverging')
         validGroups.add('sequential')
         validGroups.add('continuous')
 
@@ -137,7 +155,7 @@ export class AnalysisService {
       } else if (result.summary.type === 'OVERREPRESENTATION') {
         validGroups.add('sequential')
 
-        this.palette.set(this.paletteOptions.get('primary')!)
+        this.palette.set(this.paletteOptions.get('RdPu')!)
       }
       for (let summary of this.paletteOptions.values()) {
         //@ts-ignore
@@ -146,7 +164,7 @@ export class AnalysisService {
         summary.domain(result.expression.min || 0, result.expression.max || 1);
       }
 
-      this.state.analysisProfile.set(result?.expression.columnNames[0] || null)
+      this.state.sample.set(result?.expression.columnNames[0] || null)
 
       this.palettes.forEach(group => group.valid = validGroups.has(group.name))
     })
@@ -154,14 +172,14 @@ export class AnalysisService {
 
   resultSignal = toSignal(this.result$)
   type = computed(() => this.resultSignal()?.summary.type)
-  profiles = computed(() => this.resultSignal()?.expression.columnNames || [])
-  profileIndex = linkedSignal({
-    source: () => ({result: this.resultSignal(), profile: this.state.analysisProfile()}),
-    computation: ({result, profile}) =>
+  samples = computed(() => this.resultSignal()?.expression.columnNames || [])
+  sampleIndex = linkedSignal({
+    source: () => ({result: this.resultSignal(), sample: this.state.sample()}),
+    computation: ({result, sample}) =>
       Math.max(// Avoid -1 value from indexOf
         result &&
-        profile &&
-        result?.expression.columnNames?.indexOf(profile) ||
+        sample &&
+        result?.expression.columnNames?.indexOf(sample) ||
         0, 0
       )
   })
@@ -178,7 +196,7 @@ export class AnalysisService {
   clearAnalysis() {
     this.result = undefined;
     this.state.analysis.set(null);
-    this.state.analysisProfile.set(null);
+    this.state.sample.set(null);
   }
 
   analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {

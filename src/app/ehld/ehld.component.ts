@@ -168,7 +168,7 @@ export class EhldComponent implements AfterViewInit {
       this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
       this.ehldService.clearAnalysisInfo(this.stIdToSVGGElement);
 
-      const analysisProfile = this.state.analysisProfile();
+      const analysisProfile = this.state.sample();
       let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
       if (analysisIndex === -1) analysisIndex = 0;
 
