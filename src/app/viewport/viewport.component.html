@@ -50,15 +50,69 @@
       <div class="right-panel">
         <div class="top">
           <div class="top-left">
-            <button mat-stroked-button [matMenuTriggerFor]="an" [color]="'primary'">
-              <mat-icon>query_stats</mat-icon>
-              Analyse
-            </button>
+
+            <div class="analysis-button-group">
+              <button [matMenuTriggerFor]="an" mat-ripple class="primary">
+                <mat-icon>query_stats</mat-icon>
+                Analyze
+              </button>
+              @if (hasMultipleProfile()) {
+                <div class="profile-controls" [@appear]>
+
+                  <!-- TODO find a CSS based way to link the label width to buttons -->
+                  <div class="label" [style.max-width.px]="buttons.clientWidth">
+                    {{ analysis.sampleIndex() + 1 }}/{{ analysis.samples().length }} : {{ state.sample() }}
+                  </div>
+                  <div class="buttons" #buttons >
+                    <button mat-ripple class="primary" [@appear]
+                            matTooltip="Previous sample"
+                            (click)="previousProfile()"
+                            [disabled]="isFirstProfile()">
+                      <mat-icon>skip_previous</mat-icon>
+                    </button>
+                    <button mat-ripple class="primary" [@appear]
+                            (click)="toggleIterate()"
+                            [matTooltip]=" interval ? 'Pause samples' : 'Play samples'"
+                    >
+                      <mat-icon [fontIcon]="interval ? 'pause' : 'play_arrow'"></mat-icon>
+                    </button>
+                    <button mat-ripple class="primary" [@appear]
+                            matTooltip="Next sample"
+                            (click)="nextProfile()"
+                            [disabled]="isLastProfile()">
+                      <mat-icon>skip_next</mat-icon>
+                    </button>
+                    <button mat-ripple class="primary" [@appear]
+                            matTooltip="Set sample display duration"
+                            [matMenuTriggerFor]="speed">
+                      <mat-icon>speed</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+
+              @if (analysis.resultSignal()) {
+                <button class="error" mat-ripple (click)="clear()" matTooltip="Clear analyis" [@appear]>
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+            </div>
+            <mat-menu #speed="matMenu">
+              <mat-radio-group [(ngModel)]="playSpeed">
+                @for (option of [1, 2, 5, 10, 15]; track option) {
+                  <div mat-menu-item>
+                    <mat-radio-button [value]="option">{{ option }} s</mat-radio-button>
+                  </div>
+                }
+              </mat-radio-group>
+            </mat-menu>
+
             <mat-menu #an="matMenu">
               <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
               <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
               <button mat-menu-item (click)="analysis.loadAnalysis('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
             </mat-menu>
+
             @if (normalPathway()) {
               <button mat-stroked-button [routerLink]="['/PathwayBrowser', normalPathway()?.stId]"
                       queryParamsHandling="preserve">

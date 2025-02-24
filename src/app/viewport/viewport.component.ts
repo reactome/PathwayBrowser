@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, computed, effect, ViewChild, WritableSignal} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  effect,
+  model,
+  ViewChild,
+  WritableSignal
+} from '@angular/core';
 import {DiagramComponent} from "../diagram/diagram.component";
 import {ResourceAndType} from "../interactors/model/interactor.model";
 import {InteractorsComponent} from "../interactors/interactors.component";
@@ -14,12 +23,26 @@ import {GeneralService} from "../services/general.service";
 import {DataStateService} from "../services/data-state.service";
 import {isPathwayOrTLP} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
+import {animate, style, transition, trigger} from "@angular/animations";
 
 @Component({
   selector: 'cr-viewport',
   templateUrl: './viewport.component.html',
   styleUrls: ['./viewport.component.scss'],
-  standalone: false
+  standalone: false,
+  animations: [
+    trigger('appear', [
+      transition(':enter', [
+        style({width: '0', padding: '0'}),
+        animate('1000ms ease-in-out', style({width: '*'})),
+      ]),
+      transition(':leave', [
+        animate('1000ms ease-in-out', style({
+          width: '0'
+        })),
+      ])
+    ])
+  ]
 })
 @UntilDestroy()
 export class ViewportComponent implements AfterViewInit {
@@ -102,5 +125,60 @@ export class ViewportComponent implements AfterViewInit {
       this.visibility.species = false;
     }
   }
+
+  interval?: number
+  isFirstProfile = computed(() => this.analysis.sampleIndex() === 0)
+  isLastProfile = computed(() => this.analysis.sampleIndex() >= this.analysis.samples().length - 1)
+  hasMultipleProfile = computed(() => this.analysis.samples().length > 1);
+  playSpeed = model(2);
+
+  updateSpeed = effect(() => {
+    console.log('Update play speed', this.playSpeed());
+    if (this.interval) {
+      this.pause();
+      this.play();
+    }
+  })
+
+  previousProfile() {
+    this.updateProfile(this.analysis.sampleIndex() - 1)
+  }
+
+  nextProfile() {
+    this.updateProfile(this.analysis.sampleIndex() + 1)
+  }
+
+  clear() {
+    this.pause()
+    this.analysis.clearAnalysis()
+  }
+
+  updateProfile(index: number) {
+    this.analysis.sampleIndex.set(index)
+    this.state.sample.set(this.analysis.samples()[index])
+  }
+
+  toggleIterate() {
+    if (this.interval === undefined) {
+      this.play();
+    } else {
+      this.pause();
+    }
+  }
+
+  play() {
+    this.interval = window.setInterval(this.iterate.bind(this), this.playSpeed() * 1000);
+  }
+
+  pause() {
+    window.clearInterval(this.interval);
+    this.interval = undefined;
+  }
+
+  iterate() {
+    if (!this.isLastProfile()) this.nextProfile();
+    else this.updateProfile(0)
+  }
+
 }
 
