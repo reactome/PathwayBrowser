@@ -25,7 +25,7 @@
   </div>
 
   <div id="events-container">
-    <mat-tree [dataSource]="treeDataSource" [childrenAccessor]="childrenAccessor" [trackBy]="trackById" class="example-tree">
+    <mat-tree [dataSource]="treeDataSource" [childrenAccessor]="childrenAccessor" [trackBy]="trackById" class="tree">
       <!-- This is the tree node template for leaf nodes -->
       <mat-tree-node *matTreeNodeDef="let node" class="leaf-node"
                      [ngClass]="{'has-sibling': hasRootSiblingForLeafNode(node)}" [attr.st-id]="node.stId">
