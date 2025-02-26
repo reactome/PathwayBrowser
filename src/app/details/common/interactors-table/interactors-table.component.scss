@@ -106,7 +106,7 @@
   max-height: var(--diameter);
   border-radius: var(--diameter);
   padding: 0 var(--padding);
-  background: var(--tertiary);
+  background: var(--interactor-fill);
   flex-shrink: 0;
   margin: 0 var(--padding);
 }
@@ -151,10 +151,10 @@ a {
 }
 
 .evidence-button:hover {
-  background: var(--tertiary);
+  background: var(--interactor-fill);
 
   .intact-icon {
-    color: var(--tertiary);
+    color: var(--interactor-fill);
   }
 }
 
