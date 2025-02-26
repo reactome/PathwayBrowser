@@ -79,15 +79,9 @@ export class DescriptionComponent {
   })
 
 
-  interactors = computed(() => {
-    const interactorsData = this._interactors.value();
-    return interactorsData || [];
-  });
+  interactors = computed(() => this._interactors.value() || []);
 
-  interactorsLength = computed(() => {
-    const interactors = this._interactors.value();
-    return interactors ? interactors.length : 0;
-  });
+  interactorsLength = computed(() => this._interactors.value()?.length || 0);
 
 
   protected readonly isArray = isArray;
