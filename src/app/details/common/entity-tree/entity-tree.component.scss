@@ -1,0 +1,334 @@
+@use '@angular/material' as mat;
+
+
+:host {
+  width: 100%;
+}
+
+#component-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 0;
+  width: 100%;
+  flex-direction: row;
+  gap: 10px;
+
+  font-family: 'Roboto Flex', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+
+}
+
+
+.depth-controller {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: var(--column-width);
+  gap: 5px;
+}
+
+.composition-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding-left: 10px;
+  border-left: 2px solid var(--outline-variant);
+  flex: 1;
+}
+
+
+.paginator {
+  width: 100%;
+}
+
+
+.counter {
+  //box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  //padding: 1px 6px;
+  width: 20px;
+  height: 20px;
+  background: light-dark(var(--surface), var(--primary));
+  border: 1px solid var(--primary);
+  border-radius: 50px;
+  color: light-dark(var(--on-surface), var(--surface));
+}
+
+.arrow {
+  @include mat.icon-button-overrides((
+    state-layer-size: 24px,
+    icon-color: var(--primary)
+  ));
+
+}
+
+
+.composition-container {
+  @include mat.tree-overrides((
+    node-text-weight: 400,
+    node-text-size:14px
+  ));
+}
+
+.component-tree {
+  width: 100%;
+
+}
+
+.component-tree-invisible {
+  display: none;
+}
+
+.component-tree ul,
+.component-tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+/*
+ * This padding sets alignment of the nested nodes.
+ */
+.component-tree .mat-nested-tree-node div[role=group] {
+  padding-left: 24px;
+}
+
+/*
+ * Padding for leaf nodes.
+ * Leaf nodes need to have padding so as to align with other non-leaf nodes
+ * under the same parent.
+ */
+//.tree div[role=group] > .mat-nested-tree-node {
+//  padding-left: 40px;
+//}
+
+
+.tree-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.tree-node:hover {
+  background: var(--surface2);
+  border-radius: 50px;
+}
+
+.left {
+  display: flex;
+  flex: 0 1 auto; /* Default flex properties for left element */
+  align-items: center;
+  gap: 5px
+
+}
+
+.right {
+  flex: 0 1 auto; /* Default flex properties for right element */
+  display: flex;
+  min-width: fit-content;
+  gap: 5px;
+
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+
+
+.mat-tree {
+  //background: var(--surface);
+  //--mat-text-button-horizontal-padding: 5px;
+  //--mat-text-button-with-icon-horizontal-padding: 8px;
+  --mat-tree-node-min-height: 20px;
+}
+
+.treeNodeToggle {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  align-items: center;
+}
+
+.species {
+  padding: 0 8px;
+  background: var(--primary-container);
+  border-radius: 10px;
+  align-content: center;
+
+  color: var(--on-primary-container);
+
+}
+
+.compartment {
+  padding: 0 8px;
+  background: var(--tertiary-container);
+  border-radius: 10px;
+  align-content: center;
+
+
+  color: var(--on-tertiary-container);
+}
+
+.goTo-container,
+.select-container {
+  padding: 0;
+  gap: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50px;
+  background: var(--primary);
+
+
+  .custom-icon {
+    color: var(--on-primary);
+    display: flex;
+    padding: 4px;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+}
+
+.symbol-icon {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+//ul {
+//  margin: 17px;
+//  padding: 0;
+//  border-left: 1px solid var(--outline-variant);
+//}
+
+
+/* Style for each tree node */
+//.mat-nested-tree-node {
+//  position: relative;
+//}
+//
+//
+///* Horizontal connector */
+//.mat-nested-tree-node .tree-node::before {
+//  content: "";
+//  position: absolute;
+//  left: -20px; /* Match with vertical line */
+//  width: 20px; /* Length of the horizontal connector */
+//  height: 1px;
+//  background-color: #81b41c;
+//}
+//
+///* Hide Horizontal line for level 1(root) */
+//.mat-nested-tree-node[aria-level="1"] > .mat-tree-node > .tree-node::before {
+//  display: none;
+//}
+//
+///* Vertical line */
+//.group {
+//  margin-left: 12px;
+//  border-left: 1px solid #7a0909;
+//  //position: relative;
+//
+//}
+//
+//
+///* Remove extra vertical line after the last child */
+//.group > .mat-nested-tree-node:last-child::after {
+//  content: "";
+//  position: absolute;
+//  left: -21px;
+//  bottom: 0;
+//  width: 3px;
+//  height: 50%;
+//  background-color: var(--surface);
+//}
+
+
+/* Group (ul equivalent) */
+.group {
+  list-style: none;
+  position: relative;
+}
+
+/* Tree node (li equivalent) */
+.mat-nested-tree-node {
+  position: relative;
+}
+
+.mat-tree-node {
+  padding-left: 4px;
+}
+
+/* Horizontal line (::before) */
+.mat-nested-tree-node::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  // border-top: 2px solid #4c8c37;
+  border-top-width: 2px;
+  border-top-color: var(--on-surface);
+  top: 11px;
+  width: 12px;
+}
+
+/* Vertical line (::after) */
+.mat-nested-tree-node::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+
+  height: 100%;
+  top: 4px;
+  //border-left: 2px solid #a60c0c;
+  border-left-width: 2px;
+  border-left-color: var(--on-surface);
+
+}
+
+/* Adjust vertical line for the last child */
+.group > .mat-nested-tree-node:last-child::after {
+  height: 8px;
+}
+
+/* Hide horizontal line for root nodes */
+.mat-nested-tree-node[aria-level="1"]::before {
+  display: none;
+}
+
+/* Hide vertical line for root nodes */
+.mat-nested-tree-node[aria-level="1"]::after {
+  display: none;
+}
+
+
+/* Dynamic border styles based on node.type */
+.mat-nested-tree-node.member::before, {
+  border-top-style: dashed
+}
+
+.mat-nested-tree-node.member::after {
+  border-left-style: dashed;
+
+}
+
+.mat-nested-tree-node.component::before {
+  border-top-style: solid;
+}
+
+.mat-nested-tree-node.component::after {
+  border-left-style: solid;
+
+}

@@ -86,6 +86,7 @@
       <!-- This is the tree node template for expandable nodes -->
       <mat-nested-tree-node *matTreeNodeDef="let node; when: eventService.hasChild" [attr.st-id]="node.stId">
         <div class="tree-node">
+          <!--todo: clean structure, try not use button for the event's displayName and replace click event with (expandedChange)-->
           <div class="left">
             <button #treeControlButton mat-icon-button class="button-size no-hover-effect"
                     [attr.aria-label]="'Toggle ' + node.name" (click)="onTreeEventSelect(node)">

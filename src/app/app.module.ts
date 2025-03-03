@@ -62,27 +62,30 @@ import {
   MatTable
 } from "@angular/material/table";
 import {AnalysisControlsComponent} from "./controls/analysis-controls/analysis-controls.component";
+import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
+import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
+
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    DiagramComponent,
-    DiagramIteratorComponent,
-    CustomInteractorDialogComponent,
-    InteractorsComponent,
-    ViewportComponent,
-    SpeciesComponent,
-    EventHierarchyComponent,
-    EhldComponent,
-    DiagramHomeComponent,
-    DetailsComponent,
-    DescriptionComponent,
-    DescriptionOverviewComponent,
-    SummationRefsTreeComponent,
-    PublicationComponent,
-    InteractorsTableComponent,
-
-  ],
+    declarations: [
+        AppComponent,
+        DiagramComponent,
+        DiagramIteratorComponent,
+        CustomInteractorDialogComponent,
+        InteractorsComponent,
+        ViewportComponent,
+        SpeciesComponent,
+        EventHierarchyComponent,
+        EhldComponent,
+        DiagramHomeComponent,
+        DetailsComponent,
+        DescriptionComponent,
+        DescriptionOverviewComponent,
+        SummationRefsTreeComponent,
+        PublicationComponent,
+        InteractorsTableComponent,
+        EntityTreeComponent,
+    ],
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,
@@ -132,7 +135,8 @@ import {AnalysisControlsComponent} from "./controls/analysis-controls/analysis-c
     MatRow,
     MatHeaderRowDef,
     MatRowDef,
-    AnalysisControlsComponent
+    AnalysisControlsComponent,
+    ExtractCompartmentPipe
   ],
   providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
 })

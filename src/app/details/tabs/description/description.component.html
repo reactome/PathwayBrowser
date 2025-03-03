@@ -244,7 +244,7 @@
     @for (element of elements; track element.key) {
       @if (obj()[element.key] && !element?.manual) {
 
-          <div class="divider-container">
+          <div class="divider-container" [id]="element.key">
             <div class="divider-name-container">
               <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
             </div>
@@ -253,12 +253,7 @@
             </div>
           </div>
 
-        <div [id]="element.key" class="element-container row">
-            <div class="control-container">this is navigation control</div>
-            <div class="composition-container">
-              this is test content
-            </div>
-        </div>
+          <cr-component-tree [data]="obj()[element.key]"></cr-component-tree>
       }
     }
 

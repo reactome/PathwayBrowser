@@ -23,7 +23,9 @@ export const DataKeys = {
   REVIEW_STATUS: 'reviewStatus',
   PUBLICATION: 'publication',
   INTERACTORS: 'interactors',
-  AUTHORSHIP: 'authorship'
+  AUTHORSHIP: 'authorship',
+  INFERRED_FROM: 'inferredFrom',
+  PRECEDING_EVENT: 'precedingEvent',
 
 } as const;
 
@@ -45,4 +47,6 @@ export const Labels = {
   OTHER_FORMS: 'Other forms',
   INFERENCES: 'Inferences',
   INTERACTORS: 'Interactors',
+  INFERRED_FROM: 'Inferred From',
+  PRECEDING_EVENT: 'Preceding Event',
 } as const;
