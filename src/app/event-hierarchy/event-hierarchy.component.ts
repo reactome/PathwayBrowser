@@ -436,7 +436,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     const selectedEventId = isPathwayOrTLP(treeEvent) && treeEvent.hasDiagram ? '' : treeEvent.stId;
     this._ignore = true;
     // this.speciesService.setIgnore(true);
-    this.router.navigate(['PathwayBrowser', diagramId], {
+    this.router.navigate([diagramId], {
       queryParamsHandling: "preserve" // Keep existing query params
     }).then(() => {
       this.state.select.set(selectedEventId);

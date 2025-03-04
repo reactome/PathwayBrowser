@@ -23,7 +23,7 @@
             <div class="palette" [style.background]="analysis.palette().gradient" style="vertical-align: center">
             </div>
           </mat-select-trigger>
-          <ng-container *ngFor="let group of analysis.palettes ">
+          <ng-container *ngFor="let group of analysis.paletteGroups ">
             <mat-optgroup *ngIf="group.valid" style="align-self: center">
               <mat-label align="center">{{ group.name }}</mat-label>
               <mat-option *ngFor="let palette of group.palettes" [value]="analysis.paletteOptions.get(palette)">

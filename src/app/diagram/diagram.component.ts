@@ -60,7 +60,7 @@ export class DiagramComponent implements AfterViewInit {
               public dark: DarkService,
               private interactorsService: InteractorService,
               private state: UrlStateService,
-              private analysis: AnalysisService,
+              public analysis: AnalysisService,
               private event: EventService,
               private router: Router,
               private route: ActivatedRoute
@@ -174,7 +174,7 @@ export class DiagramComponent implements AfterViewInit {
         this.cys[0] = this.cy;
         this.reactomeStyle.bindToCytoscape(this.cy);
         this.reactomeStyle.clearCache();
-        this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([`../${e.target.data('graph.stId')}`], {
+        this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
           queryParamsHandling: "preserve",
           relativeTo: this.route
         }))
@@ -201,7 +201,7 @@ export class DiagramComponent implements AfterViewInit {
           const diagramId = this.pathwayId();
           if (newDiagramId !== diagramId) {
             this.pathwayId.set(newDiagramId);
-            this.router.navigate(['PathwayBrowser', diagramId], {
+            this.router.navigate([diagramId], {
               queryParamsHandling: "preserve"
             }).then(() => {
               this.state.select.set(event.stId);

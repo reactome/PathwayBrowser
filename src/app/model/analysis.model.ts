@@ -116,6 +116,8 @@ export namespace Analysis {
     }
   }
 
+  export type Type = 'OVERREPRESENTATION' | 'EXPRESSION' | 'GSA_REGULATION';
+
   export interface Result {
     expression: {
       columnNames: string[],
@@ -143,7 +145,7 @@ export namespace Analysis {
 
     summary: {
       token: string,
-      type: 'OVERREPRESENTATION' | 'EXPRESSION' | 'GSA_REGULATION' | string,
+      type: Type | string,
       sampleName: string,
       text: boolean,
       projection: boolean,

@@ -120,7 +120,7 @@ export class SpeciesService {
       else params[key] = JSON.parse(newValue);
     }
 
-    this.router.navigate(['/PathwayBrowser', pathwayId].filter(isDefined), {
+    this.router.navigate([pathwayId].filter(isDefined), {
       queryParams: params,
       preserveFragment: true
     });

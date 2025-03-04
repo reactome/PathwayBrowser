@@ -56,15 +56,15 @@ export class PaletteSummary {
 
   get gradient(): string {
     return this.n === -1 ?
-      `linear-gradient(to right in oklab, ${this.colors.join(', ')})` :
-      `linear-gradient(to right in oklab, ${this.scale.colors(this.n).map((c, i) => `${c} ${i / this.n * 100}%, ${c} ${(i + 1) / this.n * 100}%`).join(', ')})`
+      `linear-gradient(to top in oklab, ${this.colors.join(', ')})` :
+      `linear-gradient(to top in oklab, ${this.scale.colors(this.n).map((c, i) => `${c} ${i / this.n * 100}%, ${c} ${(i + 1) / this.n * 100}%`).join(', ')})`
   }
 
   get colors() {
     return this.isDark ? this.darkColors : this.lightColors;
   }
 
-  set dark(isDark:boolean) {
+  set dark(isDark: boolean) {
     this.isDark = isDark;
     this.scale = chroma.scale(this.colors).mode('oklab').classes(this.n).padding(this.padding)
   }
@@ -87,9 +87,24 @@ export class AnalysisService {
     ['primary', new PaletteSummary(['#fff', extract(this.style.properties.global.primary)])]
   ]);
 
-  palette: WritableSignal<PaletteSummary> = signal(this.paletteOptions.get('primary')!);
 
-  palettes: { name: PaletteGroup, palettes: PaletteName[], valid: boolean }[] = [
+  typeToDefaultPalette = new Map<Analysis.Type, PaletteName>([
+    ['GSA_REGULATION', 'ancient'],
+    ['EXPRESSION', 'RdPu'],
+    ['OVERREPRESENTATION', 'RdPu'],
+  ]);
+
+  palette: WritableSignal<PaletteSummary> = linkedSignal({
+    source: () => ({palette: this.state.palette(), type: this.type()}),
+    computation: ({palette, type}) =>
+      this.paletteOptions.get(
+        palette ||
+        this.typeToDefaultPalette.get(type || 'OVERREPRESENTATION')!
+      )!
+  })
+
+
+  paletteGroups: { name: PaletteGroup, palettes: PaletteName[], valid: boolean }[] = [
     {
       name: 'sequential', valid: false, palettes: [
         // 'primary',
@@ -120,7 +135,7 @@ export class AnalysisService {
         // 'PRGn',
         'PiYG',
         // 'BrBG',
-        // 'ancient'
+        'ancient'
       ]
     },
     {name: 'continuous', valid: false, palettes: ['Spectral', 'Viridis']},
@@ -144,19 +159,21 @@ export class AnalysisService {
       const validGroups: Set<PaletteGroup> = new Set();
       if (result.summary.type === 'GSA_REGULATION') {
         validGroups.add('diverging')
-
-        this.palette.set(this.paletteOptions.get('PiYG')!)
       } else if (result.summary.type === 'EXPRESSION') {
         // validGroups.add('diverging')
         validGroups.add('sequential')
         validGroups.add('continuous')
-
-        this.palette.set(this.paletteOptions.get('RdPu')!)
       } else if (result.summary.type === 'OVERREPRESENTATION') {
         validGroups.add('sequential')
-
-        this.palette.set(this.paletteOptions.get('RdPu')!)
       }
+      if (this.state.palette()) {
+        const isValidPalette = [...validGroups.values()].some(validGroup =>
+          this.paletteGroups.find(group => group.name === validGroup)
+            ?.palettes.includes(this.state.palette()!)
+        );
+        if (!isValidPalette) this.state.palette.set(null)
+      }
+
       for (let summary of this.paletteOptions.values()) {
         //@ts-ignore
         summary.scale.nodata(extract(this.style.properties.analysis.notFound))
@@ -166,12 +183,12 @@ export class AnalysisService {
 
       this.state.sample.set(result?.expression.columnNames[0] || null)
 
-      this.palettes.forEach(group => group.valid = validGroups.has(group.name))
+      this.paletteGroups.forEach(group => group.valid = validGroups.has(group.name))
     })
   )
 
   resultSignal = toSignal(this.result$)
-  type = computed(() => this.resultSignal()?.summary.type)
+  type = computed(() => this.resultSignal()?.summary.type as Analysis.Type | undefined)
   samples = computed(() => this.resultSignal()?.expression.columnNames || [])
   sampleIndex = linkedSignal({
     source: () => ({result: this.resultSignal(), sample: this.state.sample()}),

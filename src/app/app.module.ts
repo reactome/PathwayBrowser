@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {LOCALE_ID, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {AppComponent} from './app.component';
@@ -61,9 +61,9 @@ import {
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
   MatTable
 } from "@angular/material/table";
-import {AnalysisControlsComponent} from "./controls/analysis-controls/analysis-controls.component";
 import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
 import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
+import {AnalysisLegendComponent} from "./legend/analysis-legend/analysis-legend.component";
 
 
 @NgModule({
@@ -135,10 +135,17 @@ import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
     MatRow,
     MatHeaderRowDef,
     MatRowDef,
-    AnalysisControlsComponent,
+    AnalysisLegendComponent,
     ExtractCompartmentPipe
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi()), DatePipe]
+  providers: [
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: LOCALE_ID,
+      useFactory: () => navigator.language || 'en-US'
+    },
+    DatePipe
+  ]
 })
 export class AppModule {
 }

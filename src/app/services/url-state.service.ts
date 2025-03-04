@@ -4,6 +4,7 @@ import {filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isBoolean, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
+import {PaletteName} from "./analysis.service";
 
 
 export type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T};
@@ -30,6 +31,7 @@ export class UrlStateService implements State {
     flagInteractors: urlParam<boolean>(false, ['FLGINT']),
     overlay: urlParam<string | null>(null),
     analysis: urlParam<string | null>(null, ['ANALYSIS']),
+    palette: urlParam<PaletteName | null>(null),
     sample: urlParam<string | null>(null),
   };
 
@@ -40,6 +42,7 @@ export class UrlStateService implements State {
   public readonly overlay = this.values.overlay
   public readonly analysis = this.values.analysis
   public readonly sample = this.values.sample
+  public readonly palette = this.values.palette
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 
@@ -56,7 +59,7 @@ export class UrlStateService implements State {
 
     effect(() => {
       console.log('Updating patwhayId to ',  this.pathwayId())
-      this.router.navigate(['/PathwayBrowser', this.pathwayId()], {queryParamsHandling:'preserve', preserveFragment: true});
+      this.router.navigate([this.pathwayId()], {queryParamsHandling:'preserve', preserveFragment: true});
     });
 
 

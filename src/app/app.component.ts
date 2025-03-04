@@ -4,10 +4,10 @@ import {MatIconRegistry} from "@angular/material/icon";
 import {IconService} from "./services/icon.service";
 
 @Component({
-    selector: 'cr-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    standalone: false
+  selector: 'cr-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  standalone: false
 })
 export class AppComponent implements OnInit {
   title = 'PathwayBrowser'
@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
     const speciesIcon = this.iconService.getSpeciesIcons();
     const generalIcons = this.iconService.getGeneralIcons();
     const reactomeSubjectIcons = this.iconService.getReactomeSubjectIcons();
+    this.matIconRegistry.registerFontClassAlias('symbols', 'material-symbols-rounded')
 
     speciesIcon.forEach(icon => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/species/${icon.route}.svg`));

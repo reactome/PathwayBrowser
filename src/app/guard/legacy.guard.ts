@@ -25,8 +25,8 @@ export const legacyGuard: CanActivateFn = (route, state) => {
           })
       }
     }
-    return router.navigate([`PathwayBrowser`, id], {fragment: undefined, queryParams: params})
+    return router.navigate([id], {fragment: undefined, queryParams: params})
   }
 
-  return router.navigate([`PathwayBrowser`, id]); // Default routing
+  return router.navigate([id]); // Default routing
 };

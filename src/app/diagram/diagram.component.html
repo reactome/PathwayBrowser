@@ -11,13 +11,25 @@
   </div>
 
   <div id="legend-boundary" [style.--legend-width.px]="ratio  * container.clientHeight">
+
     <div cdkDrag cdkDragLockAxis="x" cdkDragBoundary="#legend-boundary" id="legend-container"
          (cdkDragMoved)="updateLegend()"
-         [style.height]="container.clientHeight + 'px'">
-      <button id="legend-handle" cdkDragHandle>LEGEND</button>
+         [style.height.px]="container.clientHeight">
+      <div class="legend-group" [class.has-analysis]="analysis.resultSignal()"
+           [style.--handle-height.px]="handle.clientHeight">
+        <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
+        @if (analysis.resultSignal()) {
+          <div class="analysis-legend">
+            <cr-analysis-legend></cr-analysis-legend>
+          </div>
+        }
+      </div>
       <div id="legend" #legend></div>
     </div>
+
   </div>
+
+
 
   <!--  <form id="controls">-->
   <!--    <button mat-raised-button (click)="updateStyle()">Update Style</button>-->

@@ -268,19 +268,9 @@
   position: relative;
 }
 
-.floating {
-  position: absolute;
-  bottom: 0;
-
-  &.center {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-}
 
 .analysis-button-group {
-  --outline-width: 2px;
+  --outline-width: 1px;
   background: var(--outline);
   border: var(--outline-width) solid var(--outline);
   border-radius: 50px;
@@ -304,7 +294,7 @@
       color: var(--on-surface);
       font: var(--mat-sys-body-small);
       line-height: var(--mat-sys-body-small-line-height);
-      height: calc(50% - 1px);
+      height: calc(50% - 0.5px);
       white-space: nowrap;
       text-align: center;
       text-overflow: ellipsis;
@@ -317,7 +307,7 @@
       display: flex;
       gap: var(--outline-width);
       width: 100%;
-      height: calc(50% - 1px);
+      height: calc(50% - 0.5px);
       box-sizing: border-box;
 
       button {
@@ -382,4 +372,9 @@
   @include mat.slider-overrides((
     value-indicator-height: 8px,
   ));
+}
+
+
+.hide-overflow {
+  overflow: hidden !important;
 }
