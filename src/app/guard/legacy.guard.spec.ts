@@ -46,7 +46,7 @@ describe('legacyGuard', () => {
     );
 
     setTimeout(() => {
-      expect(state.select()).toEqual(['R-HSA-109797']);
+      expect(state.select()).toEqual('R-HSA-109797');
       expect(state.flag()).toEqual(['R-HSA-1637910']);
       expect(state.flagInteractors()).toEqual(true);
     })

@@ -1,17 +1,19 @@
-.loading {
-  background-size: auto 100% !important;
-  background: url(loader.gif) no-repeat center;
-}
-
-.video {
-  filter: brightness(1.2);
-}
-
-.dark {
-  .video {
-    filter: brightness(1);
+@mixin configure-diagrams {
+  .loading {
+    background-size: auto 100% !important;
+    background: url(loader.gif) no-repeat center;
   }
-  .molecule {
-    filter: invert(1) hue-rotate(180deg);
+
+  .video {
+    filter: brightness(1.2);
+  }
+
+  .dark {
+    .video {
+      filter: brightness(1);
+    }
+    .molecule {
+      filter: invert(1) hue-rotate(180deg);
+    }
   }
 }
