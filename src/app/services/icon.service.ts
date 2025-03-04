@@ -98,6 +98,7 @@ export class IconService {
     {name: 'orcid', tooltip: 'Orcid', route: 'orcid'},
     {name: 'search', tooltip: 'Search', route: 'search'},
     {name: 'intact', tooltip: 'IntAct', route: 'intact'},
+    {name: 'select', tooltip: 'Select', route: 'select'},
   ];
 
   speciesIcons = [

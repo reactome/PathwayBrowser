@@ -5,6 +5,7 @@ import {Complex} from "./complex.model";
 import {ReactionLikeEvent} from "../event/reaction-like-event.model";
 import {CatalystActivity} from "../catalyst-activity.model";
 import {CellType} from "../external-ontology/cell-type.model";
+import {ComposedOf} from "../composed-of.model";
 
 
 export interface PhysicalEntity extends DatabaseObject {
@@ -24,6 +25,11 @@ export interface PhysicalEntity extends DatabaseObject {
 
 
   speciesName:string;
+
+
+  //Tree building
+  composedOf?: ComposedOf[];
+  type:string;
 
 
 }

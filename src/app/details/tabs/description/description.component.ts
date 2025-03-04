@@ -103,6 +103,8 @@ export class DescriptionComponent {
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
     {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
+    {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
+    {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
   ]
 
 
