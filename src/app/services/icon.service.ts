@@ -21,8 +21,7 @@ export class IconService {
     EntityWithAccessionedSequence: {name: 'protein', tooltip: 'Protein', route: 'protein'},
     Complex: {
       name: 'complex',
-      tooltip: 'An entity formed by the association of two or more component entities (these components can themselves be complexes).\n' +
-        'At least one component must be specified. Complexes represent all experimentally verified components and their stoichiometry where this is known but may not include as yet unidentified components',
+      tooltip: 'Complex',
       route: 'complex'
     },
     SimpleEntity: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
