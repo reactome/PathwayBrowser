@@ -50,13 +50,11 @@
 
 
 .counter {
-  //box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
-  //padding: 1px 6px;
   width: 20px;
   height: 20px;
   background: light-dark(var(--surface), var(--primary));
@@ -166,9 +164,7 @@
   background: var(--primary-container);
   border-radius: 10px;
   align-content: center;
-
   color: var(--on-primary-container);
-
 }
 
 .compartment {
@@ -176,8 +172,6 @@
   background: var(--tertiary-container);
   border-radius: 10px;
   align-content: center;
-
-
   color: var(--on-tertiary-container);
 }
 
@@ -208,100 +202,42 @@
   flex-shrink: 0;
 }
 
-//ul {
-//  margin: 17px;
-//  padding: 0;
-//  border-left: 1px solid var(--outline-variant);
-//}
 
-
-/* Style for each tree node */
-//.mat-nested-tree-node {
-//  position: relative;
-//}
-//
-//
-///* Horizontal connector */
-//.mat-nested-tree-node .tree-node::before {
-//  content: "";
-//  position: absolute;
-//  left: -20px; /* Match with vertical line */
-//  width: 20px; /* Length of the horizontal connector */
-//  height: 1px;
-//  background-color: #81b41c;
-//}
-//
-///* Hide Horizontal line for level 1(root) */
-//.mat-nested-tree-node[aria-level="1"] > .mat-tree-node > .tree-node::before {
-//  display: none;
-//}
-//
-///* Vertical line */
-//.group {
-//  margin-left: 12px;
-//  border-left: 1px solid #7a0909;
-//  //position: relative;
-//
-//}
-//
-//
-///* Remove extra vertical line after the last child */
-//.group > .mat-nested-tree-node:last-child::after {
-//  content: "";
-//  position: absolute;
-//  left: -21px;
-//  bottom: 0;
-//  width: 3px;
-//  height: 50%;
-//  background-color: var(--surface);
-//}
-
-
-/* Group (ul equivalent) */
-.group {
-  list-style: none;
+// Ideas from https://www.cssscript.com/minimalist-tree-view-pure-css/
+.mat-nested-tree-node{
+  list-style-type: none;
   position: relative;
 }
 
-/* Tree node (li equivalent) */
-.mat-nested-tree-node {
-  position: relative;
-}
-
-.mat-tree-node {
-  padding-left: 4px;
-}
-
-/* Horizontal line (::before) */
+/* Horizontal line and vertical line as connector  (::before) */
 .mat-nested-tree-node::before {
   content: "";
   position: absolute;
-  left: -8px;
-  // border-top: 2px solid #4c8c37;
-  border-top-width: 2px;
-  border-top-color: var(--on-surface);
-  top: 11px;
-  width: 12px;
+  top: 0;
+  left: -13px;
+  width: 13px;
+  height: 11px;
+
+  border-left-width: 2px;
+  border-left-color: var(--on-surface);
+  border-bottom-width: 2px; // To make a rounded corner
+  border-bottom-color: var(--on-surface);
+
 }
 
 /* Vertical line (::after) */
 .mat-nested-tree-node::after {
-  content: "";
   position: absolute;
-  left: -8px;
-
+  content: "";
+  top: 0;
+  left: -13px;
+  width: 13px;
   height: 100%;
-  top: 4px;
-  //border-left: 2px solid #a60c0c;
+
   border-left-width: 2px;
-  border-left-color: var(--on-surface);
-
+  border-bottom-color: var(--on-surface);
 }
 
-/* Adjust vertical line for the last child */
-.group > .mat-nested-tree-node:last-child::after {
-  height: 8px;
-}
 
 /* Hide horizontal line for root nodes */
 .mat-nested-tree-node[aria-level="1"]::before {
@@ -313,22 +249,61 @@
   display: none;
 }
 
-
-/* Dynamic border styles based on node.type */
-.mat-nested-tree-node.member::before, {
-  border-top-style: dashed
+/* Remove lines for the last child */
+.group .mat-nested-tree-node:last-child::after {
+  display: none;
 }
 
-.mat-nested-tree-node.member::after {
-  border-left-style: dashed;
-
+/* Adjust border radius for the last child */
+.group .mat-nested-tree-node:last-child::before {
+  //border-radius: 0 0 0 5px;
+  border-bottom-left-radius: 25%;
 }
 
-.mat-nested-tree-node.component::before {
-  border-top-style: solid;
+/* Space between connector and node */
+.mat-nested-tree-node:not([aria-level="1"]) .mat-tree-node {
+  padding-left: 4px;
 }
 
-.mat-nested-tree-node.component::after {
+/* Dynamic border styles based on node type */
+.group > .mat-nested-tree-node.dottedConnector::before, {
+  border-left-style: dotted;
+  border-bottom-style: dotted;
+}
+
+.group > .mat-nested-tree-node.dottedConnector::after {
+  border-left-style: dotted;
+}
+
+.group > .mat-nested-tree-node.solidConnector::before {
   border-left-style: solid;
-
+  border-bottom-style: solid;
 }
+
+.group > .mat-nested-tree-node.solidConnector::after {
+  border-left-style: solid;
+}
+
+.group > .mat-nested-tree-node.dashedConnector::before {
+  border-left-style: dashed;
+  border-bottom-style: dashed;
+}
+
+.group > .mat-nested-tree-node.dashedConnector::after {
+  border-left-style: dashed;
+}
+
+.group > .mat-nested-tree-node.otherConnector::before {
+
+  border-left-style: solid;
+  border-left-color: var(--primary);
+  border-bottom-style: solid;
+  border-bottom-color: var(--primary);
+}
+
+.group > .mat-nested-tree-node.otherConnector::after {
+  border-left-style: solid;
+  border-top-color: var(--primary);
+}
+
+

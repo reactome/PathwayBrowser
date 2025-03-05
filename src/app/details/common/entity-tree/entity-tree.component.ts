@@ -108,10 +108,6 @@ export class EntityTreeComponent {
 
     const flatTree = this.flattenTree(updatedData);
 
-    // if(enhancedData.composedOf){
-    //   enhancedData.composedOf = this.transformComposedOf(enhancedData.composedOf)
-    // }
-
     const targetTree = flatTree.find(node => node.stId === enhancedData.stId);
     if (targetTree) {
       // Merge changes from enhancedData into targetTree
@@ -131,24 +127,6 @@ export class EntityTreeComponent {
     }
 
     return existingData;
-
-    // return existingData.map(node => {
-    //   if (node.stId === enhancedData.stId) {
-    //     return {...node, ...enhancedData};
-    //   }
-    //
-    //   if (node.composedOf) {
-    //     return {
-    //       ...node,
-    //       composedOf: node.composedOf.map(composed => ({
-    //         ...composed,
-    //         element: this.updatedEntity(composed.element, enhancedData)
-    //       }))
-    //     };
-    //   }
-    //
-    //   return node;
-    // });
   }
 
 
@@ -189,7 +167,6 @@ export class EntityTreeComponent {
   }
 
 
-
   firstPage() {
     this.depthIndex = 1;
   }
@@ -215,6 +192,20 @@ export class EntityTreeComponent {
     return this.iconService.getIconDetails(obj);
   }
 
+  getNodeConnector(node: PhysicalEntity): string {
+    if (node.type === 'component' || node.type === 'repeatedUnit') {
+      return 'solidConnector';
+    }
 
-  protected readonly menubar = menubar;
+    if (node.type === 'member') {
+      return 'dottedConnector';
+    }
+
+    if (node.type === 'candidate') {
+      return 'dashedConnector';
+    }
+
+    return 'solidConnector';
+  }
+
 }
