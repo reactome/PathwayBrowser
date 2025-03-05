@@ -50,7 +50,6 @@ export class EntityTreeComponent {
             }
           }));
 
-         // enhancedData.type = enhancedData.composedOf[0]?.type || enhancedData.type;
         }
         return enhancedData;
       })
@@ -88,7 +87,7 @@ export class EntityTreeComponent {
   }
 
 
-  childrenAccessor = (node: PhysicalEntity): PhysicalEntity[]  => {
+  childrenAccessor = (node: PhysicalEntity): PhysicalEntity[] => {
     return node.composedOf?.flatMap(composed => composed.element) ?? [];
   };
 
