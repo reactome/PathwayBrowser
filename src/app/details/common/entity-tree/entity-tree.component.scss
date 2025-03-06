@@ -256,23 +256,17 @@
 
 /* Adjust border radius for the last child */
 .group .mat-nested-tree-node:last-child::before {
-  //border-radius: 0 0 0 5px;
-  border-bottom-left-radius: 25%;
-}
-
-/* Space between connector and node */
-.mat-nested-tree-node:not([aria-level="1"]) .mat-tree-node {
-  padding-left: 4px;
+  border-radius: 0 0 0 5px;
 }
 
 /* Dynamic border styles based on node type */
-.group > .mat-nested-tree-node.dottedConnector::before, {
-  border-left-style: dotted;
-  border-bottom-style: dotted;
+.group > .mat-nested-tree-node.dashedConnector::before, {
+  border-left-style: dashed;
+  border-bottom-style: dashed;
 }
 
-.group > .mat-nested-tree-node.dottedConnector::after {
-  border-left-style: dotted;
+.group > .mat-nested-tree-node.dashedConnector::after {
+  border-left-style: dashed;
 }
 
 .group > .mat-nested-tree-node.solidConnector::before {
@@ -284,24 +278,27 @@
   border-left-style: solid;
 }
 
-.group > .mat-nested-tree-node.dashedConnector::before {
+.group > .mat-nested-tree-node.smallDashedConnector::before {
+  border-left-width: 1px;
+  border-bottom-width: 1px;
   border-left-style: dashed;
   border-bottom-style: dashed;
 }
 
-.group > .mat-nested-tree-node.dashedConnector::after {
+.group > .mat-nested-tree-node.smallDashedConnector::after {
+  border-left-width: 1px;
   border-left-style: dashed;
 }
 
-.group > .mat-nested-tree-node.otherConnector::before {
-
+.otherConnector::before {
   border-left-style: solid;
   border-left-color: var(--primary);
   border-bottom-style: solid;
   border-bottom-color: var(--primary);
+  height:70px
 }
 
-.group > .mat-nested-tree-node.otherConnector::after {
+.otherConnector::after {
   border-left-style: solid;
   border-top-color: var(--primary);
 }

@@ -23,9 +23,7 @@
       <!-- This is the tree node template for leaf nodes -->
 
       <mat-nested-tree-node *matTreeNodeDef="let node" [ngClass]=getNodeConnector(node)>
-        {{ node.name[0]}}
-
-
+        {{ node.name[0] }}
       </mat-nested-tree-node>
 
 
@@ -53,7 +51,7 @@
             </div>
             <div class="right">
               <span class="compartment" matTreeNodeToggle>{{ node.displayName | extractCompartment }}</span>
-              @if (node.speciesName){
+              @if (node.speciesName) {
                 <span class="species" matTreeNodeToggle>{{ node.speciesName }}</span>
               }
               <div class="select-container">
@@ -76,8 +74,31 @@
             This padding value depends on the mat-icon-button width.  -->
 
         <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
-          <ng-container matTreeNodeOutlet></ng-container>
+          <ng-container
+            *ngIf="node.schemaClass === 'EntityWithAccessionedSequence'; then protein; else entity">
+          </ng-container>
         </div>
+
+        <!-- Template for child nodes when parent is EWAS (protein) -->
+        <ng-template #protein>
+          <mat-nested-tree-node class="otherConnector">
+            <!-- Details -->
+            <cr-description-overview [obj]="node"></cr-description-overview>
+
+            <!-- External Reference -->
+            @if (referenceEntity()) {
+              <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
+
+              <cr-cross-references [referenceEntity]=referenceEntity()!></cr-cross-references>
+            }
+
+          </mat-nested-tree-node>
+        </ng-template>
+
+        <!-- Default child template for nested entities-->
+        <ng-template #entity>
+          <ng-container matTreeNodeOutlet></ng-container>
+        </ng-template>
 
       </mat-nested-tree-node>
     </mat-tree>

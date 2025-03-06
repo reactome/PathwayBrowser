@@ -2,12 +2,14 @@ import {Component, computed, effect, input, signal} from '@angular/core';
 import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {DatabaseObjectService} from "../../../services/database-object.service";
-import {forkJoin, map, Observable, of} from "rxjs";
+import {map, of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {ComposedOf} from "../../../model/graph/composed-of.model";
+import {DataStateService} from "../../../services/data-state.service";
+import {isEWAS} from "../../../services/utils";
 
 
 @Component({
@@ -33,7 +35,8 @@ export class EntityTreeComponent {
   _selectedNode = signal<PhysicalEntity | null>(null);
   selectedNode = computed(() => this._selectedNode());
 
-  _enhancedData = rxResource({
+
+  _enhancedSelectedNode = rxResource({
     request: () => this.selectedNode()?.stId,
     loader: (param) => param.request ? this.entitiesService.getEntityInDepth(param.request).pipe(
       map(enhancedData => {
@@ -62,7 +65,8 @@ export class EntityTreeComponent {
 
   constructor(private databaseObjectService: DatabaseObjectService,
               private iconService: IconService,
-              private entitiesService: EntitiesService
+              private entitiesService: EntitiesService,
+              private dataStateService: DataStateService,
   ) {
     effect(() => {
       if (this.data().length > 0) {
@@ -73,13 +77,13 @@ export class EntityTreeComponent {
 
     effect(() => {
 
-      const enhancedData = this._enhancedData.value();
+      const enhancedData = this._enhancedSelectedNode.value();
       if (!enhancedData) return;
 
-      const updatedData = this.updateTargetNode(this.dataSource.data, enhancedData!);
+      const updatedTree = this.updateTree(this.dataSource.data, enhancedData!);
 
       this.dataSource.data = [];
-      this.dataSource.data = updatedData
+      this.dataSource.data = updatedTree
 
     });
 
@@ -88,7 +92,10 @@ export class EntityTreeComponent {
 
 
   childrenAccessor = (node: PhysicalEntity): PhysicalEntity[] => {
-    return node.composedOf?.flatMap(composed => composed.element) ?? [];
+    if (!node || !node.composedOf) {
+      return []; // Return an empty array when composedOf is undefined
+    }
+    return node.composedOf.flatMap(composed => composed.element);
   };
 
 
@@ -102,47 +109,18 @@ export class EntityTreeComponent {
     this.depthIndex++;
   }
 
-  private updateTargetNode(existingData: PhysicalEntity[], enhancedData: PhysicalEntity): PhysicalEntity[] {
-    const updatedData = [...existingData];
+  private updateTree(existingTreeData: PhysicalEntity[], enhancedData: PhysicalEntity): PhysicalEntity[] {
 
-    const flatTree = this.flattenTree(updatedData);
+    const tree = [...existingTreeData];
+    const flatTree = this.flattenTree(tree);
+    const targetTreeNode = flatTree.find(node => node.stId === enhancedData.stId);
 
-    const targetTree = flatTree.find(node => node.stId === enhancedData.stId);
-    if (targetTree) {
+    if (targetTreeNode) {
       // Merge changes from enhancedData into targetTree
-      Object.assign(targetTree, enhancedData);
+      Object.assign(targetTreeNode, enhancedData);
     }
 
-    return updatedData;
-  }
-
-  private updatedEntity(existingData: PhysicalEntity[], enhancedData: PhysicalEntity): PhysicalEntity[] {
-
-    const tree = this.flattenTree(existingData);
-    const targetTree = tree.find(node => node.stId === enhancedData.stId);
-    if (targetTree) {
-      // Merge changes from enhancedData into targetTree
-      Object.assign(targetTree, enhancedData);
-    }
-
-    return existingData;
-  }
-
-
-  loadExtraData(data: PhysicalEntity[]): Observable<PhysicalEntity[]> {
-    if (!data?.length) return of(data);
-
-    const requests = data.map(d => this.databaseObjectService.fetchEnhancedEntry(d.stId));
-
-    return forkJoin(requests).pipe(
-      map(responses => {
-        const responseMap = new Map(responses.map(item => [item.stId, item]));
-        return data.map(entity => ({
-          ...entity,
-          ...responseMap.get(entity.stId)
-        }));
-      })
-    );
+    return tree;
   }
 
 
@@ -197,11 +175,11 @@ export class EntityTreeComponent {
     }
 
     if (node.type === 'member') {
-      return 'dottedConnector';
+      return 'dashedConnector';
     }
 
     if (node.type === 'candidate') {
-      return 'dashedConnector';
+      return 'smallDashedConnector';
     }
 
     return 'solidConnector';
