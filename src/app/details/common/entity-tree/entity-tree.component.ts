@@ -38,25 +38,41 @@ export class EntityTreeComponent {
 
   _enhancedSelectedNode = rxResource({
     request: () => this.selectedNode()?.stId,
-    loader: (param) => param.request ? this.entitiesService.getEntityInDepth(param.request).pipe(
-      map(enhancedData => {
-        if (enhancedData && enhancedData.composedOf) {
-          enhancedData.composedOf = enhancedData.composedOf.map(composed => ({
-            ...composed,
-            element: {
-              ...composed.element,
-              composedOf: [], // Add an empty composedOf array to ensure the node is expandable
-              // Add below to PE to avoid lose these data because we are retuning PE not composedOf in childrenAccessor
-              type: composed.type,
-              stoichiometry: composed.stoichiometry,
-              order: composed.order
-            }
-          }));
+    loader: (param) => {
+      if (!param.request) {
+        return of(null);
+      }
 
-        }
-        return enhancedData;
-      })
-    ) : of(null)
+      // Check the condition to determine which method to call
+      if (this.selectedNode()?.schemaClass === 'EntityWithAccessionedSequence') {
+        return this.dataStateService.fetchEnhancedData<PhysicalEntity>(param.request);
+      } else {
+        return this.entitiesService.getEntityInDepth(param.request).pipe(
+          map(enhancedData => {
+            if (enhancedData && enhancedData.composedOf) {
+              enhancedData.composedOf = enhancedData.composedOf.map(composed => ({
+                ...composed,
+                element: {
+                  ...composed.element,
+                  composedOf: [], // Add an empty composedOf array to ensure the node is expandable
+                  // Add below to PE to avoid losing these data because we are returning PE not composedOf in childrenAccessor
+                  type: composed.type,
+                  stoichiometry: composed.stoichiometry,
+                  order: composed.order
+                }
+              }));
+            }
+            return enhancedData;
+          })
+        );
+      }
+    }
+  });
+
+  referenceEntity = computed(() => {
+    const data = this._enhancedSelectedNode.value();
+    if (!data || !isEWAS(data)) return undefined;
+    return data.referenceEntity;
   });
 
 
