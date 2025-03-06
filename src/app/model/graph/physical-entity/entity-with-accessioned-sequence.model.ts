@@ -3,6 +3,6 @@ import {ReferenceSequence} from "../reference-entity/reference-sequence.model";
 
 export interface EntityWithAccessionedSequence extends GenomeEncodedEntity {
 
-  referenceEntity: ReferenceSequence
-  referenceType: string
+  referenceEntity: ReferenceSequence;
+  referenceType: string;
 }

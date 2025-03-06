@@ -37,15 +37,15 @@
     <div class="overview" #overview [ngClass]="{'update-layout': !icon.isLoading() && icon.value()}" [style.--icon-height.px]="overview.offsetHeight">
       <cr-description-overview  [obj]="obj()"></cr-description-overview>
       @if (!icon.isLoading() && icon.value()) {
-        <div class="icon-container" >
+        <div class="icon-container">
           <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
         </div>
       }
     </div>
 
     <!-- External Reference -->
-    @if (externalRef() && externalRef().length > 0) {
-      <div class="divider-container" [id]= DataKeys.REFERENCE_ENTITY>
+    @if (referenceEntity()) {
+      <div class="divider-container" [id]=DataKeys.REFERENCE_ENTITY>
         <div class="divider-name-container">
           <ng-container
             *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.EXTERNAL_REFERENCE }"></ng-container>
@@ -55,33 +55,14 @@
         </div>
       </div>
 
-      <div class="element-container">
-        @for (property of externalRef(); track property.label) {
-          <div class="row">
-            <div class="label-container">{{ property.label | titlecase }}</div>
-            <div class="composition-container"
-                 [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
-              @if (isArray(property.value) && !isString(property.value[0])) {
-                @for (item of property.value; track item.dbId) {
-                  <span class="column-item">
-                        <a [href]="item.url" target="_blank"> {{ item.databaseName }}:{{ item.identifier }}</a>
-                      </span>
-                }
-              } @else {
-                @if (property.label === 'External Reference') {
-                  <a [href]="referenceEntity()?.url" target="_blank">{{ referenceEntity()?.displayName }}</a>
-                } @else {
-                  <span>{{ property.value }}</span>
-                }
-              }
-            </div>
-          </div>
-        }
-      </div>
+      @if (referenceEntity()) {
+        <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
+      }
+
     }
 
     <!-- Cross References-->
-    @if (crossReferences() && crossReferences().length > 0) {
+    @if (referenceEntity()) {
       <div class="divider-container" [id]=DataKeys.CROSS_REFERENCES>
         <div class="divider-name-container">
           <ng-container
@@ -92,21 +73,8 @@
         </div>
       </div>
 
-      <div class="element-container">
-        @for (ref of crossReferences() | sortByText :'databaseName'; track ref) {
-          <div class="row">
-            <div class="label-container">{{ ref.databaseName }}</div>
-            <div class="composition-container">
-              @for (item of ref.data; track item.dbId) {
-                <a [href]="item.url" target="_blank">{{ item.identifier }}</a>
-                @if (item !== ref.data[ref.data.length - 1]) {
-                  <span class="margin-right">,</span>
-                }
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <cr-cross-references [referenceEntity]=referenceEntity()!></cr-cross-references>
+
     }
 
     <!-- Literature References-->
@@ -224,7 +192,7 @@
     }
 
 
-    @if ( interactors() && interactors().length > 0) {
+    @if (interactors() && interactors().length > 0) {
       <div class="divider-container" [id]="DataKeys.INTERACTORS">
         <div class="divider-name-container">
           <ng-container
@@ -236,7 +204,7 @@
         </div>
       </div>
       <div class="element-container">
-          <cr-interactors-table [interactors]="interactors()!"></cr-interactors-table>
+        <cr-interactors-table [interactors]="interactors()!"></cr-interactors-table>
       </div>
     }
 
@@ -244,16 +212,16 @@
     @for (element of elements; track element.key) {
       @if (obj()[element.key] && !element?.manual) {
 
-          <div class="divider-container" [id]="element.key">
-            <div class="divider-name-container">
-              <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
-            </div>
-            <div class="divider-line-container">
-              <mat-divider class="divider"></mat-divider>
-            </div>
+        <div class="divider-container" [id]="element.key">
+          <div class="divider-name-container">
+            <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
           </div>
+          <div class="divider-line-container">
+            <mat-divider class="divider"></mat-divider>
+          </div>
+        </div>
 
-          <cr-component-tree [data]="obj()[element.key]"></cr-component-tree>
+        <cr-component-tree [data]="obj()[element.key]"></cr-component-tree>
       }
     }
 

@@ -6,7 +6,6 @@ import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
 import {rxResource, toSignal} from "@angular/core/rxjs-interop";
-import {isArray, isString} from "lodash";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {SelectableObject} from "../../../services/event.service";
@@ -45,8 +44,6 @@ export class DescriptionComponent {
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
   referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
-  readonly externalRef = computed(() => this.getTransformedExternalRef(this.referenceEntity()));
-  readonly crossReferences = computed(() => this.getGroupedCrossReferences(this.referenceEntity()));
   readonly inferences: Signal<PhysicalEntity[] | undefined> = computed(() => getProperty(this.obj(), DataKeys.INFERRED_TO));
   section = toSignal(this.route.fragment)
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
@@ -84,8 +81,6 @@ export class DescriptionComponent {
   interactorsLength = computed(() => this._interactors.value()?.length || 0);
 
 
-  protected readonly isArray = isArray;
-  protected readonly isString = isString;
   protected readonly Labels = Labels;
   protected readonly DataKeys = DataKeys;
 
@@ -127,42 +122,6 @@ export class DescriptionComponent {
     return this.iconService.getIconDetails(obj);
   }
 
-  getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {
-    if (!refEntity) return [];
-    const externalRef = {...refEntity};
-    const properties = [
-      {key: 'displayName', label: 'External Reference'},
-      {key: 'geneName', label: 'Gene Names'},
-      {key: 'chain', label: 'Chain'},
-      {key: 'referenceGene', label: 'Reference Genes'},
-      {key: 'referenceTranscript', label: 'Reference Transcript'}
-    ];
-    const results: { label: string, value: any }[] = [];
-    for (const property of properties) {
-      let value = externalRef[property.key];
-      if (!value) continue;
-      results.push({
-        label: property.label || property.key,
-        value: value
-      });
-    }
-    return results;
-  }
-
-
-  getGroupedCrossReferences(refEntity: ReferenceEntity | undefined) {
-    if (!refEntity || !refEntity.crossReference) return [];
-
-    const crossRefs = [...refEntity.crossReference];
-    const dbNames = [...new Set(crossRefs.map(ref => ref.databaseName))];
-
-    return dbNames.map(dbName => ({
-      databaseName: dbName,
-      data: crossRefs.filter(ref => ref.databaseName === dbName)
-    }));
-
-  }
-
   isTOCIncluded(key: string) {
     const obj = this.obj();
 
@@ -170,7 +129,7 @@ export class DescriptionComponent {
       case DataKeys.OVERVIEW:
         return obj;
       case DataKeys.CROSS_REFERENCES:
-        return this.crossReferences() && this.crossReferences().length > 0;
+        return this.referenceEntity()?.crossReference;
       case DataKeys.OTHER_FORMS:
         return this.otherForms() && this.otherForms().length > 0;
       case Labels.AUTHORSHIP:

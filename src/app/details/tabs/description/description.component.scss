@@ -279,23 +279,6 @@ $small-breakpoint-width: 959px;
 }
 
 
-// A grid layout
-.columns-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: start;
-  align-items: center;
-}
-
-.column-item {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  flex: 1 1 25%; // Each item takes exactly 25% of the container width
-  max-width: 25%; // Ensures all items have the same width
-}
-
 .element-container {
   display: flex;
   flex-direction: column;

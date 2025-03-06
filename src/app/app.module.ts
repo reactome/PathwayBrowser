@@ -64,28 +64,31 @@ import {
 import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
 import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
 import {AnalysisLegendComponent} from "./legend/analysis-legend/analysis-legend.component";
-
+import {ExternalReferenceComponent} from "./details/common/external-reference/external-reference.component";
+import {CrossReferencesComponent} from "./details/common/cross-references/cross-references.component";
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        DiagramComponent,
-        DiagramIteratorComponent,
-        CustomInteractorDialogComponent,
-        InteractorsComponent,
-        ViewportComponent,
-        SpeciesComponent,
-        EventHierarchyComponent,
-        EhldComponent,
-        DiagramHomeComponent,
-        DetailsComponent,
-        DescriptionComponent,
-        DescriptionOverviewComponent,
-        SummationRefsTreeComponent,
-        PublicationComponent,
-        InteractorsTableComponent,
-        EntityTreeComponent,
-    ],
+  declarations: [
+    AppComponent,
+    DiagramComponent,
+    DiagramIteratorComponent,
+    CustomInteractorDialogComponent,
+    InteractorsComponent,
+    ViewportComponent,
+    SpeciesComponent,
+    EventHierarchyComponent,
+    EhldComponent,
+    DiagramHomeComponent,
+    DetailsComponent,
+    DescriptionComponent,
+    DescriptionOverviewComponent,
+    SummationRefsTreeComponent,
+    PublicationComponent,
+    InteractorsTableComponent,
+    EntityTreeComponent,
+    ExternalReferenceComponent,
+    CrossReferencesComponent,
+  ],
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,

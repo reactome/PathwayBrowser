@@ -1,0 +1,16 @@
+<div class="element-container">
+  @for (ref of crossReferences() | sortByText :'databaseName'; track ref) {
+    <div class="row">
+      <div class="label-container">{{ ref.databaseName }}</div>
+      <div class="composition-container">
+        @for (item of ref.data; track item.dbId) {
+          <a [href]="item.url" target="_blank">{{ item.identifier }}</a>
+          @if (item !== ref.data[ref.data.length - 1]) {
+            <span class="margin-right">,</span>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>
+

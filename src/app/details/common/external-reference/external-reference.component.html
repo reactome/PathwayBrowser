@@ -1,0 +1,23 @@
+<div class="element-container">
+  @for (property of externalRef(); track property.label) {
+    <div class="row">
+      <div class="label-container">{{ property.label | titlecase }}</div>
+      <div class="composition-container"
+           [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
+        @if (isArray(property.value) && !isString(property.value[0])) {
+          @for (item of property.value; track item.dbId) {
+            <span class="column-item">
+                        <a [href]="item.url" target="_blank"> {{ item.databaseName }}:{{ item.identifier }}</a>
+                      </span>
+          }
+        } @else {
+          @if (property.label === 'External Reference') {
+            <a [href]="referenceEntity().url" target="_blank">{{ referenceEntity().displayName }}</a>
+          } @else {
+            <span>{{ property.value }}</span>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>
