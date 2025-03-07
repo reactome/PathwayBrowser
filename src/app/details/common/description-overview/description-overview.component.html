@@ -35,7 +35,8 @@
     <div *ngIf="compartment()" class="row">
       <div class="label">Compartment</div>
       <div class="value compartment-row">
-        @for (item of compartment(); track item.dbId; let i = $index; ) {
+        @for (has of compartment(); track has.element.dbId; let i = $index; ) {
+          @let item = has.element;
           <a [href]="item.url" target="_blank"
              [matTooltip]="item.definition ? item.definition : null">{{ item.displayName }}</a>
           <!-- Add comma separator except for last item -->
@@ -46,9 +47,9 @@
       </div>
     </div>
 
-    <div *ngIf="name().length > 1" class="row">
+    <div *ngIf="(name()?.length || 0) > 1" class="row">
       <div class="label">Synonyms</div>
-      <div class="value">{{ name().slice(1) }}</div>
+      <div class="value">{{ name()?.slice(1) }}</div>
     </div>
 
     <div *ngIf="['CellDevelopmentStep', 'CellLineagePath'].includes(obj().schemaClass) && tissue()" class="row">

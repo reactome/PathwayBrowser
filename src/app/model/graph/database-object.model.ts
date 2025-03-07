@@ -1,4 +1,5 @@
 import {InstanceEdit} from "./instance-edit.model";
+import {Relationship} from "./relationship.model";
 
 export interface DatabaseObject {
   [key: string]: any;
@@ -9,4 +10,7 @@ export interface DatabaseObject {
   schemaClass: string;
   modified?: InstanceEdit;
   created?: InstanceEdit;
+
+  composedOf?: Relationship.Has<DatabaseObject>[];
+
 }

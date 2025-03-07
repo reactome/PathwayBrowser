@@ -13,6 +13,8 @@ import {DatabaseObject} from "../model/graph/database-object.model";
 import {isEntity, isEvent, isPathwayOrTLP, isPathwayWithDiagram, isRLE} from "./utils";
 import {DatabaseObjectService} from "./database-object.service";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
+import {Relationship} from "../model/graph/relationship.model";
+import HasEvent = Relationship.HasEvent;
 
 
 export type SelectableObject = Event | PhysicalEntity;
@@ -117,8 +119,8 @@ export class EventService {
       }
       this.setCurrentEventAndObj(treeEvent, dbo);
       this.setTreeData(this.treeData$.value);
-      this.addAnalysisTag(dbo.hasEvent, this.analysisService.result);
-      this.addHitReactions(dbo.hasEvent, hitReactions)
+      this.addAnalysisTag(dbo.events, this.analysisService.result);
+      this.addHitReactions(dbo.events, hitReactions)
     });
   }
 
@@ -127,13 +129,14 @@ export class EventService {
     return this.dboService.fetchEnhancedEntry<Event>(tree.stId).pipe(
       switchMap(result => {
 
-        if (isPathwayOrTLP(result) && result.hasEvent && isPathwayOrTLP(tree)) {
+        if (isPathwayOrTLP(result) && result.events && isPathwayOrTLP(tree)) {
           // Update the event structure with child relationships
-          tree.hasEvent = result.hasEvent.map(child => {
-            child.ancestors = [...tree.ancestors, child];
-            child.parent = tree;
-            return child;
-          });
+          tree.events = result.events
+            .map(child => {
+              child.element.ancestors = [...tree.ancestors, child.element];
+              child.element.parent = tree;
+              return child;
+            });
           return of(result);
         } else {
           // If there are no events, return the original event
@@ -231,10 +234,10 @@ export class EventService {
   }
 
   clearAllSelectedEvents(events: Event[]) {
-    events.forEach(event => {
+    events?.forEach(event => {
       event.isSelected = false;
       if (isPathwayOrTLP(event)) {
-        this.clearAllSelectedEvents(event.hasEvent);
+        this.clearAllSelectedEvents(event.events?.map(e => e.element));
       }
     });
   }
@@ -337,7 +340,7 @@ export class EventService {
       concatMap((ancestor, index) => {
 
         // Search in last matched event's children or full tree
-        const treeEventResources = this.lastMatchedEvent && isPathwayOrTLP(this.lastMatchedEvent) ? this.lastMatchedEvent.hasEvent : tree;
+        const treeEventResources = this.lastMatchedEvent && isPathwayOrTLP(this.lastMatchedEvent) ? this.lastMatchedEvent.events?.map(e => e.element) : tree;
         const targetTreeEvent = this.findTreeEvent(treeEventResources, ancestor.stId);
 
         if (!targetTreeEvent) return EMPTY;
@@ -387,7 +390,7 @@ export class EventService {
    */
   private processHasEventData(object: DatabaseObject, treeEvent: Event, selectedIdFromUrl: string, diagramId: string, subpathwayColors: Map<number, string> | undefined, matTree: MatTree<Event, string>, index: number, totalAncestors: number) {
     if (isPathwayOrTLP(object) && isPathwayOrTLP(treeEvent)) {
-      treeEvent.hasEvent = object.hasEvent.map((child: Event) => {
+      treeEvent.events = object.events?.map((child: HasEvent) => {
         const ancestors = treeEvent.ancestors || [];
         // Remove duplicate ancestors
         if (!ancestors.some((ancestor) => ancestor.stId === treeEvent.stId)) {
@@ -395,9 +398,12 @@ export class EventService {
         }
         return {
           ...child,
-          ancestors: [...ancestors, child],
-          parent: treeEvent,
-          isSelected: child.stId === selectedIdFromUrl
+          element: {
+            ...child.element,
+            ancestors: [...ancestors, child.element],
+            parent: treeEvent,
+            isSelected: child.element.stId === selectedIdFromUrl
+          }
         }
       })
       matTree.expand(treeEvent);
@@ -434,8 +440,8 @@ export class EventService {
       // node.analysisContent = analysisContent;
       event.hitReactionsCount = `${pathwayData.reactions.found} / ${pathwayData.reactions.total}`;
 
-      if (isPathwayOrTLP(event) && event.hasEvent && event.hasEvent.length > 0) {
-        this.addAnalysisTag(event.hasEvent, analysisResult);
+      if (isPathwayOrTLP(event) && event.events && event.events.length > 0) {
+        this.addAnalysisTag(event.events?.map(e => e.element), analysisResult);
       }
     });
   }
@@ -445,8 +451,8 @@ export class EventService {
     tree.forEach(event => {
       if (!isPathwayOrTLP(event)) return;
       event.hit = hitReactions.includes(event.dbId);
-      if (event.hasEvent && event.hasEvent.length > 0) {
-        this.addHitReactions(event.hasEvent, hitReactions);
+      if (event.events && event.events.length > 0) {
+        this.addHitReactions(event.events?.map(e => e.element), hitReactions);
       }
     });
   }
@@ -457,8 +463,8 @@ export class EventService {
       if (event.stId === targetId) {
         return event;
       }
-      if (isPathwayOrTLP(event) && event.hasEvent) {
-        const found = this.findTreeEvent(event.hasEvent, targetId);
+      if (isPathwayOrTLP(event) && event.events) {
+        const found = this.findTreeEvent(event.events?.map(e => e.element), targetId);
         if (found) return found;
       }
     }
@@ -467,8 +473,8 @@ export class EventService {
 
 
   setSubtreeColors(event: Event, colors: Map<number, string> | undefined) {
-    if (colors && isPathwayOrTLP(event) && event.hasEvent) {
-      event.hasEvent.forEach(e => {
+    if (colors && isPathwayOrTLP(event) && event.events) {
+      event.events?.map(e => e.element).forEach(e => {
         if (isPathwayOrTLP(e) && !e.hasDiagram) {
           e.subpathwayColor = colors.get(e.dbId);
         }
@@ -535,7 +541,7 @@ export class EventService {
       visibleTreeNodes.push(node);
       // If the node is expanded, recursively check its children
       if (isPathwayOrTLP(node) && tree.isExpanded(node)) {
-        node.hasEvent.forEach(child => addVisibleNodes(child));
+        node.events.forEach(child => addVisibleNodes(child.element));
       }
     };
     // Start from the root nodes
@@ -552,7 +558,7 @@ export class EventService {
     const addVisibleNodes = (node: Event) => {
       expandedTreeNodes.push(node);
       if (isPathwayOrTLP(node) && tree.isExpanded(node)) {
-        node.hasEvent.forEach(child => addVisibleNodes(child));
+        node.events.forEach(child => addVisibleNodes(child.element));
       }
     };
     const rootTree = treeNodes.find(node => node.stId === tlpStId);
@@ -568,7 +574,7 @@ export class EventService {
       nodes.forEach(node => {
         flatTreeData.push(node);
         if (isPathwayOrTLP(node)) {
-          flatten(node.hasEvent);
+          flatten(node.events?.map(e => e.element));
         }
       });
     };
@@ -602,10 +608,10 @@ export class EventService {
     if (!parentTree) return;
     if (!isPathwayOrTLP(parentTree)) return;
     // Loop through the parent's children to collapse any expanded siblings
-    parentTree.hasEvent.forEach(childEvent => {
-      if (childEvent !== event && matTree.isExpanded(childEvent)) {
-        matTree.collapse(childEvent);
-        childEvent.isSelected = false;
+    parentTree.events.forEach(childEvent => {
+      if (childEvent.element !== event && matTree.isExpanded(childEvent.element)) {
+        matTree.collapse(childEvent.element);
+        childEvent.element.isSelected = false;
       }
     })
   }

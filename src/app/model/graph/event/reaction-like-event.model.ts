@@ -1,6 +1,6 @@
 import {Event} from "./event.model";
 import {PhysicalEntity} from "../physical-entity/physical-entity.model";
-import {ComposedOf} from "../composed-of.model";
+import {Relationship} from "../relationship.model";
 
 export interface ReactionLikeEvent extends Event {
   input: PhysicalEntity[];
@@ -8,6 +8,6 @@ export interface ReactionLikeEvent extends Event {
   category: string
   reactionType: string;
 
-  composedOf : ComposedOf[]
+  composedOf : Relationship.Has<Event>[]
 
 }

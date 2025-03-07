@@ -8,8 +8,10 @@ export class ExtractCompartmentPipe implements PipeTransform {
 
   // Get compartment name from string
   // Substrates for chaperone mediated autophagy [cytosol] => cytosol
-  transform(value: string): string | null {
+  transform(value: string, remove = false): string | null {
     if (!value) return null;
+
+    if (remove) return value.split('[')[0]
 
     const match = value.match(/\[(.*?)\]/);
     return match ? match[1] : null;

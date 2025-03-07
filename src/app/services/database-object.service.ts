@@ -27,7 +27,7 @@ export class DatabaseObjectService {
   }
 
   fetchEnhancedEntry<T extends DatabaseObject>(stId: string): Observable<T> {
-    let url = `${this._ENHANCED_QUERY}${stId}?includeRef=true`;
+    let url = `${this._ENHANCED_QUERY}${stId}?includeRef=true&view=nested-aggregated`;
     return this.http.get<T>(url).pipe(
       map((response: T) => {
         const deserializer = new JSOGDeserializer();

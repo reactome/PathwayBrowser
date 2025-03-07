@@ -4,6 +4,8 @@ import {ReviewStatus} from "../review-status.model";
 import {LiteratureReference} from "../publication/literature-reference.model";
 import {InstanceEdit} from "../instance-edit.model";
 import {Compartment} from "../go-term/compartment.model";
+import {Relationship} from "../relationship.model";
+import HasCompartment = Relationship.HasCompartment;
 
 
 export interface Event extends DatabaseObject {
@@ -17,7 +19,7 @@ export interface Event extends DatabaseObject {
   summation: Summation[];
   reviewStatus: ReviewStatus;
   name: string[];
-  compartment?: Compartment[];
+  hasCompartment?: HasCompartment[];
 
 
   // not from API endpoint but are needed in the tree view

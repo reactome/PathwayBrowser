@@ -43,7 +43,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   childrenAccessor = (node: Event): Event[] => {
     if (isPathwayOrTLP(node)) {
-      return node.hasEvent;
+      return node.events?.map(e => e.element);
     }
     return [];
   };
@@ -118,7 +118,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result);
 
     if (this.selectedTreeEvent && isPathwayOrTLP(this.selectedTreeEvent)) {
-      this.eventService.addHitReactions(this.selectedTreeEvent.hasEvent, hitReactions);
+      this.eventService.addHitReactions(this.selectedTreeEvent.events?.map(e => e.element), hitReactions);
     }
 
   });
@@ -214,6 +214,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
     // Combine all data and merged into one object
     initialData$.pipe(
+      tap(d => console.log('Initial data',d)),
       switchMap(initialData =>
         enhancedEventData$.pipe(
           combineLatestWith(
@@ -230,6 +231,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
           }))
         )
       ),
+      tap(d => console.log('Combined data',d)),
+
       // Build the tree with all data
       switchMap(({
                    enhancedEvent,
@@ -238,15 +241,18 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
                    hasEHLD,
                    analysisResult,
                    hitReactions
-                 }) => this.eventService.buildTree(enhancedEvent, this.pathwayId()!, this.tree, hitReactions))
+                 }) => this.eventService.buildTree(enhancedEvent, this.pathwayId()!, this.tree, hitReactions)),
+    tap(d => console.log('Final data',d)),
+
     ).subscribe({
       next: () => {
         // Give pathway id when idToUse is PEs
         const element = document.querySelector(`[st-id='${idToUse}']`) || document.querySelector(`[st-id='${this.pathwayId}']`);
         element?.scrollIntoView({behavior: 'smooth'});
       },
-      error: (err) => {
-        throw new Error('Error in building the tree:', err);
+      error: (err: Error) => {
+        console.error(err.stack)
+        throw err;
       }
     });
   }
@@ -257,8 +263,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       return false;
     }
     const parent = event.parent;
-    if (isPathwayOrTLP(parent) && parent.hasEvent) {
-      return parent.hasEvent.some(sibling => sibling !== event && this.eventService.eventHasChild(sibling));
+    if (isPathwayOrTLP(parent) && parent.events) {
+      return parent.events.some(sibling => sibling.element !== event && this.eventService.eventHasChild(sibling.element));
     }
     return false;
   }
@@ -365,8 +371,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   private selectAllParents(selectedEvent: Event, events: Event[]) {
     events.forEach(event => {
       event.isSelected = selectedEvent.ancestors?.some((parent: Event) => parent.stId === event.stId) || false;
-      if (isPathwayOrTLP(event) && event.hasEvent) {
-        this.selectAllParents(selectedEvent, event.hasEvent);
+      if (isPathwayOrTLP(event) && event.events) {
+        this.selectAllParents(selectedEvent, event.events?.map(e => e.element));
       }
     });
   }
@@ -375,8 +381,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   private clearAllSelectedEvents(events: Event[]) {
     events.forEach(event => {
       event.isSelected = false;
-      if (isPathwayOrTLP(event) && event.hasEvent) {
-        this.clearAllSelectedEvents(event.hasEvent);
+      if (isPathwayOrTLP(event) && event.events) {
+        this.clearAllSelectedEvents(event.events?.map(e => e.element));
       }
     });
   }

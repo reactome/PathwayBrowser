@@ -62,6 +62,10 @@ export class IconService {
       tooltip: 'A collection of related Events describing development of a cell line.There events can be CellDevelopmentSteps or CellLineagePaths',
       route: 'pathway'
     },
+    CatalystActivity: {name: 'catalyst-activity', tooltip: 'Catalyst activity', route: 'catalyst-activity'},
+    NegativelyRegulates: {name: 'negatively-regulates', tooltip: 'Negatively regulates Reaction', route: 'negatively-regulates'},
+    PositivelyRegulates: {name: 'positively-regulates', tooltip: 'Positively regulates Reaction', route: 'positively-regulates'},
+    Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
 
     //Reaction type
     "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},

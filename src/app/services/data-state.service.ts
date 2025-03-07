@@ -47,13 +47,13 @@ export class DataStateService {
   }
 
   fetchEnhancedData<T extends DatabaseObject>(stId: string | null): Observable<T | undefined> {
-    let url = `${environment.host}/ContentService/data/query/enhanced/${stId}?includeRef=true`;
+    let url = `${environment.host}/ContentService/data/query/enhanced/${stId}?includeRef=true&view=nested-aggregated`;
     if (stId === null) return of();
     return this.http.get<T>(url).pipe(map(this.flattenReferences))
   }
 
   fetchAncestors(stId: string | null): Observable<Pathway[]> {
-    let url = `${environment.host}/ContentService/data/event/${stId}/ancestors?includeRef=true`;
+    let url = `${environment.host}/ContentService/data/event/${stId}/ancestors?includeRef=true&view=nested-aggregated`;
     if (stId === null) return of();
     return this.http.get<Pathway[][]>(url).pipe(
       map(ancestors => ancestors.flatMap(a => a )),

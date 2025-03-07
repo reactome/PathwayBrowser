@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, Signal} from '@angular/core';
+import {Component, computed, effect, input, Signal, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {getProperty, isEntity} from "../../../services/utils";
@@ -80,6 +80,8 @@ export class DescriptionComponent {
 
   interactorsLength = computed(() => this._interactors.value()?.length || 0);
 
+  overview$ = viewChild<HTMLDivElement>('#overview');
+
 
   protected readonly Labels = Labels;
   protected readonly DataKeys = DataKeys;
@@ -108,6 +110,8 @@ export class DescriptionComponent {
               private entitiesService: EntitiesService,
               private interactorService: InteractorService,
   ) {
+    effect(() => {console.log(this.obj())
+    });
     effect(() => {
       !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({
         behavior: 'smooth',

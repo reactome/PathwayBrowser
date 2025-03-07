@@ -34,7 +34,7 @@
     </div>
 
     <!-- Overview -->
-    <div class="overview" #overview [ngClass]="{'update-layout': !icon.isLoading() && icon.value()}" [style.--icon-height.px]="overview.offsetHeight">
+    <div class="overview" #overview [class.update-layout]="!icon.isLoading() && icon.value()" [style.--icon-height.px]="overview$()?.clientHeight">
       <cr-description-overview  [obj]="obj()"></cr-description-overview>
       @if (!icon.isLoading() && icon.value()) {
         <div class="icon-container">
@@ -221,7 +221,7 @@
           </div>
         </div>
 
-        <cr-component-tree [data]="obj()[element.key]"></cr-component-tree>
+          <cr-component-tree [type]="element.key" [data]="obj()[element.key]" ></cr-component-tree>
       }
     }
 

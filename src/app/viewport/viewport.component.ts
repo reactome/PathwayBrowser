@@ -4,7 +4,7 @@ import {
   Component,
   computed,
   effect,
-  model,
+  model, viewChild,
   ViewChild,
   WritableSignal
 } from '@angular/core';
@@ -69,9 +69,9 @@ export class ViewportComponent implements AfterViewInit {
     return undefined;
   })
 
-  @ViewChild('diagram') diagram: DiagramComponent | undefined;
-  @ViewChild('interactors') interactors!: InteractorsComponent;
-  @ViewChild('darkToggle') darkToggle: MatSlideToggle | undefined;
+  diagram = viewChild(DiagramComponent);
+  interactors = viewChild.required(InteractorsComponent);
+  darkToggle = viewChild.required<MatSlideToggle>('darkToggle');
 
   currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
 
@@ -111,8 +111,8 @@ export class ViewportComponent implements AfterViewInit {
     });
 
 
-    this.darkToggle?._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
-    this.darkToggle?._switchElement.nativeElement?.querySelector('.mdc-switch__icon--off')?.querySelector('path')?.setAttribute('d', this.sun);
+    this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
+    this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--off')?.querySelector('path')?.setAttribute('d', this.sun);
   }
 
 

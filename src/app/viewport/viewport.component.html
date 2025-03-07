@@ -35,8 +35,8 @@
         </div>
 
         <div [style.display]="visibility.interactor ? 'block':'none'">
-          <cr-interactors #interactors [cy]="diagram?.cy" [cys]="diagram?.cys" [hasEHLD]="hasEHLD()"
-                          (initialiseReplaceElements)="diagram?.initialiseReplaceElements()"></cr-interactors>
+          <cr-interactors #interactors [cy]="diagram()?.cy" [cys]="diagram()?.cys" [hasEHLD]="hasEHLD()"
+                          (initialiseReplaceElements)="diagram()?.initialiseReplaceElements()"></cr-interactors>
         </div>
 
         <div class="event-hierarchy">

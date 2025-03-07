@@ -23,7 +23,9 @@
       <!-- This is the tree node template for leaf nodes -->
 
       <mat-nested-tree-node *matTreeNodeDef="let node" [ngClass]=getNodeConnector(node)>
-        {{ node.name[0] }}
+        {{ node.element.name?.[0] }} No Children
+
+
       </mat-nested-tree-node>
 
 
@@ -31,28 +33,32 @@
       <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" [cdkTreeNodeTypeaheadLabel]="node.name"
                             (expandedChange)="loadChildren(node)"
                             [ngClass]=getNodeConnector(node)>
+        @let element = node.element;
 
         <div class="mat-tree-node">
           <div class="tree-node">
             <div class="left" matTreeNodeToggle>
               <mat-icon
                 class="symbol-icon"
-                [matTooltip]="getSymbol(node).tooltip"
-                [svgIcon]="getSymbol(node).name">
+                [matTooltip]="getSymbol(element).tooltip"
+                [svgIcon]="getSymbol(element).name">
               </mat-icon>
 
               <div class="treeNodeToggle"
-                   [attr.aria-label]="'Toggle ' + node.name">
+                   [attr.aria-label]="'Toggle ' + element.name">
                 <mat-icon class="mat-icon-rtl-mirror"
-                          [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"></mat-icon>
+                          [svgIcon]="tree.isExpanded(element) ? 'collapse' : 'expand'"></mat-icon>
 
               </div>
-              {{ node.name[0]}}
+              @if (node.stoichiometry > 1) {
+                <b>{{ node.stoichiometry }} ×</b>
+              }
+              {{ element.name?.[0] || (element.displayName | extractCompartment: true)   }}
             </div>
             <div class="right">
-              <span class="compartment" matTreeNodeToggle>{{ node.displayName | extractCompartment }}</span>
-              @if (node.speciesName) {
-                <span class="species" matTreeNodeToggle>{{ node.speciesName }}</span>
+              <span class="compartment" matTreeNodeToggle>{{ element.displayName | extractCompartment }}</span>
+              @if (element.speciesName) {
+                <span class="species" matTreeNodeToggle>{{ element.speciesName }}</span>
               }
               <div class="select-container">
                 <a href="">
@@ -75,7 +81,7 @@
 
         <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
           <ng-container
-            *ngIf="node.schemaClass === 'EntityWithAccessionedSequence'; then protein; else entity">
+            *ngIf="node.element.schemaClass === 'EntityWithAccessionedSequence'; then protein; else entity">
           </ng-container>
         </div>
 

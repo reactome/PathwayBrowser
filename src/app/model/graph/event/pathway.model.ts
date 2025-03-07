@@ -1,7 +1,9 @@
 import {Event} from "./event.model";
+import {Relationship} from "../relationship.model";
+import HasEvent = Relationship.HasEvent;
 
 export interface Pathway extends Event {
-  hasEvent: Event[];
+  events: HasEvent[];
   hasDiagram: boolean;
   hasEHLD: boolean;
   normalPathway?: Pathway;
