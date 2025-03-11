@@ -63,8 +63,16 @@ export class IconService {
       route: 'pathway'
     },
     CatalystActivity: {name: 'catalyst-activity', tooltip: 'Catalyst activity', route: 'catalyst-activity'},
-    NegativelyRegulates: {name: 'negatively-regulates', tooltip: 'Negatively regulates Reaction', route: 'negatively-regulates'},
-    PositivelyRegulates: {name: 'positively-regulates', tooltip: 'Positively regulates Reaction', route: 'positively-regulates'},
+    NegativelyRegulates: {
+      name: 'negatively-regulates',
+      tooltip: 'Negatively regulates Reaction',
+      route: 'negatively-regulates'
+    },
+    PositivelyRegulates: {
+      name: 'positively-regulates',
+      tooltip: 'Positively regulates Reaction',
+      route: 'positively-regulates'
+    },
     Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
 
     //Reaction type
@@ -104,6 +112,19 @@ export class IconService {
     {name: 'select', tooltip: 'Select', route: 'select'},
   ];
 
+  // Not in used for now, leave here for future use
+  connectors = [
+    {name: 'dashed-I', route: 'dashed-I'},
+    {name: 'dashed-L', route: 'dashed-L'},
+    {name: 'dashed-T', route: 'dashed-T'},
+    {name: 'mini-dashed-I', route: 'mini-dashed-I'},
+    {name: 'mini-dashed-L', route: 'mini-dashed-L'},
+    {name: 'mini-dashed-T', route: 'mini-dashed-T'},
+    {name: 'solid-I', route: 'solid-I'},
+    {name: 'solid-L', route: 'solid-L'},
+    {name: 'solid-T', route: 'solid-T'},
+  ]
+
   speciesIcons = [
     {name: '9913', route: 'bos-taurus'},
     {name: '6239', route: 'caenorhabditis-elegans'},
@@ -135,6 +156,9 @@ export class IconService {
     return this.generalIcons;
   }
 
+  getConnectors() {
+    return this.connectors;
+  }
 
   loadIcon(id: string): Observable<string> {
     return this.http.get(`${environment.host}/icon/${id}.svg`, {responseType: 'text'});

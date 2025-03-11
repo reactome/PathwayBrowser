@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
     const speciesIcon = this.iconService.getSpeciesIcons();
     const generalIcons = this.iconService.getGeneralIcons();
     const reactomeSubjectIcons = this.iconService.getReactomeSubjectIcons();
+    const connectors = this.iconService.getConnectors();
     this.matIconRegistry.registerFontClassAlias('symbols', 'material-symbols-rounded')
 
     speciesIcon.forEach(icon => {
@@ -30,6 +31,10 @@ export class AppComponent implements OnInit {
     generalIcons.forEach(icon => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/general/${icon.route}.svg`));
     });
+
+    connectors.forEach(connector => {
+      this.matIconRegistry.addSvgIcon(connector.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/connector/${connector.route}.svg`));
+    })
 
     Object.values(reactomeSubjectIcons).forEach((icon) => {
       this.matIconRegistry.addSvgIcon(icon.name, this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/icons/reactome-subject/${icon.route}.svg`));

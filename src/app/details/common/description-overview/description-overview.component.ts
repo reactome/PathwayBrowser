@@ -4,7 +4,6 @@ import {getProperty, isDefined} from "../../../services/utils";
 import {Anatomy} from "../../../model/graph/external-ontology/anatomy.model";
 import {ReviewStatus} from "../../../model/graph/review-status.model";
 import {Summation} from 'src/app/model/graph/summation.model';
-import {Compartment} from "../../../model/graph/go-term/compartment.model";
 import {DataKeys} from "../../../constants/constants";
 import {Relationship} from "../../../model/graph/relationship.model";
 import HasCompartment = Relationship.HasCompartment;
