@@ -204,39 +204,39 @@
 
 
 // Ideas from https://www.cssscript.com/minimalist-tree-view-pure-css/
-.mat-nested-tree-node{
+.mat-nested-tree-node {
   list-style-type: none;
   position: relative;
 }
 
 /* Horizontal line and vertical line as connector  (::before) */
-.mat-nested-tree-node::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -13px;
-  width: 13px;
-  height: 11px;
-
-  border-left-width: 2px;
-  border-left-color: var(--on-surface);
-  border-bottom-width: 2px; // To make a rounded corner
-  border-bottom-color: var(--on-surface);
-
-}
+//.mat-nested-tree-node::before {
+//  content: "";
+//  position: absolute;
+//  top: 0;
+//  left: -13px;
+//  width: 13px;
+//  height: 11px;
+//
+//  border-left-width: 2px;
+//  border-left-color: var(--on-surface);
+//  border-bottom-width: 2px; // To make a rounded corner
+//  border-bottom-color: var(--on-surface);
+//
+//}
 
 /* Vertical line (::after) */
-.mat-nested-tree-node::after {
-  position: absolute;
-  content: "";
-  top: 0;
-  left: -13px;
-  width: 13px;
-  height: 100%;
-
-  border-left-width: 2px;
-  border-bottom-color: var(--on-surface);
-}
+//.mat-nested-tree-node::after {
+//  position: absolute;
+//  content: "";
+//  top: 0;
+//  left: -13px;
+//  width: 13px;
+//  height: 100%;
+//
+//  border-left-width: 2px;
+//  border-bottom-color: var(--on-surface);
+//}
 
 
 /* Hide horizontal line for root nodes */
@@ -250,57 +250,216 @@
 }
 
 /* Remove lines for the last child */
-.group .mat-nested-tree-node:last-child::after {
-  display: none;
-}
+//.group .mat-nested-tree-node:last-child::after {
+//  display: none;
+//}
 
 /* Adjust border radius for the last child */
-.group .mat-nested-tree-node:last-child::before {
-  border-radius: 0 0 0 5px;
-}
+//.group .mat-nested-tree-node:last-child::before {
+//  border-radius: 0 0 0 5px;
+//}
 
 /* Dynamic border styles based on node type */
-.group > .mat-nested-tree-node.dashedConnector::before, {
-  border-left-style: dashed;
-  border-bottom-style: dashed;
+//.group > .mat-nested-tree-node.dashedConnector::before, {
+//  border-left-style: dashed;
+//  border-bottom-style: dashed;
+//  background-image: url( '/assets/connector/dashed-I.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.dashedConnector::after {
+//  border-left-style: dashed;
+//}
+//
+//.group > .mat-nested-tree-node.solidConnector::before {
+//  border-left-style: solid;
+//  border-bottom-style: solid;
+//}
+//
+//.group > .mat-nested-tree-node.solidConnector::after {
+//  border-left-style: solid;
+//}
+//
+//.group > .mat-nested-tree-node.smallDashedConnector::before {
+//  border-left-width: 1px;
+//  border-bottom-width: 1px;
+//  border-left-style: dashed;
+//  border-bottom-style: dashed;
+//}
+//
+//.group > .mat-nested-tree-node.smallDashedConnector::after {
+//  border-left-width: 1px;
+//  border-left-style: dashed;
+//}
+
+//.otherConnector::before {
+//  border-left-style: solid;
+//  border-left-color: var(--primary);
+//  border-bottom-style: solid;
+//  border-bottom-color: var(--primary);
+//  height:70px
+//}
+//
+//.otherConnector::after {
+//  border-left-style: solid;
+//  border-top-color: var(--primary);
+//}
+//
+//.mat-nested-tree-node::before {
+//  position: absolute;
+//  content: "";
+//  top: 0;
+//  left: -24px;
+//  width: 24px;
+//  height: 24px;
+//}
+//
+//
+//
+///* Dynamic border styles based on node type */
+//.group > .mat-nested-tree-node.dashedIConnector::before, {
+//  background-image: url( '/assets/connector/dashed-I.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.dashedTConnector::before {
+//  background-image: url( '/assets/connector/dashed-T.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.dashedLConnector::before {
+//  background-image: url( '/assets/connector/dashed-L.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.solidIConnector::before, {
+//  background-image: url( '/assets/connector/solid-I.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.solidTConnector::before {
+//  background-image: url( '/assets/connector/solid-T.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.solidLConnector::before {
+//  background-image: url( '/assets/connector/solid-L.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.miniDashedIConnector::before, {
+//  background-image: url( '/assets/connector/mini-dashed-I.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.miniDashedTConnector::before {
+//  background-image: url( '/assets/connector/mini-dashed-T.svg' );
+//}
+//
+//.group > .mat-nested-tree-node.miniDashedLConnector::before {
+//  background-image: url( '/assets/connector/mini-dashed-L.svg' );
+//}
+//
+///* Base connector styles remain unchanged */
+//.mat-nested-tree-node::before {
+//  position: absolute;
+//  content: "";
+//  top: 0;
+//  left: -24px;
+//  width: 24px;
+//  height: 24px;
+//}
+//
+///* Extra vertical line for first child of an expanded node */
+//.mat-nested-tree-node.extra::after {
+//  content: "";
+//  position: absolute;
+//  top:0;
+//  left: -48px;
+//  width: 24px;
+//  height: 24px;
+//  background-image: url( '/assets/connector/dashed-I.svg' );
+//}
+
+// Hide connector for root
+//.mat-nested-tree-node[aria-level="1"] > .connector-container {
+//  display: none;
+//}
+
+.connector-container {
+  position: absolute;
+  top: 0;
+  height: 24px;
+  display: flex;
 }
 
-.group > .mat-nested-tree-node.dashedConnector::after {
-  border-left-style: dashed;
+.connector {
+  width: 24px;
+  height: 24px;
 }
 
-.group > .mat-nested-tree-node.solidConnector::before {
-  border-left-style: solid;
-  border-bottom-style: solid;
+.protein-connector-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+
+  .connector:not(:last-child) {
+    width: 24px;
+    height: 100%
+  }
+
 }
 
-.group > .mat-nested-tree-node.solidConnector::after {
-  border-left-style: solid;
+.protein-content-container {
+  border: 2px solid var(--primary);
+  border-radius: 10px;
 }
 
-.group > .mat-nested-tree-node.smallDashedConnector::before {
-  border-left-width: 1px;
-  border-bottom-width: 1px;
-  border-left-style: dashed;
-  border-bottom-style: dashed;
+
+.dashedIConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/dashed-I.svg');
 }
 
-.group > .mat-nested-tree-node.smallDashedConnector::after {
-  border-left-width: 1px;
-  border-left-style: dashed;
+.dashedTConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/dashed-T.svg');
 }
 
-.otherConnector::before {
-  border-left-style: solid;
-  border-left-color: var(--primary);
-  border-bottom-style: solid;
-  border-bottom-color: var(--primary);
-  height:70px
+.dashedLConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/dashed-L.svg');
 }
 
-.otherConnector::after {
-  border-left-style: solid;
-  border-top-color: var(--primary);
+.solidIConnector, {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/solid-I.svg');
+}
+
+.solidTConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/solid-T.svg');
+
+}
+
+.solidLConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/solid-L.svg');
+}
+
+.miniDashedIConnector, {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/mini-dashed-I.svg');
+
+}
+
+.miniDashedTConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/mini-dashed-T.svg');
+
+}
+
+.miniDashedLConnector {
+  background-color: var(--on-surface);
+  mask: url('/assets/connector/mini-dashed-L.svg');
+}
+
+.otherConnector {
+  background-color: var(--primary);
+  mask: url('/assets/connector/solid-L.svg');
 }
 
 
