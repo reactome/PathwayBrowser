@@ -7,6 +7,7 @@ import {TopLevelPathway} from "../model/graph/event/top-level-pathway.model";
 import {CellLineagePath} from "../model/graph/event/cell-lineage-path.model";
 import {EntityWithAccessionedSequence} from "../model/graph/physical-entity/entity-with-accessioned-sequence.model";
 import {LiteratureReference} from "../model/graph/publication/literature-reference.model";
+import {SchemaClasses} from "../constants/constants";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -27,33 +28,33 @@ export function isEvent(obj: DatabaseObject): obj is Event {
 }
 
 export function isPathway(obj: DatabaseObject): obj is Pathway {
-  return obj.schemaClass === "Pathway";
+  return obj.schemaClass === SchemaClasses.PATHWAY;
 }
 
 export function isTLP(obj: DatabaseObject): obj is TopLevelPathway {
-  return obj.schemaClass === "TopLevelPathway";
+  return obj.schemaClass === SchemaClasses.TLP;
 }
 
 export function isCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
-  return obj.schemaClass === "CellLineagePathway";
+  return obj.schemaClass === SchemaClasses.CELL_LINEAGE_PATH;
 }
 
 export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPathway | CellLineagePath {
   return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
 }
 
-const physicalEntityClasses = new Set(['PhysicalEntity', 'Complex', 'Drug', 'ChemicalDrug', 'ProteinDrug', 'RNADrug', 'EntitySet', 'CandidateSet', 'GenomeEncodedEntity', 'EntityWithAccessionedSequence',
-  'EntityWithAccessionedSequence', 'OtherEntity', 'Polymer', 'SimpleEntity']);
+const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
+  SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY]);
 
 export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
   return physicalEntityClasses.has(obj.schemaClass);
 }
 
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
-  return obj.schemaClass === "EntityWithAccessionedSequence";
+  return obj.schemaClass === SchemaClasses.EWAS;
 }
 
-const reactionLikeEventClasses = new Set(['Reaction', 'BlackBoxEvent', 'Polymerisation', 'Depolymerisation', 'FailedReaction', 'CellDevelopmentStep']);
+const reactionLikeEventClasses: Set<string> = new Set([SchemaClasses.REACTION, SchemaClasses.BLACK_BOX_EVENT, SchemaClasses.POLYMERISATION, SchemaClasses.DEPOLYMERISATION, SchemaClasses.FAILED_REACTION, SchemaClasses.CELL_DEVELOPMENT_STEP]);
 
 export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
   return reactionLikeEventClasses.has(obj.schemaClass);

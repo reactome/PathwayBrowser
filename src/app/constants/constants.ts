@@ -50,3 +50,32 @@ export const Labels = {
   INFERRED_FROM: 'Inferred From',
   PRECEDING_EVENT: 'Preceding Event',
 } as const;
+
+export const SchemaClasses = {
+  EWAS: 'EntityWithAccessionedSequence',
+  PE: 'PhysicalEntity',
+  COMPLEX: 'Complex',
+  DRUG: 'Drug',
+  CHEMICAL_DRUG: 'ChemicalDrug',
+  PROTEIN_DRUG: 'ProteinDrug',
+  RNA_DRUG: 'RNADrug',
+  ENTITY_SET: 'EntitySet',
+  CANDIDATE_SET: 'CandidateSet',
+  GENOME_ENCODED_ENTITY: 'GenomeEncodedEntity',
+  OTHER_ENTITY: 'OtherEntity',
+  POLYMER: 'Polymer',
+  SIMPLE_ENTITY: 'SimpleEntity',
+
+
+  PATHWAY: 'Pathway',
+  TLP: 'TopLevelPathway',
+  CELL_LINEAGE_PATH: 'CellLineagePath',
+  REACTION: 'Reaction',
+  BLACK_BOX_EVENT: 'BlackBoxEvent',
+  POLYMERISATION: 'Polymerisation',
+  DEPOLYMERISATION: 'Depolymerisation',
+  FAILED_REACTION: 'FailedReaction',
+  CELL_DEVELOPMENT_STEP: 'CellDevelopmentStep'
+
+
+} as const
