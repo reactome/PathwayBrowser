@@ -1,5 +1,4 @@
 import {Component, computed, effect, input, signal} from '@angular/core';
-import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {map, of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
@@ -7,9 +6,10 @@ import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
-import {isEWAS} from "../../../services/utils";
+import {isEvent, isEWAS} from "../../../services/utils";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {SchemaClasses} from "../../../constants/constants";
+import {SelectableObject} from "../../../services/event.service";
 
 
 @Component({
@@ -49,8 +49,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (!param.request) return of();
 
       // Check the condition to determine which method to call
-      if (this.selectedNode()?.schemaClass === SchemaClasses.EWAS) {
-        return this.dataStateService.fetchEnhancedData<PhysicalEntity>(param.request);
+      if (this.selectedNode()?.schemaClass === SchemaClasses.EWAS || (this.selectedNode() && isEvent(this.selectedNode()!))) {
+        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request);
       } else {
         return this.entitiesService.getEntityInDepth(param.request)
           .pipe(
@@ -234,9 +234,9 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
   // To create an array of a specific level for indexing connector class
-  getArray(level: string | null, isProteinContent: boolean): number[] {
+  getArray(level: string | null, isDetailContent: boolean): number[] {
     // Exclude root for normal tree node and include it when tree node is a protein content node
-    let size = !isProteinContent ? Number(level ?? 0) - 1 : Number(level ?? 0);
+    let size = !isDetailContent ? Number(level ?? 0) - 1 : Number(level ?? 0);
     let result = [];
     for (let i = 0; i < size; i++) {
       result.push(i);
@@ -272,12 +272,12 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return connectors
   }
 
-  getParentsConnector(node: R, isProteinContent: boolean) {
+  getParentsConnector(node: R, isDetailContent: boolean) {
 
     const ancestors = this.findAncestors(node, this.dataSource.data);
     // Get all parents excepted the last one, ancestors include the node itself, the last one is processing with getCurrentNodeConnector(node)
     // if the parent is the protein, then include it in the list as the parent and kid(protein content node) is the same node
-    const parents = !isProteinContent ? [...ancestors].slice(0, -1) : ancestors;
+    const parents = !isDetailContent ? [...ancestors].slice(0, -1) : ancestors;
     // const parents =  [...ancestors].slice(0, -1)
 
     const connectorClasses: string[] = [];
@@ -339,4 +339,5 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   protected readonly Number = Number;
   protected readonly SchemaClasses = SchemaClasses;
+  protected readonly isEvent = isEvent;
 }

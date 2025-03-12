@@ -89,14 +89,14 @@
 
         <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
           <ng-container
-            *ngIf="node.element.schemaClass === SchemaClasses.EWAS; then protein; else entity">
+            *ngIf="node.element.schemaClass === SchemaClasses.EWAS || isEvent(node.element); then details; else entity">
           </ng-container>
         </div>
 
-        <!-- Template for child nodes when parent is EWAS (protein) -->
-        <ng-template #protein>
+        <!-- Template for child nodes when parent is EWAS (protein) or Event -->
+        <ng-template #details>
           <mat-nested-tree-node>
-            <div class="protein-connector-container" [ngStyle]="getConnectorStyles(treeNodeRef, true)">
+            <div class="details-connector-container" [ngStyle]="getConnectorStyles(treeNodeRef, true)">
               <!--To create an array of a specific length-->
               @for (index of getArray(treeNodeRef.ariaLevel, true); track index) {
                 <div class="connector"
@@ -105,7 +105,7 @@
               }
             </div>
 
-            <div class="protein-content-container">
+            <div class="details-content-container">
               <!-- Details content -->
               <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
               @if (referenceEntity()) {

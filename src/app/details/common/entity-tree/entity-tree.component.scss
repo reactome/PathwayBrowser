@@ -212,7 +212,7 @@
   height: 24px;
 }
 
-.protein-connector-container {
+.details-connector-container {
   position: absolute;
   top: 0;
   height: 100%;
@@ -302,7 +302,7 @@
 }
 
 /* Content tree node styles*/
-.protein-content-container {
+.details-content-container {
   border: 2px solid var(--primary);
   border-radius: 10px;
   display: flex;
@@ -311,10 +311,10 @@
 }
 
 
-.protein-content-container > :first-child {
+.details-content-container > :first-child {
   padding-top: 6px;
 }
 
-.protein-content-container > :last-child {
+.details-content-container > :last-child {
   padding-bottom: 6px;
 }
