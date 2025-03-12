@@ -35,7 +35,7 @@
 
     <!-- Overview -->
     <div class="overview" #overview [class.update-layout]="!icon.isLoading() && icon.value()" [style.--icon-height.px]="overview$()?.clientHeight">
-      <cr-description-overview  [obj]="obj()"></cr-description-overview>
+      <cr-description-overview  [obj]="obj()" [showSpecies]="true"></cr-description-overview>
       @if (!icon.isLoading() && icon.value()) {
         <div class="icon-container">
           <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>

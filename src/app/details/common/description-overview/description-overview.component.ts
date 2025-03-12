@@ -19,6 +19,7 @@ import HasCompartment = Relationship.HasCompartment;
 export class DescriptionOverviewComponent {
 
   readonly obj = input.required<DatabaseObject>();
+  readonly showSpecies = input<boolean>(true);
 
   readonly allRefs = computed(() => {
     const literatureRefs = getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE);

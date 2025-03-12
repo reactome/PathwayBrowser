@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div *ngIf="speciesName()" class="row">
+    <div *ngIf="speciesName() && showSpecies()" class="row">
       <div class="label">Species</div>
       <div class="value">{{ speciesName() }}</div>
     </div>
