@@ -1,6 +1,5 @@
 @use '@angular/material' as mat;
 
-
 :host {
   width: 100%;
 }
@@ -81,19 +80,12 @@
 
 .component-tree {
   width: 100%;
-
 }
 
 .component-tree-invisible {
   display: none;
 }
 
-.component-tree ul,
-.component-tree li {
-  margin-top: 0;
-  margin-bottom: 0;
-  list-style-type: none;
-}
 
 /*
  * This padding sets alignment of the nested nodes.
@@ -130,7 +122,6 @@
   flex: 0 1 auto; /* Default flex properties for left element */
   align-items: center;
   gap: 5px
-
 }
 
 .right {
@@ -146,13 +137,10 @@
 
 
 .mat-tree {
-  //background: var(--surface);
-  //--mat-text-button-horizontal-padding: 5px;
-  //--mat-text-button-with-icon-horizontal-padding: 8px;
   --mat-tree-node-min-height: 20px;
 }
 
-.treeNodeToggle {
+.toggle-icon-container {
   display: flex;
   width: 12px;
   height: 12px;
@@ -184,7 +172,6 @@
   border-radius: 50px;
   background: var(--primary);
 
-
   .custom-icon {
     color: var(--on-primary);
     display: flex;
@@ -203,180 +190,10 @@
 }
 
 
-// Ideas from https://www.cssscript.com/minimalist-tree-view-pure-css/
+/* Connector styles*/
 .mat-nested-tree-node {
-  list-style-type: none;
   position: relative;
 }
-
-/* Horizontal line and vertical line as connector  (::before) */
-//.mat-nested-tree-node::before {
-//  content: "";
-//  position: absolute;
-//  top: 0;
-//  left: -13px;
-//  width: 13px;
-//  height: 11px;
-//
-//  border-left-width: 2px;
-//  border-left-color: var(--on-surface);
-//  border-bottom-width: 2px; // To make a rounded corner
-//  border-bottom-color: var(--on-surface);
-//
-//}
-
-/* Vertical line (::after) */
-//.mat-nested-tree-node::after {
-//  position: absolute;
-//  content: "";
-//  top: 0;
-//  left: -13px;
-//  width: 13px;
-//  height: 100%;
-//
-//  border-left-width: 2px;
-//  border-bottom-color: var(--on-surface);
-//}
-
-
-/* Hide horizontal line for root nodes */
-.mat-nested-tree-node[aria-level="1"]::before {
-  display: none;
-}
-
-/* Hide vertical line for root nodes */
-.mat-nested-tree-node[aria-level="1"]::after {
-  display: none;
-}
-
-/* Remove lines for the last child */
-//.group .mat-nested-tree-node:last-child::after {
-//  display: none;
-//}
-
-/* Adjust border radius for the last child */
-//.group .mat-nested-tree-node:last-child::before {
-//  border-radius: 0 0 0 5px;
-//}
-
-/* Dynamic border styles based on node type */
-//.group > .mat-nested-tree-node.dashedConnector::before, {
-//  border-left-style: dashed;
-//  border-bottom-style: dashed;
-//  background-image: url( '/assets/connector/dashed-I.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.dashedConnector::after {
-//  border-left-style: dashed;
-//}
-//
-//.group > .mat-nested-tree-node.solidConnector::before {
-//  border-left-style: solid;
-//  border-bottom-style: solid;
-//}
-//
-//.group > .mat-nested-tree-node.solidConnector::after {
-//  border-left-style: solid;
-//}
-//
-//.group > .mat-nested-tree-node.smallDashedConnector::before {
-//  border-left-width: 1px;
-//  border-bottom-width: 1px;
-//  border-left-style: dashed;
-//  border-bottom-style: dashed;
-//}
-//
-//.group > .mat-nested-tree-node.smallDashedConnector::after {
-//  border-left-width: 1px;
-//  border-left-style: dashed;
-//}
-
-//.otherConnector::before {
-//  border-left-style: solid;
-//  border-left-color: var(--primary);
-//  border-bottom-style: solid;
-//  border-bottom-color: var(--primary);
-//  height:70px
-//}
-//
-//.otherConnector::after {
-//  border-left-style: solid;
-//  border-top-color: var(--primary);
-//}
-//
-//.mat-nested-tree-node::before {
-//  position: absolute;
-//  content: "";
-//  top: 0;
-//  left: -24px;
-//  width: 24px;
-//  height: 24px;
-//}
-//
-//
-//
-///* Dynamic border styles based on node type */
-//.group > .mat-nested-tree-node.dashedIConnector::before, {
-//  background-image: url( '/assets/connector/dashed-I.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.dashedTConnector::before {
-//  background-image: url( '/assets/connector/dashed-T.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.dashedLConnector::before {
-//  background-image: url( '/assets/connector/dashed-L.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.solidIConnector::before, {
-//  background-image: url( '/assets/connector/solid-I.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.solidTConnector::before {
-//  background-image: url( '/assets/connector/solid-T.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.solidLConnector::before {
-//  background-image: url( '/assets/connector/solid-L.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.miniDashedIConnector::before, {
-//  background-image: url( '/assets/connector/mini-dashed-I.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.miniDashedTConnector::before {
-//  background-image: url( '/assets/connector/mini-dashed-T.svg' );
-//}
-//
-//.group > .mat-nested-tree-node.miniDashedLConnector::before {
-//  background-image: url( '/assets/connector/mini-dashed-L.svg' );
-//}
-//
-///* Base connector styles remain unchanged */
-//.mat-nested-tree-node::before {
-//  position: absolute;
-//  content: "";
-//  top: 0;
-//  left: -24px;
-//  width: 24px;
-//  height: 24px;
-//}
-//
-///* Extra vertical line for first child of an expanded node */
-//.mat-nested-tree-node.extra::after {
-//  content: "";
-//  position: absolute;
-//  top:0;
-//  left: -48px;
-//  width: 24px;
-//  height: 24px;
-//  background-image: url( '/assets/connector/dashed-I.svg' );
-//}
-
-// Hide connector for root
-//.mat-nested-tree-node[aria-level="1"] > .connector-container {
-//  display: none;
-//}
 
 .connector-container {
   position: absolute;

@@ -52,7 +52,7 @@
                 [svgIcon]="getSymbol(element).name">
               </mat-icon>
 
-              <div class="treeNodeToggle"
+              <div class="toggle-icon-container"
                    [attr.aria-label]="'Toggle ' + element.name">
                 <mat-icon class="mat-icon-rtl-mirror"
                           [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"></mat-icon>
@@ -89,7 +89,7 @@
 
         <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
           <ng-container
-            *ngIf="node.element.schemaClass === 'EntityWithAccessionedSequence'; then protein; else entity">
+            *ngIf="node.element.schemaClass === SchemaClasses.EWAS; then protein; else entity">
           </ng-container>
         </div>
 

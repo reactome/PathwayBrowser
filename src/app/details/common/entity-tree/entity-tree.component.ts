@@ -338,4 +338,5 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
 
   protected readonly Number = Number;
+  protected readonly SchemaClasses = SchemaClasses;
 }
