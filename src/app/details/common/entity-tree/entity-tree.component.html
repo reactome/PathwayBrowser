@@ -108,13 +108,13 @@
             <div class="details-content-container">
               <!-- Details content -->
               <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
-              @if (referenceEntity()) {
+              @if (element.referenceEntity) {
                 <mat-divider></mat-divider>
                 <!-- External Reference -->
-                <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
+                <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
                 <mat-divider></mat-divider>
                 <!-- Cross References -->
-                <cr-cross-references [referenceEntity]=referenceEntity()!></cr-cross-references>
+                <cr-cross-references [referenceEntity]=element.referenceEntity></cr-cross-references>
               }
             </div>
 

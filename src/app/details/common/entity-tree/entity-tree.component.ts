@@ -6,7 +6,7 @@ import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
-import {isEvent, isEWAS} from "../../../services/utils";
+import {isEvent} from "../../../services/utils";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {SchemaClasses} from "../../../constants/constants";
 import {SelectableObject} from "../../../services/event.service";
@@ -47,16 +47,16 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     request: () => this.selectedNode()?.stId,
     loader: (param) => {
       if (!param.request) return of();
-
+      const selectedNode = this.selectedNode();
       // Check the condition to determine which method to call
-      if (this.selectedNode()?.schemaClass === SchemaClasses.EWAS || (this.selectedNode() && isEvent(this.selectedNode()!))) {
+      if (selectedNode?.schemaClass === SchemaClasses.EWAS || (selectedNode && isEvent(selectedNode))) {
         return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request);
       } else {
         return this.entitiesService.getEntityInDepth(param.request)
           .pipe(
-            map(enhancedData => {
-              if (enhancedData && enhancedData.composedOf) {
-                enhancedData.composedOf = enhancedData.composedOf.map((composed, index, array) => ({
+            map(entityResult => {
+              if (entityResult && entityResult.composedOf) {
+                entityResult.composedOf = entityResult.composedOf.map((composed, index, array) => ({
                   ...composed,
                   element: {
                     ...composed.element,
@@ -65,18 +65,12 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
                 }));
               }
               return {
-                ...enhancedData
+                ...entityResult
               };
             })
           );
       }
     }
-  });
-
-  referenceEntity = computed(() => {
-    const data = this._enhancedSelectedNode.value();
-    if (!data || !isEWAS(data)) return undefined;
-    return data.referenceEntity;
   });
 
 
@@ -96,10 +90,10 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     effect(() => {
 
-      const enhancedData = this._enhancedSelectedNode.value();
-      if (!enhancedData) return;
+      const result = this._enhancedSelectedNode.value();
+      if (!result) return;
 
-      const updatedTree = this.updateTree(this.dataSource.data, enhancedData! as unknown as E);
+      const updatedTree = this.updateTree(this.dataSource.data, result! as unknown as E);
 
       this.dataSource.data = [];
       this.dataSource.data = updatedTree
@@ -127,15 +121,15 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     this.depthIndex++;
   }
 
-  private updateTree(existingTreeData: R[], enhancedData: E): R[] {
+  private updateTree(existingTreeData: R[], result: E): R[] {
 
     const tree = [...existingTreeData];
     const flatTree = this.flattenTree(tree);
-    const targetTreeNode = flatTree.find(node => node.element.stId === enhancedData.stId);
+    const targetTreeNode = flatTree.find(node => node.element.stId === result.stId);
 
     if (targetTreeNode) {
-      // Merge changes from enhancedData into targetTree
-      Object.assign(targetTreeNode.element, enhancedData);
+      // Merge all properties from result directly into the element
+      Object.assign(targetTreeNode.element, result);
     }
 
     return tree;
