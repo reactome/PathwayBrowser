@@ -107,10 +107,12 @@
 
             <div class="protein-content-container">
               <!-- Details content -->
-              <cr-description-overview [obj]="node"></cr-description-overview>
+              <cr-description-overview [obj]="element"></cr-description-overview>
               @if (referenceEntity()) {
+                <mat-divider></mat-divider>
                 <!-- External Reference -->
                 <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
+                <mat-divider></mat-divider>
                 <!-- Cross References -->
                 <cr-cross-references [referenceEntity]=referenceEntity()!></cr-cross-references>
               }

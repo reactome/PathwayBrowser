@@ -115,6 +115,11 @@
 .tree-node:hover {
   background: var(--surface2);
   border-radius: 50px;
+  // Make the hover background larger than its parent container on X
+  padding-left: 4px;
+  margin-left: -4px;
+  padding-right: 4px;
+  margin-right: -4px;
 }
 
 .left {
@@ -220,12 +225,6 @@
 
 }
 
-.protein-content-container {
-  border: 2px solid var(--primary);
-  border-radius: 10px;
-}
-
-
 .dashedIConnector {
   background-color: var(--on-surface);
   mask: url('/assets/connector/dashed-I.svg');
@@ -280,3 +279,42 @@
 }
 
 
+/* Add padding between connector and tree node and ignore the level 1*/
+.mat-nested-tree-node[aria-level="1"] > .mat-tree-node {
+  padding-left: 0;
+}
+
+.mat-tree-node {
+  padding-left: 4px;
+}
+
+
+/* Divider styles */
+.composition-container {
+  @include mat.divider-overrides((
+    color: var(--outline-variant),
+    width: 2px
+  ));
+}
+
+.mat-divider {
+  margin: 0 6px;
+}
+
+/* Content tree node styles*/
+.protein-content-container {
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  display: flex;
+  gap: 6px;
+  flex-direction: column;
+}
+
+
+.protein-content-container > :first-child {
+  padding-top: 6px;
+}
+
+.protein-content-container > :last-child {
+  padding-bottom: 6px;
+}
