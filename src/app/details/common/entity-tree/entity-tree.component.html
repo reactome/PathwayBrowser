@@ -37,7 +37,7 @@
         <div class="connector-container" [ngStyle]="getConnectorStyles(treeNodeRef, false)">
           <!--To create an array of a specific length-->
           @for (index of getArray(treeNodeRef.ariaLevel, false); track index) {
-            <div class="connector"
+            <div class="connector" [matTooltip]="node.type"
                  [ngClass]="getAllConnectors(treeNodeRef, node, index, treeNodeRef.ariaLevel)[index]">
             </div>
           }
