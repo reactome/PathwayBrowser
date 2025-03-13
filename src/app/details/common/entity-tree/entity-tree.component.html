@@ -34,7 +34,7 @@
                             matTreeNodeToggle
                             #treeNodeRef>
         @let element= node.element;
-        <div class="connector-container" [ngStyle]="getConnectorStyles(treeNodeRef, false)">
+        <div class="connector-container" [style.--level]="getLevel(treeNodeRef, false)">
           <!--To create an array of a specific length-->
           @for (index of getArray(treeNodeRef.ariaLevel, false); track index) {
             <div class="connector" [matTooltip]="node.type"
@@ -43,44 +43,42 @@
           }
         </div>
 
-        <div class="mat-tree-node">
-          <div class="tree-node">
-            <div class="left">
-              <mat-icon
-                class="symbol-icon"
-                [matTooltip]="getSymbol(element).tooltip"
-                [svgIcon]="getSymbol(element).name">
-              </mat-icon>
+        <div class="mat-tree-node" [style.--level]="getLevel(treeNodeRef, false)">
+          <div class="left">
+            <mat-icon
+              class="symbol-icon"
+              [matTooltip]="getSymbol(element).tooltip"
+              [svgIcon]="getSymbol(element).name">
+            </mat-icon>
 
-              <div class="toggle-icon-container"
-                   [attr.aria-label]="'Toggle ' + element.name">
-                <mat-icon class="mat-icon-rtl-mirror"
-                          [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"></mat-icon>
+            <div class="toggle-icon-container"
+                 [attr.aria-label]="'Toggle ' + element.name">
+              <mat-icon class="mat-icon-rtl-mirror"
+                        [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"></mat-icon>
 
-              </div>
-              @if (node.stoichiometry > 1) {
-                <b>{{ node.stoichiometry }} ×</b>
-              }
-              {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
             </div>
-            <div class="right">
-              <span class="compartment">{{ element.displayName | extractCompartment }}</span>
-              @if (element.speciesName) {
-                <span class="species">{{ element.speciesName }}</span>
-              }
-              <div class="select-container">
-                <a href="" (click)="$event.stopPropagation()">
-                  <mat-icon class='custom-icon' [svgIcon]="'select'"></mat-icon>
-                </a>
-              </div>
-              <div class="goTo-container">
-                <a href="" (click)="$event.stopPropagation()">
-                  <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
-                </a>
-              </div>
+            @if (node.stoichiometry > 1) {
+              <b>{{ node.stoichiometry }} ×</b>
+            }
+            {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
+          </div>
+          <div class="right">
+            <span class="compartment">{{ element.displayName | extractCompartment }}</span>
+            @if (element.speciesName) {
+              <span class="species">{{ element.speciesName }}</span>
+            }
+            <div class="select-container">
+              <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+              <a href="" (click)="$event.stopPropagation()">
+                <mat-icon class='custom-icon' [svgIcon]="'select'"></mat-icon>
+              </a>
+            </div>
+            <div class="goTo-container">
+              <a href="" (click)="$event.stopPropagation()">
+                <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
+              </a>
             </div>
           </div>
-
         </div>
 
 
@@ -95,8 +93,10 @@
 
         <!-- Template for child nodes when parent is EWAS (protein) or Event -->
         <ng-template #details>
-          <mat-nested-tree-node>
-            <div class="details-connector-container" [ngStyle]="getConnectorStyles(treeNodeRef, true)">
+          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+          <mat-nested-tree-node (click)="$event.stopPropagation()">
+            <div class="details-connector-container" [matTooltip]="node.type"
+                 [style.--level]="getLevel(treeNodeRef, true)">
               <!--To create an array of a specific length-->
               @for (index of getArray(treeNodeRef.ariaLevel, true); track index) {
                 <div class="connector"

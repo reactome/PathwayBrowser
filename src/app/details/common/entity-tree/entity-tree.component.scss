@@ -19,6 +19,10 @@
   line-height: 20px;
   letter-spacing: 0.25px;
 
+  --padding: 2px;
+  --connector-width: 24px;
+  --connector-height: 24px;
+
 }
 
 
@@ -37,7 +41,7 @@
   flex-direction: column;
   flex-wrap: wrap;
   align-items: flex-start;
-  padding-left: 10px;
+  padding-left: 8px;
   border-left: 2px solid var(--outline-variant);
   flex: 1;
 }
@@ -104,7 +108,7 @@
 //}
 
 
-.tree-node {
+.mat-tree-node {
   display: flex;
   align-items: center;
   width: 100%;
@@ -112,15 +116,21 @@
   cursor: pointer;
 }
 
-.tree-node:hover {
+.mat-tree-node:hover {
   background: var(--surface2);
   border-radius: 50px;
-  // Make the hover background larger than its parent container on X
-  padding-left: 4px;
-  margin-left: -4px;
-  padding-right: 4px;
-  margin-right: -4px;
 }
+
+/* Add padding between connector and tree node and ignore the level 1*/
+.mat-nested-tree-node[aria-level="1"] > .mat-tree-node {
+  padding: 0 var(--padding)
+}
+
+.mat-tree-node {
+  //padding-left: calc(2 * var(--padding));
+  //padding-left: calc(var(--padding) * var(--depth, 1));
+}
+
 
 .left {
   display: flex;
@@ -189,8 +199,8 @@
 
 .symbol-icon {
   display: flex;
-  width: 24px;
-  height: 24px;
+  width: var(--connector-width);
+  height: var(--connector-height);
   flex-shrink: 0;
 }
 
@@ -203,13 +213,18 @@
 .connector-container {
   position: absolute;
   top: 0;
-  height: 24px;
+  height: var(--connector-height);
   display: flex;
+
+  width: calc(var(--connector-width) * var(--level, 1));
+  left: calc(-1 * var(--connector-width) * var(--level, 1));
+  //padding-left: calc(var(--padding) * var(--depth, 1));
+
 }
 
 .connector {
-  width: 24px;
-  height: 24px;
+  width: var(--connector-width);
+  height: var(--connector-height);
 }
 
 .details-connector-container {
@@ -218,8 +233,12 @@
   height: 100%;
   display: flex;
 
+  width: calc(var(--connector-width) * var(--level, 1));
+  left: calc(-1 * var(--connector-width) * var(--level, 1));
+  //padding-left: calc(var(--padding) * var(--depth, 1));
+
   .connector:not(:last-child) {
-    width: 24px;
+    width: var(--connector-width);
     height: 100%
   }
 
@@ -276,16 +295,6 @@
 .otherConnector {
   background-color: var(--primary);
   mask: url('/assets/connector/solid-L.svg');
-}
-
-
-/* Add padding between connector and tree node and ignore the level 1*/
-.mat-nested-tree-node[aria-level="1"] > .mat-tree-node {
-  padding-left: 0;
-}
-
-.mat-tree-node {
-  padding-left: 4px;
 }
 
 

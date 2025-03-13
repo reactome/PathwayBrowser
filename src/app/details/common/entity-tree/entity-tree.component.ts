@@ -171,28 +171,12 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   // The method below are all helper methods for creating branch lines for the nested tree view, open to any better strategy in future
   // Dynamic get the size of the connector container
-  getConnectorStyles(element: HTMLElement, isProteinContent: boolean) {
-
-    const level = Number(element.getAttribute('aria-level'));
-    // if the node is a protein content node, then include it otherwise exclude root
-    const connectorNumber = !isProteinContent ? level - 1 : level;
-
-    const width = 24;
-    const left = -24;
-    if (connectorNumber > 0) {
-      const width = connectorNumber * 24;
-      const left = -connectorNumber * 24;
-      return {
-        'width': `${width}px`,
-        'left': `${left}px`
-      };
-    }
-
-    return {
-      'width': `${width}px`,
-      'left': `${left}px`
-    };
+  getLevel(element: HTMLElement, isDetailContent: boolean) {
+    let depth = Number(element.getAttribute('aria-level'));
+    // If it's a protein content node, count it; otherwise, exclude root from level calculation
+    return !isDetailContent ? depth - 1 : depth;
   }
+
 
   getCurrentNodeConnector(element: HTMLElement, node: R): string {
 
