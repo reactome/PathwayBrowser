@@ -3,7 +3,6 @@ import {Summation} from "../summation.model";
 import {ReviewStatus} from "../review-status.model";
 import {LiteratureReference} from "../publication/literature-reference.model";
 import {InstanceEdit} from "../instance-edit.model";
-import {Compartment} from "../go-term/compartment.model";
 import {Relationship} from "../relationship.model";
 import HasCompartment = Relationship.HasCompartment;
 

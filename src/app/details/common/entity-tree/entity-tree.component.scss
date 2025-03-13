@@ -126,11 +126,12 @@
   padding: 0 var(--padding)
 }
 
+// Space between icon and connector
 .mat-tree-node {
-  //padding-left: calc(2 * var(--padding));
   //padding-left: calc(var(--padding) * var(--depth, 1));
+  //padding: 0 4px;
+  // padding: 0 calc(var(--padding) * var(--level, 1))
 }
-
 
 .left {
   display: flex;
@@ -309,6 +310,11 @@
 .mat-divider {
   margin: 0 6px;
 }
+
+.divider-color {
+  border-top-color: var(--primary);
+}
+
 
 /* Content tree node styles*/
 .details-content-container {

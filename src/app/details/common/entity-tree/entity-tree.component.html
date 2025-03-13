@@ -45,28 +45,29 @@
 
         <div class="mat-tree-node" [style.--level]="getLevel(treeNodeRef, false)">
           <div class="left">
-            <mat-icon
-              class="symbol-icon"
-              [matTooltip]="getSymbol(element).tooltip"
-              [svgIcon]="getSymbol(element).name">
+            <mat-icon class="symbol-icon"
+                      [matTooltip]="getSymbol(element).tooltip"
+                      [svgIcon]="getSymbol(element).name">
             </mat-icon>
 
-            <div class="toggle-icon-container"
-                 [attr.aria-label]="'Toggle ' + element.name">
+            <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
               <mat-icon class="mat-icon-rtl-mirror"
-                        [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"></mat-icon>
-
+                        [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
+              </mat-icon>
             </div>
+
             @if (node.stoichiometry > 1) {
               <b>{{ node.stoichiometry }} ×</b>
             }
             {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
           </div>
+
           <div class="right">
             <span class="compartment">{{ element.displayName | extractCompartment }}</span>
             @if (element.speciesName) {
               <span class="species">{{ element.speciesName }}</span>
             }
+
             <div class="select-container">
               <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
               <a href="" (click)="$event.stopPropagation()">
@@ -84,7 +85,6 @@
 
         <!-- There is inline padding applied to this div using styles.
             This padding value depends on the mat-icon-button width.  -->
-
         <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
           <ng-container
             *ngIf="node.element.schemaClass === SchemaClasses.EWAS || isEvent(node.element); then details; else entity">
@@ -95,7 +95,8 @@
         <ng-template #details>
           <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
           <mat-nested-tree-node (click)="$event.stopPropagation()">
-            <div class="details-connector-container" [matTooltip]="node.type"
+            <div class="details-connector-container"
+                 [matTooltip]="node.type"
                  [style.--level]="getLevel(treeNodeRef, true)">
               <!--To create an array of a specific length-->
               @for (index of getArray(treeNodeRef.ariaLevel, true); track index) {
@@ -109,7 +110,7 @@
               <!-- Details content -->
               <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
               @if (element.referenceEntity) {
-                <mat-divider></mat-divider>
+                <mat-divider class="divider-color"></mat-divider>
                 <!-- External Reference -->
                 <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
                 <mat-divider></mat-divider>
