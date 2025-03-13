@@ -77,73 +77,6 @@
 
     }
 
-    <!-- Literature References-->
-    @if (literatureRefs()) {
-      <div class="divider-container" [id]=DataKeys.LITERATURE_REFERENCE>
-        <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REFERENCE }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-
-      <div class="element-container">
-        @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
-          <div class="row">
-            <div class="label-container">{{ ref.year }}</div>
-            <div class="composition-container">
-              <cr-publication [publication]=ref [showYear]="false"></cr-publication>
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Authorship-->
-    @if (authorship() && authorship().length > 0) {
-
-      <div class="divider-container" [id]=DataKeys.AUTHORSHIP>
-        <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.AUTHORSHIP }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container">
-        @for (item of authorship(); track item) {
-          <div class="row">
-            <div class="label-container">{{ item.label }}</div>
-            <div class="composition-container flex-column">
-              @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
-                <div class="authorship-item">
-                  @for (author of ie.author; let i = $index; track author.dbId) {
-                    <a [href]="'/content/detail/' + author.dbId" target="_blank" [ngClass]="{'margin-right': !author.orcidId}">
-                      {{ author.firstname }} {{ author.surname }}
-                    </a>
-
-                    @if (author.orcidId) {
-                      <a [href]="'https://orcid.org/' + author.orcidId" target="_blank">
-                        <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
-                      </a>
-                    }
-                    <!-- Add separator except for last item -->
-                    @if (i < ie.author.length - 1) {
-                      <span class="margin-right">,</span>
-                    }
-                  }
-                  - {{ ie.dateTime | authorshipDateFormat }}
-                </div>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    }
-
     <!-- Other forms-->
     @if (otherForms() && otherForms().length > 0) {
       <div class="divider-container" [id]=DataKeys.OTHER_FORMS>
@@ -224,6 +157,74 @@
           <cr-component-tree [type]="element.key" [data]="obj()[element.key]" ></cr-component-tree>
       }
     }
+
+    <!-- Literature References-->
+    @if (literatureRefs()) {
+      <div class="divider-container" [id]=DataKeys.LITERATURE_REFERENCE>
+        <div class="divider-name-container">
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REFERENCE }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+
+      <div class="element-container">
+        @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
+          <div class="row">
+            <div class="label-container">{{ ref.year }}</div>
+            <div class="composition-container">
+              <cr-publication [publication]=ref [showYear]="false"></cr-publication>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Authorship-->
+    @if (authorship() && authorship().length > 0) {
+
+      <div class="divider-container" [id]=DataKeys.AUTHORSHIP>
+        <div class="divider-name-container">
+          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.AUTHORSHIP }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+      <div class="element-container">
+        @for (item of authorship(); track item) {
+          <div class="row">
+            <div class="label-container">{{ item.label }}</div>
+            <div class="composition-container flex-column">
+              @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
+                <div class="authorship-item">
+                  @for (author of ie.author; let i = $index; track author.dbId) {
+                    <a [href]="'/content/detail/' + author.dbId" target="_blank" [ngClass]="{'margin-right': !author.orcidId}">
+                      {{ author.firstname }} {{ author.surname }}
+                    </a>
+
+                    @if (author.orcidId) {
+                      <a [href]="'https://orcid.org/' + author.orcidId" target="_blank">
+                        <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
+                      </a>
+                    }
+                    <!-- Add separator except for last item -->
+                    @if (i < ie.author.length - 1) {
+                      <span class="margin-right">,</span>
+                    }
+                  }
+                  - {{ ie.dateTime | authorshipDateFormat }}
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
 
   </div>
 

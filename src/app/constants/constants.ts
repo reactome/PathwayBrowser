@@ -26,6 +26,7 @@ export const DataKeys = {
   AUTHORSHIP: 'authorship',
   INFERRED_FROM: 'inferredFrom',
   PRECEDING_EVENT: 'precedingEvent',
+  FOLLOWING_EVENT: 'followingEvent',
 
 } as const;
 
@@ -49,6 +50,7 @@ export const Labels = {
   INTERACTORS: 'Interactors',
   INFERRED_FROM: 'Inferred From',
   PRECEDING_EVENT: 'Preceding Event',
+  FOLLOWING_EVENT: 'Following Events',
 } as const;
 
 export const SchemaClasses = {

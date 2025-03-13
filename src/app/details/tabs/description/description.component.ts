@@ -102,6 +102,7 @@ export class DescriptionComponent {
     {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
+    {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
   ]
 
 
