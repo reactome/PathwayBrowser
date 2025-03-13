@@ -90,10 +90,8 @@ export class DescriptionComponent {
   //todo get divider label from here
   elements: { key: string, label: string, manual?: boolean }[] = [
     {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
-    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
     {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true},
     {key: DataKeys.CROSS_REFERENCES, label: Labels.CROSS_REFERENCES, manual: true},
-    {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
     {key: DataKeys.INPUT, label: Labels.INPUTS},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS},
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY},
@@ -103,6 +101,8 @@ export class DescriptionComponent {
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
+    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
+    {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
   ]
 
 
