@@ -44,6 +44,8 @@
   padding-left: 8px;
   border-left: 2px solid var(--outline-variant);
   flex: 1;
+  overflow: hidden;
+  padding-right: calc(2 * var(--padding));
 }
 
 
@@ -137,7 +139,15 @@
   display: flex;
   flex: 0 1 auto; /* Default flex properties for left element */
   align-items: center;
-  gap: 5px
+  gap: 5px;
+  min-width: 200px;
+
+}
+
+.name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .right {

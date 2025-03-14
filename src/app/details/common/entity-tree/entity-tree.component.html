@@ -55,11 +55,12 @@
                         [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
               </mat-icon>
             </div>
-
+            <span class="name">
             @if (node.stoichiometry > 1) {
               <b>{{ node.stoichiometry }} ×</b>
             }
             {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
+              </span>
           </div>
 
           <div class="right">
