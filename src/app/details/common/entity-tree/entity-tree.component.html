@@ -33,7 +33,7 @@
                             (expandedChange)="loadChildren(node)"
                             matTreeNodeToggle
                             #treeNodeRef>
-        @let element= node.element;
+        @let element = node.element;
         <div class="connector-container" [style.--level]="getLevel(treeNodeRef, false)">
           <!--To create an array of a specific length-->
           @for (index of getArray(treeNodeRef.ariaLevel, false); track index) {
@@ -63,7 +63,13 @@
           </div>
 
           <div class="right">
-            <span class="compartment">{{ element.displayName | extractCompartment }}</span>
+            @if (!isEvent(element)) {
+              <span class="compartment">{{ element.displayName | extractCompartment }}</span>
+            } @else {
+              @for (has of element.hasCompartment; track has.element.dbId) {
+                <span class="compartment">{{ has.element.displayName }}</span>
+              }
+            }
             @if (element.speciesName) {
               <span class="species">{{ element.speciesName }}</span>
             }
