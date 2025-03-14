@@ -8,6 +8,7 @@ import {CellLineagePath} from "../model/graph/event/cell-lineage-path.model";
 import {EntityWithAccessionedSequence} from "../model/graph/physical-entity/entity-with-accessioned-sequence.model";
 import {LiteratureReference} from "../model/graph/publication/literature-reference.model";
 import {SchemaClasses} from "../constants/constants";
+import {CatalystActivity} from "../model/graph/catalyst-activity.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -62,6 +63,10 @@ export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
   return isPathwayOrTLP(obj) && obj.hasDiagram;
+}
+
+export function isCatalystActivity(obj: DatabaseObject): obj is CatalystActivity {
+  return obj.schemaClass === SchemaClasses.CATALYST_ACTIVITY
 }
 
 

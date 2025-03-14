@@ -27,6 +27,10 @@ export const DataKeys = {
   INFERRED_FROM: 'inferredFrom',
   PRECEDING_EVENT: 'precedingEvent',
   FOLLOWING_EVENT: 'followingEvent',
+  COMPONENTS: 'components',
+  INPUT_FOR: 'inputFor',
+  OUTPUT_FOR: 'outputFor',
+
 
 } as const;
 
@@ -51,6 +55,9 @@ export const Labels = {
   INFERRED_FROM: 'Inferred From',
   PRECEDING_EVENT: 'Preceding Event',
   FOLLOWING_EVENT: 'Following Events',
+  COMPONENTS: 'Components',
+  INPUT_FOR: 'Consumed by',
+  OUTPUT_FOR: 'Produced by',
 } as const;
 
 export const SchemaClasses = {
@@ -77,7 +84,7 @@ export const SchemaClasses = {
   POLYMERISATION: 'Polymerisation',
   DEPOLYMERISATION: 'Depolymerisation',
   FAILED_REACTION: 'FailedReaction',
-  CELL_DEVELOPMENT_STEP: 'CellDevelopmentStep'
-
+  CELL_DEVELOPMENT_STEP: 'CellDevelopmentStep',
+  CATALYST_ACTIVITY: 'CatalystActivity'
 
 } as const

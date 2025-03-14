@@ -117,6 +117,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
   loadChildren(node: R) {
+
+    if (isCatalystActivity(node.element)) {
+      node.element.composedOf = [{
+        element: {...node.element.physicalEntity, composedOf: []},
+        order: 0,
+        stoichiometry: 1,
+        type: ' '
+      }]
+      this.updateMatTreeDataSource(node.element);
+    }
+
     this._selectedNode.set(node.element);
     this.depthIndex++;
   }
