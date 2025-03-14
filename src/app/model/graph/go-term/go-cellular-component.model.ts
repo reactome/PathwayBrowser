@@ -1,8 +1,9 @@
-import {GoTerm} from "./go-term.model";
+import {Go_Term} from "./go-term.model";
 
-export interface GoCellularComponent extends GoTerm {
-  componentOf: GoCellularComponent[];
-  hasPart: GoCellularComponent[];
-  instanceOf: GoCellularComponent[];
-  surroundedBy: GoCellularComponent[];
+
+export interface GO_CellularComponent extends Go_Term {
+  componentOf: GO_CellularComponent[];
+  hasPart: GO_CellularComponent[];
+  instanceOf: GO_CellularComponent[];
+  surroundedBy: GO_CellularComponent[];
 }
