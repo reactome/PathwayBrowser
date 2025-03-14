@@ -94,7 +94,7 @@
             This padding value depends on the mat-icon-button width.  -->
         <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
           <ng-container
-            *ngIf="node.element.schemaClass === SchemaClasses.EWAS || isEvent(node.element); then details; else entity">
+            *ngIf="!isNestedView(node.element); then details; else entity">
           </ng-container>
         </div>
 

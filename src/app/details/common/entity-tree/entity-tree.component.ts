@@ -6,7 +6,7 @@ import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
-import {isEvent} from "../../../services/utils";
+import {isCatalystActivity, isEvent} from "../../../services/utils";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {SchemaClasses} from "../../../constants/constants";
 import {SelectableObject} from "../../../services/event.service";
@@ -49,7 +49,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (!param.request) return of();
       const selectedNode = this.selectedNode();
       // Check the condition to determine which method to call
-      if (selectedNode?.schemaClass === SchemaClasses.EWAS || (selectedNode && isEvent(selectedNode))) {
+      if (!this.isNestedView(selectedNode)) {
         return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request);
       } else {
         return this.entitiesService.getEntityInDepth(param.request)
@@ -93,10 +93,12 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       const result = this._enhancedSelectedNode.value();
       if (!result) return;
 
-      const updatedTree = this.updateTree(this.dataSource.data, result! as unknown as E);
+      // const updatedTree = this.updateTree(this.dataSource.data, result! as unknown as E);
+      //
+      // this.dataSource.data = [];
+      // this.dataSource.data = updatedTree
 
-      this.dataSource.data = [];
-      this.dataSource.data = updatedTree
+      this.updateMatTreeDataSource(result as unknown as E);
 
     });
 
@@ -132,6 +134,20 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     this.depthIndex++;
   }
 
+  isNestedView(selectedNode: E | null): boolean {
+    if (!selectedNode) return true;
+
+    const nonNestedClasses: Set<string> = new Set([
+      SchemaClasses.EWAS,
+      SchemaClasses.SIMPLE_ENTITY
+    ])
+
+    return !(
+      nonNestedClasses.has(selectedNode.schemaClass) || isEvent(selectedNode)
+    );
+  }
+
+
   private updateTree(existingTreeData: R[], result: E): R[] {
 
     const tree = [...existingTreeData];
@@ -144,6 +160,13 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     }
 
     return tree;
+  }
+
+  private updateMatTreeDataSource(node: E) {
+    const updatedTree = this.updateTree(this.dataSource.data, node);
+
+    this.dataSource.data = [];
+    this.dataSource.data = updatedTree;
   }
 
   private flattenTree(nodes: R[]): R[] {
@@ -219,7 +242,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       return 'miniDashedTConnector';
     }
 
-    return 'solidIConnector';
+    return 'otherConnector';
   }
 
   // To create an array of a specific level for indexing connector class
@@ -296,7 +319,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     if (firstChild.type === 'member') return 'dashedIConnector';
     if (firstChild.type === 'component' || node.type === 'repeatedUnit') return 'solidIConnector';
     if (firstChild.type === 'candidate') return 'miniDashedIConnector';
-    return 'solidIConnector';
+    return 'otherConnector';
   }
 
   findAncestors(node: R, treeData: R[]): R[] {
