@@ -97,7 +97,6 @@ export class DescriptionComponent {
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY},
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
-    {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
@@ -106,6 +105,7 @@ export class DescriptionComponent {
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
     {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
     {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
+    {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
   ]
 
 
