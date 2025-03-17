@@ -63,15 +63,15 @@ export class IconService {
       route: 'pathway'
     },
     CatalystActivity: {name: 'catalyst-activity', tooltip: 'Catalyst activity', route: 'catalyst-activity'},
-    NegativelyRegulates: {
-      name: 'negatively-regulates',
+    NegativeGeneExpressionRegulation: {
+      name: 'negative-regulation',
       tooltip: 'Negatively regulates Reaction',
-      route: 'negatively-regulates'
+      route: 'negative-regulation'
     },
-    PositivelyRegulates: {
-      name: 'positively-regulates',
+    PositiveGeneExpressionRegulation: {
+      name: 'positive-regulation',
       tooltip: 'Positively regulates Reaction',
-      route: 'positively-regulates'
+      route: 'positive-regulation'
     },
     Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
 
