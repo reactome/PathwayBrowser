@@ -7,4 +7,5 @@ export interface Go_Term extends DatabaseObject {
   databaseName: string;
   name: String;
   referenceDatabase: ReferenceDatabase;
+  accession: string;
 }
