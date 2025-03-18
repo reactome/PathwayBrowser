@@ -1,0 +1,25 @@
+<div id="component-container">
+  <div class="depth-controller">
+    @if (depthControl()) {
+      <button mat-icon-button class="arrow" [disabled]="depthIndex === 1" (click)="firstPage()">
+        <mat-icon>first_page</mat-icon>
+      </button>
+      <button mat-icon-button class="arrow" [disabled]="depthIndex === 1" (click)="previousPage()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <span class="counter">{{ depthIndex }}</span>
+
+      <button mat-icon-button class="arrow" [disabled]="depthIndex === length" (click)="nextPage()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <button mat-icon-button class="arrow" [disabled]="depthIndex === length" (click)="lastPage()">
+        <mat-icon>last_page</mat-icon>
+      </button>
+    }
+  </div>
+
+  <div class="composition-container">
+    <cr-entity-tree [type]="type()" [data]="data()" [depthIndex]="depthIndex"></cr-entity-tree>
+  </div>
+
+</div>
