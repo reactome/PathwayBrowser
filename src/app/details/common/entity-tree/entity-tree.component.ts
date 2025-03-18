@@ -1,25 +1,25 @@
 import {Component, computed, effect, input, signal} from '@angular/core';
+import {isEvent} from "../../../services/utils";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
-import {map, of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
+import {map, of} from "rxjs";
+import {SelectableObject} from "../../../services/event.service";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
+import {SchemaClasses} from "../../../constants/constants";
 import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
-import {isCatalystActivity, isEvent} from "../../../services/utils";
 import {Relationship} from "../../../model/graph/relationship.model";
-import {SchemaClasses} from "../../../constants/constants";
-import {SelectableObject} from "../../../services/event.service";
-
 
 @Component({
-  selector: 'cr-component-tree',
+  selector: 'cr-entity-tree',
+  standalone: false,
   templateUrl: './entity-tree.component.html',
-  styleUrl: './entity-tree.component.scss',
-  standalone: false
+  styleUrl: './entity-tree.component.scss'
 })
 export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
 
+  readonly depthIndex = input.required<number | null>();
   readonly type = input.required<string>()
   readonly data = input.required<R[], (E | R)[]>({
     transform: (data: (E | R)[]): R[] => {
@@ -41,6 +41,35 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   _selectedNode = signal<E | null>(null);
   selectedNode = computed(() => this._selectedNode());
+
+
+  constructor(private iconService: IconService,
+              private entitiesService: EntitiesService,
+              private dataStateService: DataStateService,
+  ) {
+    effect(() => {
+      if (this.data().length > 0) {
+        this.dataSource.data = this.data();
+      }
+    });
+
+
+    effect(() => {
+
+      const result = this._enhancedSelectedNode.value();
+      if (!result) return;
+
+      // const updatedTree = this.updateTree(this.dataSource.data, result! as unknown as E);
+      //
+      // this.dataSource.data = [];
+      // this.dataSource.data = updatedTree
+
+      this.updateMatTreeDataSource(result as unknown as E);
+
+    });
+
+
+  }
 
 
   _enhancedSelectedNode = rxResource({
@@ -73,39 +102,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     }
   });
 
-
-  length = 8; // Total pages
-  depthIndex = 1; // Start from Page 1
-
-  constructor(private iconService: IconService,
-              private entitiesService: EntitiesService,
-              private dataStateService: DataStateService,
-  ) {
-    effect(() => {
-      if (this.data().length > 0) {
-        this.dataSource.data = this.data();
-      }
-    });
-
-
-    effect(() => {
-
-      const result = this._enhancedSelectedNode.value();
-      if (!result) return;
-
-      // const updatedTree = this.updateTree(this.dataSource.data, result! as unknown as E);
-      //
-      // this.dataSource.data = [];
-      // this.dataSource.data = updatedTree
-
-      this.updateMatTreeDataSource(result as unknown as E);
-
-    });
-
-
-  }
-
-
   childrenAccessor = (node: R): R[] => {
     if (!node || !node.element.composedOf) {
       return []; // Return an empty array when composedOf is undefined
@@ -120,18 +116,29 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   loadChildren(node: R) {
 
-    if (isCatalystActivity(node.element)) {
-      node.element.composedOf = [{
-        element: {...node.element.physicalEntity, composedOf: []},
-        order: 0,
-        stoichiometry: 1,
-        type: ' '
-      }]
-      this.updateMatTreeDataSource(node.element);
-    }
+    // if (isCatalystActivity(node.element)) {
+    //   node.element.composedOf = [{
+    //     element: {...node.element.physicalEntity, composedOf: []},
+    //     order: 0,
+    //     stoichiometry: 1,
+    //     type: this.type()
+    //   }]
+    //   this.updateMatTreeDataSource(node.element);
+    // }
+    //
+    // if (isRegulation(node.element)) {
+    //   const elementsToAdd = [node.element.regulator, ...node.element.regulatedEntity];
+    //   node.element.composedOf = elementsToAdd.map((element, index) => ({
+    //     element: {...element, composedOf: []},
+    //     order: index,
+    //     stoichiometry: 1,
+    //     type: this.type()
+    //   }));
+    //   this.updateMatTreeDataSource(node.element);
+    // }
 
     this._selectedNode.set(node.element);
-    this.depthIndex++;
+
   }
 
   isNestedView(selectedNode: E | null): boolean {
@@ -177,28 +184,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         [])
     ]);
   }
-
-  firstPage() {
-    this.depthIndex = 1;
-  }
-
-  previousPage() {
-    if (this.depthIndex > 1) {
-      this.depthIndex--;
-    }
-  }
-
-  nextPage() {
-    if (this.depthIndex < this.length) {
-      this.depthIndex++;
-    }
-  }
-
-  lastPage() {
-    this.depthIndex = this.length;
-  }
-
-
   getSymbol(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
   }
@@ -241,6 +226,10 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (posinset === setsize) return 'miniDashedLConnector';
       return 'miniDashedTConnector';
     }
+
+    // if (node.type === 'regulatedBy' || node.type === 'catalystActivity') {
+    //   return ' '
+    // }
 
     return 'otherConnector';
   }
@@ -319,6 +308,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     if (firstChild.type === 'member') return 'dashedIConnector';
     if (firstChild.type === 'component' || node.type === 'repeatedUnit') return 'solidIConnector';
     if (firstChild.type === 'candidate') return 'miniDashedIConnector';
+    // if (firstChild.type === 'regulatedBy' || node.type === 'catalystActivity') return ' ';
     return 'otherConnector';
   }
 
@@ -349,7 +339,5 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
 
-  protected readonly Number = Number;
-  protected readonly SchemaClasses = SchemaClasses;
   protected readonly isEvent = isEvent;
 }

@@ -4,94 +4,23 @@
   width: 100%;
 }
 
-#component-container {
-  display: flex;
-  align-items: flex-start;
-  padding: 0;
-  width: 100%;
-  flex-direction: row;
-  gap: 10px;
+.component-tree {
 
-  font-family: 'Roboto Flex', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0.25px;
-
-  --padding: 2px;
-  --connector-width: 24px;
-  --connector-height: 24px;
-
-}
-
-
-.depth-controller {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  width: var(--column-width);
-  gap: 5px;
-}
-
-.composition-container {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  padding-left: 8px;
-  border-left: 2px solid var(--outline-variant);
-  flex: 1;
-  overflow: hidden;
-  padding-right: calc(2 * var(--padding));
-}
-
-
-.paginator {
-  width: 100%;
-}
-
-
-.counter {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  background: light-dark(var(--surface), var(--primary));
-  border: 1px solid var(--primary);
-  border-radius: 50px;
-  color: light-dark(var(--on-surface), var(--surface));
-}
-
-.arrow {
-  @include mat.icon-button-overrides((
-    state-layer-size: 24px,
-    icon-color: var(--primary)
-  ));
-
-}
-
-
-.composition-container {
   @include mat.tree-overrides((
     node-text-weight: 400,
     node-text-size:14px
   ));
-}
 
-.component-tree {
-  width: 100%;
+  & {
+    --padding: 2px;
+    --connector-width: 24px;
+    --connector-height: 24px;
+  }
 }
 
 .component-tree-invisible {
   display: none;
 }
-
 
 /*
  * This padding sets alignment of the nested nodes.
