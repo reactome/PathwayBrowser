@@ -61,11 +61,13 @@ import {
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
   MatTable
 } from "@angular/material/table";
-import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
 import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
 import {AnalysisLegendComponent} from "./legend/analysis-legend/analysis-legend.component";
 import {ExternalReferenceComponent} from "./details/common/external-reference/external-reference.component";
 import {CrossReferencesComponent} from "./details/common/cross-references/cross-references.component";
+import {CatalystActivityComponent} from "./details/common/catalyst-activity/catalyst-activity.component";
+import {ControllerTreeComponent} from "./details/common/controller-tree/controller-tree.component";
+import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
 
 @NgModule({
   declarations: [
@@ -85,9 +87,11 @@ import {CrossReferencesComponent} from "./details/common/cross-references/cross-
     SummationRefsTreeComponent,
     PublicationComponent,
     InteractorsTableComponent,
-    EntityTreeComponent,
+    ControllerTreeComponent,
     ExternalReferenceComponent,
     CrossReferencesComponent,
+    CatalystActivityComponent,
+    EntityTreeComponent
   ],
   bootstrap: [AppComponent],
   imports: [

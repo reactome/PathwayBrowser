@@ -1,142 +1,117 @@
-<div id="component-container">
-  <div class="depth-controller">
-    <button mat-icon-button class="arrow" [disabled]="depthIndex === 1" (click)="firstPage()">
-      <mat-icon>first_page</mat-icon>
-    </button>
-    <button mat-icon-button class="arrow" [disabled]="depthIndex === 1" (click)="previousPage()">
-      <mat-icon>chevron_left</mat-icon>
-    </button>
-    <span class="counter">{{ depthIndex }}</span>
+<mat-tree #tree [dataSource]=dataSource [childrenAccessor]="childrenAccessor" class="component-tree">
+  <!-- This is the tree node template for leaf nodes -->
 
-    <button mat-icon-button class="arrow" [disabled]="depthIndex === length" (click)="nextPage()">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-    <button mat-icon-button class="arrow" [disabled]="depthIndex === length" (click)="lastPage()">
-      <mat-icon>last_page</mat-icon>
-    </button>
-
-  </div>
-
-  <div class="composition-container">
-
-    <mat-tree #tree [dataSource]=dataSource [childrenAccessor]="childrenAccessor" class="component-tree">
-      <!-- This is the tree node template for leaf nodes -->
-
-      <mat-nested-tree-node *matTreeNodeDef="let node">
-        {{ node.element.name?.[0] }}
-      </mat-nested-tree-node>
+  <mat-nested-tree-node *matTreeNodeDef="let node">
+    {{ node.element.name?.[0] }}
+  </mat-nested-tree-node>
 
 
-      <!-- This is the tree node template for expandable nodes -->
-      <mat-nested-tree-node *matTreeNodeDef="let node; let i = index; when: hasChild"
-                            [cdkTreeNodeTypeaheadLabel]="node.name"
-                            (expandedChange)="loadChildren(node)"
-                            matTreeNodeToggle
-                            #treeNodeRef>
-        @let element = node.element;
-        <div class="connector-container" [style.--level]="getLevel(treeNodeRef, false)">
+  <!-- This is the tree node template for expandable nodes -->
+  <mat-nested-tree-node *matTreeNodeDef="let node; let i = index; when: hasChild"
+                        [cdkTreeNodeTypeaheadLabel]="node.name"
+                        (expandedChange)="loadChildren(node)"
+                        matTreeNodeToggle
+                        #treeNodeRef>
+    @let element = node.element;
+    <div class="connector-container" [style.--level]="getLevel(treeNodeRef, false)">
+      <!--To create an array of a specific length-->
+      @for (index of getArray(treeNodeRef.ariaLevel, false); track index) {
+        <div class="connector" [matTooltip]="node.type"
+             [ngClass]="getAllConnectors(treeNodeRef, node, index, treeNodeRef.ariaLevel)[index]">
+        </div>
+      }
+    </div>
+
+    <div class="mat-tree-node" [style.--level]="getLevel(treeNodeRef, false)">
+      <div class="left">
+        <mat-icon class="symbol-icon"
+                  [matTooltip]="getSymbol(element).tooltip"
+                  [svgIcon]="getSymbol(element).name">
+        </mat-icon>
+
+        <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
+          <mat-icon class="mat-icon-rtl-mirror"
+                    [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
+          </mat-icon>
+        </div>
+        <span class="name">
+            @if (node.stoichiometry > 1) {
+              <b>{{ node.stoichiometry }} ×</b>
+            }
+          {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
+              </span>
+      </div>
+
+      <div class="right">
+        @if (!isEvent(element)) {
+          <span class="compartment">{{ element.displayName | extractCompartment }}</span>
+        } @else {
+          @for (has of element.hasCompartment; track has.element.dbId) {
+            <span class="compartment">{{ has.element.displayName }}</span>
+          }
+        }
+        @if (element.speciesName) {
+          <span class="species">{{ element.speciesName }}</span>
+        }
+
+        <div class="select-container">
+          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+          <a href="" (click)="$event.stopPropagation()">
+            <mat-icon class='custom-icon' [svgIcon]="'select'"></mat-icon>
+          </a>
+        </div>
+        <div class="goTo-container">
+          <a href="" (click)="$event.stopPropagation()">
+            <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- There is inline padding applied to this div using styles.
+        This padding value depends on the mat-icon-button width.  -->
+    <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
+      <ng-container
+        *ngIf="!isNestedView(node.element); then details; else entity">
+      </ng-container>
+    </div>
+
+    <!-- Template for child nodes when parent is EWAS (protein) or Event -->
+    <ng-template #details>
+      <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+      <mat-nested-tree-node (click)="$event.stopPropagation()">
+        <div class="details-connector-container"
+             [matTooltip]="node.type"
+             [style.--level]="getLevel(treeNodeRef, true)">
           <!--To create an array of a specific length-->
-          @for (index of getArray(treeNodeRef.ariaLevel, false); track index) {
-            <div class="connector" [matTooltip]="node.type"
-                 [ngClass]="getAllConnectors(treeNodeRef, node, index, treeNodeRef.ariaLevel)[index]">
+          @for (index of getArray(treeNodeRef.ariaLevel, true); track index) {
+            <div class="connector"
+                 [ngClass]="index != getArray(treeNodeRef.ariaLevel, true).length - 1 ? getParentsConnector(node, true)[index] :'otherConnector' ">
             </div>
           }
         </div>
 
-        <div class="mat-tree-node" [style.--level]="getLevel(treeNodeRef, false)">
-          <div class="left">
-            <mat-icon class="symbol-icon"
-                      [matTooltip]="getSymbol(element).tooltip"
-                      [svgIcon]="getSymbol(element).name">
-            </mat-icon>
-
-            <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
-              <mat-icon class="mat-icon-rtl-mirror"
-                        [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
-              </mat-icon>
-            </div>
-            <span class="name">
-            @if (node.stoichiometry > 1) {
-              <b>{{ node.stoichiometry }} ×</b>
-            }
-            {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
-              </span>
-          </div>
-
-          <div class="right">
-            @if (!isEvent(element)) {
-              <span class="compartment">{{ element.displayName | extractCompartment }}</span>
-            } @else {
-              @for (has of element.hasCompartment; track has.element.dbId) {
-                <span class="compartment">{{ has.element.displayName }}</span>
-              }
-            }
-            @if (element.speciesName) {
-              <span class="species">{{ element.speciesName }}</span>
-            }
-
-            <div class="select-container">
-              <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-              <a href="" (click)="$event.stopPropagation()">
-                <mat-icon class='custom-icon' [svgIcon]="'select'"></mat-icon>
-              </a>
-            </div>
-            <div class="goTo-container">
-              <a href="" (click)="$event.stopPropagation()">
-                <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
-              </a>
-            </div>
-          </div>
+        <div class="details-content-container">
+          <!-- Details content -->
+          <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
+          @if (element.referenceEntity) {
+            <mat-divider class="divider-color"></mat-divider>
+            <!-- External Reference -->
+            <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
+            <mat-divider></mat-divider>
+            <!-- Cross References -->
+            <cr-cross-references [referenceEntity]=element.referenceEntity></cr-cross-references>
+          }
         </div>
-
-
-        <!-- There is inline padding applied to this div using styles.
-            This padding value depends on the mat-icon-button width.  -->
-        <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group">
-          <ng-container
-            *ngIf="!isNestedView(node.element); then details; else entity">
-          </ng-container>
-        </div>
-
-        <!-- Template for child nodes when parent is EWAS (protein) or Event -->
-        <ng-template #details>
-          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-          <mat-nested-tree-node (click)="$event.stopPropagation()">
-            <div class="details-connector-container"
-                 [matTooltip]="node.type"
-                 [style.--level]="getLevel(treeNodeRef, true)">
-              <!--To create an array of a specific length-->
-              @for (index of getArray(treeNodeRef.ariaLevel, true); track index) {
-                <div class="connector"
-                     [ngClass]="index != getArray(treeNodeRef.ariaLevel, true).length - 1 ? getParentsConnector(node, true)[index] :'otherConnector' ">
-                </div>
-              }
-            </div>
-
-            <div class="details-content-container">
-              <!-- Details content -->
-              <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
-              @if (element.referenceEntity) {
-                <mat-divider class="divider-color"></mat-divider>
-                <!-- External Reference -->
-                <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
-                <mat-divider></mat-divider>
-                <!-- Cross References -->
-                <cr-cross-references [referenceEntity]=element.referenceEntity></cr-cross-references>
-              }
-            </div>
-
-          </mat-nested-tree-node>
-        </ng-template>
-
-        <!-- Default child template for nested entities-->
-        <ng-template #entity>
-          <ng-container matTreeNodeOutlet></ng-container>
-        </ng-template>
 
       </mat-nested-tree-node>
-    </mat-tree>
+    </ng-template>
 
+    <!-- Default child template for nested entities-->
+    <ng-template #entity>
+      <ng-container matTreeNodeOutlet></ng-container>
+    </ng-template>
 
-  </div>
-</div>
+  </mat-nested-tree-node>
+</mat-tree>

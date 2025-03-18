@@ -136,7 +136,7 @@
           </div>
         </div>
 
-          <cr-component-tree [type]="element.key" [data]="obj()[element.key]" ></cr-component-tree>
+        <cr-controller-tree [type]="element.key" [data]="obj()[element.key]" [depthControl]="element.depthControl ?? false"></cr-controller-tree>
       }
     }
 
