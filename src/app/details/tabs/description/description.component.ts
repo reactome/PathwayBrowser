@@ -104,7 +104,7 @@ export class DescriptionComponent {
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
-    {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS},
+    {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, depthControl: true},
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
