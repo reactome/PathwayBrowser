@@ -140,6 +140,24 @@
       }
     }
 
+    <!-- Catalyst Activity-->
+    @if (catalystActivity()) {
+      <div class="divider-container" [id]=DataKeys.CATALYST_ACTIVITY>
+        <div class="divider-name-container">
+          <ng-container
+            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CATALYST_ACTIVITY }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+      <div class="element-container">
+        <cr-catalyst-activity [catalystActivity]="catalystActivity()" [catalystActivityReference]="catalystRef()"></cr-catalyst-activity>
+      </div>
+
+    }
+
     <!-- Literature References-->
     @if (literatureRefs()) {
       <div class="divider-container" [id]=DataKeys.LITERATURE_REFERENCE>

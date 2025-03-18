@@ -14,6 +14,8 @@ import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-enti
 import {InteractorService} from "../../../interactors/services/interactor.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataKeys, Labels} from "../../../constants/constants";
+import {CatalystActivity} from "../../../model/graph/catalyst-activity.model";
+import {CatalystActivityReference} from "../../../model/graph/control-reference/catalyst-activity-reference.model";
 
 
 @Component({
@@ -77,8 +79,10 @@ export class DescriptionComponent {
 
 
   interactors = computed(() => this._interactors.value() || []);
-
   interactorsLength = computed(() => this._interactors.value()?.length || 0);
+
+  catalystActivity: Signal<CatalystActivity[]> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITY));
+  catalystRef: Signal<CatalystActivityReference> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITY_REFERENCE));
 
   overview$ = viewChild<HTMLDivElement>('#overview');
 
@@ -88,13 +92,13 @@ export class DescriptionComponent {
 
 
   //todo get divider label from here
-  elements: { key: string, label: string, manual?: boolean }[] = [
+  elements: { key: string, label: string, manual?: boolean, depthControl?: boolean }[] = [
     {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
     {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true},
     {key: DataKeys.CROSS_REFERENCES, label: Labels.CROSS_REFERENCES, manual: true},
-    {key: DataKeys.INPUT, label: Labels.INPUTS},
-    {key: DataKeys.OUTPUT, label: Labels.OUTPUTS},
-    {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY},
+    {key: DataKeys.INPUT, label: Labels.INPUTS, depthControl: true},
+    {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, depthControl: true},
+    {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY},
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
@@ -103,6 +107,7 @@ export class DescriptionComponent {
     {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS},
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
+    {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
     {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
     {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
     {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
@@ -136,6 +141,8 @@ export class DescriptionComponent {
     switch (key) {
       case DataKeys.OVERVIEW:
         return obj;
+      case DataKeys.CATALYST_ACTIVITY:
+        return this.catalystActivity() && this.catalystActivity().length > 0;
       case DataKeys.CROSS_REFERENCES:
         return this.referenceEntity()?.crossReference;
       case DataKeys.OTHER_FORMS:

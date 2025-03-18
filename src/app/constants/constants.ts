@@ -11,6 +11,7 @@ export const DataKeys = {
   INPUT: 'inputs',
   OUTPUT: 'outputs',
   CATALYST_ACTIVITY: 'catalystActivity',
+  CATALYST_ACTIVITY_REFERENCE: 'catalystActivityReference',
   OTHER_FORMS: 'otherForms',
   INFERRED_TO: 'inferredTo',
   SUMMATION: 'summation',

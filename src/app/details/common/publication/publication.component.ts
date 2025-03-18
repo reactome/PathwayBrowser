@@ -1,5 +1,6 @@
 import {Component, input} from '@angular/core';
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
+import {Publication} from "../../../model/graph/publication/publication.model";
 
 @Component({
     selector: 'cr-publication',
@@ -8,7 +9,7 @@ import {LiteratureReference} from "../../../model/graph/publication/literature-r
     standalone: false
 })
 export class PublicationComponent{
-  readonly ref = input.required<LiteratureReference>({ alias: "publication" });
+  readonly ref = input.required<LiteratureReference | Publication>({ alias: "publication" });
   readonly showYear = input<boolean>(false);
   isExpanded = false;
 
