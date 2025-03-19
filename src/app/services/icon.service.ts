@@ -14,11 +14,22 @@ export class IconService {
   constructor(private http: HttpClient) {
   }
 
+  protein = {name: 'protein', tooltip: 'Protein', route: 'protein'};
+  negativeRegulation = {
+    name: 'negative-regulation',
+    tooltip: 'Negatively regulates Reaction',
+    route: 'negative-regulation'
+  };
+  positiveRegulation = {
+    name: 'positive-regulation',
+    tooltip: 'Positively regulates Reaction',
+    route: 'positive-regulation'
+  }
 
   reactomeSubjectIcons: { [key: string]: { name: string; tooltip?: string; route: string } } = {
     Pathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
     BlackBoxEvent: {name: 'omitted', tooltip: 'Black Box Event', route: 'omitted'},
-    EntityWithAccessionedSequence: {name: 'protein', tooltip: 'Protein', route: 'protein'},
+    EntityWithAccessionedSequence: this.protein,
     Complex: {
       name: 'complex',
       tooltip: 'Complex',
@@ -31,7 +42,8 @@ export class IconService {
     CandidateSet: {name: 'candidate-set', tooltip: 'Candidate Set', route: 'candidate-set'},
     ReferenceDNASequence: {name: 'gene', tooltip: 'Reference DNA Sequence', route: 'gene'},
     ReferenceRNASequence: {name: 'RNA', tooltip: 'Reference RNA Sequence', route: 'RNA'},
-    ReferenceGeneProduct: {name: 'protein', tooltip: 'Protein', route: 'protein'},
+    ReferenceGeneProduct: this.protein,
+    ReferenceIsoform: this.protein,
     GenomeEncodedEntity: {
       name: 'genome-encoded-entity',
       tooltip: 'Genome Encoded Entity',
@@ -63,16 +75,10 @@ export class IconService {
       route: 'pathway'
     },
     CatalystActivity: {name: 'catalyst-activity', tooltip: 'Catalyst activity', route: 'catalyst-activity'},
-    NegativeGeneExpressionRegulation: {
-      name: 'negative-regulation',
-      tooltip: 'Negatively regulates Reaction',
-      route: 'negative-regulation'
-    },
-    PositiveGeneExpressionRegulation: {
-      name: 'positive-regulation',
-      tooltip: 'Positively regulates Reaction',
-      route: 'positive-regulation'
-    },
+    NegativeRegulation: this.negativeRegulation,
+    NegativeGeneExpressionRegulation: this.negativeRegulation,
+    PositiveRegulation: this.positiveRegulation,
+    PositiveGeneExpressionRegulation: this.positiveRegulation,
     Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
 
     //Reaction type

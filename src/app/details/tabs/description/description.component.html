@@ -155,7 +155,22 @@
       <div class="element-container">
         <cr-catalyst-activity [catalystActivity]="catalystActivity()" [catalystActivityReference]="catalystRef()"></cr-catalyst-activity>
       </div>
+    }
 
+    @if (regulations()) {
+      <div class="divider-container" [id]=DataKeys.REGULATED_BY>
+        <div class="divider-name-container">
+          <ng-container
+            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REGULATED_BY }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+      <div class="element-container">
+        <cr-regulation [regulations]="regulations()" [regulationRefs]="regulationRefs()"></cr-regulation>
+      </div>
     }
 
     <!-- Literature References-->

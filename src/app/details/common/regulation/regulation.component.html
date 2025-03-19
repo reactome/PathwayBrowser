@@ -1,0 +1,66 @@
+@for (regulation of regulations(); track regulation.dbId) {
+  <div class="regulation-container">
+    <div class="row">
+      <div class="label-container">Type</div>
+      <div class="composition-container">
+        <mat-icon class='custom-icon' [svgIcon]="getSymbol(regulation).name">
+        </mat-icon>
+        @if (regulation.schemaClass.includes('Negative')) {
+          <span>Negative Regulation</span>
+        } @else {
+          <span>Positive Regulation</span>
+        }
+      </div>
+    </div>
+
+    @if(regulation.activity){
+      <div class="row">
+        <div class="label-container">Biological Process</div>
+        <div class="composition-container">
+          <span><a [href]="regulation.activity.url" target="_blank">{{ regulation.activity.displayName }}({{ regulation.activity.databaseName }}
+            :{{ regulation.activity.accession }})</a></span>
+        </div>
+      </div>
+    }
+
+
+  @if(regulation.activeUnit){
+    <div class="row">
+      <div class="label-container">Active Unit</div>
+      <div class="composition-container tree-padding multiple">
+        @for (au of regulation.activeUnit; track au.dbId) {
+          <cr-entity-tree [type]="'activeUnit'" [data]="[au]" [depthIndex]=null></cr-entity-tree>
+        }
+      </div>
+    </div>
+  }
+
+    @if(regulation.regulator){
+      <div class="row">
+        <div class="label-container">Regulator</div>
+        <div class="composition-container tree-padding">
+            <cr-entity-tree [type]="'regulator'" [data]="[regulation.regulator]" [depthIndex]=null></cr-entity-tree>
+        </div>
+      </div>
+    }
+
+
+    @if (regulationRefs()) {
+      @for (ref of regulationRefs(); track ref.dbId) {
+        @if (ref.regulatedBy.dbId === regulation.dbId) {
+          <div class="row">
+            <div class="label-container">Reference</div>
+            <div class="composition-container ref-padding">
+              @for (ref of ref.literatureReference | sortByDate:'year'; track ref.dbId) {
+                <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
+
+
+  </div>
+
+}

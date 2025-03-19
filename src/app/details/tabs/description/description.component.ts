@@ -16,6 +16,8 @@ import {EntitiesService} from "../../../services/entities.service";
 import {DataKeys, Labels} from "../../../constants/constants";
 import {CatalystActivity} from "../../../model/graph/catalyst-activity.model";
 import {CatalystActivityReference} from "../../../model/graph/control-reference/catalyst-activity-reference.model";
+import {Regulation} from "../../../model/graph/Regulation/regulation.model";
+import {RegulationReference} from "../../../model/graph/control-reference/regulation-reference.model";
 
 
 @Component({
@@ -84,6 +86,9 @@ export class DescriptionComponent {
   catalystActivity: Signal<CatalystActivity[]> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITY));
   catalystRef: Signal<CatalystActivityReference> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITY_REFERENCE));
 
+  regulations: Signal<Regulation[]> = computed(() => getProperty(this.obj(), DataKeys.REGULATED_BY));
+  regulationRefs: Signal<RegulationReference[]> = computed(() => getProperty(this.obj(), DataKeys.REGULATION_REFERENCE));
+
   overview$ = viewChild<HTMLDivElement>('#overview');
 
 
@@ -98,7 +103,6 @@ export class DescriptionComponent {
     {key: DataKeys.CROSS_REFERENCES, label: Labels.CROSS_REFERENCES, manual: true},
     {key: DataKeys.INPUT, label: Labels.INPUTS, depthControl: true},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, depthControl: true},
-    {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY},
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
@@ -109,6 +113,7 @@ export class DescriptionComponent {
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
     {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
+    {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual:true},
     {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
     {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
   ]

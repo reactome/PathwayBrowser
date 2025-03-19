@@ -9,6 +9,7 @@ import {EntityWithAccessionedSequence} from "../model/graph/physical-entity/enti
 import {LiteratureReference} from "../model/graph/publication/literature-reference.model";
 import {SchemaClasses} from "../constants/constants";
 import {CatalystActivity} from "../model/graph/catalyst-activity.model";
+import {Regulation} from "../model/graph/Regulation/regulation.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -69,6 +70,11 @@ export function isCatalystActivity(obj: DatabaseObject): obj is CatalystActivity
   return obj.schemaClass === SchemaClasses.CATALYST_ACTIVITY
 }
 
+const regulationClasses: Set<string> = new Set([SchemaClasses.REGULATION, SchemaClasses.NEGATIVE_REGULATION, SchemaClasses.NEGATIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.POSITIVE_REGULATION, SchemaClasses.POSITIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.REQUIREMENT]);
+
+export function isRegulation(obj: DatabaseObject): obj is Regulation {
+  return regulationClasses.has(obj.schemaClass)
+}
 
 /** Generic function to dynamic access child property
  *  T represents the type of the obj parameter, which must extend DatabaseObject.

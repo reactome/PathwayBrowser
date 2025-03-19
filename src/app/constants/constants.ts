@@ -31,6 +31,9 @@ export const DataKeys = {
   COMPONENTS: 'components',
   INPUT_FOR: 'inputFor',
   OUTPUT_FOR: 'outputFor',
+  REGULATED_BY: 'regulatedBy',
+  REGULATION_REFERENCE: 'regulationReference',
+  MODIFIED_RESIDUES: 'modifiedResidues'
 
 
 } as const;
@@ -59,6 +62,8 @@ export const Labels = {
   COMPONENTS: 'Components',
   INPUT_FOR: 'Consumed by',
   OUTPUT_FOR: 'Produced by',
+  REGULATED_BY: 'Regulations',
+  MODIFIED_RESIDUES: 'Modifications'
 } as const;
 
 export const SchemaClasses = {
@@ -86,6 +91,13 @@ export const SchemaClasses = {
   DEPOLYMERISATION: 'Depolymerisation',
   FAILED_REACTION: 'FailedReaction',
   CELL_DEVELOPMENT_STEP: 'CellDevelopmentStep',
-  CATALYST_ACTIVITY: 'CatalystActivity'
+  CATALYST_ACTIVITY: 'CatalystActivity',
+
+  REGULATION: 'Regulation',
+  NEGATIVE_REGULATION: 'NegativeRegulation',
+  NEGATIVE_GENE_EXPRESSION_REGULATION: 'NegativeGeneExpressionRegulation',
+  POSITIVE_REGULATION: 'PositiveRegulation',
+  POSITIVE_GENE_EXPRESSION_REGULATION: 'PositiveGeneExpressionRegulation',
+  REQUIREMENT: 'Requirement',
 
 } as const
