@@ -19,7 +19,7 @@
       </div>
     }
 
-    @if (ca.activity) {
+    @if (ca.activity && ca.activity.ecNumber) {
       <div class="row">
         <div class="label-container">EC Number</div>
         <div class="composition-container">
@@ -32,9 +32,9 @@
     @if (ca.activeUnit) {
       <div class="row">
         <div class="label-container">Active Unit</div>
-        <div class="composition-container tree-padding">
+        <div class="composition-container tree-padding multiple">
           @for (unit of ca.activeUnit; track unit.dbId) {
-            <cr-entity-tree [type]="'activeUNit'" [data]="[unit]" [depthIndex]=null></cr-entity-tree>
+            <cr-entity-tree [type]="'activeUnit'" [data]="[unit]" [depthIndex]=null></cr-entity-tree>
           }
 
         </div>

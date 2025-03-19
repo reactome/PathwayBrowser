@@ -14,45 +14,15 @@ export class CatalystActivityComponent {
   readonly catalystActivityReference = input.required<CatalystActivityReference>({ alias: "catalystActivityReference" });
 
 
-  // catalystRef= computed(() => {
-  //   const ref = this.catalystActivityReference();
-  //   if(!ref) return null;
+  // cas = computed(() => {
+  //   const catalystActivity = this.catalystActivity();
   //
-  //   if(ref.catalystActivity.dbId ===)
+  //   if (catalystActivity.length === 1) {
+  //     return [catalystActivity[0], { ...catalystActivity[0] }];
+  //   }
   //
-  // })
-
-
-  catalystActivityDetails = computed(() => {
-    const catalystActivity = this.catalystActivity();
-    if (!catalystActivity) return [];
-
-    const properties = [
-      { key: 'displayName', label: 'Activity' },
-      { key: 'geneName', label: 'EC number' },
-      { key: 'chain', label: 'References' },
-      { key: 'referenceGene', label: 'Active Unit' },
-      { key: 'referenceTranscript', label: 'Catalyst' }
-    ];
-
-    return catalystActivity.map((item) => {
-      const ca = { ...item };
-
-      const results = [];
-      for (const property of properties) {
-        let value = ca[property.key];
-        if (!value) continue;
-        results.push({
-          label: property.label || property.key,
-          value: value
-        });
-      }
-
-      return results;
-    });
-  });
-
-
+  //   return [...catalystActivity];
+  // });
 
 
 }
