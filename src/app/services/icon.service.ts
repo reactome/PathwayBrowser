@@ -80,6 +80,8 @@ export class IconService {
     PositiveRegulation: this.positiveRegulation,
     PositiveGeneExpressionRegulation: this.positiveRegulation,
     Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
+    ReferenceGroup: {name: 'reference-group', tooltip: 'Reference Group', route: 'reference-group'},
+
 
     //Reaction type
     "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},
