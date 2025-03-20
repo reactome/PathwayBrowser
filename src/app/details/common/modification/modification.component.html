@@ -1,0 +1,48 @@
+@for (mr of modifications(); track mr.element.dbId; ) {
+  @let element = mr.element;
+  <div class="modification-container">
+    <div class="row">
+      <div class="label-container">Type</div>
+      <div class="composition-container">
+        <mat-icon class='custom-icon' [matTooltip]="'Refernece Group'" svgIcon="reference-group"></mat-icon>
+        <span>Type</span>
+      </div>
+    </div>
+
+
+    @if (element.psiMod) {
+      <div class="row">
+        <div class="label-container">PSI-MOD</div>
+        <div class="composition-container">
+         <span><a [href]="element.psiMod.url" target="_blank">{{ element.psiMod.displayName }}
+           ({{ element.psiMod.name[0] }}
+           :{{ element.psiMod.identifier }})</a></span>
+        </div>
+      </div>
+    }
+
+    @if (element.coordinate) {
+      <div class="row">
+        <div class="label-container">Position</div>
+        <div class="composition-container">
+          <span>{{ element.coordinate }}</span>
+        </div>
+      </div>
+    }
+
+    @if (element.modification) {
+      <div class="row">
+        <div class="label-container">Modification</div>
+        <div class="composition-container">
+          @if (element.modification.schemaClass === 'ReferenceGroup') {
+            <span><a [href]="element.modification.url" target="_blank">{{ element.modification.displayName }}
+              ({{ element.modification.databaseName }}
+              :{{ element.modification.identifier }})</a></span>
+          } @else {
+            <cr-entity-tree [type]="'modification'" [data]="[element.modification]" [depthIndex]=null></cr-entity-tree>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

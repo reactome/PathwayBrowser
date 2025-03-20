@@ -68,6 +68,8 @@ import {CrossReferencesComponent} from "./details/common/cross-references/cross-
 import {CatalystActivityComponent} from "./details/common/catalyst-activity/catalyst-activity.component";
 import {ControllerTreeComponent} from "./details/common/controller-tree/controller-tree.component";
 import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
+import {RegulationComponent} from "./details/common/regulation/regulation.component";
+import {ModificationComponent} from "./details/common/modification/modification.component";
 
 @NgModule({
   declarations: [
@@ -91,7 +93,9 @@ import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.comp
     ExternalReferenceComponent,
     CrossReferencesComponent,
     CatalystActivityComponent,
-    EntityTreeComponent
+    EntityTreeComponent,
+    RegulationComponent,
+    ModificationComponent
   ],
   bootstrap: [AppComponent],
   imports: [

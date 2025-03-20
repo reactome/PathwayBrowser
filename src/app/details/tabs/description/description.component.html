@@ -77,6 +77,23 @@
 
     }
 
+    <!-- Modifications-->
+    @if(modifications()){
+      <div class="divider-container" [id]=DataKeys.MODIFIED_RESIDUES>
+        <div class="divider-name-container">
+          <ng-container
+            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.MODIFIED_RESIDUES }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+      <div class="element-container">
+        <cr-modification [modifications]="modifications()"></cr-modification>
+      </div>
+    }
+
     <!-- Other forms-->
     @if (otherForms() && otherForms().length > 0) {
       <div class="divider-container" [id]=DataKeys.OTHER_FORMS>

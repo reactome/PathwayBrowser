@@ -5,6 +5,7 @@ import {Event} from "./event/event.model";
 import {Person} from "./person.model";
 import {Publication} from "./publication/publication.model";
 import {Polymer} from "./physical-entity/polymer.model";
+import {GroupModifiedResidue} from "./abstract-modified-residue/group-modified-residue.model";
 
 
 export namespace Relationship {
@@ -37,7 +38,7 @@ export namespace Relationship {
   export interface HasMember extends Has<Event, "member"> {
   }
 
-  export interface HasModifiedResidue extends Has<Event, "modifiedResidue"> {
+  export interface HasModifiedResidue extends Has<GroupModifiedResidue, "modifiedResidue"> {
   }
 
   export interface Input extends Has<PhysicalEntity, "input"> {
