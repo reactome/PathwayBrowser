@@ -62,7 +62,7 @@
     }
 
     <!-- Cross References-->
-    @if (referenceEntity() && referenceEntity()?.crossReference) {
+    @if (referenceEntity() && referenceEntity().crossReference) {
       <div class="divider-container" [id]=DataKeys.CROSS_REFERENCES>
         <div class="divider-name-container">
           <ng-container
@@ -98,7 +98,7 @@
     }
 
     <!-- Other forms-->
-    @if (otherForms() && otherForms().length > 0) {
+    @if (otherForms() && otherForms().size > 0) {
       <div class="divider-container" [id]=DataKeys.OTHER_FORMS>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.OTHER_FORMS }"></ng-container>
@@ -110,11 +110,17 @@
 
 
       <div class="element-container columns">
-        @for (pe of otherForms()! | sortByText :'label'; track pe.dbId) {
+        @for (item of otherForms()! |  keyvalue | sortByText :'key'; track item.key) {
           <div class="row padding">
-            <div class="label-container">{{ pe.label }}</div>
+            <div class="label-container">{{ item.key }}</div>
             <div class="composition-container">
-              <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+              @for (pe of item.value; let i = $index; track pe.dbId){
+                <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+                <!-- Add separator except for last item -->
+                @if (i < item.value.length - 1) {
+                  <span class="margin-right">,</span>
+                }
+              }
             </div>
           </div>
         }
@@ -122,7 +128,7 @@
     }
 
     <!-- Inferences(Inferred To)-->
-    @if (inferences()) {
+    @if (inferences() && inferences().size > 0) {
       <div class="divider-container" [id]=DataKeys.INFERRED_TO>
         <div class="divider-name-container">
           <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.INFERENCES }"></ng-container>
@@ -133,11 +139,17 @@
       </div>
 
       <div class="element-container columns">
-        @for (pe of inferences()! | sortByText :'speciesName'; track pe.dbId) {
+        @for (item of inferences()! | keyvalue | sortByText : 'key'; track item.key) {
           <div class="row padding">
-            <div class="label-container">{{ pe.speciesName }}</div>
+            <div class="label-container">{{ item.key }}</div>
             <div class="composition-container">
-              <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+              @for (pe of item.value; let i = $index; track pe.dbId) {
+                <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+                <!-- Add separator except for last item -->
+                @if (i < item.value.length - 1) {
+                  <span class="margin-right">,</span>
+                }
+              }
             </div>
           </div>
         }

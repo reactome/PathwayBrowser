@@ -46,19 +46,18 @@ export class EntitiesService {
     return results;
   }
 
+  // Generic function to group by any property
+  getGroupedData<T>(data: T[], getKey: (item: T) => string): Map<string, T[]> {
+    const grouped = new Map<string, T[]>();
 
-  getGroupedCrossReferences(refEntity: ReferenceEntity | undefined) {
-    if (!refEntity || !refEntity.crossReference) return [];
+    // Loop over unique keys and group data by the key
+    const uniqueKeys = [...new Set(data.map(item => getKey(item)))];
 
-    const crossRefs = [...refEntity.crossReference];
-    const dbNames = [...new Set(crossRefs.map(ref => ref.databaseName))];
+    uniqueKeys.forEach(key => {
+      grouped.set(key, data.filter(item => getKey(item) === key));
+    });
 
-    return dbNames.map(dbName => ({
-      databaseName: dbName,
-      data: crossRefs.filter(ref => ref.databaseName === dbName)
-    }));
-
+    return grouped;
   }
-
 
 }

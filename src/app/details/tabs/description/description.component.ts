@@ -50,8 +50,7 @@ export class DescriptionComponent {
   readonly analysisResult = input<Analysis.Result>();
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
-  referenceEntity: Signal<ReferenceEntity | undefined> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
-  readonly inferences: Signal<PhysicalEntity[] | undefined> = computed(() => getProperty(this.obj(), DataKeys.INFERRED_TO));
+  referenceEntity: Signal<ReferenceEntity> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
   section = toSignal(this.route.fragment)
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
 
@@ -72,14 +71,17 @@ export class DescriptionComponent {
 
   });
 
+  inferences = computed(() => {
+    const inferences: PhysicalEntity[] = getProperty(this.obj(), DataKeys.INFERRED_TO);
+    if (!inferences) return new Map<string, PhysicalEntity[]>();
+    return this.getGroupedInferences(inferences);
+  });
+
 
   otherForms = computed(() => {
     const value = this._otherForms.value();
-    if (!value) return [];
-    return value.map(entity => ({
-      ...entity,
-      label: entity.displayName.match(/\[(.*?)\]/)?.[1] || '' // HSPA8 [plasma membrane] => plasma membrane
-    }))
+    if (!value) return new Map<string, PhysicalEntity[]>();
+    return this.getGroupedOtherForms(value);
   })
 
 
@@ -92,7 +94,7 @@ export class DescriptionComponent {
   regulations: Signal<Regulation[]> = computed(() => getProperty(this.obj(), DataKeys.REGULATED_BY));
   regulationRefs: Signal<RegulationReference[]> = computed(() => getProperty(this.obj(), DataKeys.REGULATION_REFERENCE));
 
-  modifications:Signal<HasModifiedResidue[]> = computed(() => getProperty(this.obj(), DataKeys.MODIFIED_RESIDUES));
+  modifications: Signal<HasModifiedResidue[]> = computed(() => getProperty(this.obj(), DataKeys.MODIFIED_RESIDUES));
 
   overview$ = viewChild<HTMLDivElement>('#overview');
 
@@ -131,9 +133,6 @@ export class DescriptionComponent {
               private interactorService: InteractorService,
   ) {
     effect(() => {
-      console.log(this.obj())
-    });
-    effect(() => {
       !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
@@ -147,6 +146,19 @@ export class DescriptionComponent {
     return this.iconService.getIconDetails(obj);
   }
 
+  // Group by species name
+  getGroupedInferences(inferences: PhysicalEntity[]) {
+    return this.entitiesService.getGroupedData(inferences, pe => pe.speciesName);
+  }
+
+  // Group by compartment
+  getGroupedOtherForms(otherForms: PhysicalEntity[]) {
+    return this.entitiesService.getGroupedData(otherForms, pe => {
+      // Extract compartment (group name) from displayName => HSPA8 [plasma membrane] => plasma membrane
+      return pe.displayName.match(/\[(.*?)\]/)?.[1] || pe.displayName;
+    });
+  }
+
   isTOCIncluded(key: string) {
     const obj = this.obj();
 
@@ -158,7 +170,7 @@ export class DescriptionComponent {
       case DataKeys.CROSS_REFERENCES:
         return this.referenceEntity()?.crossReference;
       case DataKeys.OTHER_FORMS:
-        return this.otherForms() && this.otherForms().length > 0;
+        return this.otherForms() && this.otherForms().size > 0;
       case Labels.AUTHORSHIP:
         return this.authorship() && this.authorship().length > 0;
       case DataKeys.INTERACTORS:
