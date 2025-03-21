@@ -67,7 +67,7 @@ export class MolecularProcessComponent {
       dbId: entry.dbId,
       schemaClass: entry.schemaClass,
       type: entry.schemaClass.includes('Negative') ? 'Negative Regulation' : 'Positive Regulation',
-      activity: entry.activity,
+      go_BiologicalProcess: entry.activity,
       activeUnit: entry.activeUnit,
       regulator: entry.regulator,
       regulationReference: this.regulationRefs(),

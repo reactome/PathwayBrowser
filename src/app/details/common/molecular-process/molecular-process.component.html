@@ -13,9 +13,7 @@
       <div class="row">
         <div class="label-container">PSI-MOD</div>
         <div class="composition-container">
-         <span><a [href]="item.psiMod.url" target="_blank">{{ item.psiMod.displayName }}
-           ({{ item.psiMod.name[0] }}
-           :{{ item.psiMod.identifier }})</a></span>
+         <span><a [href]="item.psiMod.url" target="_blank">{{ item.psiMod.name[0] }}:({{ item.psiMod.identifier }})</a></span>
         </div>
       </div>
     }
@@ -65,6 +63,19 @@
         </div>
       </div>
     }
+
+    @if (item.go_BiologicalProcess) {
+      <div class="row">
+        <div class="label-container">Biological Process</div>
+        <div class="composition-container">
+          <span><a [href]="item.go_BiologicalProcess.url" target="_blank">{{ item.go_BiologicalProcess.displayName }}
+            ({{ item.go_BiologicalProcess.databaseName }}
+            :{{ item.go_BiologicalProcess.accession }})</a></span>
+        </div>
+      </div>
+    }
+
+
 
     @if (item.activeUnit) {
       <div class="row">

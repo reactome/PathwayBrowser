@@ -18,10 +18,11 @@ export interface MolecularProcess extends DatabaseObject {
   ecNumber?: number;
   activeUnit?: PhysicalEntity[];
   catalyst?: PhysicalEntity;
-  catalystActivityReference: CatalystActivityReference;
+  catalystActivityReference?: CatalystActivityReference;
   // Regulation
   regulator?: PhysicalEntity;
-  regulationReference: RegulationReference[]
+  regulationReference?: RegulationReference[];
+  go_BiologicalProcess?: GO_MolecularFunction;
   // Modifications
   psiMod?: PsiMod;
   coordinate?: number;
