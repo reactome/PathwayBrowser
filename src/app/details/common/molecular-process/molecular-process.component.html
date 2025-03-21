@@ -1,0 +1,131 @@
+@for (item of data(); track item) {
+  <div class="container">
+    <div class="row">
+      <div class="label-container">Type</div>
+      <div class="composition-container">
+        <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+        <span>{{ item.type }}</span>
+      </div>
+    </div>
+
+
+    @if (item.psiMod) {
+      <div class="row">
+        <div class="label-container">PSI-MOD</div>
+        <div class="composition-container">
+         <span><a [href]="item.psiMod.url" target="_blank">{{ item.psiMod.displayName }}
+           ({{ item.psiMod.name[0] }}
+           :{{ item.psiMod.identifier }})</a></span>
+        </div>
+      </div>
+    }
+
+
+    @if (item.coordinate) {
+      <div class="row">
+        <div class="label-container">Position</div>
+        <div class="composition-container">
+          <span>{{ item.coordinate }}</span>
+        </div>
+      </div>
+    }
+
+    @if (item.modification) {
+      <div class="row">
+        <div class="label-container">Modification</div>
+        <div class="composition-container">
+          @if (isReferenceGroup(item.modification)) {
+            <span><a [href]="item.modification.url" target="_blank">{{ item.modification.displayName }}
+              ({{ item.modification.databaseName }}
+              :{{ item.modification.identifier }})</a></span>
+          } @else if(isEntity(item.modification)){
+            <cr-entity-tree [type]="'modification'" [data]="[item.modification]" [depthIndex]=null></cr-entity-tree>
+          }
+        </div>
+      </div>
+    }
+
+    @if (item.activity) {
+      <div class="row">
+        <div class="label-container">Activity</div>
+        <div class="composition-container">
+          <span><a [href]="item.activity.url" target="_blank">{{ item.activity.displayName }}
+            ({{ item.activity.databaseName }}
+            :{{ item.activity.accession }})</a></span>
+        </div>
+      </div>
+    }
+
+    @if (item.activity && item.activity.ecNumber) {
+      <div class="row">
+        <div class="label-container">EC Number</div>
+        <div class="composition-container">
+          <span><a
+            [href]=" 'https://www.enzyme-database.org/query.php?ec=' + item.activity.ecNumber">{{ item.activity.ecNumber }}</a></span>
+        </div>
+      </div>
+    }
+
+    @if (item.activeUnit) {
+      <div class="row">
+        <div class="label-container">Active Unit</div>
+        <div class="composition-container tree-padding multiple">
+          @for (unit of item.activeUnit; track unit.dbId) {
+            <cr-entity-tree [type]="'activeUnit'" [data]="[unit]" [depthIndex]=null></cr-entity-tree>
+          }
+
+        </div>
+      </div>
+    }
+
+    @if (item.regulator) {
+      <div class="row">
+        <div class="label-container">Regulator</div>
+        <div class="composition-container tree-padding">
+          <cr-entity-tree [type]="'regulator'" [data]="[item.regulator]" [depthIndex]=null></cr-entity-tree>
+        </div>
+      </div>
+    }
+
+
+    @if (item.catalyst) {
+      <div class="row">
+        <div class="label-container">Catalyst</div>
+        <div class="composition-container tree-padding">
+          <cr-entity-tree [type]="'catalyst'" [data]="[item.catalyst]" [depthIndex]=null></cr-entity-tree>
+        </div>
+      </div>
+    }
+
+    @if (item.catalystActivityReference && item.catalystActivityReference.catalystActivity.dbId === item.dbId) {
+      <div class="row">
+        <div class="label-container">Reference</div>
+        <div class="composition-container ref-padding">
+
+          @for (ref of item.catalystActivityReference.literatureReference | sortByDate:'year'; track ref.dbId) {
+            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+          }
+        </div>
+      </div>
+    }
+
+
+    @if (item.regulationReference) {
+      @for (ref of item.regulationReference; track ref.dbId) {
+        @if (ref.regulatedBy.dbId === item.dbId) {
+          <div class="row">
+            <div class="label-container">Reference</div>
+            <div class="composition-container ref-padding">
+              @for (ref of ref.literatureReference | sortByDate:'year'; track ref.dbId) {
+                <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
+
+  </div>
+}
+
+

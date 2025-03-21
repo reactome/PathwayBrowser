@@ -70,6 +70,7 @@ import {ControllerTreeComponent} from "./details/common/controller-tree/controll
 import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
 import {RegulationComponent} from "./details/common/regulation/regulation.component";
 import {ModificationComponent} from "./details/common/modification/modification.component";
+import {MolecularProcessComponent} from "./details/common/molecular-process/molecular-process.component";
 
 @NgModule({
   declarations: [
@@ -95,7 +96,8 @@ import {ModificationComponent} from "./details/common/modification/modification.
     CatalystActivityComponent,
     EntityTreeComponent,
     RegulationComponent,
-    ModificationComponent
+    ModificationComponent,
+    MolecularProcessComponent
   ],
   bootstrap: [AppComponent],
   imports: [
