@@ -99,8 +99,10 @@
             <mat-divider class="divider-color"></mat-divider>
             <!-- External Reference -->
             <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
+          }
+          <!-- Cross References -->
+          @if (element.referenceEntity && element.referenceEntity.crossReference) {
             <mat-divider></mat-divider>
-            <!-- Cross References -->
             <cr-cross-references [referenceEntity]=element.referenceEntity></cr-cross-references>
           }
         </div>

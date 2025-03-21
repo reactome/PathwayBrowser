@@ -62,7 +62,7 @@
     }
 
     <!-- Cross References-->
-    @if (referenceEntity()) {
+    @if (referenceEntity() && referenceEntity()?.crossReference) {
       <div class="divider-container" [id]=DataKeys.CROSS_REFERENCES>
         <div class="divider-name-container">
           <ng-container
