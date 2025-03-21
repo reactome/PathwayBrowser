@@ -30,15 +30,15 @@
       </div>
     }
 
-    @if (element.modification) {
+    @if (hasModification(element) && element.modification) {
       <div class="row">
         <div class="label-container">Modification</div>
         <div class="composition-container">
-          @if (element.modification.schemaClass === 'ReferenceGroup') {
+          @if (isReferenceGroup(element.modification)) {
             <span><a [href]="element.modification.url" target="_blank">{{ element.modification.displayName }}
               ({{ element.modification.databaseName }}
               :{{ element.modification.identifier }})</a></span>
-          } @else {
+          } @else if (isEntity(element.modification)) {
             <cr-entity-tree [type]="'modification'" [data]="[element.modification]" [depthIndex]=null></cr-entity-tree>
           }
         </div>

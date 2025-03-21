@@ -10,6 +10,13 @@ import {LiteratureReference} from "../model/graph/publication/literature-referen
 import {SchemaClasses} from "../constants/constants";
 import {CatalystActivity} from "../model/graph/catalyst-activity.model";
 import {Regulation} from "../model/graph/Regulation/regulation.model";
+import {Relationship} from "../model/graph/relationship.model";
+import {GroupModifiedResidue} from "../model/graph/abstract-modified-residue/group-modified-residue.model";
+import {ReferenceGroup} from "../model/graph/reference-entity/reference-group.model";
+import {CrosslinkedResidue} from "../model/graph/abstract-modified-residue/crosslinked-residue.model";
+import {IntraChainCrosslinkedResidue} from "../model/graph/abstract-modified-residue/intra-chain-crosslinked-residue.model";
+import {InterChainCrosslinkedResidue} from "../model/graph/abstract-modified-residue/inter-chain-crosslinked-residue.model";
+import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -66,14 +73,28 @@ export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
   return isPathwayOrTLP(obj) && obj.hasDiagram;
 }
 
-export function isCatalystActivity(obj: DatabaseObject): obj is CatalystActivity {
-  return obj.schemaClass === SchemaClasses.CATALYST_ACTIVITY
-}
-
 const regulationClasses: Set<string> = new Set([SchemaClasses.REGULATION, SchemaClasses.NEGATIVE_REGULATION, SchemaClasses.NEGATIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.POSITIVE_REGULATION, SchemaClasses.POSITIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.REQUIREMENT]);
 
-export function isRegulation(obj: DatabaseObject): obj is Regulation {
-  return regulationClasses.has(obj.schemaClass)
+export function isRegulation(obj: Regulation | CatalystActivity | HasModifiedResidue): obj is Regulation {
+  return 'schemaClass' in obj && regulationClasses.has(obj.schemaClass);
+}
+
+export function isCatalystActivity(obj: Regulation | CatalystActivity | HasModifiedResidue): obj is CatalystActivity {
+  return 'schemaClass' in obj && obj.schemaClass === SchemaClasses.CATALYST_ACTIVITY;
+}
+
+export function isHasModifiedResidue(obj: Regulation | CatalystActivity | HasModifiedResidue): obj is HasModifiedResidue {
+  return 'type' in obj && obj.type === 'modifiedResidue';
+}
+
+const modificationClasses: Set<string> = new Set([SchemaClasses.GROUP_MODIFIED_RESIDUE, SchemaClasses.CROSSLINKED_RESIDUE, SchemaClasses.INTER_CHAIN_CROSSLINKED_RESIDUE, SchemaClasses.INTRA_CHAIN_CROSSLINKED_RESIDUE]);
+
+export function hasModification(obj: DatabaseObject): obj is GroupModifiedResidue | CrosslinkedResidue | InterChainCrosslinkedResidue | IntraChainCrosslinkedResidue {
+  return modificationClasses.has(obj.schemaClass);
+}
+
+export function isReferenceGroup(obj: DatabaseObject): obj is ReferenceGroup {
+  return obj.schemaClass === SchemaClasses.REFERENCE_GROUP;
 }
 
 /** Generic function to dynamic access child property
