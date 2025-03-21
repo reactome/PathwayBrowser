@@ -5,7 +5,8 @@ import {Event} from "./event/event.model";
 import {Person} from "./person.model";
 import {Publication} from "./publication/publication.model";
 import {Polymer} from "./physical-entity/polymer.model";
-import {GroupModifiedResidue} from "./abstract-modified-residue/group-modified-residue.model";
+import {Type} from "../../constants/constants";
+import {TranslationalModification} from "./abstract-modified-residue/translational-modification.model";
 
 
 export namespace Relationship {
@@ -17,52 +18,52 @@ export namespace Relationship {
     element: O;
   }
 
-  export interface HasCandidate extends Has<PhysicalEntity, "candidate"> {
+  export interface HasCandidate extends Has<PhysicalEntity, Type.CANDIDATE> {
   }
 
-  export interface HasCompartment extends Has<Compartment, "compartment"> {
+  export interface HasCompartment extends Has<Compartment, Type.COMPARTMENT> {
   }
 
-  export interface HasComponent extends Has<PhysicalEntity, "component"> {
+  export interface HasComponent extends Has<PhysicalEntity, Type.COMPONENT> {
   }
 
-  export interface ComponentOf extends Has<PhysicalEntity, "componentOf"> {
+  export interface ComponentOf extends Has<PhysicalEntity, Type.COMPONENT_OF> {
   }
 
-  export interface HasEncapsulatedEvent extends Has<Event, "encapsulatedEvent"> {
+  export interface HasEncapsulatedEvent extends Has<Event, Type.ENCAPSULATED_EVENT> {
   }
 
-  export interface HasEvent extends Has<Event, "event"> {
+  export interface HasEvent extends Has<Event, Type.EVENT> {
   }
 
-  export interface HasMember extends Has<Event, "member"> {
+  export interface HasMember extends Has<Event, Type.MEMBER> {
   }
 
-  export interface HasModifiedResidue extends Has<GroupModifiedResidue, "modifiedResidue"> {
+  export interface HasModifiedResidue extends Has<TranslationalModification, Type.MODIFIED_RESIDUE> {
   }
 
-  export interface Input extends Has<PhysicalEntity, "input"> {
+  export interface Input extends Has<PhysicalEntity, Type.INPUT> {
   }
 
-  export interface Output extends Has<PhysicalEntity, "output"> {
+  export interface Output extends Has<PhysicalEntity, Type.OUTPUT> {
   }
 
-  export interface InputOf extends Has<PhysicalEntity, "inputOf"> {
+  export interface InputOf extends Has<PhysicalEntity, Type.INPUT_OF> {
   }
 
-  export interface OutputOf extends Has<PhysicalEntity, "outputOf"> {
+  export interface OutputOf extends Has<PhysicalEntity, Type.OUTPUT_OF> {
   }
 
-  export interface Author extends Has<Person, "author"> {
+  export interface Author extends Has<Person, Type.AUTHOR> {
   }
 
-  export interface HasPublication extends Has<Publication, "publication"> {
+  export interface HasPublication extends Has<Publication, Type.PUBLICATION> {
   }
 
-  export interface RepeatedUnit extends Has<PhysicalEntity, "repeatedUnit"> {
+  export interface RepeatedUnit extends Has<PhysicalEntity, Type.REPEATED_UNIT> {
   }
 
-  export interface RepeatedUnitOf extends Has<Polymer, "repeatedUnitOf"> {
+  export interface RepeatedUnitOf extends Has<Polymer, Type.REPEATED_UNIT_OF> {
   }
 
 }

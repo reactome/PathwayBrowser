@@ -99,5 +99,30 @@ export const SchemaClasses = {
   POSITIVE_REGULATION: 'PositiveRegulation',
   POSITIVE_GENE_EXPRESSION_REGULATION: 'PositiveGeneExpressionRegulation',
   REQUIREMENT: 'Requirement',
+  GROUP_MODIFIED_RESIDUE: 'GroupModifiedResidue',
+  CROSSLINKED_RESIDUE: 'CrosslinkedResidue',
+  INTER_CHAIN_CROSSLINKED_RESIDUE: 'InterChainCrosslinkedResidue',
+  INTRA_CHAIN_CROSSLINKED_RESIDUE: 'IntraChainCrosslinkedResidue',
 
-} as const
+  REFERENCE_GROUP: 'ReferenceGroup',
+
+} as const;
+
+export enum Type {
+  CANDIDATE = 'candidate',
+  COMPARTMENT = 'compartment',
+  COMPONENT = 'component',
+  COMPONENT_OF = 'componentOf',
+  ENCAPSULATED_EVENT = 'encapsulatedEvent',
+  EVENT = 'event',
+  MEMBER = 'member',
+  MODIFIED_RESIDUE = 'modifiedResident',
+  INPUT = 'input',
+  OUTPUT = 'output',
+  INPUT_OF = 'inputOf',
+  OUTPUT_OF = 'outputOf',
+  AUTHOR = 'author',
+  PUBLICATION = 'publication',
+  REPEATED_UNIT = 'repeatedUnit',
+  REPEATED_UNIT_OF = 'repeatedUnitOf',
+}
