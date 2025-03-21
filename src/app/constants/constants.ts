@@ -76,6 +76,7 @@ export const SchemaClasses = {
   RNA_DRUG: 'RNADrug',
   ENTITY_SET: 'EntitySet',
   CANDIDATE_SET: 'CandidateSet',
+  DEFINED_SET: 'DefinedSet',
   GENOME_ENCODED_ENTITY: 'GenomeEncodedEntity',
   OTHER_ENTITY: 'OtherEntity',
   POLYMER: 'Polymer',
