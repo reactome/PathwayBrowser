@@ -26,6 +26,12 @@ export class IconService {
     route: 'positive-regulation'
   }
 
+  referenceGroup={
+    name: 'reference-group',
+    tooltip: 'Reference group',
+    route: 'reference-group'
+  }
+
   reactomeSubjectIcons: { [key: string]: { name: string; tooltip?: string; route: string } } = {
     Pathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
     BlackBoxEvent: {name: 'omitted', tooltip: 'Black Box Event', route: 'omitted'},
@@ -80,7 +86,8 @@ export class IconService {
     PositiveRegulation: this.positiveRegulation,
     PositiveGeneExpressionRegulation: this.positiveRegulation,
     Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
-    ReferenceGroup: {name: 'reference-group', tooltip: 'Reference Group', route: 'reference-group'},
+    GroupModifiedResidue: this.referenceGroup,
+    ModifiedResidue: this.referenceGroup,
 
 
     //Reaction type
