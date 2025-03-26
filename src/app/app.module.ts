@@ -71,6 +71,8 @@ import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.comp
 import {RegulationComponent} from "./details/common/regulation/regulation.component";
 import {ModificationComponent} from "./details/common/modification/modification.component";
 import {MolecularProcessComponent} from "./details/common/molecular-process/molecular-process.component";
+import {FormatClassNamePipe} from "./pipes/format-class-name.pipe";
+import {CastPipe} from "./pipes/cast.pipe";
 
 @NgModule({
   declarations: [
@@ -149,7 +151,9 @@ import {MolecularProcessComponent} from "./details/common/molecular-process/mole
     MatHeaderRowDef,
     MatRowDef,
     AnalysisLegendComponent,
-    ExtractCompartmentPipe
+    ExtractCompartmentPipe,
+    FormatClassNamePipe,
+    CastPipe
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
