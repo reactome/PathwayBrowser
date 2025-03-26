@@ -36,9 +36,6 @@ export class MolecularProcessComponent {
   readonly regulationRefs = input.required<RegulationReference[]>({alias: 'regulationRefs'});
 
   constructor(private iconService: IconService) {
-    effect(() => {
-      console.log("data is ", this.data())
-    });
   }
 
   getSymbol(obj: DatabaseObject) {
@@ -104,7 +101,7 @@ export class MolecularProcessComponent {
       schemaClass: entry.element.schemaClass,
       name: entry.element.displayName,
       psiMod: psiMods,
-      coordinate:  hasProperty(entry.element, "coordinate") ? entry.element.coordinate : undefined,
+      coordinate: hasProperty(entry.element, "coordinate") ? entry.element.coordinate : undefined,
       modification: hasProperty(entry.element, "modification") ? entry.element.modification : undefined,
       literatureReference: [],
       isModification: true

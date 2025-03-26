@@ -167,7 +167,7 @@ export class DescriptionComponent {
       case DataKeys.CATALYST_ACTIVITY:
         return this.catalystActivity() && this.catalystActivity().length > 0;
       case DataKeys.CROSS_REFERENCES:
-        return this.referenceEntity().crossReference;
+        return this.referenceEntity()?.crossReference;
       case DataKeys.OTHER_FORMS:
         return this.otherForms() && this.otherForms().size > 0;
       case Labels.AUTHORSHIP:
