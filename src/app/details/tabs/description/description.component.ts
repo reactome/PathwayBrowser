@@ -42,7 +42,7 @@ export class DescriptionComponent {
   })
 
   _interactors = rxResource({
-    request: () => isEntity(this.obj()) && this.referenceEntity()?.identifier,
+    request: () => isEntity(this.obj()) && this.referenceEntity().identifier,
     loader: (param) => param.request ? this.interactorService.getCustomInteractorsByAcc(param.request) : of(null)
   })
 
@@ -161,20 +161,19 @@ export class DescriptionComponent {
 
   isTOCIncluded(key: string) {
     const obj = this.obj();
-
     switch (key) {
       case DataKeys.OVERVIEW:
         return obj;
       case DataKeys.CATALYST_ACTIVITY:
         return this.catalystActivity() && this.catalystActivity().length > 0;
       case DataKeys.CROSS_REFERENCES:
-        return this.referenceEntity()?.crossReference;
+        return this.referenceEntity().crossReference;
       case DataKeys.OTHER_FORMS:
         return this.otherForms() && this.otherForms().size > 0;
       case Labels.AUTHORSHIP:
         return this.authorship() && this.authorship().length > 0;
       case DataKeys.INTERACTORS:
-        return !this._interactors.isLoading() && this._interactors.value();
+        return this.interactors() && this.interactors().length > 0;
       default:
         return obj[key] !== undefined && obj[key];
     }
