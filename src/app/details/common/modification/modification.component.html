@@ -1,27 +1,27 @@
+<!--
 @for (mr of modifications(); track mr.element.dbId; ) {
   @let element = mr.element;
   <div class="modification-container">
-    <div class="row">
-      <div class="label-container">Type</div>
-      <div class="composition-container">
-        <mat-icon class='custom-icon' [matTooltip]="'Refernece Group'" svgIcon="reference-group"></mat-icon>
-        <span>Type</span>
-      </div>
-    </div>
 
-
-    @if (element.psiMod) {
+    @if (hasProperty(element, "psiMod") && element.psiMod) {
       <div class="row">
-        <div class="label-container">PSI-MOD</div>
+        <div class="label-container">Type</div>
         <div class="composition-container">
-         <span><a [href]="element.psiMod.url" target="_blank">{{ element.psiMod.displayName }}
-           ({{ element.psiMod.name[0] }}
-           :{{ element.psiMod.identifier }})</a></span>
+          @for (psiMod of element.psiMod; track psiMod.dbId) {
+            <span><a [href]="psiMod.url" target="_blank">{{ psiMod.displayName }}
+              ({{ psiMod.name[0] }}
+              :{{ psiMod.identifier }})</a></span>
+          }
         </div>
+      </div>
+    } @else {
+      <div class="composition-container">
+        <mat-icon class='custom-icon' [svgIcon]="getSymbol(element).name"></mat-icon>
+        <span>{{ element.schemaClass | formatClassName }}</span>
       </div>
     }
 
-    @if (element.coordinate) {
+    @if (hasProperty(element, "coordinate") && element.coordinate) {
       <div class="row">
         <div class="label-container">Position</div>
         <div class="composition-container">
@@ -30,19 +30,23 @@
       </div>
     }
 
-    @if (hasModification(element) && element.modification) {
-      <div class="row">
-        <div class="label-container">Modification</div>
-        <div class="composition-container">
-          @if (isReferenceGroup(element.modification)) {
-            <span><a [href]="element.modification.url" target="_blank">{{ element.modification.displayName }}
-              ({{ element.modification.databaseName }}
-              :{{ element.modification.identifier }})</a></span>
-          } @else if (isEntity(element.modification)) {
-            <cr-entity-tree [type]="'modification'" [data]="[element.modification]" [depthIndex]=null></cr-entity-tree>
-          }
+    @if (getModification(element)) {
+      @let mod = getModification(element);
+      @if (mod) {
+        <div class="row">
+          <div class="label-container">Modification</div>
+          <div class="composition-container">
+            @if (isReferenceGroup(mod)) {
+              <span><a [href]="mod.url" target="_blank">{{ mod.displayName }}
+                ({{ mod.databaseName }}
+                :{{ mod.identifier }})</a></span>
+            } @else if (isEntity(mod)) {
+              <cr-entity-tree [type]="'modification'" [data]="[mod]" [depthIndex]=null></cr-entity-tree>
+            }
+          </div>
         </div>
-      </div>
+      }
     }
   </div>
 }
+-->
