@@ -1,21 +1,74 @@
 @for (item of data(); track item) {
   <div class="container">
-    <div class="row">
-      <div class="label-container">Type</div>
-      <div class="composition-container">
-        <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
-        <span>{{ item.type }}</span>
-      </div>
-    </div>
-
-
-    @if (item.psiMod) {
+    @if (item.type) {
       <div class="row">
-        <div class="label-container">PSI-MOD</div>
+        <div class="label-container">Type</div>
         <div class="composition-container">
-         <span><a [href]="item.psiMod.url" target="_blank">{{ item.psiMod.name[0] }}:({{ item.psiMod.identifier }})</a></span>
+          <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+          <span>{{ item.type }}</span>
         </div>
       </div>
+    }
+
+
+    <!--ReplacedResidue / FragmentModification-->
+    @if (isReplacedResidue(item) || isFragmentModification(item)) {
+      <div class="row">
+        <div class="label-container">Name</div>
+        <div class="composition-container">
+          <span>{{ item.displayName }}</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label-container">Type</div>
+        <div class="composition-container">
+          <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+          <span>{{ item.schemaClass | formatClassName }}</span>
+        </div>
+      </div>
+
+      @if (item.psiMod) {
+        <div class="row">
+          <div class="label-container">PSI-MOD</div>
+          <div class="composition-container multiple">
+            @for (psiMod of item.psiMod; track psiMod.dbId) {
+              <div class="psiMod-container">
+                <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+                <span><a [href]="psiMod.url" target="_blank" [matTooltip]="psiMod.definition">{{ psiMod.name[0] }}
+                  :({{ psiMod.identifier }})</a></span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Non ReplacedResidue / FragmentModification -->
+    @if (!isReplacedResidue(item) && !isFragmentModification(item)) {
+      @if (item.psiMod) {
+        <div class="row">
+          <div class="label-container">Type</div>
+          <div class="composition-container multiple">
+            @for (psiMod of item.psiMod; track psiMod.dbId) {
+              <div class="psiMod-container">
+                <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+                <span><a [href]="psiMod.url" target="_blank" [matTooltip]="psiMod.definition">{{ psiMod.name[0] }}
+                  :({{ psiMod.identifier }})</a></span>
+              </div>
+            }
+          </div>
+        </div>
+        <!--Use schemaClass as the Type if there is no psiMod and it is modified residue -->
+      } @else if (!item.psiMod && item.isModification) {
+        <div class="row">
+          <div class="label-container">Type</div>
+          <div class="composition-container">
+            <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+            <span>{{ item.schemaClass | formatClassName }}</span>
+          </div>
+        </div>
+      }
     }
 
 
@@ -32,11 +85,11 @@
       <div class="row">
         <div class="label-container">Modification</div>
         <div class="composition-container">
-          @if (isReferenceGroup(item.modification)) {
+          @if (isReferenceGroup(item.modification) || isReferenceMolecule(item.modification)) {
             <span><a [href]="item.modification.url" target="_blank">{{ item.modification.displayName }}
               ({{ item.modification.databaseName }}
               :{{ item.modification.identifier }})</a></span>
-          } @else if(isEntity(item.modification)){
+          } @else if (isEntity(item.modification)) {
             <cr-entity-tree [type]="'modification'" [data]="[item.modification]" [depthIndex]=null></cr-entity-tree>
           }
         </div>
@@ -74,7 +127,6 @@
         </div>
       </div>
     }
-
 
 
     @if (item.activeUnit) {

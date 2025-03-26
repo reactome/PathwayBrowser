@@ -11,12 +11,11 @@ import {SchemaClasses} from "../constants/constants";
 import {CatalystActivity} from "../model/graph/catalyst-activity.model";
 import {Regulation} from "../model/graph/Regulation/regulation.model";
 import {Relationship} from "../model/graph/relationship.model";
-import {GroupModifiedResidue} from "../model/graph/abstract-modified-residue/group-modified-residue.model";
 import {ReferenceGroup} from "../model/graph/reference-entity/reference-group.model";
-import {CrosslinkedResidue} from "../model/graph/abstract-modified-residue/crosslinked-residue.model";
-import {IntraChainCrosslinkedResidue} from "../model/graph/abstract-modified-residue/intra-chain-crosslinked-residue.model";
-import {InterChainCrosslinkedResidue} from "../model/graph/abstract-modified-residue/inter-chain-crosslinked-residue.model";
+import {ReplacedResidue} from "../model/graph/abstract-modified-residue/replaced-residue.model";
+import {FragmentModification} from "../model/graph/abstract-modified-residue/fragment-modification.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
+import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molecule.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -52,7 +51,7 @@ export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPa
   return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
 }
 
-const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET,SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
+const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
   SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY]);
 
 export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
@@ -87,14 +86,28 @@ export function isHasModifiedResidue(obj: Regulation | CatalystActivity | HasMod
   return 'type' in obj && obj.type === 'modifiedResidue';
 }
 
-const modificationClasses: Set<string> = new Set([SchemaClasses.GROUP_MODIFIED_RESIDUE, SchemaClasses.CROSSLINKED_RESIDUE, SchemaClasses.INTER_CHAIN_CROSSLINKED_RESIDUE, SchemaClasses.INTRA_CHAIN_CROSSLINKED_RESIDUE]);
 
-export function hasModification(obj: DatabaseObject): obj is GroupModifiedResidue | CrosslinkedResidue | InterChainCrosslinkedResidue | IntraChainCrosslinkedResidue {
-  return modificationClasses.has(obj.schemaClass);
+// Checks whether a given property exists in an object
+export function hasProperty<K extends keyof DatabaseObject>(obj: DatabaseObject, property: K): obj is DatabaseObject & Record<K, unknown> {
+  return property in obj;
+}
+
+const fragmentModificationClasses: Set<string> = new Set([SchemaClasses.FRAGMENT_MODIFICATION, SchemaClasses.FRAGMENT_DELETION_MODIFICATION, SchemaClasses.FRAGMENT_INSERTION_MODIFICATION, SchemaClasses.FRAGMENT_REPLACED_MODIFICATION]);
+
+export function isFragmentModification(obj: DatabaseObject): obj is FragmentModification {
+  return fragmentModificationClasses.has(obj.schemaClass);
+}
+
+
+export function isReplacedResidue(obj: DatabaseObject): obj is ReplacedResidue {
+  return obj.schemaClass === SchemaClasses.REPLACED_RESIDUE || obj.schemaClass === SchemaClasses.NONSENSE_MUTATION;
 }
 
 export function isReferenceGroup(obj: DatabaseObject): obj is ReferenceGroup {
   return obj.schemaClass === SchemaClasses.REFERENCE_GROUP;
+}
+export function isReferenceMolecule(obj:DatabaseObject): obj is ReferenceMolecule{
+  return obj.schemaClass === SchemaClasses.REFERENCE_MOLECULE
 }
 
 /** Generic function to dynamic access child property

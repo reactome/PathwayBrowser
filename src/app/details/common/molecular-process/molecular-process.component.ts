@@ -7,16 +7,17 @@ import {IconService} from "../../../services/icon.service";
 import {RegulationReference} from "../../../model/graph/control-reference/regulation-reference.model";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {
-  hasModification,
+  hasProperty,
   isCatalystActivity,
   isEntity,
+  isFragmentModification,
   isHasModifiedResidue,
-  isReferenceGroup,
-  isRegulation
+  isReferenceGroup, isReferenceMolecule,
+  isRegulation,
+  isReplacedResidue
 } from "../../../services/utils";
-
-import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {MolecularProcess} from "../../../model/graph/molecular-process.model";
+import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 
 @Component({
@@ -71,6 +72,7 @@ export class MolecularProcessComponent {
       activeUnit: entry.activeUnit,
       regulator: entry.regulator,
       regulationReference: this.regulationRefs(),
+      isRegulation: true
     } as unknown as MolecularProcess;
   }
 
@@ -84,20 +86,34 @@ export class MolecularProcessComponent {
       activeUnit: entry.activeUnit,
       catalyst: entry.physicalEntity,
       catalystActivityReference: this.catalystActivityReference(),
+      isCatalystActivity: true
     } as unknown as MolecularProcess;
   }
 
   private getModifiedResidue(entry: HasModifiedResidue) {
+    let psiMods = hasProperty(entry.element, "psiMod") ? entry.element.psiMod : undefined;
+
+    if (psiMods) {
+      psiMods = Array.isArray(psiMods) ? psiMods : [psiMods]; // Ensure it's always an array
+    } else {
+      psiMods = undefined;
+    }
+
     return {
-      type: "Modification",
+      displayName: entry.element.displayName,
       schemaClass: entry.element.schemaClass,
-      psiMod: entry.element.psiMod,
-      coordinate: entry.element.coordinate,
-      modification: hasModification(entry.element) && entry.element.modification,
+      name: entry.element.displayName,
+      psiMod: psiMods,
+      coordinate:  hasProperty(entry.element, "coordinate") ? entry.element.coordinate : undefined,
+      modification: hasProperty(entry.element, "modification") ? entry.element.modification : undefined,
       literatureReference: [],
+      isModification: true
     } as unknown as MolecularProcess;
   }
 
   protected readonly isReferenceGroup = isReferenceGroup;
   protected readonly isEntity = isEntity;
+  protected readonly isReplacedResidue = isReplacedResidue;
+  protected readonly isFragmentModification = isFragmentModification;
+  protected readonly isReferenceMolecule = isReferenceMolecule;
 }
