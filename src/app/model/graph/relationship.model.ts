@@ -6,7 +6,7 @@ import {Person} from "./person.model";
 import {Publication} from "./publication/publication.model";
 import {Polymer} from "./physical-entity/polymer.model";
 import {Type} from "../../constants/constants";
-import {TranslationalModification} from "./abstract-modified-residue/translational-modification.model";
+import {AbstractModifiedResidue} from "./abstract-modified-residue/abstract-modified-residue.model";
 
 
 export namespace Relationship {
@@ -39,7 +39,7 @@ export namespace Relationship {
   export interface HasMember extends Has<Event, Type.MEMBER> {
   }
 
-  export interface HasModifiedResidue extends Has<TranslationalModification, Type.MODIFIED_RESIDUE> {
+  export interface HasModifiedResidue extends Has<AbstractModifiedResidue, Type.MODIFIED_RESIDUE> {
   }
 
   export interface Input extends Has<PhysicalEntity, Type.INPUT> {
