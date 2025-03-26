@@ -47,6 +47,7 @@
   flex-wrap: wrap;
   align-items: center;
   padding-left: 10px;
+  padding-right: 10px;
   border-left: 2px solid var(--outline-variant);
   flex: 1;
 
@@ -56,4 +57,8 @@
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.25px;
+}
+
+.margin-right {
+  margin-right: var(--margin-right);
 }
