@@ -81,6 +81,7 @@ export enum SchemaClasses {
   OTHER_ENTITY = 'OtherEntity',
   POLYMER = 'Polymer',
   SIMPLE_ENTITY = 'SimpleEntity',
+  REFERENCE_MOLECULE = 'ReferenceMolecule',
 
 
   PATHWAY = 'Pathway',
