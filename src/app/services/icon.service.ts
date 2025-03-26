@@ -26,10 +26,16 @@ export class IconService {
     route: 'positive-regulation'
   }
 
-  referenceGroup={
+  referenceGroup = {
     name: 'reference-group',
     tooltip: 'Reference group',
     route: 'reference-group'
+  }
+
+  geneticallyModifiedResidue = {
+    name: 'genetically-modified-residue',
+    tooltip: 'Genetically Modified Residue',
+    route: 'genetically-modified-residue'
   }
 
   reactomeSubjectIcons: { [key: string]: { name: string; tooltip?: string; route: string } } = {
@@ -88,13 +94,28 @@ export class IconService {
     Requirement: {name: 'requirement', tooltip: 'Requirement for Reaction', route: 'requirement'},
     GroupModifiedResidue: this.referenceGroup,
     ModifiedResidue: this.referenceGroup,
+    InterChainCrosslinkedResidue: this.referenceGroup,
+    IntraChainCrosslinkedResidue: this.referenceGroup,
+    GeneticallyModifiedResidue: this.geneticallyModifiedResidue,
+    TranscriptionalModification: this.geneticallyModifiedResidue,
+    ModifiedNucleotide: this.geneticallyModifiedResidue,
+    FragmentModification: this.geneticallyModifiedResidue,
+    FragmentDeletionModification: this.geneticallyModifiedResidue,
+    FragmentInsertionModification: this.geneticallyModifiedResidue,
+    FragmentReplacedModification: this.geneticallyModifiedResidue,
+    ReplacedResidue: this.geneticallyModifiedResidue,
+    NonsenseMutation: this.geneticallyModifiedResidue,
 
 
     //Reaction type
-    "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},
-    "binding": {name: 'binding', tooltip: 'Association/Binding reaction', route: 'binding'},
-    "dissociation": {name: 'dissociation', tooltip: 'Dissociation reaction', route: 'dissociation'},
-    "omitted": {name: 'omitted', tooltip: 'Omitted reaction', route: 'omitted'}, //BlackBoxEvent
+    "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'}
+    ,
+    "binding": {name: 'binding', tooltip: 'Association/Binding reaction', route: 'binding'}
+    ,
+    "dissociation": {name: 'dissociation', tooltip: 'Dissociation reaction', route: 'dissociation'}
+    ,
+    "omitted": {name: 'omitted', tooltip: 'Omitted reaction', route: 'omitted'}
+    , //BlackBoxEvent
     "transition": {name: 'transition', tooltip: 'Transition reaction', route: 'transition'}
 
   };
@@ -127,7 +148,7 @@ export class IconService {
     {name: 'select', tooltip: 'Select', route: 'select'},
   ];
 
-  // Not in used for now, leave here for future use
+// Not in used for now, leave here for future use
   connectors = [
     {name: 'dashed-I', route: 'dashed-I'},
     {name: 'dashed-L', route: 'dashed-L'},
