@@ -42,7 +42,7 @@ export class DescriptionComponent {
   })
 
   _interactors = rxResource({
-    request: () => isEntity(this.obj()) && this.referenceEntity().identifier,
+    request: () => isEntity(this.obj()) && this.referenceEntity()?.identifier,
     loader: (param) => param.request ? this.interactorService.getCustomInteractorsByAcc(param.request) : of(null)
   })
 
