@@ -13,12 +13,6 @@
 
     <!--ReplacedResidue / FragmentModification-->
     @if (isReplacedResidue(item) || isFragmentModification(item)) {
-      <div class="row">
-        <div class="label-container">Name</div>
-        <div class="composition-container">
-          <span>{{ item.displayName }}</span>
-        </div>
-      </div>
 
       <div class="row">
         <div class="label-container">Type</div>
@@ -28,13 +22,19 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="label-container">Name</div>
+        <div class="composition-container">
+          <span>{{ item.displayName }}</span>
+        </div>
+      </div>
+
       @if (item.psiMod) {
         <div class="row">
           <div class="label-container">PSI-MOD</div>
           <div class="composition-container multiple">
             @for (psiMod of item.psiMod; track psiMod.dbId) {
               <div class="psiMod-container">
-                <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
                 <span><a [href]="psiMod.url" target="_blank" [matTooltip]="psiMod.definition">{{ psiMod.name[0] }}
                   :({{ psiMod.identifier }})</a></span>
               </div>
