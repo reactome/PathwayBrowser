@@ -34,24 +34,42 @@
                     [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
           </mat-icon>
         </div>
-        <span class="name">
+        <span class="name" #name [matTooltip]="element.name?.[0]" [matTooltipDisabled]="!isEllipsisActive(name)">
             @if (node.stoichiometry > 1) {
               <b>{{ node.stoichiometry }} ×</b>
             }
           {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
-              </span>
+        </span>
       </div>
 
+
       <div class="right">
+        <!--Compartment-->
         @if (!isEvent(element)) {
-          <span class="compartment">{{ element.displayName | extractCompartment }}</span>
+          <span class="compartment name" #compartment [matTooltip]="element.displayName | extractCompartment"
+                [matTooltipDisabled]="!isEllipsisActive(compartment)">{{ element.displayName | extractCompartment }}
+          </span>
         } @else {
           @for (has of element.hasCompartment; track has.element.dbId) {
-            <span class="compartment">{{ has.element.displayName }}</span>
+            <span class="compartment name" #compartment [matTooltip]="has.element.displayName"
+                  [matTooltipDisabled]="!isEllipsisActive(compartment)">{{ has.element.displayName }}
+            </span>
           }
         }
+
+        <!--Species-->
         @if (element.speciesName) {
-          <span class="species">{{ element.speciesName }}</span>
+          <!--todo species could a single object or array of species-->
+          @let speciesArr = Array.isArray(element.species) ? element.species : [element.species];
+          <!--From Severe acute respiratory syndrome coronavirus 2 to SARS-CoV-2 -->
+          @if (element.speciesName.length >= maxLength && speciesArr?.length > 0 && speciesArr[0]?.name?.length > 1) {
+            @let shortName = getShortest(speciesArr[0].name);
+            <span class="species name" [matTooltip]="element.speciesName">{{ shortName }}</span>
+          } @else {
+            <span class="species name" #speciesName [matTooltip]="element.speciesName"
+                  [matTooltipDisabled]="!isEllipsisActive(speciesName)">{{ element.speciesName }}
+            </span>
+          }
         }
 
         <div class="select-container">

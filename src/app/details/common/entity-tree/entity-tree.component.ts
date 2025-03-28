@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, model, signal} from '@angular/core';
 import {isEvent} from "../../../services/utils";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
@@ -42,6 +42,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   _selectedNode = signal<E | null>(null);
   selectedNode = computed(() => this._selectedNode());
 
+
+  maxLength = 27; // Use Molluscum contagiosum virus's length
 
   constructor(private iconService: IconService,
               private entitiesService: EntitiesService,
@@ -149,11 +151,12 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       SchemaClasses.SIMPLE_ENTITY
     ])
 
-    return !(
-      nonNestedClasses.has(selectedNode.schemaClass) || isEvent(selectedNode)
-    );
+    return !(nonNestedClasses.has(selectedNode.schemaClass) || isEvent(selectedNode));
   }
 
+  isEllipsisActive(e: HTMLElement): boolean {
+    return e ? (e.offsetWidth < e.scrollWidth) : false;
+  }
 
   private updateTree(existingTreeData: R[], result: E): R[] {
 
@@ -184,6 +187,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         [])
     ]);
   }
+
   getSymbol(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
   }
@@ -338,6 +342,13 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return [];
   }
 
+  getShortest(arr: string[]) {
+    return arr.reduce((a, b) => (a.length <= b.length ? a : b));
+  }
+
 
   protected readonly isEvent = isEvent;
+  protected readonly Array = Array;
+
+
 }

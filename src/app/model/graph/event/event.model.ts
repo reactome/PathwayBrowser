@@ -5,6 +5,7 @@ import {LiteratureReference} from "../publication/literature-reference.model";
 import {InstanceEdit} from "../instance-edit.model";
 import {Relationship} from "../relationship.model";
 import HasCompartment = Relationship.HasCompartment;
+import {Species} from "../species.model";
 
 
 export interface Event extends DatabaseObject {
@@ -19,6 +20,7 @@ export interface Event extends DatabaseObject {
   reviewStatus: ReviewStatus;
   name: string[];
   hasCompartment?: HasCompartment[];
+  species: Species[];
 
 
   // not from API endpoint but are needed in the tree view

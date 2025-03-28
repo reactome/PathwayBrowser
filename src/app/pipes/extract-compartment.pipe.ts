@@ -6,8 +6,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export class ExtractCompartmentPipe implements PipeTransform {
 
-  // Get compartment name from string
-  // Substrates for chaperone mediated autophagy [cytosol] => cytosol
+  // Get compartment name from string when remove is false, and get displayName when return is true
+  // DisplayName result from backend: RTC [double membrane vesicle viral factory outer membrane]
+  // True: RTC, False: double membrane vesicle viral factory outer membrane
   transform(value: string, remove = false): string | null {
     if (!value) return null;
 

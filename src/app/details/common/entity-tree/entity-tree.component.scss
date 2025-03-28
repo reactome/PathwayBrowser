@@ -15,6 +15,7 @@
     --padding: 2px;
     --connector-width: 24px;
     --connector-height: 24px;
+    --max-width: 150px;
   }
 }
 
@@ -73,6 +74,7 @@
 
 }
 
+
 .name {
   white-space: nowrap;
   overflow: hidden;
@@ -82,7 +84,6 @@
 .right {
   flex: 0 1 auto; /* Default flex properties for right element */
   display: flex;
-  min-width: fit-content;
   gap: 5px;
 
   font-size: 12px;
@@ -108,6 +109,7 @@
   border-radius: 10px;
   align-content: center;
   color: var(--on-primary-container);
+  max-width: var(--max-width);
 }
 
 .compartment {
@@ -116,6 +118,7 @@
   border-radius: 10px;
   align-content: center;
   color: var(--on-tertiary-container);
+  max-width: var(--max-width);
 }
 
 .goTo-container,
