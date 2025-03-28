@@ -19,8 +19,8 @@ import {CatalystActivityReference} from "../../../model/graph/control-reference/
 import {Regulation} from "../../../model/graph/Regulation/regulation.model";
 import {RegulationReference} from "../../../model/graph/control-reference/regulation-reference.model";
 import {Relationship} from "../../../model/graph/relationship.model";
+import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
-
 
 
 @Component({
@@ -96,6 +96,15 @@ export class DescriptionComponent {
 
   modifications: Signal<HasModifiedResidue[]> = computed(() => getProperty(this.obj(), DataKeys.MODIFIED_RESIDUES));
 
+  crossReference = computed(() => {
+    if (this.referenceEntity() && this.referenceEntity().crossReference) {
+      return this.referenceEntity().crossReference;
+    }
+
+    const crossReference: DatabaseIdentifier[] = getProperty(this.obj(), DataKeys.CROSS_REFERENCE);
+    return crossReference ? [...crossReference] : [];
+  });
+
   overview$ = viewChild<HTMLDivElement>('#overview');
 
 
@@ -107,7 +116,7 @@ export class DescriptionComponent {
   elements: { key: string, label: string, manual?: boolean, depthControl?: boolean }[] = [
     {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
     {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true},
-    {key: DataKeys.CROSS_REFERENCES, label: Labels.CROSS_REFERENCES, manual: true},
+    {key: DataKeys.CROSS_REFERENCE, label: Labels.CROSS_REFERENCES, manual: true},
     {key: DataKeys.MODIFIED_RESIDUES, label: Labels.MODIFIED_RESIDUES, manual: true},
     {key: DataKeys.INPUT, label: Labels.INPUTS, depthControl: true},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, depthControl: true},
@@ -166,8 +175,8 @@ export class DescriptionComponent {
         return obj;
       case DataKeys.CATALYST_ACTIVITY:
         return this.catalystActivity() && this.catalystActivity().length > 0;
-      case DataKeys.CROSS_REFERENCES:
-        return this.referenceEntity()?.crossReference;
+      case DataKeys.CROSS_REFERENCE:
+        return this.crossReference().length > 0;
       case DataKeys.OTHER_FORMS:
         return this.otherForms() && this.otherForms().size > 0;
       case Labels.AUTHORSHIP:

@@ -1,5 +1,4 @@
 import {Component, computed, input} from '@angular/core';
-import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {EntitiesService} from "../../../services/entities.service";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 
@@ -10,12 +9,12 @@ import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model
   standalone: false
 })
 export class CrossReferencesComponent {
-  readonly referenceEntity = input.required<ReferenceEntity>();
+  readonly _crossReferences = input.required<DatabaseIdentifier[]>({alias: 'crossRefs'});
 
   readonly crossReferences = computed(() => {
-    const referenceEntity = this.referenceEntity();
-    if (!referenceEntity || !referenceEntity.crossReference) return new Map<string, DatabaseIdentifier[]>();
-    const crossRefs = [...referenceEntity.crossReference];
+
+    if (this._crossReferences().length == 0) return new Map<string, DatabaseIdentifier[]>();
+    const crossRefs = [...this._crossReferences()];
     return this.entitiesService.getGroupedData(crossRefs, ref => ref.databaseName);
   });
 

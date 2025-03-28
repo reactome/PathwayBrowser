@@ -103,7 +103,7 @@
           <!-- Cross References -->
           @if (element.referenceEntity && element.referenceEntity.crossReference) {
             <mat-divider></mat-divider>
-            <cr-cross-references [referenceEntity]=element.referenceEntity></cr-cross-references>
+            <cr-cross-references [crossRefs]=element.referenceEntity.crossReference></cr-cross-references>
           }
         </div>
 

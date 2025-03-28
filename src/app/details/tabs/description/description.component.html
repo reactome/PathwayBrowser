@@ -62,8 +62,8 @@
     }
 
     <!-- Cross References-->
-    @if (referenceEntity() && referenceEntity().crossReference) {
-      <div class="divider-container" [id]=DataKeys.CROSS_REFERENCES>
+    @if (crossReference() && crossReference().length > 0) {
+      <div class="divider-container" [id]=DataKeys.CROSS_REFERENCE>
         <div class="divider-name-container">
           <ng-container
             *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CROSS_REFERENCES  }"></ng-container>
@@ -73,8 +73,7 @@
         </div>
       </div>
 
-      <cr-cross-references [referenceEntity]=referenceEntity()!></cr-cross-references>
-
+      <cr-cross-references [crossRefs]=crossReference()></cr-cross-references>
     }
 
     <!-- Modifications-->

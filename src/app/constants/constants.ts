@@ -3,7 +3,7 @@ export const DataKeys = {
   OVERVIEW: 'overview',
   LITERATURE_REFERENCE: 'literatureReference',
   REFERENCE_ENTITY: 'referenceEntity',
-  CROSS_REFERENCES: 'crossReferences',
+  CROSS_REFERENCE: 'crossReference',
   AUTHORED: 'authored',
   REVIEWED: 'reviewed',
   EDITED: 'edited',
@@ -33,7 +33,8 @@ export const DataKeys = {
   OUTPUT_FOR: 'outputFor',
   REGULATED_BY: 'regulatedBy',
   REGULATION_REFERENCE: 'regulationReference',
-  MODIFIED_RESIDUES: 'modifiedResidues'
+  MODIFIED_RESIDUES: 'modifiedResidues',
+  MEMBERS: 'members',
 
 
 } as const;
@@ -63,7 +64,8 @@ export const Labels = {
   INPUT_FOR: 'Consumed by',
   OUTPUT_FOR: 'Produced by',
   REGULATED_BY: 'Regulations',
-  MODIFIED_RESIDUES: 'Modifications'
+  MODIFIED_RESIDUES: 'Modifications',
+  MEMBERS: 'Members',
 } as const;
 
 export enum SchemaClasses {
