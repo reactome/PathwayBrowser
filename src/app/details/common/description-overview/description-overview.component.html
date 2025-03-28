@@ -72,7 +72,7 @@
 
   <div *ngIf="summation()" class="row">
     <div class="label">Summation</div>
-    <div class="value" *ngIf="summation() && summation()[0].text as summationText">
+    <div class="value flex-grow" *ngIf="summation() && summation()[0].text as summationText">
       <div [innerHTML]="summationText | includeRef: allRefs()" [class.columns]="summationText.length > 500"></div>
 
       <!--Display summation refs if is available-->

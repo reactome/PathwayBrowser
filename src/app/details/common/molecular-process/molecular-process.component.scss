@@ -76,6 +76,7 @@
   border-left: 2px solid var(--outline-variant);
   flex: 1;
   gap: 5px;
+  min-width: 0; // Ensures that the child element doesn’t force itself to be wider than the container, without this, Firefox doesn't allow the element to shrink properly.
 }
 
 

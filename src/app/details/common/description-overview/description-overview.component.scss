@@ -90,8 +90,8 @@
 
   .score {
     position: absolute;
-    left: 14.29%;
-    right: 10.71%;
+    //left: 14.29%;
+    //right: 10.71%;
     top: 14.29%;
     bottom: 14.29%;
 
@@ -107,6 +107,7 @@
 
 .columns {
   columns: 2 25em;
+  width: 100%;
 }
 
 
@@ -115,4 +116,8 @@
   flex-direction: row;
   width: 100%;
   margin-bottom: -10px;
+}
+
+.flex-grow {
+  flex: 1;
 }

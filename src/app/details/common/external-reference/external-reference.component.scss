@@ -50,6 +50,8 @@
   border-left: 2px solid var(--outline-variant);
   flex: 1;
 
+  min-width: 0; // Allows flex container to shrink properly in Firefox
+
   font-family: 'Roboto Flex', sans-serif;
   font-style: normal;
   font-weight: 400;
@@ -73,4 +75,8 @@
   overflow: hidden;
   flex: 1 1 25%; // Each item takes exactly 25% of the container width
   max-width: 25%; // Ensures all items have the same width
+}
+
+.item {
+  overflow: hidden; // Allows flex container to shrink properly in Firefox
 }
