@@ -129,8 +129,8 @@ export class DescriptionComponent {
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
-    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
     {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual: true},
+    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
     {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
     {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
   ]
