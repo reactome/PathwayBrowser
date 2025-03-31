@@ -61,11 +61,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       const result = this._enhancedSelectedNode.value();
       if (!result) return;
 
-      // const updatedTree = this.updateTree(this.dataSource.data, result! as unknown as E);
-      //
-      // this.dataSource.data = [];
-      // this.dataSource.data = updatedTree
-
       this.updateMatTreeDataSource(result as unknown as E);
 
     });
@@ -117,27 +112,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
   loadChildren(node: R) {
-
-    // if (isCatalystActivity(node.element)) {
-    //   node.element.composedOf = [{
-    //     element: {...node.element.physicalEntity, composedOf: []},
-    //     order: 0,
-    //     stoichiometry: 1,
-    //     type: this.type()
-    //   }]
-    //   this.updateMatTreeDataSource(node.element);
-    // }
-    //
-    // if (isRegulation(node.element)) {
-    //   const elementsToAdd = [node.element.regulator, ...node.element.regulatedEntity];
-    //   node.element.composedOf = elementsToAdd.map((element, index) => ({
-    //     element: {...element, composedOf: []},
-    //     order: index,
-    //     stoichiometry: 1,
-    //     type: this.type()
-    //   }));
-    //   this.updateMatTreeDataSource(node.element);
-    // }
 
     this._selectedNode.set(node.element);
 
@@ -349,6 +323,4 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   protected readonly isEvent = isEvent;
   protected readonly Array = Array;
-
-
 }
