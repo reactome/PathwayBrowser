@@ -275,3 +275,13 @@
 .details-content-container > :last-child {
   padding-bottom: 6px;
 }
+
+
+/* Take full height of the parent to ensure branch line(connector) is working in Firefox and Safari*/
+.details-tree {
+  width: 100%;
+}
+
+.details-group {
+  display: flex;
+}
