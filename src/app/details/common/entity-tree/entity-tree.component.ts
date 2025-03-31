@@ -122,7 +122,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     const nonNestedClasses: Set<string> = new Set([
       SchemaClasses.EWAS,
-      SchemaClasses.SIMPLE_ENTITY
+      SchemaClasses.SIMPLE_ENTITY,
+      SchemaClasses.CHEMICAL_DRUG
     ])
 
     return !(nonNestedClasses.has(selectedNode.schemaClass) || isEvent(selectedNode));

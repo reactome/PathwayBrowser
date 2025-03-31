@@ -36,7 +36,7 @@ export namespace Relationship {
   export interface HasEvent extends Has<Event, Type.EVENT> {
   }
 
-  export interface HasMember extends Has<Event, Type.MEMBER> {
+  export interface HasMember extends Has<PhysicalEntity, Type.MEMBER> {
   }
 
   export interface HasModifiedResidue extends Has<AbstractModifiedResidue, Type.MODIFIED_RESIDUE> {

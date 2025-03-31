@@ -122,6 +122,7 @@ export class DescriptionComponent {
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, depthControl: true},
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
+    {key: DataKeys.MEMBERS, label: Labels.MEMBERS},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
