@@ -92,7 +92,7 @@
 <!--        <cr-modification [modifications]="modifications()"></cr-modification>-->
 
         <cr-molecular-process [entries]="modifications()" [catalystActivityReference]="catalystRef()"
-                           [regulationRefs]="regulationRefs()"></cr-molecular-process>
+                              [regulationRefs]="regulationRefs()"></cr-molecular-process>
       </div>
     }
 
@@ -108,7 +108,7 @@
       </div>
 
 
-      <div class="element-container columns">
+      <div class="element-container columns" [class.columns]="otherForms().size > 1 ? 'columns' : ''">
         @for (item of otherForms()! |  keyvalue | sortByText :'key'; track item.key) {
           <div class="row padding">
             <div class="label-container">{{ item.key }}</div>
