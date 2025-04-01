@@ -275,22 +275,27 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (grandParentChildCount && parent.index === grandParentChildCount - 1) {
         connectorClasses.push('');
       } else {
-        connectorClasses.push(this.getParentConnector(grandParent!));
+        connectorClasses.push(this.getParentConnector(grandParent!, node));
       }
     }
-
 
     return connectorClasses;
   }
 
-  getParentConnector(node: R) {
-    // Use the first child to know the connector type, because the parent could be input or output type
-    const firstChild = node.element.composedOf && node.element.composedOf.length > 0 ? node.element.composedOf[0] : null;
-    if (!firstChild) return '';
+  getParentConnector(parentNode: R, node: R) {
 
-    if (firstChild.type === 'member') return 'dashedIConnector';
-    if (firstChild.type === 'component' || node.type === 'repeatedUnit') return 'solidIConnector';
-    if (firstChild.type === 'candidate') return 'miniDashedIConnector';
+    if (!parentNode.element.composedOf || parentNode.element.composedOf.length === 0) return '';
+
+    // Find a child with the same type as the clicked node
+    const matchedChild = parentNode.element.composedOf.find(child => child.type === node.type);
+    // Fallback to the first child if no match is found and use the first child to know the connector type, because the parent could be input or output type
+    // Cannot use the composedOf[0] directly is because the elements in composedOf could have different types, for instance, member and candidate, composedOf[0] will always
+    // return member type not candidate
+    const typeReference = matchedChild || parentNode.element.composedOf[0];
+
+    if (typeReference.type === 'member') return 'dashedIConnector';
+    if (typeReference.type === 'component' || parentNode.type === 'repeatedUnit') return 'solidIConnector';
+    if (typeReference.type === 'candidate') return 'miniDashedIConnector';
     // if (firstChild.type === 'regulatedBy' || node.type === 'catalystActivity') return ' ';
     return 'otherConnector';
   }
