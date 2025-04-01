@@ -1,4 +1,6 @@
-@for (item of data(); track item) {
+<!--Sort by position if data is Modified Residue-->
+@let processedData = data()[0].isModification ? (data() | sortByDate: 'coordinate': false) : data();
+@for (item of processedData; track item) {
   <div class="container">
     @if (item.type) {
       <div class="row">
