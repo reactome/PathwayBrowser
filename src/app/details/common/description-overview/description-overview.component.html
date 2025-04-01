@@ -47,6 +47,23 @@
       </div>
     </div>
 
+
+    <div *ngIf="disease()" class="row">
+      <div class="label">Disease</div>
+      <div class="value compartment-row">
+        @for (d of disease(); track d.dbId; let i = $index; ) {
+          @let dbInfo = d.databaseName + ':' + d.identifier;
+          <a [href]="d.url" target="_blank"
+             [matTooltip]="d.definition ? d.definition : null">{{ d.displayName | titlecase }}({{dbInfo}})
+          </a>
+          <!-- Add comma separator except for last item -->
+          @if (i < disease().length - 1) {
+            <span class="comma">,</span>
+          }
+        }
+      </div>
+    </div>
+
     <div *ngIf="(name()?.length || 0) > 1" class="row">
       <div class="label">Synonyms</div>
       <div class="value">{{ name().slice(1) }}</div>

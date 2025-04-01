@@ -6,6 +6,7 @@ import {InstanceEdit} from "../instance-edit.model";
 import {Relationship} from "../relationship.model";
 import HasCompartment = Relationship.HasCompartment;
 import {Species} from "../species.model";
+import {Disease} from "../external-ontology/disease.model";
 
 
 export interface Event extends DatabaseObject {
@@ -21,6 +22,7 @@ export interface Event extends DatabaseObject {
   name: string[];
   hasCompartment?: HasCompartment[];
   species: Species[];
+  disease?: Disease[];
 
 
   // not from API endpoint but are needed in the tree view

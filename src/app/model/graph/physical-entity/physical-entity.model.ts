@@ -4,6 +4,7 @@ import {CatalystActivity} from "../catalyst-activity.model";
 import {CellType} from "../external-ontology/cell-type.model";
 import {Relationship} from "../relationship.model";
 import {DatabaseIdentifier} from "../database-identifier.model";
+import {Disease} from "../external-ontology/disease.model";
 
 
 export interface PhysicalEntity extends DatabaseObject {
@@ -20,6 +21,8 @@ export interface PhysicalEntity extends DatabaseObject {
   crossReference: DatabaseIdentifier[];
   inferredTo: PhysicalEntity[];
   inferredFrom: PhysicalEntity[];
+  inDisease?: Boolean;
+  disease?: Disease[];
 
 
   speciesName: string;

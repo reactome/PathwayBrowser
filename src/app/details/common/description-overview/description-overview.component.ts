@@ -7,6 +7,7 @@ import {Summation} from 'src/app/model/graph/summation.model';
 import {DataKeys} from "../../../constants/constants";
 import {Relationship} from "../../../model/graph/relationship.model";
 import HasCompartment = Relationship.HasCompartment;
+import {Disease} from "../../../model/graph/external-ontology/disease.model";
 
 
 
@@ -35,6 +36,7 @@ export class DescriptionOverviewComponent {
   readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), DataKeys.TISSUE));
   readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), DataKeys.REVIEW_STATUS));
   readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), DataKeys.SUMMATION));
+  readonly disease: Signal<Disease[]> = computed(() => getProperty(this.obj(), DataKeys.DISEASE));
 
 
   reviewStar: { [key: string]: { percentage: number, score: number } } = {

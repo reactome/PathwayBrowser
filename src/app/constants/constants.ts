@@ -35,6 +35,8 @@ export const DataKeys = {
   REGULATION_REFERENCE: 'regulationReference',
   MODIFIED_RESIDUES: 'modifiedResidues',
   MEMBERS: 'members',
+  IN_DISEASE: 'inDisease',
+  DISEASE: 'disease'
 
 
 } as const;
