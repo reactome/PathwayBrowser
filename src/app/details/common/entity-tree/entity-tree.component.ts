@@ -24,15 +24,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   readonly data = input.required<R[], (E | R)[]>({
     transform: (data: (E | R)[]): R[] => {
       if (!data || data.length === 0) return [];
-      if (data[0].stoichiometry) return data.map(r => ({
+      if (data[0].stoichiometry) return data.map((r, index) => ({
         ...r,
-        element: {...r.element, composedOf: r.element.composedOf || []}
+        element: {...r.element, composedOf: r.element.composedOf || []},
+        index: index,
       })) as R[];
       return (data as E[]).map(e => ({
         element: {...e, composedOf: e.composedOf || []},
         order: 0,
         stoichiometry: 1,
-        type: this.type()
+        type: this.type(),
+        index: 0
       }) as R); // Wrap in fake relationship to keep stoichiometry and global structure
     }
   });
@@ -87,7 +89,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
                   element: {
                     ...composed.element,
                     composedOf: [], // Add an empty composedOf array to ensure the node is expandable
-                  }
+                  },
+                  index: index,
                 }));
               }
               return {
@@ -180,29 +183,30 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     if (!element || !node) return '';
 
-    const posinset = Number(element.getAttribute('aria-posinset'));
-    const setsize = Number(element.getAttribute('aria-setsize'));
+    const index = node.index;
+    // Size of all children nodes
+    const size = Number(element.getAttribute('aria-setsize'));
 
     // Member
     if (node.type === 'member') {
-      if (posinset === 1 && setsize === 1) return 'dashedLConnector'; // Single child → Last item
-      if (posinset === 1) return 'dashedTConnector'; // First item
-      if (posinset === setsize) return 'dashedLConnector'; // Last item
+      if (index === 0 && size === 1) return 'dashedLConnector'; // Single child → Last item
+      if (index === 0) return 'dashedTConnector'; // First item
+      if (index === size - 1) return 'dashedLConnector'; // Last item
       return 'dashedTConnector'; // middle items
     }
 
     // Default class for other node types
     if (node.type === 'component' || node.type === 'repeatedUnit') {
-      if (posinset === 1 && setsize === 1) return 'solidLConnector';
-      if (posinset === 1) return 'solidTConnector';
-      if (posinset === setsize) return 'solidLConnector';
+      if (index === 0 && size === 1) return 'solidLConnector';
+      if (index === 0) return 'solidTConnector';
+      if (index === size - 1) return 'solidLConnector';
       return 'solidTConnector';
     }
 
     if (node.type === 'candidate') {
-      if (posinset === 1 && setsize === 1) return 'miniDashedLConnector';
-      if (posinset === 1) return 'miniDashedTConnector';
-      if (posinset === setsize) return 'miniDashedLConnector';
+      if (index === 0 && size === 1) return 'miniDashedLConnector';
+      if (index === 0) return 'miniDashedTConnector';
+      if (index === size - 1) return 'miniDashedLConnector';
       return 'miniDashedTConnector';
     }
 
@@ -268,7 +272,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
       const grandParentChildCount = grandParent?.element.composedOf && grandParent.element.composedOf.length ? grandParent.element.composedOf.length : null;
       // Compare the order of current parent with the size of previous parent composedOf to determine if the parent is the last kid, adding empty string as connector
-      if (grandParentChildCount && parent.order === grandParentChildCount - 1) {
+      if (grandParentChildCount && parent.index === grandParentChildCount - 1) {
         connectorClasses.push('');
       } else {
         connectorClasses.push(this.getParentConnector(grandParent!));

@@ -16,6 +16,7 @@ export namespace Relationship {
     stoichiometry: number;
     order: number;
     element: O;
+    index: number;
   }
 
   export interface HasCandidate extends Has<PhysicalEntity, Type.CANDIDATE> {
