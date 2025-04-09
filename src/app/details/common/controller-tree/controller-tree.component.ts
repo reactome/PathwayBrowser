@@ -1,5 +1,6 @@
-import {Component, input} from '@angular/core';
+import {Component, input, signal, ViewChild} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
+import {EntityTreeComponent} from "../entity-tree/entity-tree.component";
 
 
 @Component({
@@ -11,32 +12,48 @@ import {DatabaseObject} from "../../../model/graph/database-object.model";
 export class ControllerTreeComponent<E extends DatabaseObject> {
 
 
+  @ViewChild('entityTree') treeComponent!: EntityTreeComponent<any, any>;
+
   readonly type = input.required<string>();
   readonly depthControl = input.required<boolean>();
   readonly data = input.required<E[]>();
 
-  length = 8; // Total pages
-  depthIndex = 1; // Start from Page 1
 
+  depthIndex = signal(1);
+  depthChangeSource = signal<'controller' | 'tree' | null>(null);
+
+  //maxDepth = computed(() => this.treeComponent?.maxDepth());
+
+  maxDepth = signal(null);
 
   firstPage() {
-    this.depthIndex = 1;
+    this.depthIndex.set(1);
   }
 
   previousPage() {
-    if (this.depthIndex > 1) {
-      this.depthIndex--;
+    const depth = this.depthIndex();
+    if (depth != null && depth > 1) {
+      this.depthChangeSource.set('controller');
+      this.depthIndex.update((d) => d! - 1);
+
     }
   }
 
   nextPage() {
-    if (this.depthIndex < this.length) {
-      this.depthIndex++;
+    const maxLength = this.maxDepth();
+    const depth = this.depthIndex();
+    console.log("maxLength in controller", maxLength);
+    console.log("depth in controller", depth);
+    if (!maxLength || !depth) return;
+    if (depth < maxLength) {
+      this.depthChangeSource.set('controller');
+      this.depthIndex.update((d) => d! + 1);
+
     }
   }
 
   lastPage() {
-    this.depthIndex = this.length;
+    this.depthIndex.set(-1);
   }
 
 }

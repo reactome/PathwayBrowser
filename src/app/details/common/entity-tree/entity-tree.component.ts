@@ -1,8 +1,8 @@
-import {Component, computed, effect, ElementRef, input, model, signal} from '@angular/core';
+import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
 import {isEvent} from "../../../services/utils";
-import {MatTreeNestedDataSource} from "@angular/material/tree";
+import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {map, of} from "rxjs";
+import {forkJoin, map, of, tap} from "rxjs";
 import {SelectableObject} from "../../../services/event.service";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {SchemaClasses} from "../../../constants/constants";
@@ -10,6 +10,8 @@ import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
+import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
+
 
 @Component({
   selector: 'cr-entity-tree',
@@ -17,9 +19,15 @@ import {Relationship} from "../../../model/graph/relationship.model";
   templateUrl: './entity-tree.component.html',
   styleUrl: './entity-tree.component.scss'
 })
-export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
+export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>>{
 
-  readonly depthIndex = input.required<number | null>();
+  depthControl = input.required<boolean | null>();
+  depthIndex = model.required<number | null>();
+  depthChangeSource = model<'controller' | 'tree' | null>(null);
+  maxDepth = model<number | null>(null);
+
+  @ViewChild(MatTree) tree!: MatTree<R>;
+
   readonly type = input.required<string>()
   readonly data = input.required<R[], (E | R)[]>({
     transform: (data: (E | R)[]): R[] => {
@@ -41,11 +49,11 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   dataSource = new MatTreeNestedDataSource<R>();
 
-  _selectedNode = signal<E | null>(null);
-  selectedNode = computed(() => this._selectedNode());
+  _selectedTreeNode = signal<E | null>(null);
+  selectedTreeNode = computed(() => this._selectedTreeNode());
 
 
-  maxLength = 27; // Use Molluscum contagiosum virus's length
+  maxStringLength = 27; // Use Molluscum contagiosum virus's length
 
   constructor(private iconService: IconService,
               private entitiesService: EntitiesService,
@@ -55,32 +63,210 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (this.data().length > 0) {
         this.dataSource.data = this.data();
       }
+
+      // Only fetch the full tree when depth controller exists
+      if(this.depthControl()){
+        this.loadFullTreeAndSetMaxLength().subscribe();
+        console.log("maxLength", this.maxDepth());
+      }
     });
 
 
     effect(() => {
 
-      const result = this._enhancedSelectedNode.value();
+      const result = this._enhancedSelectedTreeNode.value();
       if (!result) return;
-
       this.updateMatTreeDataSource(result as unknown as E);
 
     });
 
 
+    // Updating entire tree when user click depth controller
+    effect(() => {
+      // Skip updating the tree current resource is 'tree'
+      if (this.depthChangeSource() === 'tree') {
+        return;
+      }
+      const treeData = this._treeSource.value() as R[];
+
+      if (treeData && treeData.length > 0) {
+        this.dataSource.data = [];
+        this.dataSource.data = treeData;
+        this.expandNodesWithChildren(treeData);
+      }
+
+    });
+
+
+    effect(() => {
+      if (this.depthIndex() === 1 && this.tree) {
+        this.tree.collapseAll();
+      }
+    });
+
   }
 
 
-  _enhancedSelectedNode = rxResource({
-    request: () => this.selectedNode()?.stId,
+
+  private loadFullTreeAndSetMaxLength() {
+    const nodeResults = this.data().map((node) => this.fetchTreeAtDepth(node, -1));
+    return forkJoin(nodeResults).pipe(
+      tap((tree) => {
+          const maxLevel = this.getMaxDepthFromMetadata(tree);
+          console.log("maxLevel is", maxLevel);
+        //  this.depthIndex.set(maxLevel);
+          this.maxDepth.set(maxLevel);
+      })
+    );
+  }
+
+  // _treeSource = rxResource({
+  //   request: () => ({depth: this.depthIndex()}),
+  //   loader: ({request}) => {
+  //     console.log("resource in tree ", this.depthChangeSource())
+  //     if(request.depth === -1){
+  //       console.log("fetch full tree, ", request.depth);
+  //
+  //       const depthInQuery = request.depth; // Ignore the default depth value 1.
+  //       const nodeResults = this.data().map((node) => {
+  //         const element = node.element as E;
+  //
+  //         if (!this.isNestedView(element) || !element.stId || !request.depth) {
+  //           // Ensure even non-nested elements have composedOf to make it expandable
+  //           const normalElement = {
+  //             ...element,
+  //             composedOf: element.composedOf ?? [],
+  //           };
+  //
+  //           return of({...node, element: normalElement});
+  //         }
+  //         // Nested Complex or Set
+  //         return this.entitiesService.getEntityInDepth(element.stId, depthInQuery).pipe(
+  //           map((entity) => {
+  //             // Recursively fetched entity
+  //             const nestedEntity = {
+  //               ...element, // preserve anything local
+  //               ...entity,  // override with fetched
+  //               composedOf: this.getComposedOfRecursively(entity.composedOf ?? []),
+  //             };
+  //
+  //             return {
+  //               ...node,
+  //               element: nestedEntity,
+  //             };
+  //           })
+  //         );
+  //       });
+  //
+  //       return forkJoin(nodeResults).pipe(
+  //         tap((tree) =>{
+  //           const maxLevel = this.getMaxDepthFromMetadata(tree);
+  //           this.depthIndex.set(maxLevel);
+  //         })
+  //       );
+  //     }
+  //
+  //
+  //     if (!request.depth || request.depth === 1) return of([]); // Prevent to load with default depth 1
+  //     const depthInQuery = request.depth - 1; // Ignore the default depth value 1.
+  //     const nodeResults = this.data().map((node) => {
+  //       const element = node.element as E;
+  //
+  //       if (!this.isNestedView(element) || !element.stId || !request.depth) {
+  //         // Ensure even non-nested elements have composedOf to make it expandable
+  //         const normalElement = {
+  //           ...element,
+  //           composedOf: element.composedOf ?? [],
+  //         };
+  //
+  //         return of({...node, element: normalElement});
+  //       }
+  //       // Nested Complex or Set
+  //       return this.entitiesService.getEntityInDepth(element.stId, depthInQuery).pipe(
+  //         map((entity) => {
+  //           // Recursively fetched entity
+  //           const nestedEntity = {
+  //             ...element, // preserve anything local
+  //             ...entity,  // override with fetched
+  //             composedOf: this.getComposedOfRecursively(entity.composedOf ?? []),
+  //           };
+  //
+  //           return {
+  //             ...node,
+  //             element: nestedEntity,
+  //           };
+  //         })
+  //       );
+  //     });
+  //
+  //     return forkJoin(nodeResults);
+  //   }
+  // });
+
+  _treeSource = rxResource({
+    request: () => ({depth: this.depthIndex()}),
+    loader: ({request}) => {
+      const depth = request.depth;
+      // Prevent default depth from loading
+      if (!depth || depth === 1) return of([]);
+      // Determine the real depth
+      const depthInQuery = depth === -1 ? depth : depth - 1; //  // Ignore the default depth value 1 when depth is not -1
+
+      const nodeResults = this.data().map((node) => this.fetchTreeAtDepth(node, depthInQuery));
+
+      return forkJoin(nodeResults).pipe(
+        tap((tree) => {
+          if (depth === -1) {
+            const maxLevel = this.getMaxDepthFromMetadata(tree);
+            this.depthIndex.set(maxLevel);
+            this.maxDepth.set(maxLevel);
+          }
+        })
+      );
+    }
+  });
+
+
+  fetchTreeAtDepth(node: R, depth: number) {
+    const element = node.element as E;
+    const id = element.stId || element.dbId;
+
+    if (!this.isNestedView(element)) {
+      // Return node with composedOf
+      const normalElement = {
+        ...element,
+        composedOf: element.composedOf ?? [],
+      };
+      return of({...node, element: normalElement});
+    }
+
+    return this.entitiesService.getEntityInDepth(id, depth).pipe(
+      tap((entity) => {
+      }),
+      map((entity) => {
+        const nestedElement = {
+          ...element,
+          ...entity,
+          composedOf: this.getComposedOfRecursively(entity.composedOf ?? []),
+        };
+        return {
+          ...node,
+          element: nestedElement,
+        };
+      })
+    );
+  }
+
+
+  _enhancedSelectedTreeNode = rxResource({
+    request: () => this.selectedTreeNode()?.stId,
     loader: (param) => {
-      if (!param.request) return of();
-      const selectedNode = this.selectedNode();
+      const selectedNode = this.selectedTreeNode();
       // Check the condition to determine which method to call
       if (!this.isNestedView(selectedNode)) {
         return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request);
       } else {
-        return this.entitiesService.getEntityInDepth(param.request)
+        return this.entitiesService.getEntityInDepth(param.request, 1)
           .pipe(
             map(entityResult => {
               if (entityResult && entityResult.composedOf) {
@@ -114,11 +300,108 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return node.element.composedOf !== undefined;
   }
 
-  loadChildren(node: R) {
+  // on node click
+  // loadChildren(node: R) {
+  //
+  //   this._selectedTreeNode.set(node.element);
+  //
+  //   if (!this.depthIndex()) return;
+  //
+  //   const maxExpandedLevel = this.getMaxLevel(); // Add the root level 1
+  //   const selectedNodeLevel = this.tree._getLevel(node) ? this.tree._getLevel(node)! + 1 : maxExpandedLevel;
+  //
+  //   console.log("maxExpandedLevel", maxExpandedLevel);
+  //   console.log("selected", selectedNodeLevel);
+  //
+  //   if (this.depthIndex()! < this.maxLength) {
+  //     this.depthChangeSource.set('tree');
+  //     this.depthIndex.update((d) => {
+  //       if (!d || !selectedNodeLevel) return null;
+  //       if(selectedNodeLevel < maxExpandedLevel) {
+  //         console.log("index " ,d)
+  //         console.log("max " ,d)
+  //         return maxExpandedLevel;
+  //       }
+  //       console.log("level ", this.tree._getLevel(node))
+  //       return this.tree.isExpanded(node) ? d + 1 : d - 1;
+  //     });
+  //   }
+  // }
 
-    this._selectedNode.set(node.element);
+
+  loadChildren(node: R) {
+    this._selectedTreeNode.set(node.element);
+
+    const newMaxLevel = this.getMaxLevel();
+
+    if (this.depthIndex() !== newMaxLevel) {
+      this.depthChangeSource.set('tree');
+      this.depthIndex.set(newMaxLevel);
+      console.log('DepthIndex updated to:', newMaxLevel);
+      console.log('DepthIndex updated to:', newMaxLevel);
+    }
 
   }
+
+
+  getMaxLevel(): number {
+    return Math.max(
+      ...this.dataSource.data.map(node => this.getMaxExpandedLevel(node, 1)) // Starts at level 1
+    );
+  }
+
+
+  getMaxExpandedLevel(node: R, level: number): number {
+    if (!this.tree.isExpanded(node) || !node.element.composedOf?.length) {
+      return level;
+    }
+
+    return Math.max(
+      ...node.element.composedOf.map(child => this.getMaxExpandedLevel(child as R, level + 1))
+    );
+  }
+
+
+  getMaxDepthFromMetadata(nodes: R[], level = 1): number {
+    if (!nodes || nodes.length === 0) return level;
+
+    return Math.max(
+      ...nodes.map(node => {
+        const children = node.element?.composedOf || [];
+        return this.getMaxDepthFromMetadata(children as R[], level + 1);
+      })
+    );
+  }
+
+
+  expandNodesWithChildren(nodes: R[]) {
+    for (const node of nodes) {
+      if (!node.element.composedOf) return;
+      if (node.element.composedOf.length > 0) {
+        this.tree.expand(node);
+        this.expandNodesWithChildren(node.element.composedOf as R[]);
+      }
+    }
+  }
+
+
+  getComposedOfRecursively(composedArray: Relationship.Has<PhysicalEntity>[]): Relationship.Has<PhysicalEntity>[] {
+    if (!Array.isArray(composedArray)) return [];
+
+    return composedArray.map((composed, index) => {
+      const element = composed?.element ?? {};
+      const nestedComposedOf = Array.isArray(element.composedOf) ? this.getComposedOfRecursively(element.composedOf) : [];
+      return {
+        ...composed,
+        element: {
+          ...element,
+          composedOf: nestedComposedOf,
+        },
+        index,
+      };
+    });
+  }
+
 
   isNestedView(selectedNode: E | null): boolean {
     if (!selectedNode) return true;
@@ -333,4 +616,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   protected readonly isEvent = isEvent;
   protected readonly Array = Array;
+
+
+
 }

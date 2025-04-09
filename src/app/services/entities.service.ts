@@ -19,8 +19,8 @@ export class EntitiesService {
     return this.http.get<PhysicalEntity[]>(url);
   }
 
-  getEntityInDepth(stId: string): Observable<PhysicalEntity> {
-    const url = `${environment.host}/ContentService/data/entity/${stId}/in-depth?maxDepth=1&attributes=species%2Ccompartment&view=nested-aggregated&includeRef=true`;
+  getEntityInDepth(id: string | number, depth: number): Observable<PhysicalEntity> {
+    const url = `${environment.host}/ContentService/data/entity/${id}/in-depth?maxDepth=${depth}&attributes=species%2Ccompartment&view=nested-aggregated&includeRef=true`;
     return this.http.get<PhysicalEntity>(url).pipe(map(this.dataStateService.flattenReferences))
   }
 
