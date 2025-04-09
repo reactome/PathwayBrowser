@@ -62,7 +62,7 @@
           <!--todo species could a single object or array of species-->
           @let speciesArr = Array.isArray(element.species) ? element.species : [element.species];
           <!--From Severe acute respiratory syndrome coronavirus 2 to SARS-CoV-2 -->
-          @if (element.speciesName.length >= maxLength && speciesArr?.length > 0 && speciesArr[0]?.name?.length > 1) {
+          @if (element.speciesName.length >= maxStringLength && speciesArr?.length > 0 && speciesArr[0]?.name?.length > 1) {
             @let shortName = getShortest(speciesArr[0].name);
             <span class="species name" [matTooltip]="element.speciesName">{{ shortName }}</span>
           } @else {
