@@ -21,12 +21,10 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
 
   depthIndex = signal(1);
   depthChangeSource = signal<'controller' | 'tree' | null>(null);
-
-  //maxDepth = computed(() => this.treeComponent?.maxDepth());
-
   maxDepth = signal(null);
 
   firstPage() {
+    this.depthChangeSource.set('controller');
     this.depthIndex.set(1);
   }
 
@@ -42,8 +40,6 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
   nextPage() {
     const maxLength = this.maxDepth();
     const depth = this.depthIndex();
-    console.log("maxLength in controller", maxLength);
-    console.log("depth in controller", depth);
     if (!maxLength || !depth) return;
     if (depth < maxLength) {
       this.depthChangeSource.set('controller');
@@ -53,7 +49,10 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
   }
 
   lastPage() {
-    this.depthIndex.set(-1);
+    const maxLength = this.maxDepth();
+    if (!maxLength) return;
+    this.depthChangeSource.set('controller');
+    this.depthIndex.set(maxLength);
   }
 
 }
