@@ -21,13 +21,13 @@ import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-enti
 })
 export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
 
-  depthControl = input.required<boolean | null>();
+  hasDepthControl = input.required<boolean | null>();
   depthIndex = model.required<number | null>();
   depthChangeSource = model<'controller' | 'tree' | null>(null);
   treeLength = model<number | null>(null);
   _selectedTreeNode = signal<E | null>(null);
   selectedTreeNode = computed(() => this._selectedTreeNode());
-
+  fullTreeCache:R[]= [];
 
   @ViewChild(MatTree) tree!: MatTree<R>;
 
@@ -63,7 +63,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
 
       // Only fetch the full tree when depth controller exists
-      if (this.depthControl()) {
+      if (this.hasDepthControl()) {
         this.loadFullTreeAndSetMaxLength().subscribe();
       }
     });
@@ -104,6 +104,9 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         // const maxLevel = this.getMaxDepthFromMetadata(tree, 0);
         const maxLevel = this.getTreeDepth(tree, 0);
         this.treeLength.set(maxLevel);
+        console.log("maxLevel in load", maxLevel);
+        this.fullTreeCache = tree;
+        console.log(this.fullTreeCache);
       })
     );
   }
@@ -120,21 +123,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       const depth = request.depth;
       // Prevent default depth from loading
       if (!depth || depth === 1) return of([]);
-      // Determine the real depth
-      const depthInQuery = depth === -1 ? depth : depth - 1; //  // Ignore the default depth value 1 when depth is not -1
+
+      // Use cached tree data when depth is the tree length
+      if(depth === this.treeLength() ){
+         return of(this.fullTreeCache);
+      }
+
+      const depthInQuery = depth -1;
 
       const nodeResults = this.data().map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
-      return forkJoin(nodeResults).pipe(
-        tap((tree) => {
-          if (depth === -1) {
-            // const maxLevel = this.getMaxDepthFromMetadata(tree, 0);
-            const maxLevel = this.getTreeDepth(tree, 0);
-            this.depthIndex.set(maxLevel);
-            this.treeLength.set(maxLevel);
-          }
-        })
-      );
+      return forkJoin(nodeResults).pipe();
     }
   });
 
@@ -284,7 +283,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       ...nodes.map(node => {
         const children = node.element?.composedOf || [];
 
-        const isExpanded = this.tree.isExpanded(node);
+        const isExpanded = this.tree?.isExpanded(node);
         const isNested = this.isNestedView(node.element);
 
         // Stop if not expanded or not nested

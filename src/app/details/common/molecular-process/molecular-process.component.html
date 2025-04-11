@@ -92,7 +92,7 @@
               ({{ item.modification.databaseName }}
               :{{ item.modification.identifier }})</a></span>
           } @else if (isEntity(item.modification)) {
-            <cr-entity-tree [type]="'modification'" [data]="[item.modification]" [depthIndex]=null [depthChangeSource]=null [depthControl]=null></cr-entity-tree>
+            <cr-entity-tree [type]="'modification'" [data]="[item.modification]" [depthIndex]=null [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
           }
         </div>
       </div>
@@ -136,7 +136,7 @@
         <div class="label-container">Active Unit</div>
         <div class="composition-container tree-padding multiple">
           @for (unit of item.activeUnit; track unit.dbId) {
-            <cr-entity-tree [type]="'activeUnit'" [data]="[unit]" [depthIndex]=null [depthChangeSource]=null [depthControl]=null></cr-entity-tree>
+            <cr-entity-tree [type]="'activeUnit'" [data]="[unit]" [depthIndex]=null [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
           }
 
         </div>
@@ -147,7 +147,7 @@
       <div class="row">
         <div class="label-container">Regulator</div>
         <div class="composition-container tree-padding">
-          <cr-entity-tree [type]="'regulator'" [data]="[item.regulator]" [depthIndex]=null [depthChangeSource]=null [depthControl]=null></cr-entity-tree>
+          <cr-entity-tree [type]="'regulator'" [data]="[item.regulator]" [depthIndex]=null [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
         </div>
       </div>
     }
@@ -157,7 +157,7 @@
       <div class="row">
         <div class="label-container">Catalyst</div>
         <div class="composition-container tree-padding">
-          <cr-entity-tree [type]="'catalyst'" [data]="[item.catalyst]" [depthIndex]=null [depthChangeSource]=null [depthControl]=null></cr-entity-tree>
+          <cr-entity-tree [type]="'catalyst'" [data]="[item.catalyst]" [depthIndex]=null [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
         </div>
       </div>
     }

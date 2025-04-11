@@ -52,6 +52,7 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
     const maxLength = this.maxDepth();
     if (!maxLength) return;
     this.depthChangeSource.set('controller');
+    console.log("maxLength", maxLength);
     this.depthIndex.set(maxLength);
   }
 

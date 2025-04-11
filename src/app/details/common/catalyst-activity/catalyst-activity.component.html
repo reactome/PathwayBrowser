@@ -35,7 +35,7 @@
         <div class="composition-container tree-padding multiple">
           @for (unit of ca.activeUnit; track unit.dbId) {
             <cr-entity-tree [type]="'activeUnit'" [data]="[unit]" [depthIndex]=null
-                            [depthChangeSource]=null [depthControl]=null></cr-entity-tree>
+                            [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
           }
 
         </div>
@@ -47,7 +47,7 @@
         <div class="label-container">Catalyst</div>
         <div class="composition-container tree-padding">
           <cr-entity-tree [type]="'catalyst'" [data]="[ca.physicalEntity]" [depthIndex]=null
-                          [depthChangeSource]=null [depthControl]=null></cr-entity-tree>
+                          [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
         </div>
       </div>
     }
