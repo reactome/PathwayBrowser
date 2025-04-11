@@ -123,7 +123,9 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
       const depth = request.depth;
       // Prevent default depth from loading
-      if (!depth || depth === 1) return of([]);
+      if (!depth || depth === 1) {
+        return of(this.data());
+      }
 
       // Use cached tree data when depth is the tree length
       if(depth === this.treeLength() ){
@@ -131,7 +133,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
 
       const depthInQuery = depth -1;
-
       const nodeResults = this.data().map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
       return forkJoin(nodeResults).pipe();
@@ -256,25 +257,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       })
     );
   }
-
-
-  // Recursively tracks the deepest level of the tree
-  // getTreeDepth(nodes: R[], level = 0, respectExpansion = false): number {
-  //   if (!nodes || nodes.length === 0 ) return level;
-  //
-  //   return Math.max(
-  //     ...nodes.map(node => {
-  //       const isExpanded = this.tree.isExpanded(node);
-  //       const children = node.element?.composedOf || [];
-  //
-  //       if (respectExpansion && !isExpanded ) {
-  //         return level + 1; // Stop here if collapsed and roots node start at 1
-  //       }
-  //
-  //       return this.getTreeDepth(children as R[], level + 1, respectExpansion);
-  //     })
-  //   );
-  // }
 
   // Recursively tracks the deepest level of the tree
   getTreeDepth(nodes: R[], level = 1, respectExpansion = false): number {

@@ -1,6 +1,5 @@
-import {Component, input, signal, ViewChild} from '@angular/core';
+import {Component, input, signal} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
-import {EntityTreeComponent} from "../entity-tree/entity-tree.component";
 
 
 @Component({
@@ -27,20 +26,19 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
 
   previousPage() {
     const depth = this.depthIndex();
-    if (depth != null && depth > 1) {
+    if (depth > 1) {
       this.depthChangeSource.set('controller');
-      this.depthIndex.update((d) => d! - 1);
-
+      this.depthIndex.update((d) => d - 1);
     }
   }
 
   nextPage() {
     const maxLength = this.maxDepth();
     const depth = this.depthIndex();
-    if (!maxLength || !depth) return;
+    if (!maxLength) return;
     if (depth < maxLength) {
       this.depthChangeSource.set('controller');
-      this.depthIndex.update((d) => d! + 1);
+      this.depthIndex.update((d) => d + 1);
 
     }
   }
@@ -49,7 +47,6 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
     const maxLength = this.maxDepth();
     if (!maxLength) return;
     this.depthChangeSource.set('controller');
-    console.log("maxLength", maxLength);
     this.depthIndex.set(maxLength);
   }
 
