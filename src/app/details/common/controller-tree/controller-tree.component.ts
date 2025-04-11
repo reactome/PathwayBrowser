@@ -11,17 +11,14 @@ import {EntityTreeComponent} from "../entity-tree/entity-tree.component";
 })
 export class ControllerTreeComponent<E extends DatabaseObject> {
 
-
-  @ViewChild('entityTree') treeComponent!: EntityTreeComponent<any, any>;
-
   readonly type = input.required<string>();
   readonly depthControl = input.required<boolean>();
   readonly data = input.required<E[]>();
 
 
   depthIndex = signal(1);
-  depthChangeSource = signal<'controller' | 'tree' | null>(null);
-  maxDepth = signal(null);
+  depthChangeSource = signal<'controller' | 'tree' | undefined>(undefined);
+  maxDepth = signal(undefined);
 
   firstPage() {
     this.depthChangeSource.set('controller');

@@ -13,33 +13,34 @@
       </div>
     </div>
 
-    @if(regulation.activity){
+    @if (regulation.activity) {
       <div class="row">
         <div class="label-container">Biological Process</div>
         <div class="composition-container">
-          <span><a [href]="regulation.activity.url" target="_blank">{{ regulation.activity.displayName }}({{ regulation.activity.databaseName }}
+          <span><a [href]="regulation.activity.url" target="_blank">{{ regulation.activity.displayName }}
+            ({{ regulation.activity.databaseName }}
             :{{ regulation.activity.accession }})</a></span>
         </div>
       </div>
     }
 
 
-  @if(regulation.activeUnit){
-    <div class="row">
-      <div class="label-container">Active Unit</div>
-      <div class="composition-container tree-padding multiple">
-        @for (au of regulation.activeUnit; track au.dbId) {
-          <cr-entity-tree [type]="'activeUnit'" [data]="[au]" [depthIndex]=null [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
-        }
+    @if (regulation.activeUnit) {
+      <div class="row">
+        <div class="label-container">Active Unit</div>
+        <div class="composition-container tree-padding multiple">
+          @for (au of regulation.activeUnit; track au.dbId) {
+            <cr-entity-tree [type]="'activeUnit'" [data]="[au]"></cr-entity-tree>
+          }
+        </div>
       </div>
-    </div>
-  }
+    }
 
-    @if(regulation.regulator){
+    @if (regulation.regulator) {
       <div class="row">
         <div class="label-container">Regulator</div>
         <div class="composition-container tree-padding">
-            <cr-entity-tree [type]="'regulator'" [data]="[regulation.regulator]" [depthIndex]=null [depthChangeSource]=null [hasDepthControl]=null></cr-entity-tree>
+          <cr-entity-tree [type]="'regulator'" [data]="[regulation.regulator]"></cr-entity-tree>
         </div>
       </div>
     }

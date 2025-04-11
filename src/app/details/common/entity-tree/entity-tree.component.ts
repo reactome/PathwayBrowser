@@ -21,11 +21,12 @@ import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-enti
 })
 export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
 
-  hasDepthControl = input.required<boolean | null>();
-  depthIndex = model.required<number | null>();
-  depthChangeSource = model<'controller' | 'tree' | null>(null);
-  treeLength = model<number | null>(null);
-  _selectedTreeNode = signal<E | null>(null);
+  hasDepthControl = input<boolean>(false);
+  depthIndex = model<number | undefined>();
+  depthChangeSource = model<'controller' | 'tree' | undefined>(undefined);
+  treeLength = model<number | undefined>(undefined);
+
+  _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
   fullTreeCache:R[]= [];
 
@@ -326,7 +327,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
 
-  isNestedView(selectedNode: E | null): boolean {
+  isNestedView(selectedNode: E | undefined): boolean {
     if (!selectedNode) return true;
 
     const nonNestedClasses: Set<string> = new Set([

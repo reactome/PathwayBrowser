@@ -113,20 +113,20 @@ export class DescriptionComponent {
 
 
   //todo get divider label from here
-  elements: { key: string, label: string, manual?: boolean, depthControl?: boolean }[] = [
+  elements: { key: string, label: string, manual?: boolean, hasDepthControl?: boolean }[] = [
     {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
     {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true},
     {key: DataKeys.CROSS_REFERENCE, label: Labels.CROSS_REFERENCES, manual: true},
     {key: DataKeys.MODIFIED_RESIDUES, label: Labels.MODIFIED_RESIDUES, manual: true},
-    {key: DataKeys.INPUT, label: Labels.INPUTS, depthControl: true},
-    {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, depthControl: true},
+    {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
+    {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, hasDepthControl: true},
     {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
-    {key: DataKeys.MEMBERS, label: Labels.MEMBERS, depthControl:true},
+    {key: DataKeys.MEMBERS, label: Labels.MEMBERS, hasDepthControl:true},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
-    {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, depthControl: true},
+    {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, hasDepthControl: true},
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
