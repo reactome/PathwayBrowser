@@ -5,6 +5,7 @@ import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.mod
 import {map, Observable} from "rxjs";
 import {DataStateService} from "./data-state.service";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
+import {DatabaseObject} from "../model/graph/database-object.model";
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,9 @@ export class EntitiesService {
     return this.http.get<PhysicalEntity[]>(url);
   }
 
-  getEntityInDepth(id: string | number, depth: number): Observable<PhysicalEntity> {
+  getEntityInDepth<E extends DatabaseObject>(id: string | number, depth: number): Observable<E> {
     const url = `${environment.host}/ContentService/data/entity/${id}/in-depth?maxDepth=${depth}&attributes=species%2Ccompartment&view=nested-aggregated&includeRef=true`;
-    return this.http.get<PhysicalEntity>(url).pipe(map(this.dataStateService.flattenReferences))
+    return this.http.get<E>(url).pipe(map(this.dataStateService.flattenReferences))
   }
 
   getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {

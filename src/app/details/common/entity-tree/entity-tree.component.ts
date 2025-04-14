@@ -2,7 +2,7 @@ import {Component, computed, effect, input, model, signal, ViewChild} from '@ang
 import {isEvent} from "../../../services/utils";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {forkJoin, map, of, tap} from "rxjs";
+import {forkJoin, map, of} from "rxjs";
 import {SelectableObject} from "../../../services/event.service";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {SchemaClasses} from "../../../constants/constants";
@@ -10,7 +10,6 @@ import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
-import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
 
 
 @Component({
@@ -28,7 +27,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
-  fullTreeCache:R[]= [];
+  fullTreeCache: R[] = [];
 
   @ViewChild(MatTree) tree!: MatTree<R>;
 
@@ -58,65 +57,53 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
               private entitiesService: EntitiesService,
               private dataStateService: DataStateService,
   ) {
+
+    // Initial tree data
     effect(() => {
       if (this.data().length > 0) {
         this.dataSource.data = this.data();
       }
-
-      // Only fetch the full tree when depth controller exists
-      if (this.hasDepthControl()) {
-        this.loadFullTreeAndSetMaxLength().subscribe();
-      }
     });
 
-
+    // Updating tree based on user interaction
     effect(() => {
 
-      const result = this._enhancedSelectedTreeNode.value();
+      const result = this._selectedTreeNodeData.value();
       if (!result) return;
-      this.updateMatTreeDataSource(result as unknown as E);
+      this.updateMatTreeDataSource(result);
 
     });
 
     // Updating entire tree when user click depth controller
     effect(() => {
 
-      const treeData = this._treeSource.value() as R[];
+      const treeData = this._treeSource.value();
       if (treeData && treeData.length > 0) {
         this.dataSource.data = [];
         this.dataSource.data = treeData;
-        this.expandNodesWithChildren(treeData);
+        // tree.expandAll() will expand all tree nodes include protein
+        this.expandNestedTreeNodes(treeData);
       }
-
     });
 
+    // Fetch full tree to get maxLevel when fist load
     effect(() => {
-      if (this.depthIndex() === 1 && this.tree) {
-        this.tree.collapseAll();
-      }
+
+      const fullTree = this._fullTreeSource.value();
+      if (!fullTree || fullTree.length === 0) return;
+      const maxLevel = this.getTreeDepth(fullTree, 0);
+      this.treeLength.set(maxLevel);
+      this.fullTreeCache = this._fullTreeSource.value() as R[];
+
     });
 
-  }
-
-  loadFullTreeAndSetMaxLength() {
-    const nodeResults = this.data().map((node) => this.fetchTreeAtDepth(node, -1));
-    return forkJoin(nodeResults).pipe(
-      tap((tree) => {
-        // const maxLevel = this.getMaxDepthFromMetadata(tree, 0);
-        const maxLevel = this.getTreeDepth(tree, 0);
-        this.treeLength.set(maxLevel);
-        console.log("maxLevel in load", maxLevel);
-        this.fullTreeCache = tree;
-        console.log(this.fullTreeCache);
-      })
-    );
   }
 
   _treeSource = rxResource({
     request: () => ({depth: this.depthIndex()}),
     loader: ({request}) => {
 
-      // Skip updating the tree when index changes if from the tree
+      // Skip updating the tree when index changes is from the tree
       if (this.depthChangeSource() === 'tree') {
         return of([]);
       }
@@ -128,56 +115,41 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
 
       // Use cached tree data when depth is the tree length
-      if(depth === this.treeLength() ){
-         return of(this.fullTreeCache);
+      if (depth === this.treeLength()) {
+        return of(this.fullTreeCache);
       }
 
-      const depthInQuery = depth -1;
-      const nodeResults = this.data().map((node) => this.fetchTreeAtDepth(node, depthInQuery));
+      const depthInQuery = depth - 1; // Ignore the default depth 1
+      const results = this.data().map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
-      return forkJoin(nodeResults).pipe();
+      return forkJoin(results).pipe();
     }
   });
 
-
-  fetchTreeAtDepth(node: R, depth: number) {
-    const element = node.element as E;
-    const id = element.stId || element.dbId;
-
-    if (!this.isNestedView(element)) {
-      // Return node with composedOf
-      const normalElement = {
-        ...element,
-        composedOf: element.composedOf ?? [],
-      };
-      return of({...node, element: normalElement});
+  // Get max level when first load
+  _fullTreeSource = rxResource({
+    request: () => (this.data()),
+    loader: (params) => {
+      if (this.hasDepthControl()) {
+        const nodeResults = params.request.map((node) => this.fetchTreeAtDepth(node, -1));
+        return forkJoin(nodeResults);
+      }
+      return of([]);
     }
-
-    return this.entitiesService.getEntityInDepth(id, depth).pipe(
-      map((entity) => {
-        const nestedElement = {
-          ...element,
-          ...entity,
-          composedOf: this.getComposedOfRecursively(entity.composedOf ?? []),
-        };
-        return {
-          ...node,
-          element: nestedElement,
-        };
-      })
-    );
-  }
+  })
 
 
-  _enhancedSelectedTreeNode = rxResource({
+  _selectedTreeNodeData = rxResource({
     request: () => this.selectedTreeNode()?.stId,
     loader: (param) => {
       const selectedNode = this.selectedTreeNode();
       // Check the condition to determine which method to call
+      // Protein
       if (!this.isNestedView(selectedNode)) {
-        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request);
+        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request).pipe(map(result => result as unknown as E));
       } else {
-        return this.entitiesService.getEntityInDepth(param.request, 1)
+        // PE -> Complex and Set
+        return this.entitiesService.getEntityInDepth<E>(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
           .pipe(
             map(entityResult => {
               if (entityResult && entityResult.composedOf) {
@@ -228,32 +200,31 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   }
 
+  fetchTreeAtDepth(node: R, depth: number) {
+    const element = node.element as E;
+    const id = element.stId || element.dbId;
 
-  getMaxLevel(): number {
-    return Math.max(
-      ...this.dataSource.data.map(node => this.getMaxExpandedLevel(node, 1)) // Starts at level 1
-    );
-  }
-
-
-  getMaxExpandedLevel(node: R, level: number): number {
-    if (!this.tree.isExpanded(node) || !node.element.composedOf?.length || !this.isNestedView(node.element)) {
-      return level;
+    if (!this.isNestedView(element)) {
+      // Return node with composedOf when element is protein
+      const normalElement = {
+        ...element,
+        composedOf: element.composedOf ?? [],
+      };
+      return of({...node, element: normalElement});
     }
 
-    return Math.max(
-      ...node.element.composedOf.map(child => this.getMaxExpandedLevel(child as R, level + 1))
-    );
-  }
-
-
-  getMaxDepthFromMetadata(nodes: R[], level: number): number {
-    if (!nodes || nodes.length === 0) return level;
-
-    return Math.max(
-      ...nodes.map(node => {
-        const children = node.element?.composedOf || [];
-        return this.getMaxDepthFromMetadata(children as R[], level + 1);
+    return this.entitiesService.getEntityInDepth<E>(id, depth).pipe(
+      map((entityResult) => {
+        const composedOf = entityResult.composedOf || [];
+        const nestedElement = {
+          ...element,
+          ...entityResult,
+          composedOf: this.getComposedOfRecursively(composedOf),
+        };
+        return {
+          ...node,
+          element: nestedElement,
+        };
       })
     );
   }
@@ -280,22 +251,22 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
 
-  expandNodesWithChildren(nodes: R[]) {
+  expandNestedTreeNodes(nodes: R[]) {
     for (const node of nodes) {
       if (!node.element.composedOf) return;
       if (node.element.composedOf.length > 0) {
         this.tree.expand(node);
-        this.expandNodesWithChildren(node.element.composedOf as R[]);
+        this.expandNestedTreeNodes(node.element.composedOf as R[]);
       }
     }
   }
 
 
-  getComposedOfRecursively(composedArray: Relationship.Has<PhysicalEntity>[]): Relationship.Has<PhysicalEntity>[] {
+  getComposedOfRecursively(composedArray: Relationship.Has<DatabaseObject>[]): Relationship.Has<DatabaseObject>[] {
     if (!Array.isArray(composedArray)) return [];
 
     return composedArray.map((composed, index) => {
-      const element = composed?.element ?? {};
+      const element = composed?.element ?? [];
       const nestedComposedOf = Array.isArray(element.composedOf) ? this.getComposedOfRecursively(element.composedOf) : [];
       return {
         ...composed,
@@ -325,7 +296,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return e ? (e.offsetWidth < e.scrollWidth) : false;
   }
 
-  private updateTree(existingTreeData: R[], result: E): R[] {
+  updateTree(existingTreeData: R[], result: E): R[] {
 
     const tree = [...existingTreeData];
     const flatTree = this.flattenTree(tree);
@@ -339,14 +310,14 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return tree;
   }
 
-  private updateMatTreeDataSource(node: E) {
+  updateMatTreeDataSource(node: E) {
     const updatedTree = this.updateTree(this.dataSource.data, node);
 
     this.dataSource.data = [];
     this.dataSource.data = updatedTree;
   }
 
-  private flattenTree(nodes: R[]): R[] {
+  flattenTree(nodes: R[]): R[] {
     return nodes.flatMap(node => [
       node,
       ...(node.element.composedOf ?
@@ -522,7 +493,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   protected readonly isEvent = isEvent;
   protected readonly Array = Array;
-
 
 
 }
