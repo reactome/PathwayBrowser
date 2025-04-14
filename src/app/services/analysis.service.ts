@@ -184,6 +184,10 @@ export class AnalysisService {
       this.state.sample.set(result?.expression.columnNames[0] || null)
 
       this.paletteGroups.forEach(group => group.valid = validGroups.has(group.name))
+    }),
+    catchError((error: any) => {
+      this.clearAnalysis();
+      return of()
     })
   )
 
