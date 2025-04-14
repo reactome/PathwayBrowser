@@ -76,13 +76,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     // Updating entire tree when user click depth controller
     effect(() => {
-
-      const treeData = this._treeSource.value();
-      if (treeData && treeData.length > 0) {
-        this.dataSource.data = [];
-        this.dataSource.data = treeData;
-        // tree.expandAll() will expand all tree nodes include protein
-        this.expandNestedTreeNodes(treeData);
+      // TODO evaluate with CHuq if that's alright
+      const index = this.depthIndex();
+      const source = this.depthChangeSource();
+      if (index && index > 0 && source == 'controller') {
+        const treeData = this._treeSource.value();
+        if (treeData && treeData.length > 0) {
+          this.dataSource.data = [];
+          this.dataSource.data = treeData;
+          // tree.expandAll() will expand all tree nodes include protein
+          this.expandNestedTreeNodes(treeData);
+        }
       }
     });
 
