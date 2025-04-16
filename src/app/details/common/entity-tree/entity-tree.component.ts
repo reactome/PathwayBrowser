@@ -10,6 +10,7 @@ import {IconService} from "../../../services/icon.service";
 import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
+import {cloneDeep} from "lodash";
 
 
 @Component({
@@ -27,7 +28,9 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
+  //todo: not used for now, delete it in future
   fullTreeCache: R[] = [];
+  initialData: R[] = [];
 
   @ViewChild(MatTree) tree!: MatTree<R>;
 
@@ -61,13 +64,13 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     // Initial tree data
     effect(() => {
       if (this.data().length > 0) {
+        this.initialData = cloneDeep(this.data());
         this.dataSource.data = this.data();
       }
     });
 
     // Updating tree based on user interaction
     effect(() => {
-
       const result = this._selectedTreeNodeData.value();
       if (!result) return;
       this.updateMatTreeDataSource(result);
@@ -79,7 +82,13 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       // TODO evaluate with CHuq if that's alright
       const index = this.depthIndex();
       const source = this.depthChangeSource();
-      if (index && index > 0 && source == 'controller') {
+
+      if (index === 1 && this.tree) {
+        this.tree.collapseAll();
+        return;
+      }
+
+      if (index && index > 1 && source == 'controller') {
         const treeData = this._treeSource.value();
         if (treeData && treeData.length > 0) {
           this.dataSource.data = [];
@@ -97,8 +106,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (!fullTree || fullTree.length === 0) return;
       const maxLevel = this.getTreeDepth(fullTree, 0);
       this.treeLength.set(maxLevel);
-      this.fullTreeCache = this._fullTreeSource.value() as R[];
-
+      this.fullTreeCache = fullTree;
     });
 
   }
@@ -109,22 +117,24 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
       // Skip updating the tree when index changes is from the tree
       if (this.depthChangeSource() === 'tree') {
-        return of([]);
+        return of(this.dataSource.data);
       }
 
       const depth = request.depth;
-      // Prevent default depth from loading
-      if (!depth || depth === 1) {
-        return of(this.data());
+
+      if (!depth) {
+        return of(this.dataSource.data);
       }
+
+      //todo: this cause issue right now, revisit to use cached data
 
       // Use cached tree data when depth is the tree length
-      if (depth === this.treeLength()) {
-        return of(this.fullTreeCache);
-      }
+      // if (depth === this.treeLength()) {
+      //   return of(this.fullTreeCache);
+      // }
 
-      const depthInQuery = depth - 1; // Ignore the default depth 1
-      const results = this.data().map((node) => this.fetchTreeAtDepth(node, depthInQuery));
+      const depthInQuery = depth === this.treeLength() ? -1 : depth - 1; // Ignore the default depth 1
+      const results = [...this.data()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
       return forkJoin(results).pipe();
     }
@@ -138,7 +148,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         const nodeResults = params.request.map((node) => this.fetchTreeAtDepth(node, -1));
         return forkJoin(nodeResults);
       }
-      return of([]);
+
+      return of(this.data());
     }
   })
 
@@ -167,7 +178,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
                 }));
               }
               return {
-                ...entityResult
+                ...entityResult,
+                isLoaded: true,
               };
             })
           );
@@ -188,20 +200,33 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
 
+  // Fetch children data when user click to expand, no need to send API call when tree node already exists
   loadChildren(node: R) {
-    this._selectedTreeNode.set(node.element);
+
+    const isExpanded = this.tree.isExpanded(node);
+
+    // Expand
+    if (isExpanded) {
+      const alreadyLoaded = node.element.isLoaded;
+      const hasNoChildren = alreadyLoaded && node.element.composedOf?.length === 0; // For nested entity which already exists but no children data
+      if (!alreadyLoaded || hasNoChildren) {
+        // No children data — sending API call to fetch children data
+        this._selectedTreeNode.set(node.element);
+      } else {
+        console.log('Children already loaded — skipping API call');
+      }
+    }
 
 
+    // Handle both expand and collapse with one timeout to get depthIndex
     // Defer so the tree has time to update its expansion state
     setTimeout(() => {
-      // const newDepth = this.getMaxLevel();
       const depth = this.getTreeDepth(this.dataSource.data, 1, true);
       if (this.depthIndex() !== depth) {
         this.depthIndex.set(depth);
         this.depthChangeSource.set('tree');
       }
     }, 500);
-
   }
 
   fetchTreeAtDepth(node: R, depth: number) {
@@ -224,10 +249,11 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
           ...element,
           ...entityResult,
           composedOf: this.getComposedOfRecursively(composedOf),
+          isLoaded: true,
         };
         return {
           ...node,
-          element: nestedElement,
+          element: nestedElement
         };
       })
     );
@@ -277,6 +303,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         element: {
           ...element,
           composedOf: nestedComposedOf,
+          isLoaded: true
         },
         index,
       };
@@ -300,6 +327,14 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return e ? (e.offsetWidth < e.scrollWidth) : false;
   }
 
+
+  updateMatTreeDataSource(node: E) {
+    const updatedTree = this.updateTree(this.dataSource.data, node);
+
+    this.dataSource.data = [];
+    this.dataSource.data = updatedTree;
+  }
+
   updateTree(existingTreeData: R[], result: E): R[] {
 
     const tree = [...existingTreeData];
@@ -308,17 +343,10 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     if (targetTreeNode) {
       // Merge all properties from result directly into the element
-      Object.assign(targetTreeNode.element, result);
+      Object.assign(targetTreeNode.element, result); // MUTATES ORIGINAL ELEMENT
     }
 
     return tree;
-  }
-
-  updateMatTreeDataSource(node: E) {
-    const updatedTree = this.updateTree(this.dataSource.data, node);
-
-    this.dataSource.data = [];
-    this.dataSource.data = updatedTree;
   }
 
   flattenTree(nodes: R[]): R[] {
