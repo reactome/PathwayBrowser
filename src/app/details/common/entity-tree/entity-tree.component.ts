@@ -11,6 +11,7 @@ import {EntitiesService} from "../../../services/entities.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
+import {UrlStateService} from "../../../services/url-state.service";
 
 
 @Component({
@@ -527,4 +528,9 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   protected readonly Array = Array;
 
 
+  onSelectClick(event: MouseEvent, node: E) {
+    event.stopPropagation();
+    if (!node.stId) return;
+    this.urlState.select.set(node.stId);
+  }
 }

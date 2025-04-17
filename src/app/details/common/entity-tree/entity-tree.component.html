@@ -74,12 +74,12 @@
 
         <div class="select-container">
           <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-          <a href="" (click)="$event.stopPropagation()">
-            <mat-icon class='custom-icon' [svgIcon]="'select'"></mat-icon>
-          </a>
+          <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
+            <mat-icon class="custom-icon" [svgIcon]="'select'"></mat-icon>
+          </button>
         </div>
         <div class="goTo-container">
-          <a href="" (click)="$event.stopPropagation()">
+          <a [href]="'/content/detail/' + element.stId" target="_blank" (click)="$event.stopPropagation()">
             <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
           </a>
         </div>

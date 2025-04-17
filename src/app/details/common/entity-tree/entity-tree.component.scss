@@ -137,6 +137,7 @@
     width: 12px;
     height: 12px;
     flex-shrink: 0;
+    align-items: center;
   }
 }
 
@@ -284,4 +285,10 @@
 
 .details-group {
   display: flex;
+}
+
+.button {
+  @include mat.icon-button-overrides((
+    state-layer-size: 20px
+  ))
 }
