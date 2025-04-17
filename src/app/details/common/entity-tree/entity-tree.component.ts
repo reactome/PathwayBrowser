@@ -60,6 +60,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   constructor(private iconService: IconService,
               private entitiesService: EntitiesService,
               private dataStateService: DataStateService,
+              private urlState: UrlStateService,
   ) {
 
     // Initial tree data
