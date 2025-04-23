@@ -29,8 +29,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
-  //todo: not used for now, delete it in future
   fullTreeCache: R[] = [];
+  //todo: not used for now, delete it in future
   initialData: R[] = [];
 
   @ViewChild(MatTree) tree!: MatTree<R>;
@@ -128,14 +128,13 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         return of(this.dataSource.data);
       }
 
-      //todo: this cause issue right now, revisit to use cached data
-
       // Use cached tree data when depth is the tree length
-      // if (depth === this.treeLength()) {
-      //   return of(this.fullTreeCache);
-      // }
+      if (depth === this.treeLength()) {
+        console.log("return full tree cache")
+        return of(this.fullTreeCache);
+      }
 
-      const depthInQuery = depth === this.treeLength() ? -1 : depth - 1; // Ignore the default depth 1
+      const depthInQuery = depth - 1; // Ignore the default depth 1
       const results = [...this.data()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
       return forkJoin(results).pipe();
