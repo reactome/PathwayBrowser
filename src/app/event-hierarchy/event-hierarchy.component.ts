@@ -56,6 +56,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   selectedIdFromUrl?: string;
   selectedTreeEvent?: Event;
   selectedObj?: DatabaseObject;
+  lastSpecieId?:string;
 
 
   constructor(protected eventService: EventService,
@@ -68,6 +69,13 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
               private iconService: IconService,
               private dboService: DatabaseObjectService) {
     effect(() => {
+
+      const currentSpecieId = this.speciesService.currentSpecies().taxId;
+
+      if (currentSpecieId === this.lastSpecieId) return;
+
+      this.lastSpecieId = currentSpecieId;
+
       this.buildInitialTreeWithTlps(this.speciesService.currentSpecies().taxId);
     });
   }
