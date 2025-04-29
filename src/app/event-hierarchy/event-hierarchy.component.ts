@@ -12,7 +12,7 @@ import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
 import {IconService} from "../services/icon.service";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isPathwayOrTLP, isRLE} from "../services/utils";
+import {isPathwayOrTLP} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 import {toObservable} from "@angular/core/rxjs-interop";
 
@@ -42,8 +42,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
 
   childrenAccessor = (node: Event): Event[] => {
-    if (isPathwayOrTLP(node)) {
-      return node.events?.map(e => e.element);
+    if (isPathwayOrTLP(node) && Array.isArray(node.events)) {
+      return node.events.map(e => e.element);
     }
     return [];
   };
@@ -274,22 +274,33 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     clearTimeout(this.scrollTimeout);
   }
 
+  //todo: delete it after final testing
+
+  // onTreeEventSelectBuk(treeEvent: Event) {
+  //   const isTLP = treeEvent.schemaClass === this._TOP;
+  //   const hasChild = this.eventService.eventHasChild(treeEvent);
+  //   // Toggle isSelected property if it has children for pathway
+  //   //event.isSelected = hasChild && !isTLP ? !event.isSelected : true;
+  //   const isSelected = !treeEvent.isSelected;
+  //   this.handleTreeEventSelection(treeEvent, isSelected);
+  // }
+
+
   onTreeEventSelect(treeEvent: Event) {
-    const isTLP = treeEvent.schemaClass === this._TOP;
-    const hasChild = this.eventService.eventHasChild(treeEvent);
-    // Toggle isSelected property if it has children for pathway
-    //event.isSelected = hasChild && !isTLP ? !event.isSelected : true;
-    const isSelected = !treeEvent.isSelected;
-    this.handleTreeEventSelection(treeEvent, isSelected);
+    console.log("isExpanded ? ", this.tree.isExpanded(treeEvent))
+    this.handleSelectionFromTree(treeEvent)
+
   }
 
-  private handleTreeEventSelection(event: Event, isSelected: boolean) {
-    if (isSelected) {
-      this.handleSelectionFromTree(event);
-    } else {
-      this.handleDeselectionFromTree(event);
-    }
-  }
+
+  // private handleTreeEventSelection(event: Event, isSelected: boolean) {
+  //   if (isSelected) {
+  //     this.handleSelectionFromTree(event);
+  //   } else {
+  //     this.handleDeselectionFromTree(event);
+  //   }
+  // }
+
 
   onBreadcrumbSelect(navEvent: Event) {
     this.clearAllSelectedEvents(this.treeDataSource.data);
@@ -318,54 +329,73 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
 
   private handleSelectionFromTree(event: Event) {
-    // First click
     this.clearAllSelectedEvents(this.treeDataSource.data);
     this.selectAllParents(event, this.treeDataSource.data);
-    this.toggleEventExpansion(event, true);
+    this.loadEvents(event);
     this.updateBreadcrumbs(event);
     this.setDiagramId(event);
     this.navigateToPathway(event);
   }
 
 
-  private handleDeselectionFromTree(event: Event) {
-    // Second click (deselect)
+  // private handleDeselectionFromTree(event: Event) {
+  //   // Second click (deselect)
+  //
+  //   // Disable unselected status for TLP for having a selected obj in details panel
+  //   if (event.schemaClass === this._TOP) return;
+  //
+  //   //Disable unselected status for reaction
+  //   if (isRLE(event)) return;
+  //
+  //   this.selectAllParents(event, this.treeDataSource.data);
+  //   if (isPathwayOrTLP(event)) {
+  //     this.toggleEventExpansion(event, false);
+  //   }
+  //
+  //   this.updateBreadcrumbsForEventDeselection(event);
+  //   this.handlePathwayNavigationOnDeselection(event);
+  // }
 
-    // Disable unselected status for TLP for having a selected obj in details panel
-    if (event.schemaClass === this._TOP) return;
 
-    //Disable unselected status for reaction
-    if (isRLE(event)) return;
-
-    this.selectAllParents(event, this.treeDataSource.data);
-    if (isPathwayOrTLP(event)) {
-      this.toggleEventExpansion(event, false);
-    }
-
-    this.updateBreadcrumbsForEventDeselection(event);
-    this.handlePathwayNavigationOnDeselection(event);
-  }
-
-  private toggleEventExpansion(treeEvent: Event, isSelected: boolean) {
+  private loadEvents(treeEvent: Event) {
     // Collapse all events when selecting any tlps
     if (treeEvent.schemaClass === this._TOP) {
-      this.tree.collapseAll();
+      //this.tree.collapseAll();
     }
 
-    if (isSelected) {
-      treeEvent.isSelected = true;
+    treeEvent.isSelected = true;
+    this.clearAllSelectedEvents(this.treeDataSource.data);
+    this.selectAllParents(treeEvent, this.treeDataSource.data);
+
+    if (isPathwayOrTLP(treeEvent)) {
       this.eventService.loadEventData(treeEvent);
-      this.tree.toggle(treeEvent);
     } else {
-      treeEvent.isSelected = false;
-      this.tree.toggle(treeEvent);
       this.dboService.fetchEnhancedEntry<Event>(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
         this.dboService.setCurrentObj(result);
       })
     }
-
-    this.eventService.collapseSiblingEvents(treeEvent, this.tree);
   }
+
+  // private toggleEventExpansion(treeEvent: Event, isSelected: boolean) {
+  //   // Collapse all events when selecting any tlps
+  //   if (treeEvent.schemaClass === this._TOP) {
+  //     this.tree.collapseAll();
+  //   }
+  //
+  //   if (isSelected) {
+  //     treeEvent.isSelected = true;
+  //     this.eventService.loadEventData(treeEvent);
+  //     this.tree.toggle(treeEvent);
+  //   } else {
+  //     treeEvent.isSelected = false;
+  //     this.tree.toggle(treeEvent);
+  //     this.dboService.fetchEnhancedEntry<Event>(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
+  //       this.dboService.setCurrentObj(result);
+  //     })
+  //   }
+  //
+  //   this.eventService.collapseSiblingEvents(treeEvent, this.tree);
+  // }
 
 
   private selectAllParents(selectedEvent: Event, events: Event[]) {
