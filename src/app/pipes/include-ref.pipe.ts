@@ -18,7 +18,6 @@ export class IncludeRefPipe implements PipeTransform {
         text = text.replaceAll(new RegExp(`${ref.author[0].surname} ?${this.initials(ref.author[0].initial)}\\.? ?( et al[., ]{0,2})? ?${ref.year}`, 'g'), replacer);
         if (ref.author.length === 2) {
           let regExp = new RegExp(`${ref.author[0].surname} ?${this.initials(ref.author[0].initial)}\\.? ?(and|\&) ${ref.author[1].surname} ?${this.initials(ref.author[1].initial)}\\.? ?,? ${ref.year}`, 'g');
-          console.log(regExp)
           text = text.replaceAll(regExp, replacer);
         }
       });

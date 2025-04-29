@@ -120,7 +120,7 @@ export class EventService {
       this.setCurrentEventAndObj(treeEvent, dbo);
       this.setTreeData(this.treeData$.value);
       this.addAnalysisTag(dbo.events, this.analysisService.result);
-      this.addHitReactions(dbo.events, hitReactions)
+      this.addHitReactions(dbo.events, hitReactions);
     });
   }
 
@@ -588,7 +588,7 @@ export class EventService {
   }
 
   hasChild = (_: number, event: Event) => {
-    return !!isPathwayOrTLP(event);
+    return isPathwayOrTLP(event);
   }
 
   eventHasChild(event: Event): boolean {
