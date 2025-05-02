@@ -282,57 +282,15 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     clearTimeout(this.scrollTimeout);
   }
 
-  //todo: delete it after final testing
-
-  // onTreeEventSelectBuk(treeEvent: Event) {
-  //   const isTLP = treeEvent.schemaClass === this._TOP;
-  //   const hasChild = this.eventService.eventHasChild(treeEvent);
-  //   // Toggle isSelected property if it has children for pathway
-  //   //event.isSelected = hasChild && !isTLP ? !event.isSelected : true;
-  //   const isSelected = !treeEvent.isSelected;
-  //   this.handleTreeEventSelection(treeEvent, isSelected);
-  // }
-
 
   onTreeEventSelect(treeEvent: Event) {
-    console.log("isExpanded ? ", this.tree.isExpanded(treeEvent))
-    this.handleSelectionFromTree(treeEvent)
-
+    this.handleSelectionFromTree(treeEvent);
   }
 
 
-  // private handleTreeEventSelection(event: Event, isSelected: boolean) {
-  //   if (isSelected) {
-  //     this.handleSelectionFromTree(event);
-  //   } else {
-  //     this.handleDeselectionFromTree(event);
-  //   }
-  // }
-
 
   onBreadcrumbSelect(navEvent: Event) {
-    this.clearAllSelectedEvents(this.treeDataSource.data);
-    this.selectAllParents(navEvent, this.treeDataSource.data);
-    navEvent.isSelected = true;
-    // Collapse all descendant nodes except the selected path if it has child events
-    // this.tree.collapseDescendants(navEvent);
-    // Expand the path to the selected event
-    this.tree.expand(navEvent);
-    this.updateBreadcrumbs(navEvent);
-
-    this.setDiagramId(navEvent);
-    const selectedEventId = isPathwayOrTLP(navEvent) && navEvent.hasDiagram ? '' : navEvent.stId;
-    this._ignore = true;
-    this.state.select.set(selectedEventId);
-    this._ignore = false;
-
-    const ancestors = navEvent.ancestors ? navEvent.ancestors : [];
-    this.eventService.setPath(this.pathwayId()!, ancestors);
-
-    this.dboService.fetchEnhancedEntry(navEvent.stId).pipe(untilDestroyed(this)).subscribe(result => {
-      this.eventService.setCurrentEventAndObj(navEvent, result);
-    })
-
+    this.handleSelectionFromTree(navEvent);
   }
 
 
@@ -344,25 +302,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.setDiagramId(event);
     this.navigateToPathway(event);
   }
-
-
-  // private handleDeselectionFromTree(event: Event) {
-  //   // Second click (deselect)
-  //
-  //   // Disable unselected status for TLP for having a selected obj in details panel
-  //   if (event.schemaClass === this._TOP) return;
-  //
-  //   //Disable unselected status for reaction
-  //   if (isRLE(event)) return;
-  //
-  //   this.selectAllParents(event, this.treeDataSource.data);
-  //   if (isPathwayOrTLP(event)) {
-  //     this.toggleEventExpansion(event, false);
-  //   }
-  //
-  //   this.updateBreadcrumbsForEventDeselection(event);
-  //   this.handlePathwayNavigationOnDeselection(event);
-  // }
 
 
   private loadEvents(treeEvent: Event) {
@@ -383,27 +322,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       })
     }
   }
-
-  // private toggleEventExpansion(treeEvent: Event, isSelected: boolean) {
-  //   // Collapse all events when selecting any tlps
-  //   if (treeEvent.schemaClass === this._TOP) {
-  //     this.tree.collapseAll();
-  //   }
-  //
-  //   if (isSelected) {
-  //     treeEvent.isSelected = true;
-  //     this.eventService.loadEventData(treeEvent);
-  //     this.tree.toggle(treeEvent);
-  //   } else {
-  //     treeEvent.isSelected = false;
-  //     this.tree.toggle(treeEvent);
-  //     this.dboService.fetchEnhancedEntry<Event>(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
-  //       this.dboService.setCurrentObj(result);
-  //     })
-  //   }
-  //
-  //   this.eventService.collapseSiblingEvents(treeEvent, this.tree);
-  // }
 
 
   private selectAllParents(selectedEvent: Event, events: Event[]) {
@@ -428,36 +346,37 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   private updateBreadcrumbs(event: Event) {
     if (event.schemaClass === this._TOP) {
       // If the event is a 'TopLevelPathway', set breadcrumbs to an empty array
-      this.eventService.setBreadcrumbs([event]);
-    } else if (event.ancestors) {
-      // Set breadcrumbs including the event and its parents
-      this.eventService.setBreadcrumbs([...(event.ancestors)]);
+      return this.eventService.setBreadcrumbs([event]);
     }
+
+    const ancestors = this.getAncestors(this.treeDataSource.data, event.stId)
+    if (ancestors) {
+      console.log('ancestors from method', ancestors)
+      return this.eventService.setBreadcrumbs(ancestors);
+    }
+
   }
 
-  private updateBreadcrumbsForEventDeselection(event: Event) {
-    if (event.schemaClass === this._TOP) {
-      this.eventService.setBreadcrumbs([event]);
-    } else if (event.ancestors?.length) {
-      // Update breadcrumb based on the second-to-last item
-      this.updateBreadcrumbs(event.ancestors[event.ancestors.length - 2]);
-    }
-  }
 
-  private handlePathwayNavigationOnDeselection(event: Event) {
-    // pathway and subpathway
-    if (this.eventService.eventHasChild(event)) {
-      if (event.schemaClass !== this._TOP) {
-        const eventParent = event.parent;
-        const parentWithDiagram = this.eventService.getPathwayWithDiagram(event);
-        this.pathwayId.set(parentWithDiagram!.stId);
-        this.navigateToPathway(eventParent);
-      } else {
-        this.pathwayId.set(event.stId);
-        this.navigateToPathway(event);
+  getAncestors(array:Event[] | null, stId:string): Event[] | null {
+    if (!Array.isArray(array)) return null;
+    for (let i = 0; i < array.length; i++) {
+      const node = array[i];
+
+      if (node.stId === stId) {
+        return [node]; // Node itself is part of the path
+      }
+
+      const children = isPathwayOrTLP(node) && Array.isArray(node.events) ? node.events.map(e => e.element) : [];
+      const childPath: Event[] | null= this.getAncestors(children, stId);
+      if (childPath !== null) {
+        childPath.unshift(node); // Prepend current node to path, adds the specified elements to the beginning of an array
+        return childPath;
       }
     }
+    return null; // Not found in this branch
   }
+
 
   private setDiagramId(event: Event): void {
     // Pathway

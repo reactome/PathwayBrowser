@@ -332,7 +332,15 @@ export class EventService {
   buildNestedTree(object: DatabaseObject, roots: Event[], ancestors: Event[], diagramId: string, selectedIdFromUrl: string, matTree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     const tree = [...roots];
     // Add tlp itself as ancestor to tlp
-    tree.map(tlp => tlp.ancestors = [tlp])
+   // tree.map(tlp => tlp.ancestors = [tlp])
+    // Set ancestor as itself for root node
+
+    // tree.forEach(tlp => {
+    //   // Only assign an empty array; self will be added when children are built
+    //   tlp.ancestors = []; // ✅ no self-reference here
+    // });
+
+
 
     //this.lastMatchedEvent = null; // Reset at start
 
@@ -372,6 +380,8 @@ export class EventService {
     );
   }
 
+  private _breadcrumbPath: Event[] = [];
+
   /**
    * Processes the API response data for an event and updates its properties.
    *
@@ -392,15 +402,19 @@ export class EventService {
     if (isPathwayOrTLP(object) && isPathwayOrTLP(treeEvent)) {
       treeEvent.events = object.events?.map((child: HasEvent) => {
         const ancestors = treeEvent.ancestors || [];
-        // Remove duplicate ancestors
-        if (!ancestors.some((ancestor) => ancestor.stId === treeEvent.stId)) {
-          ancestors.push(treeEvent);
-        }
+
+        // Append parent (treeEvent) if not already included
+        const alreadyIncluded = ancestors.some(ancestor => ancestor.stId === treeEvent.stId);
+        const baseAncestors = alreadyIncluded ? ancestors : [...ancestors, treeEvent];
+
+        // Include the child itself in its own ancestor list
+        const fullAncestors = [...baseAncestors, child.element];
+
         return {
           ...child,
           element: {
             ...child.element,
-            ancestors: [...ancestors, child.element],
+            ancestors: fullAncestors,
             parent: treeEvent,
             isSelected: child.element.stId === selectedIdFromUrl
           }
@@ -416,16 +430,22 @@ export class EventService {
       this.setSubtreeColors(treeEvent, subpathwayColors);
     }
 
+    this._breadcrumbPath.push(treeEvent);
+
     // Entity - false, Event - true
-    const isEvent = selectedIdFromUrl === treeEvent.stId;
-    const breadcrumbs = isEvent && treeEvent.schemaClass === "TopLevelPathway"
-      ? [treeEvent]
-      : [...treeEvent.ancestors];
-    this.setBreadcrumbs(breadcrumbs);
+    // const isEvent = selectedIdFromUrl === treeEvent.stId;
+    // const breadcrumbs = isEvent && treeEvent.schemaClass === "TopLevelPathway"
+    //   ? [treeEvent]
+    //   : [...treeEvent.ancestors];
+    // this.setBreadcrumbs(breadcrumbs);
 
 
     if (index === totalAncestors - 1) {
+      const isEvent = selectedIdFromUrl === treeEvent.stId;
+      const breadcrumbs = isEvent && treeEvent.schemaClass === "TopLevelPathway" ? [treeEvent] : this._breadcrumbPath;
       this.setCurrentTreeEvent(treeEvent);
+      console.log('this._breadcrumbPath', this._breadcrumbPath);
+      this.setBreadcrumbs(breadcrumbs)
     }
   }
 
