@@ -130,10 +130,13 @@ export class EventService {
       switchMap(result => {
 
         if (isPathwayOrTLP(result) && result.events && isPathwayOrTLP(tree)) {
+
+          const treeAncestors = this.getAncestors(this.treeData$.value, tree.stId) || [];
+
           // Update the event structure with child relationships
           tree.events = result.events
             .map(child => {
-              child.element.ancestors = [...tree.ancestors, child.element];
+              child.element.ancestors = [...treeAncestors, child.element];
               child.element.parent = tree;
               return child;
             });
@@ -145,6 +148,28 @@ export class EventService {
       })
     );
   }
+
+
+
+  getAncestors(array:Event[] | null, stId:string): Event[] | null {
+    if (!Array.isArray(array)) return null;
+    for (let i = 0; i < array.length; i++) {
+      const node = array[i];
+
+      if (node.stId === stId) {
+        return [node]; // Node itself is part of the path
+      }
+
+      const children = isPathwayOrTLP(node) && Array.isArray(node.events) ? node.events.map(e => e.element) : [];
+      const childPath: Event[] | null= this.getAncestors(children, stId);
+      if (childPath !== null) {
+        childPath.unshift(node); // Prepend current node to path, adds the specified elements to the beginning of an array
+        return childPath;
+      }
+    }
+    return null; // Not found in this branch
+  }
+
 
   /** Adjust tree structure based on selection from diagram
    *

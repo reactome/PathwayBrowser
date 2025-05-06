@@ -349,32 +349,14 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       return this.eventService.setBreadcrumbs([event]);
     }
 
-    const ancestors = this.getAncestors(this.treeDataSource.data, event.stId)
+    //todo: temporary fix for getting correct ancestors,
+    // the ideal way to get ancestors is by assigning the ancestors to the object
+
+    const ancestors = this.eventService.getAncestors(this.treeDataSource.data, event.stId)
     if (ancestors) {
-      console.log('ancestors from method', ancestors)
       return this.eventService.setBreadcrumbs(ancestors);
     }
 
-  }
-
-
-  getAncestors(array:Event[] | null, stId:string): Event[] | null {
-    if (!Array.isArray(array)) return null;
-    for (let i = 0; i < array.length; i++) {
-      const node = array[i];
-
-      if (node.stId === stId) {
-        return [node]; // Node itself is part of the path
-      }
-
-      const children = isPathwayOrTLP(node) && Array.isArray(node.events) ? node.events.map(e => e.element) : [];
-      const childPath: Event[] | null= this.getAncestors(children, stId);
-      if (childPath !== null) {
-        childPath.unshift(node); // Prepend current node to path, adds the specified elements to the beginning of an array
-        return childPath;
-      }
-    }
-    return null; // Not found in this branch
   }
 
 
