@@ -469,24 +469,28 @@ export class EventService {
       const isEvent = selectedIdFromUrl === treeEvent.stId;
       const breadcrumbs = isEvent && treeEvent.schemaClass === "TopLevelPathway" ? [treeEvent] : this._breadcrumbPath;
       this.setCurrentTreeEvent(treeEvent);
-      console.log('this._breadcrumbPath', this._breadcrumbPath);
       this.setBreadcrumbs(breadcrumbs)
     }
   }
 
   addAnalysisTag(tree: Event[] | undefined, analysisResult: Analysis.Result | undefined): void {
-    if (!analysisResult || !tree) return;
-
-    const pathwaysData = analysisResult.pathways;
+    if (!tree) return;
     tree.forEach(event => {
-      const pathwayData = pathwaysData.find(a => a.stId === event.stId);
-      if (!pathwayData || !isPathwayOrTLP(event)) return;
-      // const analysisContent = "Hit Reactions / Total Reactions";
-      // node.analysisContent = analysisContent;
-      event.hitReactionsCount = `${pathwayData.reactions.found} / ${pathwayData.reactions.total}`;
+      // If there's no analysis result, clear previous analysis info
+      if (!analysisResult) {
+        if (isPathwayOrTLP(event)) {
+          event.hitReactionsCount = undefined;
+        }
+      } else {
+        const pathwaysData = analysisResult.pathways;
+        const pathwayData = pathwaysData.find(a => a.stId === event.stId);
+        if (!pathwayData || !isPathwayOrTLP(event)) return;
 
+        event.hitReactionsCount = `${pathwayData.reactions.found} / ${pathwayData.reactions.total}`;
+      }
+      // Recursively handle children
       if (isPathwayOrTLP(event) && event.events && event.events.length > 0) {
-        this.addAnalysisTag(event.events?.map(e => e.element), analysisResult);
+        this.addAnalysisTag(event.events.map(e => e.element), analysisResult);
       }
     });
   }
