@@ -10,7 +10,69 @@
   padding: 0;
   white-space: nowrap;
   width: 100%;
-  gap: 4px
+  gap: 4px;
+
+  ::ng-deep table {
+    --radius: 16px;
+    --border: 1px;
+    --half-border: calc(var(--border) / 2);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius);
+    border: none;
+
+    th {
+      color: var(--on-primary-container);
+      background: var(--primary-container);
+      text-align: center;
+      font: var(--mat-sys-body-medium);
+      border: var(--half-border) solid var(--surface);
+      border-top: var(--border) solid var(--primary);
+      padding: 4px;
+      box-shadow: 0 2px 2px -2px black;
+
+      &:first-child {
+        border-left: var(--border) solid var(--primary);
+        border-radius: var(--radius) 0 0 0;
+      }
+
+      &:last-child {
+        border-right: var(--border) solid var(--primary);
+        border-radius: 0 var(--radius) 0 0;
+      }
+    }
+
+    td {
+      border: var(--half-border) solid var(--outline-variant);
+      text-align: center;
+      font: var(--mat-sys-body-medium);
+      padding: 4px;
+
+      &:first-child {
+        border-left: var(--border) solid var(--primary);
+      }
+
+      &:last-child {
+        border-right: var(--border) solid var(--primary);
+      }
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--surface1);
+    }
+
+    tr:last-child td {
+      border-bottom: var(--border) solid var(--primary);
+
+      &:first-child {
+        border-radius: 0 0 0 var(--radius);
+      }
+
+      &:last-child {
+        border-radius: 0 0 var(--radius) 0;
+      }
+    }
+  }
 }
 
 
