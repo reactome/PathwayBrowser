@@ -485,6 +485,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     if (typeReference.type === 'member') return 'dashedIConnector';
     if (typeReference.type === 'component' || parentNode.type === 'repeatedUnit') return 'solidIConnector';
     if (typeReference.type === 'candidate') return 'miniDashedIConnector';
+    if (typeReference.type === 'rnaMarker' || typeReference.type === 'proteinMarker') return '';
     // if (firstChild.type === 'regulatedBy' || node.type === 'catalystActivity') return ' ';
     return 'otherConnector';
   }
