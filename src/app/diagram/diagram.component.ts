@@ -1,4 +1,15 @@
-import {AfterViewInit, Component, effect, ElementRef, input, model, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  input,
+  model,
+  Output,
+  signal,
+  ViewChild
+} from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
 import {extract, ReactomeEvent, ReactomeEventTypes, Style} from "reactome-cytoscape-style";
 import cytoscape, {ElementsDefinition} from "cytoscape";
@@ -28,12 +39,9 @@ import {Analysis} from "../model/analysis.model";
 import {ActivatedRoute, Router} from "@angular/router";
 import {InteractorsComponent} from "../interactors/interactors.component";
 import {EventService} from "../services/event.service";
-import {Event} from "../model/graph/event/event.model";
+import {Event as EventModel} from "../model/graph/event/event.model";
 
 
-import chroma from "chroma-js";
-import {group, style} from "@angular/animations";
-import {MatFormField} from "@angular/material/form-field";
 import {DarkService} from "../services/dark.service";
 
 
@@ -52,6 +60,11 @@ export class DiagramComponent implements AfterViewInit {
   readonly interactorsComponent = input<InteractorsComponent>(undefined, {alias: "interactor"});
   readonly pathwayId = model.required<string>();
 
+  readonly controlZoom = signal<number>(0);
+  readonly controlMinZoom = signal<number>(1);
+  readonly controlMaxZoom = signal<number>(100);
+
+  readonly controlRange = computed(() => this.controlMaxZoom() - this.controlMinZoom());
 
   comparing: boolean = false;
   isInitialLoad: boolean = true;
@@ -86,6 +99,10 @@ export class DiagramComponent implements AfterViewInit {
       this._loadAnalysisFn(this.analysis.sampleIndex())
     );
   }
+
+  zoomToCytoscapeTransform = (x: number) => this.cy.minZoom() * Math.pow(this.cy.maxZoom() / this.cy.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
+  zoomToControlTransform = (zoomCy: number) => this.controlMinZoom() + this.controlRange() * (Math.log(zoomCy / this.cy.minZoom()) / Math.log(this.cy.maxZoom() / this.cy.minZoom()));
+
 
   cy!: cytoscape.Core;
   reactomeStyle!: Style;
@@ -136,10 +153,41 @@ export class DiagramComponent implements AfterViewInit {
 
   }
 
+  // Needs Input event binding to react to mouse drag instead of mouse drop on slider
+  zoom(inputEvent: Event) {
+    this.cy.zoom({
+      level: this.zoomToCytoscapeTransform((inputEvent.target as HTMLInputElement).valueAsNumber),
+      renderedPosition: {x: this.cy.width() / 2, y: this.cy.height() / 2}
+    })
+  }
+
+  zoomIn() {
+    this.cy.zoom({
+      level: this.cy.zoom() * 1.2,
+      renderedPosition: {x: this.cy.width() / 2, y: this.cy.height() / 2}
+    })
+  }
+
+  zoomOut() {
+    this.cy.zoom({
+      level: this.cy.zoom() / 1.2,
+      renderedPosition: {x: this.cy.width() / 2, y: this.cy.height() / 2}
+    })
+  }
+
+  move(direction: 'up' | 'right' | 'down' | 'left', distance = 50) {
+    const x = direction === 'right' ? -distance : direction === 'left' ? distance : 0;
+    const y = direction === 'up' ? distance : direction === 'down' ? -distance : 0;
+    this.cy.panBy({x, y})
+  }
+
+  fitScreen() {
+    this.cy.fit(undefined, 20)
+  }
 
   private loadDiagram(): void {
     this.event.diagramEvent$.pipe(
-      filter((event): event is Event => event !== undefined),
+      filter((event): event is EventModel => event !== undefined),
       switchMap((event) => {
         // If the diagramId is a subpathway without diagram, and it is a first load then load parent diagram
         // For instance: ../PathwayBrowser/R-HSA-69541
@@ -173,6 +221,9 @@ export class DiagramComponent implements AfterViewInit {
         });
         this.cys[0] = this.cy;
         this.reactomeStyle.bindToCytoscape(this.cy);
+        this.cy.on('zoom', () => this.controlZoom.set(this.zoomToControlTransform(this.cy.zoom())));
+
+
         this.reactomeStyle.clearCache();
         this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
           queryParamsHandling: "preserve",
@@ -191,7 +242,7 @@ export class DiagramComponent implements AfterViewInit {
     );
   }
 
-  loadSubpathwayWithDiagram(event: Event) {
+  loadSubpathwayWithDiagram(event: EventModel) {
     return this.event.fetchEventAncestors(this.pathwayId()!).pipe(
       map(ancestors => this.event.getFinalAncestor(ancestors)),
       switchMap((ancestors) => {
@@ -782,8 +833,5 @@ export class DiagramComponent implements AfterViewInit {
     this.analysis.example(example).subscribe();
   }
 
-  protected readonly style = style;
-  protected readonly brewer = chroma.brewer;
-  protected readonly MatFormField = MatFormField;
-  protected readonly group = group;
+
 }

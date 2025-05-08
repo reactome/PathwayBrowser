@@ -73,6 +73,7 @@ import {ModificationComponent} from "./details/common/modification/modification.
 import {MolecularProcessComponent} from "./details/common/molecular-process/molecular-process.component";
 import {FormatClassNamePipe} from "./pipes/format-class-name.pipe";
 import {CastPipe} from "./pipes/cast.pipe";
+import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 
 @NgModule({
   declarations: [
@@ -153,7 +154,9 @@ import {CastPipe} from "./pipes/cast.pipe";
     AnalysisLegendComponent,
     ExtractCompartmentPipe,
     FormatClassNamePipe,
-    CastPipe
+    CastPipe,
+    MatSlider,
+    MatSliderThumb
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
