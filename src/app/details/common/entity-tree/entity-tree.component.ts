@@ -130,7 +130,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
       // Use cached tree data when depth is the tree length
       if (depth === this.treeLength()) {
-        console.log("return full tree cache")
         return of(this.fullTreeCache);
       }
 
@@ -365,21 +364,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   // The method below are all helper methods for creating branch lines for the nested tree view, open to any better strategy in future
   // Dynamic get the size of the connector container
-  getLevel(element: HTMLElement, isDetailContent: boolean) {
-    let depth = Number(element.getAttribute('aria-level'));
+  getConnectorLevel(level: number, isDetailContent: boolean) {
+    // Starts from index 1, default is 0;
+    const updatedLevel = level + 1;
     // If it's a protein content node, count it; otherwise, exclude root from level calculation
-    return !isDetailContent ? depth - 1 : depth;
+    return !isDetailContent ? updatedLevel - 1 : updatedLevel;
   }
 
+  getCurrentNodeConnector(size: number, node: R): string {
 
-  getCurrentNodeConnector(element: HTMLElement, node: R): string {
-
-    if (!element || !node) return '';
-
+    if (!size || !node) return '';
     const index = node.index;
-    // Size of all children nodes
-    const size = Number(element.getAttribute('aria-setsize'));
-
     // Member
     if (node.type === 'member') {
       if (index === 0 && size === 1) return 'dashedLConnector'; // Single child → Last item
@@ -411,9 +406,12 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
   // To create an array of a specific level for indexing connector class
-  getArray(level: string | null, isDetailContent: boolean): number[] {
+  getArray(level: number | null, isDetailContent: boolean): number[] {
+    // Starts from index 1, default is 0;
+    if(!level) return [];
+    const updatedLevel = level + 1;
     // Exclude root for normal tree node and include it when tree node is a protein content node
-    let size = !isDetailContent ? Number(level ?? 0) - 1 : Number(level ?? 0);
+    let size = !isDetailContent ? updatedLevel - 1 : updatedLevel;
     let result = [];
     for (let i = 0; i < size; i++) {
       result.push(i);
@@ -430,22 +428,20 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
    *
    * return a list of connector classes
    */
-  getAllConnectors(element: HTMLElement, node: R, index: number, _level: string | null) {
+  getAllConnectors(element: number, node: R, index: number, _level: number | null) {
 
     if (!_level) return [];
     const connectors = []
-    const level = Number(_level);
+    const level = _level + 1;// sync with the depth control number starts from 1
     // Only get all parents connectors, given false value here to indicate that the current node is not protein content node
     const parentConnectors = this.getParentsConnector(node, false);
     connectors.push(...parentConnectors);
-
     // target the last connector
     // index starts from 0 and level starts from 1
     if (index === level - 2) {
       const lastConnector = this.getCurrentNodeConnector(element, node);
       connectors.push(lastConnector);
     }
-
     return connectors
   }
 

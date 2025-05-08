@@ -7,22 +7,23 @@
 
 
   <!-- This is the tree node template for expandable nodes -->
+  <!--#treeNodeRef="matNestedTreeNode" the instance of the directive or component that is exported under the name matNestedTreeNode-->
   <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild"
                         [cdkTreeNodeTypeaheadLabel]="node.name"
                         (click)="loadChildren(node)"
                         matTreeNodeToggle
-                        #treeNodeRef>
+                        #treeNodeRef='matNestedTreeNode'>
     @let element = node.element;
-    <div class="connector-container" [style.--level]="getLevel(treeNodeRef, false)">
+    <div class="connector-container" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
       <!--To create an array of a specific length-->
-      @for (index of getArray(treeNodeRef.ariaLevel, false); track index) {
+      @for (index of getArray(treeNodeRef.level, false); track index) {
         <div class="connector" [matTooltip]="node.type"
-             [ngClass]="getAllConnectors(treeNodeRef, node, index, treeNodeRef.ariaLevel)[index]">
+             [ngClass]="getAllConnectors(treeNodeRef._getSetSize(), node, index, treeNodeRef.level)[index]">
         </div>
       }
     </div>
 
-    <div class="mat-tree-node" [style.--level]="getLevel(treeNodeRef, false)">
+    <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
       <div class="left">
         <mat-icon class="symbol-icon"
                   [matTooltip]="getSymbol(element).tooltip"
@@ -101,11 +102,11 @@
       <mat-nested-tree-node class='details-tree' (click)="$event.stopPropagation()">
         <div class="details-connector-container"
              [matTooltip]="node.type"
-             [style.--level]="getLevel(treeNodeRef, true)">
+             [style.--level]="getConnectorLevel(treeNodeRef.level, true)">
           <!--To create an array of a specific length-->
-          @for (index of getArray(treeNodeRef.ariaLevel, true); track index) {
+          @for (index of getArray(treeNodeRef.level, true); track index) {
             <div class="connector"
-                 [ngClass]="index != getArray(treeNodeRef.ariaLevel, true).length - 1 ? getParentsConnector(node, true)[index] :'otherConnector' ">
+                 [ngClass]="index != getArray(treeNodeRef.level, true).length - 1 ? getParentsConnector(node, true)[index] :'otherConnector' ">
             </div>
           }
         </div>
