@@ -408,7 +408,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   // To create an array of a specific level for indexing connector class
   getArray(level: number | null, isDetailContent: boolean): number[] {
     // Starts from index 1, default is 0;
-    if(!level) return [];
+    if (level == null) return [];
     const updatedLevel = level + 1;
     // Exclude root for normal tree node and include it when tree node is a protein content node
     let size = !isDetailContent ? updatedLevel - 1 : updatedLevel;
@@ -485,6 +485,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     if (typeReference.type === 'member') return 'dashedIConnector';
     if (typeReference.type === 'component' || parentNode.type === 'repeatedUnit') return 'solidIConnector';
     if (typeReference.type === 'candidate') return 'miniDashedIConnector';
+    if (typeReference.type === 'rnaMarker' || typeReference.type === 'proteinMarker') return '';
     // if (firstChild.type === 'regulatedBy' || node.type === 'catalystActivity') return ' ';
     return 'otherConnector';
   }

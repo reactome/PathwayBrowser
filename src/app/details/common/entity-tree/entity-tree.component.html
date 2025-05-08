@@ -47,9 +47,11 @@
       <div class="right">
         <!--Compartment-->
         @if (!isEvent(element)) {
-          <span class="compartment name" #compartment [matTooltip]="element.displayName | extractCompartment"
-                [matTooltipDisabled]="!isEllipsisActive(compartment)">{{ element.displayName | extractCompartment }}
+          @if (element.displayName | extractCompartment) {
+            <span class="compartment name" #compartment [matTooltip]="element.displayName | extractCompartment"
+                  [matTooltipDisabled]="!isEllipsisActive(compartment)">{{ element.displayName | extractCompartment }}
           </span>
+          }
         } @else {
           @for (has of element.hasCompartment; track has.element.dbId) {
             <span class="compartment name" #compartment [matTooltip]="has.element.displayName"
