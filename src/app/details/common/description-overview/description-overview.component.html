@@ -12,7 +12,7 @@
       <div class="value">
         <!-- Display category for RLE -->
         <ng-container *ngIf="category; else showClassName">
-          {{ category() | titlecase  }} {{ className() }}
+          {{ category() | titlecase }} {{ className() }}
           <ng-container *ngIf="obj().schemaClass === 'Polymerisation' || obj().schemaClass === 'Depolymerisation'">
             &middot; <span class='italic'>{{ obj().schemaClass }}</span>
           </ng-container>
@@ -54,7 +54,7 @@
         @for (d of disease(); track d.dbId; let i = $index; ) {
           @let dbInfo = d.databaseName + ':' + d.identifier;
           <a [href]="d.url" target="_blank"
-             [matTooltip]="d.definition ? d.definition : null">{{ d.displayName | titlecase }}({{dbInfo}})
+             [matTooltip]="d.definition ? d.definition : null">{{ d.displayName | titlecase }}({{ dbInfo }})
           </a>
           <!-- Add comma separator except for last item -->
           @if (i < disease().length - 1) {
@@ -64,40 +64,45 @@
       </div>
     </div>
 
-    <div *ngIf="(name()?.length || 0) > 1" class="row">
-      <div class="label">Synonyms</div>
-      <div class="value">{{ name().slice(1) }}</div>
-    </div>
+    @if ((name().length || 0) > 1) {
+      <div class="row">
+        <div class="label">Synonyms</div>
+        <div class="value">{{ name().slice(1) }}</div>
+      </div>
+    }
 
-    <div *ngIf="['CellDevelopmentStep', 'CellLineagePath'].includes(obj().schemaClass) && tissue()" class="row">
-      <div class="label">Tissue</div>
-      <div class="value"><a [href]="tissue().url" target="_blank">{{ tissue().displayName }}</a></div>
-    </div>
+    @if (['CellDevelopmentStep', 'CellLineagePath'].includes(obj().schemaClass) && tissue()) {
+      <div class="row">
+        <div class="label">Tissue</div>
+        <div class="value"><a [href]="tissue().url" target="_blank">{{ tissue().displayName }}</a></div>
+      </div>
+    }
   </div>
 
   <!-- Common info ends here-->
 
-  <div *ngIf="reviewStatus()" class="row">
-    <div class="label">Review Status</div>
-    <div class="value spinner-container">
-      <mat-progress-spinner color="primary" mode="determinate"
-                            [value]="reviewStar[reviewStatus()!.displayName!].percentage"></mat-progress-spinner>
-      <div class="score"> {{ reviewStar[reviewStatus()!.displayName!].score }}/5</div>
-    </div>
-  </div>
-
-
-  <div *ngIf="summation()" class="row">
-    <div class="label">Summation</div>
-    <div class="value flex-grow" *ngIf="summation() && summation()[0].text as summationText">
-      <div [innerHTML]="summationText | includeRef: allRefs()" [class.columns]="summationText.length > 500"></div>
-
-      <!--Display summation refs if is available-->
-      <div class="summation-refs-container" *ngIf="summation() && summation()[0].literatureReference">
-        <cr-summation-refs-tree [summation]=summation()[0]></cr-summation-refs-tree>
+  @if (reviewStatus()) {
+    <div class="row">
+      <div class="label">Review Status</div>
+      <div class="value spinner-container">
+        <mat-progress-spinner color="primary" mode="determinate"
+                              [value]="reviewStar[reviewStatus()!.displayName!].percentage"></mat-progress-spinner>
+        <div class="score"> {{ reviewStar[reviewStatus()!.displayName!].score }}/5</div>
       </div>
     </div>
-  </div>
+  }
 
+  @if (summation()) {
+    <div class="row">
+      <div class="label">Summation</div>
+      <div class="value flex-grow" *ngIf="summation() && summation()[0].text as summationText">
+        <div [innerHTML]="summationText | includeRef: allRefs()" [class.columns]="summationText.length > 500"></div>
 
+        <!--Display summation refs if is available-->
+        <div class="summation-refs-container" *ngIf="summation() && summation()[0].literatureReference">
+          <cr-summation-refs-tree [summation]=summation()[0]></cr-summation-refs-tree>
+        </div>
+      </div>
+    </div>
+  }
 </div>
