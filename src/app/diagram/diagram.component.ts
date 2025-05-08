@@ -737,7 +737,7 @@ export class DiagramComponent implements AfterViewInit {
   legend2state = this.reactomeEvents$.pipe(
     filter((e) => e.detail.cy === this.legend),
     filter(() => !this._ignore),
-    distinctUntilChanged((previous, next) => next.detail.element.$id === previous.detail.element.$id),
+    distinctUntilChanged((previous, next) => next.detail.element.id() === previous.detail.element.id()),
   ).subscribe((e) => {
     const event = e as ReactomeEvent;
     const classes = event.detail.element.classes();
