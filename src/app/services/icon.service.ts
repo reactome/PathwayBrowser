@@ -48,6 +48,7 @@ export class IconService {
       route: 'complex'
     },
     SimpleEntity: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
+    Cell: {name: 'cell', tooltip: 'Cell Type', route: 'cell'},
     DefinedSet: {name: 'defined-set', tooltip: 'Defined Set', route: 'defined-set'},
     OtherEntity: {name: 'other-entity', tooltip: 'Other Entity', route: 'other-entity'},
     Polymer: {name: 'polymer', tooltip: 'Polymer', route: 'polymer'},
