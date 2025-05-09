@@ -6,8 +6,10 @@ import {
   ElementRef,
   input,
   model,
+  OnDestroy,
   Output,
   signal,
+  viewChild,
   ViewChild
 } from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
@@ -52,13 +54,17 @@ import {DarkService} from "../services/dark.service";
   styleUrls: ['./diagram.component.scss'],
   standalone: false
 })
-export class DiagramComponent implements AfterViewInit {
+export class DiagramComponent implements AfterViewInit, OnDestroy {
   title = 'pathway-browser';
   @ViewChild('cytoscape') cytoscapeContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('cytoscapeCompare') compareContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
+  readonly thumbnailRef = viewChild.required<ElementRef<HTMLImageElement>>('thumbnail');
+
+
   readonly interactorsComponent = input<InteractorsComponent>(undefined, {alias: "interactor"});
   readonly pathwayId = model.required<string>();
+
 
   readonly controlZoom = signal<number>(0);
   readonly controlMinZoom = signal<number>(1);
@@ -76,7 +82,7 @@ export class DiagramComponent implements AfterViewInit {
               public analysis: AnalysisService,
               private event: EventService,
               private router: Router,
-              private route: ActivatedRoute
+              private route: ActivatedRoute,
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
     effect(() => this.pathwayId() && this.loadDiagram());
@@ -102,7 +108,57 @@ export class DiagramComponent implements AfterViewInit {
 
   zoomToCytoscapeTransform = (x: number) => this.cy.minZoom() * Math.pow(this.cy.maxZoom() / this.cy.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
   zoomToControlTransform = (zoomCy: number) => this.controlMinZoom() + this.controlRange() * (Math.log(zoomCy / this.cy.minZoom()) / Math.log(this.cy.maxZoom() / this.cy.minZoom()));
+  thumbnailImg = signal<string>('');
+  sizeObserver!: ResizeObserver;
+  containerSize = signal<{ width: number, height: number }>({width: 0, height: 0});
+  thumbnailSize = signal<{ width: number, height: number }>({width: 0, height: 0});
+  thumbnailViewBox = computed(() => `0 0 ${this.thumbnailSize().width} ${this.thumbnailSize().height}`)
+  viewportPosition = signal<{ x: number, y: number }>({x: 0, y: 0});
+  zoomLevel = signal<number>(0.1)
+  shrinkedViewport = computed(() => {
+// Get bounding box of the entire graph
+    const bbox = this.cy?.elements()?.boundingBox() || {x1: 0, x2: 0, y1: 1, y2: 1, w: 1, h: 1}; // {x1, y1, x2, y2, w, h}
 
+// Get current zoom and pan
+    const zoom = this.zoomLevel();
+    const pan = this.viewportPosition(); // {x, y}
+
+// Get main container size (in pixels)
+    const mainWidth = this.containerSize().width;
+    const mainHeight = this.containerSize().height;
+
+// Define your thumbnail size (in pixels)
+    const thumbWidth = this.thumbnailSize().width;
+    const thumbHeight = this.thumbnailSize().height;
+
+// Compute scale factor between global graph and thumbnail
+    const scaleX = thumbWidth / bbox.w;
+    const scaleY = thumbHeight / bbox.h;
+    const scale = Math.min(scaleX, scaleY); // uniform scaling
+
+// Offset to center the graph in the thumbnail
+    const offsetX = (thumbWidth - bbox.w * scale) / 2;
+    const offsetY = (thumbHeight - bbox.h * scale) / 2;
+
+// Viewport dimensions in graph coordinate space
+    const viewW = mainWidth / zoom;
+    const viewH = mainHeight / zoom;
+
+// Viewport top-left in graph space
+    const viewX = -pan.x / zoom;
+    const viewY = -pan.y / zoom;
+
+// Convert to thumbnail coordinates
+
+    const viewRect = {
+      x: (viewX - bbox.x1) * scale + offsetX,
+      y: (viewY - bbox.y1) * scale + offsetY,
+      width: viewW * scale,
+      height: viewH * scale
+    };
+
+    return viewRect
+  });
 
   cy!: cytoscape.Core;
   reactomeStyle!: Style;
@@ -145,12 +201,27 @@ export class DiagramComponent implements AfterViewInit {
         this.legend.zoomingEnabled(false);
         this.legend.panningEnabled(false);
         this.legend.minZoom(0)
-        const bb = this.legend.elements().boundingBox();
-        // this.ratio = bb.w / bb.h;
       });
 
-    this.loadDiagram();
+    this.sizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.target === container) this.containerSize.set(entry.contentRect)
+        if (entry.target === this.thumbnailRef().nativeElement) this.thumbnailSize.set(entry.contentRect)
+      })
+    })
 
+    this.sizeObserver.observe(container);
+    this.sizeObserver.observe(this.thumbnailRef().nativeElement);
+
+    this.loadDiagram();
+  }
+
+  thumbnailLoaded() {
+    this.thumbnailSize.set(this.thumbnailRef().nativeElement.getBoundingClientRect())
+  }
+
+  ngOnDestroy(): void {
+    this.sizeObserver.disconnect();
   }
 
   // Needs Input event binding to react to mouse drag instead of mouse drop on slider
@@ -223,7 +294,6 @@ export class DiagramComponent implements AfterViewInit {
         this.reactomeStyle.bindToCytoscape(this.cy);
         this.cy.on('zoom', () => this.controlZoom.set(this.zoomToControlTransform(this.cy.zoom())));
 
-
         this.reactomeStyle.clearCache();
         this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
           queryParamsHandling: "preserve",
@@ -234,6 +304,15 @@ export class DiagramComponent implements AfterViewInit {
         this.event.setSubpathwayColors(shadowNodes && shadowNodes.length > 0
           ? new Map(shadowNodes.map(node => [node.data('reactomeId'), node.data('color')]))
           : undefined);
+
+        this.thumbnailImg.set(this.cy.png({full: true, maxHeight: 240}))
+        this.cy.on('viewport', () => {
+          this.zoomLevel.set(this.cy.zoom());
+          this.viewportPosition.set({...this.cy.pan()});
+        })
+
+        this.zoomLevel.set(this.cy.zoom());
+        this.viewportPosition.set({...this.cy.pan()});
 
         this.loadCompare(elements, container);
 

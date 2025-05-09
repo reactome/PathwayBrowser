@@ -22,15 +22,38 @@
     <div cdkDrag cdkDragLockAxis="x" cdkDragBoundary="#legend-boundary" id="legend-container"
          (cdkDragMoved)="updateLegend()"
          [style.height.px]="container.clientHeight">
-      <div class="legend-group" [class.has-analysis]="analysis.resultSignal()"
-           [style.--handle-height.px]="handle.clientHeight">
-        <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
-        @if (analysis.resultSignal() && analysis.resultSignal()?.expression?.min) {
-          <div class="analysis-legend">
-            <cr-analysis-legend></cr-analysis-legend>
-          </div>
-        }
+      <div class="legend-group-wrapper">
+        <div class="legend-group" [class.has-analysis]="analysis.resultSignal()"
+             [style.--handle-height.px]="handle.clientHeight">
+          <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
+          @if (analysis.resultSignal() && analysis.resultSignal()?.expression?.min) {
+            <div class="analysis-legend">
+              <cr-analysis-legend></cr-analysis-legend>
+            </div>
+          }
+        </div>
+
+        <div class="thumbnail">
+          <img [src]="thumbnailImg()" #thumbnail (load)="thumbnailLoaded($event)">
+          <svg class="overlay" [attr.viewBox]="thumbnailViewBox()">
+            <mask id="viewportMask" mask-type="luminance">
+              <rect [attr.width]="thumbnailSize().width" [attr.height]="thumbnailSize().height" fill="white"></rect>
+              <rect id="viewportRect" fill="black"
+                    [attr.height]="shrinkedViewport().height"
+                    [attr.width]="shrinkedViewport().width"
+                    [attr.x]="shrinkedViewport().x"
+                    [attr.y]="shrinkedViewport().y"></rect>
+            </mask>
+            <rect x="0" y="0" [attr.width]="thumbnailSize().width" [attr.height]="thumbnailSize().height" fill="var(--surface, white)" opacity="0.5"  mask="url(#viewportMask)"></rect>
+            <rect stroke="var(--primary)" stroke-width="1" fill="none"
+                  [attr.height]="shrinkedViewport().height"
+                  [attr.width]="shrinkedViewport().width"
+                  [attr.x]="shrinkedViewport().x"
+                  [attr.y]="shrinkedViewport().y"></rect>
+          </svg>
+        </div>
       </div>
+
       <div id="legend" #legend></div>
     </div>
 

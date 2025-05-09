@@ -5,18 +5,6 @@
   height: 100%;
 }
 
-//#controls {
-//  position: absolute;
-//  inset: calc(100% - 40px) 0 0 0;
-//
-//  * {
-//    background: var(--surface);
-//    color: var(--on-surface);
-//  }
-//
-//  background: var(--surface);
-//
-//}
 
 #cytoscape {
   position: absolute;
@@ -37,6 +25,9 @@
 
   background: color-mix(in srgb, var(--surface) 80%, transparent);
   backdrop-filter: blur(5px);
+  border-right: 1px solid var(--outline-variant);
+  border-top: 1px solid var(--outline-variant);
+  border-bottom: 1px solid var(--outline-variant);
   z-index: 1;
   display: flex;
   flex-direction: row;
@@ -84,6 +75,31 @@
 
 }
 
+.thumbnail {
+  margin-bottom: 10px;
+
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(5px);
+  border-left: 1px solid var(--outline-variant);
+  border-top: 1px solid var(--outline-variant);
+  border-bottom: 1px solid var(--outline-variant);
+  z-index: 1;
+  padding: 5px;
+  border-radius: 5px 0 0 5px;
+  height: 70px;
+
+  img {
+    max-height: 70px;
+  }
+
+  svg.overlay {
+    position: absolute;
+    inset: 5px;
+    height: calc(100% - 2 * 5px);
+    width: calc(100% - 2 * 5px);
+  }
+}
+
 
 #legend-boundary {
   --legend-width: 400px;
@@ -105,6 +121,15 @@
     left: calc(var(--legend-width) - var(--border-width));
     pointer-events: all;
     height: 100%;
+  }
+  .legend-group-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    align-items: flex-end;
+    width: var(--handle-width);
   }
 
   .legend-group {
