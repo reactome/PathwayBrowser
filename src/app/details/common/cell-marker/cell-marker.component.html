@@ -1,0 +1,26 @@
+<div id="markers">
+@for (maker of markers(); track maker.dbId) {
+  <div class="marker-container">
+    <div class="row">
+      <div class="label-container">Marker</div>
+      <div class="composition-container">
+        <cr-entity-tree [type]="maker.referenceType=== SchemaClasses.REFERENCE_RNA_SEQUENCE ? DataKeys.RNA_MARKERS :DataKeys.PROTEIN_MARKER"
+                        [data]="[maker]"></cr-entity-tree>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label-container">References</div>
+      <div class="composition-container ref-padding">
+        @let literatureRefs = refs().get(maker.dbId)?.literatureReference;
+        @if (literatureRefs){
+          @for (ref of literatureRefs| sortByDate:'year'; track ref.dbId) {
+            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+          }
+        }
+      </div>
+    </div>
+
+  </div>
+}
+</div>

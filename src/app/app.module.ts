@@ -74,6 +74,7 @@ import {MolecularProcessComponent} from "./details/common/molecular-process/mole
 import {FormatClassNamePipe} from "./pipes/format-class-name.pipe";
 import {CastPipe} from "./pipes/cast.pipe";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
+import {CellMarkerComponent} from "./details/common/cell-marker/cell-marker.component";
 
 @NgModule({
   declarations: [
@@ -100,7 +101,8 @@ import {MatSlider, MatSliderThumb} from "@angular/material/slider";
     EntityTreeComponent,
     RegulationComponent,
     ModificationComponent,
-    MolecularProcessComponent
+    MolecularProcessComponent,
+    CellMarkerComponent
   ],
   bootstrap: [AppComponent],
   imports: [

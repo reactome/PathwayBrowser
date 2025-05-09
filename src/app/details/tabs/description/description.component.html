@@ -43,6 +43,23 @@
       }
     </div>
 
+    <!-- Cell markers -->
+    @if (marker().length > 0) {
+      <div class="divider-container" [id]=DataKeys.PROTEIN_MARKER>
+        <div class="divider-name-container">
+          <ng-container
+            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.MARKERS }"></ng-container>
+        </div>
+        <div class="divider-line-container">
+          <mat-divider class="divider"></mat-divider>
+        </div>
+      </div>
+
+      <div class="element-container">
+        <cr-cell-marker [markers]="marker()" [markerRefs]="markerReference()"></cr-cell-marker>
+      </div>
+    }
+
     <!-- External Reference -->
     @if (referenceEntity()) {
       <div class="divider-container" [id]=DataKeys.REFERENCE_ENTITY>

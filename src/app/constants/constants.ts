@@ -36,7 +36,13 @@ export const DataKeys = {
   MODIFIED_RESIDUES: 'modifiedResidues',
   MEMBERS: 'members',
   IN_DISEASE: 'inDisease',
-  DISEASE: 'disease'
+  DISEASE: 'disease',
+  RNA_MARKERS: 'rnaMarker',
+  PROTEIN_MARKER: 'proteinMarker',
+  MARKER_REFERENCE: 'markerReference',
+  CELL_TYPE: 'cellType',
+  ORGAN:'organ',
+  TISSUE_LAYER:'tissueLayer',
 
 
 } as const;
@@ -68,6 +74,7 @@ export const Labels = {
   REGULATED_BY: 'Regulations',
   MODIFIED_RESIDUES: 'Modifications',
   MEMBERS: 'Members',
+  MARKERS: 'Markers',
 } as const;
 
 export enum SchemaClasses {
@@ -125,6 +132,8 @@ export enum SchemaClasses {
   FRAGMENT_REPLACED_MODIFICATION = 'FragmentReplacedModification',
   TRANSCRIPTIONAL_MODIFICATION = 'TranscriptionalModification',
   MODIFIED_NUCLEOTIDE = 'ModifiedNucleotide',
+
+  REFERENCE_RNA_SEQUENCE = 'ReferenceRNASequence'
 
 
 }

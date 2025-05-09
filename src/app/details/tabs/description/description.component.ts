@@ -21,6 +21,10 @@ import {RegulationReference} from "../../../model/graph/control-reference/regula
 import {Relationship} from "../../../model/graph/relationship.model";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
+import {
+  EntityWithAccessionedSequence
+} from "../../../model/graph/physical-entity/entity-with-accessioned-sequence.model";
+import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
 
 
 @Component({
@@ -105,6 +109,15 @@ export class DescriptionComponent {
     return crossReference ? [...crossReference] : [];
   });
 
+
+  marker: Signal<EntityWithAccessionedSequence[]> = computed(() => {
+    const rnaMarker = getProperty(this.obj(), DataKeys.RNA_MARKERS) || [];
+    const proteinMarker = getProperty(this.obj(), DataKeys.PROTEIN_MARKER) || [];
+    return [...rnaMarker, ...proteinMarker];
+  })
+
+  markerReference:Signal<MarkerReference[]> = computed(() => getProperty(this.obj(), DataKeys.MARKER_REFERENCE))
+
   overview$ = viewChild<HTMLDivElement>('#overview');
 
 
@@ -127,6 +140,7 @@ export class DescriptionComponent {
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
     {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, hasDepthControl: true},
+    {key: DataKeys.PROTEIN_MARKER, label: Labels.MARKERS, manual: true},
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
     {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
@@ -174,6 +188,8 @@ export class DescriptionComponent {
     switch (key) {
       case DataKeys.OVERVIEW:
         return obj;
+      case DataKeys.PROTEIN_MARKER:
+        return this.marker() && this.marker().length > 0;
       case DataKeys.CATALYST_ACTIVITY:
         return this.catalystActivity() && this.catalystActivity().length > 0;
       case DataKeys.CROSS_REFERENCE:

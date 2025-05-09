@@ -27,6 +27,20 @@
       </div>
     </div>
 
+    <div *ngIf="cellType()" class="row">
+      <div class="label">Cell Type</div>
+      <div class="value compartment-row">
+        @for (type of cellType(); track type.dbId; let i = $index; ) {
+          <a [href]="type.url" target="_blank"
+             [matTooltip]="type.definition ? type.definition : null">{{ type.displayName }}({{ type.databaseName }}:{{ type.identifier }})</a>
+          <!-- Add comma separator except for last item -->
+          @if (i < cellType().length - 1) {
+            <span class="comma">,</span>
+          }
+        }
+      </div>
+    </div>
+
     <div *ngIf="speciesName() && showSpecies()" class="row">
       <div class="label">Species</div>
       <div class="value">{{ speciesName() }}</div>
@@ -71,12 +85,32 @@
       </div>
     }
 
-    @if (['CellDevelopmentStep', 'CellLineagePath'].includes(obj().schemaClass) && tissue()) {
+
+    @if (organ()) {
       <div class="row">
-        <div class="label">Tissue</div>
-        <div class="value"><a [href]="tissue().url" target="_blank">{{ tissue().displayName }}</a></div>
+        <div class="label">Organ</div>
+        <div class="value">
+          <a [href]="organ().url" target="_blank" [matTooltip]="organ().definition ? organ().definition : null"
+          >{{ organ().displayName }}({{ organ().databaseName }}:{{ organ().identifier }})</a></div>
       </div>
     }
+
+    @if (tissue()) {
+      <div class="row">
+        <div class="label">Tissue</div>
+        <div class="value"><a [href]="tissue().url" target="_blank"
+                              [matTooltip]="tissue().definition ? tissue().definition : null">{{ tissue().displayName }}({{ tissue().databaseName }}:{{ tissue().identifier }})</a></div>
+      </div>
+    }
+
+    @if (tissueLayer()) {
+      <div class="row">
+        <div class="label">Tissue Layer</div>
+        <div class="value"><a [href]="tissueLayer().url" target="_blank">{{ tissueLayer().displayName }}({{ tissueLayer().databaseName }}:{{ tissueLayer().identifier }})</a></div>
+      </div>
+    }
+
+
   </div>
 
   <!-- Common info ends here-->

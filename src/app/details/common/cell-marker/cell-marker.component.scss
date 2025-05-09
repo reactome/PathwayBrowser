@@ -1,0 +1,70 @@
+:host {
+  width: 100%;
+}
+
+
+#markers {
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.marker-container {
+  display: flex;
+  flex-direction: column;
+
+  font-family: 'Roboto Flex', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  gap: 10px;
+  width: 100%;
+}
+
+.label-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0;
+  width: var(--column-width);
+  justify-content: center;
+  border-radius: 15px 0 0 15px;
+  gap: 5px;
+  flex-shrink: 0;
+
+
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  letter-spacing: 0.5px;
+  color: var(--on-surface);
+
+}
+
+.composition-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-left: 10px;
+  border-left: 2px solid var(--outline-variant);
+  flex: 1;
+  gap: 5px;
+
+}
+
+.ref-padding {
+  padding-left: 18px !important;
+  padding-top: 5px;
+}
