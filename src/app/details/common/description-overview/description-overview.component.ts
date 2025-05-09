@@ -8,6 +8,7 @@ import {DataKeys} from "../../../constants/constants";
 import {Relationship} from "../../../model/graph/relationship.model";
 import HasCompartment = Relationship.HasCompartment;
 import {Disease} from "../../../model/graph/external-ontology/disease.model";
+import {CellType} from "../../../model/graph/external-ontology/cell-type.model";
 
 
 
@@ -37,7 +38,9 @@ export class DescriptionOverviewComponent {
   readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), DataKeys.REVIEW_STATUS));
   readonly summation: Signal<Summation> = computed(() => getProperty(this.obj(), DataKeys.SUMMATION));
   readonly disease: Signal<Disease[]> = computed(() => getProperty(this.obj(), DataKeys.DISEASE));
-
+  readonly cellType: Signal<CellType[]> = computed(() => getProperty(this.obj(), DataKeys.CELL_TYPE));
+  readonly organ: Signal<Anatomy> = computed(()=>getProperty(this.obj(), DataKeys.ORGAN));
+  readonly tissueLayer: Signal<Anatomy> = computed(()=>getProperty(this.obj(), DataKeys.TISSUE_LAYER));
 
   reviewStar: { [key: string]: { percentage: number, score: number } } = {
     "five stars": {percentage: 100, score: 5},

@@ -5,6 +5,7 @@ import {CellType} from "../external-ontology/cell-type.model";
 import {Relationship} from "../relationship.model";
 import {DatabaseIdentifier} from "../database-identifier.model";
 import {Disease} from "../external-ontology/disease.model";
+import {MarkerReference} from "../control-reference/marker-reference.model";
 
 
 export interface PhysicalEntity extends DatabaseObject {
@@ -23,6 +24,7 @@ export interface PhysicalEntity extends DatabaseObject {
   inferredFrom: PhysicalEntity[];
   inDisease?: Boolean;
   disease?: Disease[];
+  markingReferences?: MarkerReference[];
 
 
   speciesName: string;
