@@ -34,7 +34,7 @@
         </div>
 
         <div class="thumbnail">
-          <img [src]="thumbnailImg()" #thumbnail (load)="thumbnailLoaded($event)">
+          <img [src]="thumbnailImg()" #thumbnail (load)="thumbnailLoaded()">
           <svg class="overlay" [attr.viewBox]="thumbnailViewBox()">
             <mask id="viewportMask" mask-type="luminance">
               <rect [attr.width]="thumbnailSize().width" [attr.height]="thumbnailSize().height" fill="white"></rect>
