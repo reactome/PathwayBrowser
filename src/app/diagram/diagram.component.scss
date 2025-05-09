@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 .variables {
   position: relative;
   height: 100%;
@@ -57,7 +59,10 @@
       .slider {
         width: var(--slider-height);
         min-width: var(--slider-height);
-        //height: 20px;
+
+        @include mat.slider-overrides((
+          inactive-track-color: var(--on-surface)
+        ));
       }
     }
   }
