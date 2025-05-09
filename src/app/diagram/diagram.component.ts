@@ -115,7 +115,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   thumbnailViewBox = computed(() => `0 0 ${this.thumbnailSize().width} ${this.thumbnailSize().height}`)
   viewportPosition = signal<{ x: number, y: number }>({x: 0, y: 0});
   zoomLevel = signal<number>(0.1)
-  shrinkedViewport = computed(() => {
+  shrunkViewport = computed(() => {
 // Get bounding box of the entire graph
     const bbox = this.cy?.elements()?.boundingBox() || {x1: 0, x2: 0, y1: 1, y2: 1, w: 1, h: 1}; // {x1, y1, x2, y2, w, h}
 
