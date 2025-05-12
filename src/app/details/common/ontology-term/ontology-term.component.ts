@@ -30,6 +30,5 @@ export class OntologyTermComponent {
   id = computed(() => this.term().identifier! || this.term().accession!);
 
   constructor() {
-    effect(() => console.log(this.term()));
   }
 }
