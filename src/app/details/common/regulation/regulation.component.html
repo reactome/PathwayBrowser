@@ -17,9 +17,7 @@
       <div class="row">
         <div class="label-container">Biological Process</div>
         <div class="composition-container">
-          <span><a [href]="regulation.activity.url" target="_blank">{{ regulation.activity.displayName }}
-            ({{ regulation.activity.databaseName }}
-            :{{ regulation.activity.accession }})</a></span>
+          <cr-ontology-term [term]="regulation.activity"></cr-ontology-term>
         </div>
       </div>
     }

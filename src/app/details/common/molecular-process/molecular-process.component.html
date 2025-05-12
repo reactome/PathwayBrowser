@@ -37,8 +37,7 @@
           <div class="composition-container multiple">
             @for (psiMod of item.psiMod; track psiMod.dbId) {
               <div class="psiMod-container">
-                <span><a [href]="psiMod.url" target="_blank" [matTooltip]="psiMod.definition">{{ psiMod.name[0] }}
-                  :({{ psiMod.identifier }})</a></span>
+                <cr-ontology-term [term]="psiMod"></cr-ontology-term>
               </div>
             }
           </div>
@@ -55,8 +54,7 @@
             @for (psiMod of item.psiMod; track psiMod.dbId) {
               <div class="psiMod-container">
                 <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
-                <span><a [href]="psiMod.url" target="_blank" [matTooltip]="psiMod.definition">{{ psiMod.name[0] }}
-                  :({{ psiMod.identifier }})</a></span>
+                <cr-ontology-term [term]="psiMod"></cr-ontology-term>
               </div>
             }
           </div>
@@ -88,9 +86,7 @@
         <div class="label-container">Modification</div>
         <div class="composition-container">
           @if (isReferenceGroup(item.modification) || isReferenceMolecule(item.modification)) {
-            <span><a [href]="item.modification.url" target="_blank">{{ item.modification.displayName }}
-              ({{ item.modification.databaseName }}
-              :{{ item.modification.identifier }})</a></span>
+            <cr-ontology-term [term]="item.modification"></cr-ontology-term>
           } @else if (isEntity(item.modification)) {
             <cr-entity-tree [type]="'modification'" [data]="[item.modification]"></cr-entity-tree>
           }
@@ -102,9 +98,7 @@
       <div class="row">
         <div class="label-container">Activity</div>
         <div class="composition-container">
-          <span><a [href]="item.activity.url" target="_blank">{{ item.activity.displayName }}
-            ({{ item.activity.databaseName }}
-            :{{ item.activity.accession }})</a></span>
+          <cr-ontology-term [term]="item.activity"></cr-ontology-term>
         </div>
       </div>
     }
@@ -123,9 +117,7 @@
       <div class="row">
         <div class="label-container">Biological Process</div>
         <div class="composition-container">
-          <span><a [href]="item.go_BiologicalProcess.url" target="_blank">{{ item.go_BiologicalProcess.displayName }}
-            ({{ item.go_BiologicalProcess.databaseName }}
-            :{{ item.go_BiologicalProcess.accession }})</a></span>
+          <cr-ontology-term [term]="item.go_BiologicalProcess"/>
         </div>
       </div>
     }

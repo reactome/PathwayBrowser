@@ -31,8 +31,7 @@
       <div class="label">Cell Type</div>
       <div class="value compartment-row">
         @for (type of cellType(); track type.dbId; let i = $index; ) {
-          <a [href]="type.url" target="_blank"
-             [matTooltip]="type.definition ? type.definition : null">{{ type.displayName }}({{ type.databaseName }}:{{ type.identifier }})</a>
+          <cr-ontology-term [term]="type"></cr-ontology-term>
           <!-- Add comma separator except for last item -->
           @if (i < cellType().length - 1) {
             <span class="comma">,</span>
@@ -50,9 +49,7 @@
       <div class="label">Compartment</div>
       <div class="value compartment-row">
         @for (has of compartment(); track has.element.dbId; let i = $index; ) {
-          @let item = has.element;
-          <a [href]="item.url" target="_blank"
-             [matTooltip]="item.definition ? item.definition : null">{{ item.displayName }}</a>
+          <cr-ontology-term [term]="has.element"/>
           <!-- Add comma separator except for last item -->
           @if (i < compartment().length - 1) {
             <span class="comma">,</span>
@@ -66,10 +63,7 @@
       <div class="label">Disease</div>
       <div class="value compartment-row">
         @for (d of disease(); track d.dbId; let i = $index; ) {
-          @let dbInfo = d.databaseName + ':' + d.identifier;
-          <a [href]="d.url" target="_blank"
-             [matTooltip]="d.definition ? d.definition : null">{{ d.displayName | titlecase }}({{ dbInfo }})
-          </a>
+          <cr-ontology-term [term]="d" [titleCase]="true"/>
           <!-- Add comma separator except for last item -->
           @if (i < disease().length - 1) {
             <span class="comma">,</span>
@@ -90,23 +84,22 @@
       <div class="row">
         <div class="label">Organ</div>
         <div class="value">
-          <a [href]="organ().url" target="_blank" [matTooltip]="organ().definition ? organ().definition : null"
-          >{{ organ().displayName }}({{ organ().databaseName }}:{{ organ().identifier }})</a></div>
+          <cr-ontology-term [term]="organ()"/>
+        </div>
       </div>
     }
 
     @if (tissue()) {
       <div class="row">
         <div class="label">Tissue</div>
-        <div class="value"><a [href]="tissue().url" target="_blank"
-                              [matTooltip]="tissue().definition ? tissue().definition : null">{{ tissue().displayName }}({{ tissue().databaseName }}:{{ tissue().identifier }})</a></div>
+        <div class="value"><cr-ontology-term [term]="tissue()"/> </div>
       </div>
     }
 
     @if (tissueLayer()) {
       <div class="row">
         <div class="label">Tissue Layer</div>
-        <div class="value"><a [href]="tissueLayer().url" target="_blank">{{ tissueLayer().displayName }}({{ tissueLayer().databaseName }}:{{ tissueLayer().identifier }})</a></div>
+        <div class="value"><cr-ontology-term [term]="tissueLayer()"/></div>
       </div>
     }
 

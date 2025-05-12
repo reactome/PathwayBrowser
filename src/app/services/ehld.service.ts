@@ -1,12 +1,11 @@
 import {ElementRef, Injectable} from '@angular/core';
-import {BehaviorSubject, catchError, forkJoin, map, Observable, of, tap} from "rxjs";
+import {BehaviorSubject, forkJoin, map, Observable} from "rxjs";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Graph} from "../model/graph.model";
 import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
-import {reportUnhandledError} from "rxjs/internal/util/reportUnhandledError";
 
 export interface LegendItem {
   name: string;
@@ -58,6 +57,7 @@ export class EhldService {
 
   constructor(private http: HttpClient, private analysis: AnalysisService) {
   }
+
 
 
   getSVGData(id: string): Observable<{ svg: string; graphData: Graph.Data }> {

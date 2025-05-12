@@ -13,8 +13,7 @@
       <div class="row">
         <div class="label-container">Activity</div>
         <div class="composition-container">
-          <span><a [href]="ca.activity.url" target="_blank">{{ ca.activity.displayName }}({{ ca.activity.databaseName }}
-            :{{ ca.activity.accession }})</a></span>
+          <cr-ontology-term [term]="ca.activity"></cr-ontology-term>
         </div>
       </div>
     }
