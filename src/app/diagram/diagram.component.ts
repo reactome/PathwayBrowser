@@ -253,7 +253,14 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   }
 
   fitScreen() {
-    this.cy.fit(undefined, 20)
+    this.cy.animate({
+      fit: {
+        eles: "*",
+        padding: 20
+      },
+      duration: 1000,
+      easing: "ease-in-out"
+    })
   }
 
   private loadDiagram(): void {
