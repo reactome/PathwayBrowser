@@ -40,6 +40,7 @@ export const DataKeys = {
   RNA_MARKERS: 'rnaMarker',
   PROTEIN_MARKER: 'proteinMarker',
   MARKER_REFERENCE: 'markerReference',
+  REPEATED_UNIT: 'repeatedUnits',
   CELL_TYPE: 'cellType',
   ORGAN:'organ',
   TISSUE_LAYER:'tissueLayer',
@@ -73,6 +74,7 @@ export const Labels = {
   OUTPUT_FOR: 'Produced by',
   REGULATED_BY: 'Regulations',
   MODIFIED_RESIDUES: 'Modifications',
+  REPEATED_UNIT: 'Repeated Units',
   MEMBERS: 'Members',
   MARKERS: 'Markers',
 } as const;

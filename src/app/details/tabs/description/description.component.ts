@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, Signal, viewChild} from '@angular/core';
+import {Component, computed, effect, input, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {getProperty, isEntity} from "../../../services/utils";
@@ -116,9 +116,25 @@ export class DescriptionComponent {
     return [...rnaMarker, ...proteinMarker];
   })
 
-  markerReference:Signal<MarkerReference[]> = computed(() => getProperty(this.obj(), DataKeys.MARKER_REFERENCE))
+  markerReference: Signal<MarkerReference[]> = computed(() => getProperty(this.obj(), DataKeys.MARKER_REFERENCE))
+
+  repeatedUnits: Signal<PhysicalEntity[]> = computed(() => getProperty(this.obj(), DataKeys.REPEATED_UNIT))
 
   overview$ = viewChild<HTMLDivElement>('#overview');
+
+
+  overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
+  referenceTemplate$ = viewChild.required<TemplateRef<any>>('referenceTemplate');
+  modificationsTemplate$ = viewChild.required<TemplateRef<any>>('modificationsTemplate');
+  crossReferencesTemplate$ = viewChild.required<TemplateRef<any>>('crossReferencesTemplate');
+  markerTemplate$ = viewChild.required<TemplateRef<any>>('markerTemplate');
+  regulationTemplate$ = viewChild.required<TemplateRef<any>>('regulationTemplate');
+  catalystActivityTemplate$ = viewChild.required<TemplateRef<any>>('catalystActivityTemplate');
+  inferencesTemplate$ = viewChild.required<TemplateRef<any>>('inferencesTemplate');
+  otherFormsTemplate$ = viewChild.required<TemplateRef<any>>('otherFormsTemplate');
+  literatureRefsTemplate$ = viewChild.required<TemplateRef<any>>('literatureRefsTemplate');
+  authorsTemplate$ = viewChild.required<TemplateRef<any>>('authorsTemplate');
+  interactorsTemplate$ = viewChild.required<TemplateRef<any>>('interactorsTemplate');
 
 
   protected readonly Labels = Labels;
@@ -126,28 +142,89 @@ export class DescriptionComponent {
 
 
   //todo get divider label from here
-  elements: { key: string, label: string, manual?: boolean, hasDepthControl?: boolean }[] = [
-    {key: DataKeys.OVERVIEW, label: Labels.OVERVIEW, manual: true},
-    {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true},
-    {key: DataKeys.CROSS_REFERENCE, label: Labels.CROSS_REFERENCES, manual: true},
-    {key: DataKeys.MODIFIED_RESIDUES, label: Labels.MODIFIED_RESIDUES, manual: true},
+  elements: {
+    key: string,
+    label: string,
+    hasDepthControl?: boolean,
+    manual?: boolean,
+    template?: Signal<TemplateRef<any>>,
+    isPresent?: () => boolean,
+  }[] = [
+    {
+      key: DataKeys.OVERVIEW,
+      label: Labels.OVERVIEW,
+      manual: true,
+      template: this.overviewTemplate$,
+      isPresent: () => true
+    },
+    {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true, template: this.referenceTemplate$},
+    {
+      key: DataKeys.MODIFIED_RESIDUES,
+      label: Labels.MODIFIED_RESIDUES,
+      manual: true,
+      template: this.modificationsTemplate$
+    },
+
+    {key: DataKeys.MEMBERS, label: Labels.MEMBERS, hasDepthControl: true},
+    {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, hasDepthControl: true},
+    {key: DataKeys.REPEATED_UNIT, label: Labels.REPEATED_UNIT, hasDepthControl: true},
+    {
+      key: DataKeys.PROTEIN_MARKER,
+      label: Labels.MARKERS,
+      manual: true,
+      template: this.markerTemplate$,
+      isPresent: () => this.marker()?.length > 0
+    },
+
     {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, hasDepthControl: true},
-    {key: DataKeys.OTHER_FORMS, label: Labels.OTHER_FORMS, manual: true},
-    {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true},
-    {key: DataKeys.MEMBERS, label: Labels.MEMBERS, hasDepthControl:true},
-    {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
+    {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual: true, template: this.regulationTemplate$},
+    {
+      key: DataKeys.CATALYST_ACTIVITY,
+      label: Labels.CATALYST_ACTIVITY,
+      manual: true,
+      template: this.catalystActivityTemplate$,
+      isPresent: () => this.catalystActivity()?.length > 0
+    },
+
+    {
+      key: DataKeys.CROSS_REFERENCE,
+      label: Labels.CROSS_REFERENCES,
+      manual: true,
+      template: this.crossReferencesTemplate$,
+      isPresent: () => this.crossReference()?.length > 0
+    },
+
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
     {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
-    {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, hasDepthControl: true},
-    {key: DataKeys.PROTEIN_MARKER, label: Labels.MARKERS, manual: true},
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
-    {key: DataKeys.CATALYST_ACTIVITY, label: Labels.CATALYST_ACTIVITY, manual: true},
-    {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual: true},
-    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true},
-    {key: Labels.AUTHORSHIP, label: Labels.AUTHORSHIP, manual: true},
-    {key: DataKeys.INTERACTORS, label: Labels.INTERACTORS, manual: true},
+
+    {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true, template: this.inferencesTemplate$},
+    {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
+    {
+      key: DataKeys.OTHER_FORMS,
+      label: Labels.OTHER_FORMS,
+      manual: true,
+      template: this.otherFormsTemplate$,
+      isPresent: () => this.otherForms()?.size > 0
+    },
+
+    {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true, template: this.literatureRefsTemplate$},
+    {
+      key: Labels.AUTHORSHIP,
+      label: Labels.AUTHORSHIP,
+      manual: true,
+      template: this.authorsTemplate$,
+      isPresent: () => this.authorship()?.length > 0
+    },
+    {
+      key: DataKeys.INTERACTORS,
+      label: Labels.INTERACTORS,
+      manual: true,
+      template: this.interactorsTemplate$,
+      isPresent: () => this.interactorsLength() > 0
+    },
   ]
 
 

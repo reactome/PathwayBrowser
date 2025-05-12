@@ -33,283 +33,27 @@
       </div>
     </div>
 
-    <!-- Overview -->
-    <div class="overview" #overview [class.update-layout]="!icon.isLoading() && icon.value()" [style.--icon-height.px]="overview$()?.clientHeight">
-      <cr-description-overview  [obj]="obj()" [showSpecies]="true"></cr-description-overview>
-      @if (!icon.isLoading() && icon.value()) {
-        <div class="icon-container">
-          <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
-        </div>
-      }
-    </div>
-
-    <!-- Cell markers -->
-    @if (marker().length > 0) {
-      <div class="divider-container" [id]=DataKeys.PROTEIN_MARKER>
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.MARKERS }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container">
-        <cr-cell-marker [markers]="marker()" [markerRefs]="markerReference()"></cr-cell-marker>
-      </div>
-    }
-
-    <!-- External Reference -->
-    @if (referenceEntity()) {
-      <div class="divider-container" [id]=DataKeys.REFERENCE_ENTITY>
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.EXTERNAL_REFERENCE }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      @if (referenceEntity()) {
-        <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
-      }
-
-    }
-
-    <!-- Cross References-->
-    @if (crossReference() && crossReference().length > 0) {
-      <div class="divider-container" [id]=DataKeys.CROSS_REFERENCE>
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CROSS_REFERENCES  }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <cr-cross-references [crossRefs]=crossReference()></cr-cross-references>
-    }
-
-    <!-- Modifications-->
-    @if (modifications()) {
-      <div class="divider-container" [id]=DataKeys.MODIFIED_RESIDUES>
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.MODIFIED_RESIDUES }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container">
-        <!--        <cr-modification [modifications]="modifications()"></cr-modification>-->
-
-        <cr-molecular-process [entries]="modifications()" [catalystActivityReference]="catalystRef()"
-                              [regulationRefs]="regulationRefs()"></cr-molecular-process>
-      </div>
-    }
-
-    <!-- Other forms-->
-    @if (otherForms() && otherForms().size > 0) {
-      <div class="divider-container" [id]=DataKeys.OTHER_FORMS>
-        <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.OTHER_FORMS }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-
-      <div class="element-container columns" [class.columns]="otherForms().size > 1 ? 'columns' : ''">
-        @for (item of otherForms()! |  keyvalue | sortByText :'key'; track item.key) {
-          <div class="row padding">
-            <div class="label-container">{{ item.key }}</div>
-            <div class="composition-container">
-              @for (pe of item.value; let i = $index; track pe.dbId){
-                <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
-                <!-- Add separator except for last item -->
-                @if (i < item.value.length - 1) {
-                  <span class="margin-right">,</span>
-                }
-              }
+    @for (element of elements; track element.key; let i = $index) {
+      @if (element.isPresent ? element.isPresent() : obj()[element.key]) {
+        @if (i > 0) {
+          <div class="divider-container" [id]="element.key">
+            <div class="divider-name-container">
+              <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
+            </div>
+            <div class="divider-line-container">
+              <mat-divider class="divider"></mat-divider>
             </div>
           </div>
         }
-      </div>
-    }
 
-    <!-- Inferences(Inferred To)-->
-    @if (inferences() && inferences().size > 0) {
-      <div class="divider-container" [id]=DataKeys.INFERRED_TO>
-        <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.INFERENCES }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container columns">
-        @for (item of inferences()! | keyvalue | sortByText : 'key'; track item.key) {
-          <div class="row padding">
-            <div class="label-container">{{ item.key }}</div>
-            <div class="composition-container">
-              @for (pe of item.value; let i = $index; track pe.dbId) {
-                <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
-                <!-- Add separator except for last item -->
-                @if (i < item.value.length - 1) {
-                  <span class="margin-right">,</span>
-                }
-              }
-            </div>
-          </div>
+        @if (!element.manual) {
+          <cr-controller-tree [type]="element.key" [data]="obj()[element.key]"
+                              [depthControl]="element.hasDepthControl ?? false"></cr-controller-tree>
+        } @else if (element.template) {
+          <ng-container *ngTemplateOutlet="element.template!()"></ng-container>
         }
-      </div>
-    }
-
-    @for (element of elements; track element.key) {
-      @if (obj()[element.key] && !element?.manual) {
-
-        <div class="divider-container" [id]="element.key">
-          <div class="divider-name-container">
-            <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
-          </div>
-          <div class="divider-line-container">
-            <mat-divider class="divider"></mat-divider>
-          </div>
-        </div>
-
-        <cr-controller-tree [type]="element.key" [data]="obj()[element.key]" [depthControl]="element.hasDepthControl ?? false"></cr-controller-tree>
       }
     }
-
-    <!-- Catalyst Activity-->
-    @if (catalystActivity()) {
-      <div class="divider-container" [id]=DataKeys.CATALYST_ACTIVITY>
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.CATALYST_ACTIVITY }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container">
-        <!--        <cr-catalyst-activity [catalystActivity]="catalystActivity()" [catalystActivityReference]="catalystRef()"></cr-catalyst-activity>-->
-        <cr-molecular-process [entries]="catalystActivity()" [catalystActivityReference]="catalystRef()"
-                              [regulationRefs]="regulationRefs()"></cr-molecular-process>
-      </div>
-    }
-
-    @if (regulations()) {
-      <div class="divider-container" [id]=DataKeys.REGULATED_BY>
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REGULATED_BY }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container">
-        <!--        <cr-regulation [regulations]="regulations()" [regulationRefs]="regulationRefs()"></cr-regulation>-->
-        <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"
-                              [regulationRefs]="regulationRefs()"></cr-molecular-process>
-      </div>
-    }
-
-    <!-- Literature References-->
-    @if (literatureRefs()) {
-      <div class="divider-container" [id]=DataKeys.LITERATURE_REFERENCE>
-        <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.REFERENCE }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-
-      <div class="element-container">
-        @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
-          <div class="row">
-            <div class="label-container">{{ ref.year }}</div>
-            <div class="composition-container">
-              <cr-publication [publication]=ref [showYear]="false"></cr-publication>
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Authorship-->
-    @if (authorship() && authorship().length > 0) {
-
-      <div class="divider-container" [id]=DataKeys.AUTHORSHIP>
-        <div class="divider-name-container">
-          <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.AUTHORSHIP }"></ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-
-      <div class="element-container">
-        @for (item of authorship(); track item) {
-          <div class="row">
-            <div class="label-container">{{ item.label }}</div>
-            <div class="composition-container flex-column">
-              @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
-                <div class="authorship-item">
-                  @for (author of ie.author; let i = $index; track author.dbId) {
-                    <a [href]="'/content/detail/' + author.dbId" target="_blank" [ngClass]="{'margin-right': !author.orcidId}">
-                      {{ author.firstname }} {{ author.surname }}
-                    </a>
-
-                    @if (author.orcidId) {
-                      <a [href]="'https://orcid.org/' + author.orcidId" target="_blank">
-                        <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
-                      </a>
-                    }
-                    <!-- Add separator except for last item -->
-                    @if (i < ie.author.length - 1) {
-                      <span class="margin-right">,</span>
-                    }
-                  }
-                  - {{ ie.dateTime | authorshipDateFormat }}
-                </div>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    @if (interactors() && interactors().length > 0) {
-      <div class="divider-container" [id]="DataKeys.INTERACTORS">
-        <div class="divider-name-container">
-          <ng-container
-            *ngTemplateOutlet="dividerTemplate; context: { $implicit: Labels.INTERACTORS + '(' + interactorsLength()+')' }">
-          </ng-container>
-        </div>
-        <div class="divider-line-container">
-          <mat-divider class="divider"></mat-divider>
-        </div>
-      </div>
-      <div class="element-container">
-        <cr-interactors-table [interactors]="interactors()!"></cr-interactors-table>
-      </div>
-    }
-
-
-
   </div>
 
   <div class="toc">
@@ -325,3 +69,157 @@
   </div>
 
 </div>
+
+<ng-template #overviewTemplate>
+  <!-- Overview -->
+  <div class="overview" #overview [class.update-layout]="!icon.isLoading() && icon.value()"
+       [style.--icon-height.px]="overview$()?.clientHeight">
+    <cr-description-overview [obj]="obj()" [showSpecies]="true"></cr-description-overview>
+    @if (!icon.isLoading() && icon.value()) {
+      <div class="icon-container">
+        <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #crossReferencesTemplate>
+  <cr-cross-references [crossRefs]=crossReference()></cr-cross-references>
+</ng-template>
+
+<!-- Cell markers -->
+<ng-template #markerTemplate>
+  <div class="element-container">
+    <cr-cell-marker [markers]="marker()" [markerRefs]="markerReference()"></cr-cell-marker>
+  </div>
+</ng-template>
+
+
+<!-- External Reference -->
+<ng-template #referenceTemplate>
+  <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
+</ng-template>
+
+
+<!-- Modifications-->
+<ng-template #modificationsTemplate>
+  <div class="element-container">
+    <!--        <cr-modification [modifications]="modifications()"></cr-modification>-->
+
+    <cr-molecular-process [entries]="modifications()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
+  </div>
+</ng-template>
+
+<!-- Other forms-->
+<ng-template #otherFormsTemplate>
+  <div class="element-container columns" [class.columns]="otherForms().size > 1 ? 'columns' : ''">
+    @for (item of otherForms()! |  keyvalue | sortByText :'key'; track item.key) {
+      <div class="row padding">
+        <div class="label-container">{{ item.key }}</div>
+        <div class="composition-container">
+          @for (pe of item.value; let i = $index; track pe.dbId) {
+            <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+            <!-- Add separator except for last item -->
+            @if (i < item.value.length - 1) {
+              <span class="margin-right">,</span>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<!-- Inferences(Inferred To)-->
+<ng-template #inferencesTemplate>
+  <div class="element-container columns">
+    @for (item of inferences()! | keyvalue | sortByText : 'key'; track item.key) {
+      <div class="row padding">
+        <div class="label-container">{{ item.key }}</div>
+        <div class="composition-container">
+          @for (pe of item.value; let i = $index; track pe.dbId) {
+            <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+            <!-- Add separator except for last item -->
+            @if (i < item.value.length - 1) {
+              <span class="margin-right">,</span>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<!-- Catalyst Activity-->
+<ng-template #catalystActivityTemplate>
+  <div class="element-container">
+    <!--        <cr-catalyst-activity [catalystActivity]="catalystActivity()" [catalystActivityReference]="catalystRef()"></cr-catalyst-activity>-->
+    <cr-molecular-process [entries]="catalystActivity()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
+  </div>
+</ng-template>
+
+
+<ng-template #regulationTemplate>
+  <div class="element-container">
+    <!--        <cr-regulation [regulations]="regulations()" [regulationRefs]="regulationRefs()"></cr-regulation>-->
+    <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
+  </div>
+</ng-template>
+
+
+<!-- Literature References-->
+<ng-template #literatureRefsTemplate>
+  <div class="element-container">
+    @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
+      <div class="row">
+        <div class="label-container">{{ ref.year }}</div>
+        <div class="composition-container">
+          <cr-publication [publication]=ref [showYear]="false"></cr-publication>
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #authorsTemplate>
+  <div class="element-container">
+    @for (item of authorship(); track item) {
+      <div class="row">
+        <div class="label-container">{{ item.label }}</div>
+        <div class="composition-container flex-column">
+          @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
+            <div class="authorship-item">
+              @for (author of ie.author; let i = $index; track author.dbId) {
+                <a [href]="'/content/detail/' + author.dbId" target="_blank"
+                   [ngClass]="{'margin-right': !author.orcidId}">
+                  {{ author.firstname }} {{ author.surname }}
+                </a>
+
+                @if (author.orcidId) {
+                  <a [href]="'https://orcid.org/' + author.orcidId" target="_blank">
+                    <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
+                  </a>
+                }
+                <!-- Add separator except for last item -->
+                @if (i < ie.author.length - 1) {
+                  <span class="margin-right">,</span>
+                }
+              }
+              - {{ ie.dateTime | authorshipDateFormat }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #interactorsTemplate>
+  <div class="element-container">
+    <cr-interactors-table [interactors]="interactors()!"></cr-interactors-table>
+  </div>
+</ng-template>
+
