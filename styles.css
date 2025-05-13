@@ -551,6 +551,10 @@ a:active {
   min-width: 100px;
   margin-right: 20px;
 }
+.mat-icon[data-mat-icon-name*=set] {
+  width: 28px !important;
+  margin-left: -2px;
+}
 body {
   --opacity: 0.08;
   --structure-opacity: [[130,0], [150,100]];
