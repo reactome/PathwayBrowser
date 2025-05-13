@@ -139,6 +139,8 @@ $small-breakpoint-width: 959px;
 .custom-icon {
   width: 24px;
   height: 24px;
+  margin-left: 0!important;
+  flex-shrink: 0;
 }
 
 .double-arrow {
