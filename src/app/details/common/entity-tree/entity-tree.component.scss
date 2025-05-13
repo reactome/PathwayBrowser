@@ -12,6 +12,7 @@
   ));
 
   & {
+    --gap: 4px;
     --padding: 2px;
     --connector-width: 24px;
     --connector-height: 24px;
@@ -27,17 +28,9 @@
  * This padding sets alignment of the nested nodes.
  */
 .component-tree .mat-nested-tree-node div[role=group] {
-  padding-left: 24px;
+  padding-left: 28px;
 }
 
-/*
- * Padding for leaf nodes.
- * Leaf nodes need to have padding so as to align with other non-leaf nodes
- * under the same parent.
- */
-//.tree div[role=group] > .mat-nested-tree-node {
-//  padding-left: 40px;
-//}
 
 
 .mat-tree-node {
@@ -46,23 +39,14 @@
   width: 100%;
   justify-content: space-between;
   cursor: pointer;
+  padding-left: var(--gap);
+  margin-left: calc(-1 * var(--gap));
+  padding-right: var(--padding);
 }
 
 .mat-tree-node:hover {
   background: var(--surface2);
   border-radius: 50px;
-}
-
-/* Add padding between connector and tree node and ignore the level 1*/
-.mat-nested-tree-node[aria-level="1"] > .mat-tree-node {
-  padding: 0 var(--padding)
-}
-
-// Space between icon and connector
-.mat-tree-node {
-  //padding-left: calc(var(--padding) * var(--depth, 1));
-  //padding: 0 4px;
-  // padding: 0 calc(var(--padding) * var(--level, 1))
 }
 
 .left {
@@ -160,9 +144,8 @@
   height: var(--connector-height);
   display: flex;
 
-  width: calc(var(--connector-width) * var(--level, 1));
-  left: calc(-1 * var(--connector-width) * var(--level, 1));
-  //padding-left: calc(var(--padding) * var(--depth, 1));
+  left: calc(-1 * (var(--connector-width) + var(--gap)) * var(--level, 1));
+  gap: var(--gap);
 
 }
 
@@ -177,9 +160,8 @@
   height: 100%;
   display: flex;
 
-  width: calc(var(--connector-width) * var(--level, 1));
-  left: calc(-1 * var(--connector-width) * var(--level, 1));
-  //padding-left: calc(var(--padding) * var(--depth, 1));
+  left: calc(-1 * (var(--connector-width) + var(--gap)) * var(--level, 1));
+  gap: var(--gap);
 
   .connector:not(:last-child) {
     width: var(--connector-width);
