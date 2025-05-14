@@ -11,13 +11,14 @@
     node-text-size:14px
   ));
 
-  & {
-    --gap: 4px;
-    --padding: 2px;
-    --connector-width: 24px;
-    --connector-height: 24px;
-    --max-width: 150px;
-  }
+
+  --gap: 4px;
+  --padding: 2px;
+  --connector-width: 24px;
+  --connector-height: 24px;
+  --max-width: 150px;
+  
+  padding: var(--padding);
 }
 
 .component-tree-invisible {
@@ -30,7 +31,6 @@
 .component-tree .mat-nested-tree-node div[role=group] {
   padding-left: 28px;
 }
-
 
 
 .mat-tree-node {
