@@ -42,14 +42,17 @@
                     [attr.height]="shrunkViewport().height"
                     [attr.width]="shrunkViewport().width"
                     [attr.x]="shrunkViewport().x"
-                    [attr.y]="shrunkViewport().y"></rect>
+                    [attr.y]="shrunkViewport().y"
+                    [attr.rx]="thumbnailRx()"></rect>
             </mask>
-            <rect x="0" y="0" [attr.width]="thumbnailSize().width" [attr.height]="thumbnailSize().height" fill="var(--surface, white)" opacity="0.5"  mask="url(#viewportMask)"></rect>
+            <rect x="0" y="0" [attr.width]="thumbnailSize().width" [attr.height]="thumbnailSize().height"
+                  fill="var(--surface, white)" opacity="0.5" mask="url(#viewportMask)"></rect>
             <rect stroke="var(--primary)" stroke-width="1" fill="none"
                   [attr.height]="shrunkViewport().height"
                   [attr.width]="shrunkViewport().width"
                   [attr.x]="shrunkViewport().x"
-                  [attr.y]="shrunkViewport().y"></rect>
+                  [attr.y]="shrunkViewport().y"
+                  [attr.rx]="thumbnailRx()"></rect>
           </svg>
         </div>
       </div>

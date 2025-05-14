@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
 import {extract, ReactomeEvent, ReactomeEventTypes, Style} from "reactome-cytoscape-style";
-import cytoscape, {ElementsDefinition} from "cytoscape";
+import cytoscape, {BoundingBoxWH, ElementsDefinition} from "cytoscape";
 import {InteractorService} from "../interactors/services/interactor.service";
 import {
   catchError,
@@ -46,6 +46,12 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 import {DarkService} from "../services/dark.service";
 
+
+const INIT_RX = 2;
+
+const END_RX = 0;
+
+const FIT_PADDING = 100;
 
 @UntilDestroy({checkProperties: true})
 @Component({
@@ -106,18 +112,29 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  zoomToCytoscapeTransform = (x: number) => this.cy.minZoom() * Math.pow(this.cy.maxZoom() / this.cy.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
-  zoomToControlTransform = (zoomCy: number) => this.controlMinZoom() + this.controlRange() * (Math.log(zoomCy / this.cy.minZoom()) / Math.log(this.cy.maxZoom() / this.cy.minZoom()));
+  zoomToCytoscapeTransform = (x: number) => this.minZoom() * Math.pow(this.maxZoom() / this.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
+  zoomToControlTransform = (zoomCy: number) => this.controlMinZoom() + this.controlRange() * (Math.log(zoomCy / this.minZoom()) / Math.log(this.maxZoom() / this.minZoom()));
   thumbnailImg = signal<string>('');
   sizeObserver!: ResizeObserver;
   containerSize = signal<{ width: number, height: number }>({width: 0, height: 0});
   thumbnailSize = signal<{ width: number, height: number }>({width: 0, height: 0});
+  boundingBox = signal<BoundingBoxWH>({x1: 0, y1: 1, w: 1, h: 1});
+
+
   thumbnailViewBox = computed(() => `0 0 ${this.thumbnailSize().width} ${this.thumbnailSize().height}`)
   viewportPosition = signal<{ x: number, y: number }>({x: 0, y: 0});
-  zoomLevel = signal<number>(0.1)
+  zoomLevel = signal<number>(0.1);
+  minZoom = signal<number>(0.1);
+  maxZoom = signal<number>(15);
+
+  thumbnailRxA = computed(() => (END_RX - INIT_RX) / (this.maxZoom() - this.minZoom()) );
+  thumbnailRxB = computed(() => INIT_RX - this.thumbnailRxA() * this.minZoom());
+  thumbnailRx = computed(() => this.zoomLevel() * this.thumbnailRxA() + this.thumbnailRxB());
+
+
   shrunkViewport = computed(() => {
 // Get bounding box of the entire graph
-    const bbox = this.cy?.elements()?.boundingBox() || {x1: 0, x2: 0, y1: 1, y2: 1, w: 1, h: 1}; // {x1, y1, x2, y2, w, h}
+    const bbox = this.boundingBox();
 
 // Get current zoom and pan
     const zoom = this.zoomLevel();
@@ -149,15 +166,12 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     const viewY = -pan.y / zoom;
 
 // Convert to thumbnail coordinates
-
-    const viewRect = {
+    return {
       x: (viewX - bbox.x1) * scale + offsetX,
       y: (viewY - bbox.y1) * scale + offsetY,
       width: viewW * scale,
       height: viewH * scale
-    };
-
-    return viewRect
+    }
   });
 
   cy!: cytoscape.Core;
@@ -205,7 +219,28 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
     this.sizeObserver = new ResizeObserver(entries => {
       entries.forEach(entry => {
-        if (entry.target === container) this.containerSize.set(entry.contentRect)
+        if (entry.target === container) {
+          this.containerSize.set(entry.contentRect);
+
+          // Update min zoom to be able to fit the whole diagram in the resized viewport
+          if (this.cy) {
+            const bbox = this.boundingBox();
+            const minZoom = Math.min(
+              this.containerSize().width / (bbox.w + FIT_PADDING),
+              this.containerSize().height / (bbox.h + FIT_PADDING),
+            );
+
+            this.minZoom.set(minZoom);
+            this.cys.forEach(cy => {
+              cy.minZoom(minZoom);
+              if (cy.zoom() < minZoom) {
+                this.zoomLevel.set(minZoom);
+                cy.zoom(minZoom);
+              }
+            })
+          }
+        }
+
         if (entry.target === this.thumbnailRef().nativeElement) this.thumbnailSize.set(entry.contentRect)
       })
     })
@@ -256,7 +291,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     this.cy.animate({
       fit: {
         eles: "*",
-        padding: 20
+        padding: FIT_PADDING
       },
       duration: 1000,
       easing: "ease-in-out"
@@ -319,7 +354,20 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         })
 
         this.zoomLevel.set(this.cy.zoom());
+        this.minZoom.set(this.cy.minZoom());
+        this.maxZoom.set(this.cy.maxZoom());
         this.viewportPosition.set({...this.cy.pan()});
+        this.boundingBox.set(this.cy.elements().boundingBox({
+          includeEdges: true,
+          includeNodes: true,
+
+          includeLabels: false,
+          includeMainLabels: false,
+          includeOverlays: false,
+          includeUnderlays: false,
+          includeSourceLabels: false,
+          includeTargetLabels: false,
+        }));
 
         this.loadCompare(elements, container);
 
