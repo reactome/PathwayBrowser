@@ -23,7 +23,7 @@
           [matTooltip]="symbol().tooltip"
           [svgIcon]="symbol().name">
         </mat-icon>
-        <span class="name">{{ obj().displayName }}</span>
+        <span class="name">{{ obj().name[0] || obj().displayName }}</span>
       </div>
       <div class="details-button">
         <a mat-button [href]="'/content/detail/' + obj().stId" target="_blank">

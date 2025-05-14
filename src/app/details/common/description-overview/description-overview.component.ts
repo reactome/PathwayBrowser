@@ -6,10 +6,9 @@ import {ReviewStatus} from "../../../model/graph/review-status.model";
 import {Summation} from 'src/app/model/graph/summation.model';
 import {DataKeys} from "../../../constants/constants";
 import {Relationship} from "../../../model/graph/relationship.model";
-import HasCompartment = Relationship.HasCompartment;
 import {Disease} from "../../../model/graph/external-ontology/disease.model";
 import {CellType} from "../../../model/graph/external-ontology/cell-type.model";
-
+import HasCompartment = Relationship.HasCompartment;
 
 
 @Component({
