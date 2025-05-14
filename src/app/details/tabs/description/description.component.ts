@@ -240,6 +240,7 @@ export class DescriptionComponent {
         inline: 'start'
       });
     });
+    effect(() => console.log("selected object", this.obj()))
   }
 
 
