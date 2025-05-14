@@ -267,6 +267,15 @@ export class EventService {
     });
   }
 
+  clearAllHitEvents(events: Event[]) {
+    events?.forEach(event => {
+      event.hit = false;
+      if (isPathwayOrTLP(event)) {
+        this.clearAllHitEvents(event.events?.map(e => e.element));
+      }
+    });
+  }
+
   buildTree(obj: SelectableObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     if (isEntity(obj)) {
       return this.buildTreeWithSelectedEntity(obj, diagramId, tree, hitReactions);
@@ -496,7 +505,14 @@ export class EventService {
   }
 
   addHitReactions(tree: Event[] | undefined, hitReactions: number[]) {
-    if (hitReactions.length === 0 || !tree) return;
+    if (!tree) return;
+    //todo: temporary fix for clearing hit events when there is no analysis token
+
+    // Clear analysis results
+    if (hitReactions.length === 0) {
+      this.clearAllHitEvents(this.treeData$.value);
+    }
+
     tree.forEach(event => {
       event.hit = hitReactions.includes(event.dbId);
       if (!isPathwayOrTLP(event)) return;
