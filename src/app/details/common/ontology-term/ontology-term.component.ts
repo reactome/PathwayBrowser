@@ -26,7 +26,7 @@ export class OntologyTermComponent {
   titleCase = input<boolean>(false);
   displayId = input<boolean>(true);
 
-  name = computed(() => this.term().displayName || (this.term().name instanceof Array ? this.term().name![0] : this.term().name as string));
+  name = computed(() => (this.term().name instanceof Array ? this.term().name![0] : this.term().name as string) || this.term().displayName );
   id = computed(() => this.term().identifier! || this.term().accession!);
 
   constructor() {
