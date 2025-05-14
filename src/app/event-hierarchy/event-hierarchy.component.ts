@@ -115,16 +115,17 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
 
   analysing = toObservable(this.state.analysis).pipe(
-    switchMap(result => {
-      const token = this.analysis.result?.summary.token;
-      if (!token || !this.pathwayId()) return of({hitReactions: []});
-      return this.analysis.getHitReactions(this.pathwayId()!, token).pipe(
+    combineLatestWith(toObservable(this.pathwayId)),
+    switchMap(([token, pathwayId]) => {
+      if (!pathwayId || !token) return of({hitReactions: []});
+      return this.analysis.getHitReactions(pathwayId, token).pipe(
         map(hitReactions => ({hitReactions}))
       );
     })
   ).subscribe(({hitReactions}) => {
     this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result);
 
+    // TODO add hit reactions on all opened pathways, not just current one + Make sure it gets updated upon selection / opening of a new pathway
     if (this.selectedTreeEvent && isPathwayOrTLP(this.selectedTreeEvent)) {
       this.eventService.addHitReactions(this.selectedTreeEvent.events?.map(e => e.element), hitReactions);
     }

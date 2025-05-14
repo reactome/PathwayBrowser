@@ -13,6 +13,5 @@ export interface Pathway extends Event {
   //not from API endpoint but are needed in the tree view
   subpathwayColor?: string;
   hitReactionsCount?: string;
-  hit?: boolean;
 }
 

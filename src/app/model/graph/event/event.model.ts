@@ -30,5 +30,6 @@ export interface Event extends DatabaseObject {
   isHovered?: boolean;
   ancestors: Event[];
   parent: Event;
+  hit?: boolean;
 
 }

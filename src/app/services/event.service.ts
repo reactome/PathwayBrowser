@@ -118,9 +118,9 @@ export class EventService {
         this.setSubtreeColors(treeEvent, colors);
       }
       this.setCurrentEventAndObj(treeEvent, dbo);
-      this.setTreeData(this.treeData$.value);
       this.addAnalysisTag(dbo.events, this.analysisService.result);
       this.addHitReactions(dbo.events, hitReactions);
+      this.setTreeData(this.treeData$.value);
     });
   }
 
@@ -244,17 +244,15 @@ export class EventService {
         map(([treeData, event]) => {
           this.setCurrentEventAndObj(event, event);
           this.loadEventData(treeNode)//todo: this.setCurrentEventAndObj(treeEvent, event)?
+          console.log('Subpathway, already in the tree view')
           return treeData;
         })
       );
     } else {
       // Interacting pathway, not visible in the tree view
+      console.log('Interacting pathway, not visible in the tree view');
       this.clearAllSelectedEvents(treeNodes);
-      return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, hitReactions).pipe(
-        map(treeData => {
-          return treeData;
-        })
-      );
+      return this.buildTreeWithSelectedEvent(event, diagramId, true, tree, hitReactions);
     }
   }
 
@@ -498,8 +496,8 @@ export class EventService {
   addHitReactions(tree: Event[] | undefined, hitReactions: number[]) {
     if (hitReactions.length === 0 || !tree) return;
     tree.forEach(event => {
-      if (!isPathwayOrTLP(event)) return;
       event.hit = hitReactions.includes(event.dbId);
+      if (!isPathwayOrTLP(event)) return;
       if (event.events && event.events.length > 0) {
         this.addHitReactions(event.events?.map(e => e.element), hitReactions);
       }
@@ -590,7 +588,7 @@ export class EventService {
       visibleTreeNodes.push(node);
       // If the node is expanded, recursively check its children
       if (isPathwayOrTLP(node) && tree.isExpanded(node)) {
-        node.events.forEach(child => addVisibleNodes(child.element));
+        node.events?.forEach(child => addVisibleNodes(child.element));
       }
     };
     // Start from the root nodes
@@ -607,7 +605,7 @@ export class EventService {
     const addVisibleNodes = (node: Event) => {
       expandedTreeNodes.push(node);
       if (isPathwayOrTLP(node) && tree.isExpanded(node)) {
-        node.events.forEach(child => addVisibleNodes(child.element));
+        node.events?.forEach(child => addVisibleNodes(child.element));
       }
     };
     const rootTree = treeNodes.find(node => node.stId === tlpStId);
