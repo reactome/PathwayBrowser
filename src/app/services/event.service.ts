@@ -118,8 +118,8 @@ export class EventService {
         this.setSubtreeColors(treeEvent, colors);
       }
       this.setCurrentEventAndObj(treeEvent, dbo);
-      this.addAnalysisTag(dbo.events, this.analysisService.result);
       if (isPathwayOrTLP(dbo)) {
+        this.addAnalysisTag(dbo.events?.map(e => e.element), this.analysisService.result);
         this.addHitReactions(dbo.events?.map(e => e.element), hitReactions);
       }
       this.setTreeData(this.treeData$.value);
