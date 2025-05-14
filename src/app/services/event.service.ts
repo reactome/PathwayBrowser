@@ -119,7 +119,9 @@ export class EventService {
       }
       this.setCurrentEventAndObj(treeEvent, dbo);
       this.addAnalysisTag(dbo.events, this.analysisService.result);
-      this.addHitReactions(dbo.events, hitReactions);
+      if (isPathwayOrTLP(dbo)) {
+        this.addHitReactions(dbo.events?.map(e => e.element), hitReactions);
+      }
       this.setTreeData(this.treeData$.value);
     });
   }
