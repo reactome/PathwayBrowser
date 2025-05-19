@@ -551,6 +551,27 @@ a:active {
   min-width: 100px;
   margin-right: 20px;
 }
+.label-container {
+  padding: 0;
+  width: var(--column-width);
+  justify-content: center;
+  border-radius: 15px 0 0 15px;
+  flex-shrink: 0;
+  margin: auto 0;
+  position: sticky;
+  top: 4px;
+  bottom: 4px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: right;
+  letter-spacing: 0.5px;
+  color: var(--on-surface);
+}
+p:first-child {
+  margin-top: 0;
+}
 .mat-icon[data-mat-icon-name*=set] {
   width: 28px !important;
   margin-left: -2px;
