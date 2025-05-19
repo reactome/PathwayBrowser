@@ -17,7 +17,7 @@
   --connector-width: 24px;
   --connector-height: 24px;
   --max-width: 150px;
-  
+
   padding: var(--padding);
 }
 
@@ -168,6 +168,54 @@
     height: 100%
   }
 
+}
+
+.connector[data-shape] {
+  background: var(--on-surface);
+
+  &.is {
+    background: var(--primary);
+  }
+
+  &[data-shape='I'] {
+    mask: url('../../../../assets/connector/solid-I.svg');
+  }
+
+  &[data-shape='T'] {
+    mask: url('../../../../assets/connector/solid-T.svg');
+  }
+
+  &[data-shape='L'] {
+    mask: url('../../../../assets/connector/solid-L.svg');
+  }
+
+  &.member {
+    &[data-shape='I'] {
+      mask: url('../../../../assets/connector/dashed-I.svg');
+    }
+
+    &[data-shape='T'] {
+      mask: url('../../../../assets/connector/dashed-T.svg');
+    }
+
+    &[data-shape='L'] {
+      mask: url('../../../../assets/connector/dashed-L.svg');
+    }
+  }
+
+  &.candidate {
+    &[data-shape='I'] {
+      mask: url('../../../../assets/connector/mini-dashed-I.svg');
+    }
+
+    &[data-shape='T'] {
+      mask: url('../../../../assets/connector/mini-dashed-T.svg');
+    }
+
+    &[data-shape='L'] {
+      mask: url('../../../../assets/connector/mini-dashed-L.svg');
+    }
+  }
 }
 
 .dashedIConnector {

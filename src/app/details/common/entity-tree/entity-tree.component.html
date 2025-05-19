@@ -17,8 +17,10 @@
     <div class="connector-container" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
       <!--To create an array of a specific length-->
       @for (index of getArray(treeNodeRef.level, false); track index) {
-        <div class="connector" [matTooltip]="node.type"
-             [ngClass]="getAllConnectors(treeNodeRef._getSetSize(), node, index, treeNodeRef.level)[index]">
+        <!-- TODO : avoid calling n time the getAllConnectors (removing this function from the for loop and removing the index from the function) -->
+        @let connector = getAllConnectors(treeNodeRef._getSetSize(), node, index, treeNodeRef.level)[index];
+        <div class="connector" [ngClass]="connector?.type" [attr.data-shape]="connector?.shape"
+             [matTooltip]="connector?.type">
         </div>
       }
     </div>
@@ -103,12 +105,13 @@
       <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
       <mat-nested-tree-node class='details-tree' (click)="$event.stopPropagation()">
         <div class="details-connector-container"
-             [matTooltip]="node.type"
              [style.--level]="getConnectorLevel(treeNodeRef.level, true)">
           <!--To create an array of a specific length-->
           @for (index of getArray(treeNodeRef.level, true); track index) {
-            <div class="connector"
-                 [ngClass]="index != getArray(treeNodeRef.level, true).length - 1 ? getParentsConnector(node, true)[index] :'otherConnector' ">
+            @let connector = index != getArray(treeNodeRef.level, true).length - 1 ?
+              getParentsConnector(node, true)[index] : {type: 'is', shape: 'L'};
+            <div class="connector" [ngClass]="connector?.type" [attr.data-shape]="connector?.shape"
+                 [matTooltip]="connector?.type">
             </div>
           }
         </div>
@@ -138,3 +141,5 @@
 
   </mat-nested-tree-node>
 </mat-tree>
+
+

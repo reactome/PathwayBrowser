@@ -14,6 +14,8 @@ import {cloneDeep} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
 
 
+type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
+
 @Component({
   selector: 'cr-entity-tree',
   standalone: false,
@@ -371,38 +373,18 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return !isDetailContent ? updatedLevel - 1 : updatedLevel;
   }
 
-  getCurrentNodeConnector(size: number, node: R): string {
+  getCurrentNodeConnector(size: number, node: R): Connector {
 
-    if (!size || !node) return '';
+    if (!size || !node) return null;
     const index = node.index;
-    // Member
-    if (node.type === 'member') {
-      if (index === 0 && size === 1) return 'dashedLConnector'; // Single child → Last item
-      if (index === 0) return 'dashedTConnector'; // First item
-      if (index === size - 1) return 'dashedLConnector'; // Last item
-      return 'dashedTConnector'; // middle items
+
+    return {
+      type: node.type,
+      shape: index === 0 && size == 1 ? 'L' : // Single child → Last item
+        index === 0 ? 'T' : // First item
+          index === size - 1 ? 'L' : // Last item
+            'T', // middle items
     }
-
-    // Default class for other node types
-    if (node.type === 'component' || node.type === 'repeatedUnit') {
-      if (index === 0 && size === 1) return 'solidLConnector';
-      if (index === 0) return 'solidTConnector';
-      if (index === size - 1) return 'solidLConnector';
-      return 'solidTConnector';
-    }
-
-    if (node.type === 'candidate') {
-      if (index === 0 && size === 1) return 'miniDashedLConnector';
-      if (index === 0) return 'miniDashedTConnector';
-      if (index === size - 1) return 'miniDashedLConnector';
-      return 'miniDashedTConnector';
-    }
-
-    // if (node.type === 'regulatedBy' || node.type === 'catalystActivity') {
-    //   return ' '
-    // }
-
-    return 'otherConnector';
   }
 
   // To create an array of a specific level for indexing connector class
@@ -428,7 +410,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
    *
    * return a list of connector classes
    */
-  getAllConnectors(element: number, node: R, index: number, _level: number | null) {
+  getAllConnectors(element: number, node: R, index: number, _level: number | null): Connector[] {
 
     if (!_level) return [];
     const connectors = []
@@ -445,7 +427,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return connectors
   }
 
-  getParentsConnector(node: R, isDetailContent: boolean) {
+  getParentsConnector(node: R, isDetailContent: boolean): Connector[] {
 
     const ancestors = this.findAncestors(node, this.dataSource.data);
     // Get all parents excepted the last one, ancestors include the node itself, the last one is processing with getCurrentNodeConnector(node)
@@ -453,7 +435,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     const parents = !isDetailContent ? [...ancestors].slice(0, -1) : ancestors;
     // const parents =  [...ancestors].slice(0, -1)
 
-    const connectorClasses: string[] = [];
+    const connectorClasses: Connector[] = [];
     // Start from index 1 to exclude the root
     for (let i = 1; i < parents.length; i++) {
       const parent = parents[i];
@@ -462,7 +444,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       const grandParentChildCount = grandParent?.element.composedOf && grandParent.element.composedOf.length ? grandParent.element.composedOf.length : null;
       // Compare the order of current parent with the size of previous parent composedOf to determine if the parent is the last kid, adding empty string as connector
       if (grandParentChildCount && parent.index === grandParentChildCount - 1) {
-        connectorClasses.push('');
+        connectorClasses.push(null);
       } else {
         connectorClasses.push(this.getParentConnector(grandParent!, node));
       }
@@ -471,9 +453,9 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     return connectorClasses;
   }
 
-  getParentConnector(parentNode: R, node: R) {
+  getParentConnector(parentNode: R, node: R): Connector {
 
-    if (!parentNode.element.composedOf || parentNode.element.composedOf.length === 0) return '';
+    if (!parentNode.element.composedOf || parentNode.element.composedOf.length === 0) return null;
 
     // Find a child with the same type as the clicked node
     const matchedChild = parentNode.element.composedOf.find(child => child.type === node.type);
@@ -482,12 +464,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     // return member type not candidate
     const typeReference = matchedChild || parentNode.element.composedOf[0];
 
-    if (typeReference.type === 'member') return 'dashedIConnector';
-    if (typeReference.type === 'component' || parentNode.type === 'repeatedUnit') return 'solidIConnector';
-    if (typeReference.type === 'candidate') return 'miniDashedIConnector';
-    if (typeReference.type === 'rnaMarker' || typeReference.type === 'proteinMarker') return '';
-    // if (firstChild.type === 'regulatedBy' || node.type === 'catalystActivity') return ' ';
-    return 'otherConnector';
+    return {shape: "I", type: typeReference.type};
   }
 
   findAncestors(node: R, treeData: R[]): R[] {
