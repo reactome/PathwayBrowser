@@ -166,6 +166,7 @@ export class DescriptionComponent {
     },
 
     {key: DataKeys.MEMBERS, label: Labels.MEMBERS, hasDepthControl: true},
+    {key: DataKeys.CANDIDATES, label: Labels.CANDIDATES, hasDepthControl: true},
     {key: DataKeys.COMPONENTS, label: Labels.COMPONENTS, hasDepthControl: true},
     {key: DataKeys.REPEATED_UNIT, label: Labels.REPEATED_UNIT, hasDepthControl: true},
     {

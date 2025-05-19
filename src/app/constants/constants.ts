@@ -35,6 +35,7 @@ export const DataKeys = {
   REGULATION_REFERENCE: 'regulationReference',
   MODIFIED_RESIDUES: 'modifiedResidues',
   MEMBERS: 'members',
+  CANDIDATES: 'candidates',
   IN_DISEASE: 'inDisease',
   DISEASE: 'disease',
   RNA_MARKERS: 'rnaMarker',
@@ -76,6 +77,7 @@ export const Labels = {
   MODIFIED_RESIDUES: 'Modifications',
   REPEATED_UNIT: 'Repeated Units',
   MEMBERS: 'Members',
+  CANDIDATES: 'Candidates',
   MARKERS: 'Markers',
 } as const;
 
