@@ -1,25 +1,34 @@
 <div id="component-container">
   <div class="depth-controller">
     @if (depthControl()) {
-      <button mat-icon-button class="arrow" [disabled]="depthIndex() === 1" (click)="firstPage()">
-        <mat-icon>first_page</mat-icon>
+      <button mat-icon-button class="arrow" [disabled]="depthIndex() === 1" (click)="firstPage()"
+              matTooltip="Collapse all">
+<!--        <mat-icon>first_page</mat-icon>-->
+        <mat-icon fontSet="symbols">vertical_align_top</mat-icon>
       </button>
-      <button mat-icon-button class="arrow" [disabled]="depthIndex() === 1" (click)="previousPage()">
-        <mat-icon>chevron_left</mat-icon>
+      <button mat-icon-button class="arrow" [disabled]="depthIndex() === 1" (click)="previousPage()"
+              matTooltip="Collapse one">
+<!--        <mat-icon>chevron_left</mat-icon>-->
+        <mat-icon fontSet="symbols" class="flipped">step_into</mat-icon>
       </button>
       <span class="counter">{{ depthIndex() }}</span>
 
-      <button mat-icon-button class="arrow" [disabled]="depthIndex() === maxDepth()" (click)="nextPage()">
-        <mat-icon>chevron_right</mat-icon>
+      <button mat-icon-button class="arrow" [disabled]="depthIndex() === maxDepth()" (click)="nextPage()"
+              matTooltip="Expand one">
+<!--        <mat-icon>chevron_right</mat-icon>-->
+        <mat-icon fontSet="symbols">step_into</mat-icon>
       </button>
-      <button mat-icon-button class="arrow" [disabled]="depthIndex() === maxDepth()" (click)="lastPage()">
-        <mat-icon>last_page</mat-icon>
+      <button mat-icon-button class="arrow" [disabled]="depthIndex() === maxDepth()" (click)="lastPage()"
+              matTooltip="Expand all">
+<!--        <mat-icon>last_page</mat-icon>-->
+        <mat-icon fontSet="symbols">vertical_align_bottom</mat-icon>
       </button>
     }
   </div>
 
   <div class="composition-container">
-    <cr-entity-tree [type]="type()" [data]="data()" [hasDepthControl]="depthControl()" [(depthIndex)]="depthIndex" [(treeLength)]="maxDepth" [(depthChangeSource)]="depthChangeSource"></cr-entity-tree>
+    <cr-entity-tree [type]="type()" [data]="data()" [hasDepthControl]="depthControl()" [(depthIndex)]="depthIndex"
+                    [(treeLength)]="maxDepth" [(depthChangeSource)]="depthChangeSource"></cr-entity-tree>
   </div>
 
 </div>
