@@ -32,6 +32,10 @@
   padding: 0;
   width: var(--column-width);
   gap: 5px;
+  position: sticky;
+  top: 4px;
+  bottom: 4px;
+  //margin: auto 0; // Center
 }
 
 .composition-container {
@@ -72,5 +76,9 @@
     icon-color: var(--primary)
   ));
 
+}
+
+.flipped {
+  transform: rotate(180deg);
 }
 

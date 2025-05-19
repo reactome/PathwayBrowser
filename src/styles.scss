@@ -54,6 +54,36 @@ a {
   margin-right: 20px;
 }
 
+// SHARED ACROSS MANY COMPONENTS
+.label-container {
+  padding: 0;
+  width: var(--column-width);
+  justify-content: center;
+  border-radius: 15px 0 0 15px;
+  flex-shrink: 0;
+
+  // Sticky vertically centered div
+  margin: auto 0;
+  position: sticky;
+  top: 4px;
+  bottom: 4px;
+
+  // text style, an extra span?
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 20px; // Avoid sticky to act one one liners
+  text-align: right;
+  letter-spacing: 0.5px;
+  color: var(--on-surface);
+
+}
+
+// Avoid first paragraph of summation being indented
+p:first-child {
+  margin-top: 0;
+}
+
 /**
  * Exception for sets as they are going out of their bounding box
  */
