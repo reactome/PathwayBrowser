@@ -1,7 +1,7 @@
 import {Component, computed, effect, input, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
-import {getProperty, isEntity} from "../../../services/utils";
+import {getProperty, groupAndSortBy, isEntity} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
@@ -54,6 +54,8 @@ export class DescriptionComponent {
   readonly analysisResult = input<Analysis.Result>();
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
+  readonly groupedReferences = computed(() => groupAndSortBy(this.literatureRefs(), ref => ref.year, (key1, key2) => key2 - key1));
+
   referenceEntity: Signal<ReferenceEntity> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
   section = toSignal(this.route.fragment)
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {

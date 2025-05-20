@@ -22,6 +22,12 @@ export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
 }
 
+export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, orderBy: (key1: K, key2: K) => number): {key: K, elements: E[]}[] {
+  const grouped = new Map<K, E[]>();
+  elements.forEach(element => grouped.set(getKey(element), [...(grouped.get(getKey(element)) || []), element]))
+  return [...grouped.keys()].sort(orderBy).map(key => ({key, elements: grouped.get(key)!}));
+}
+
 export function sortByYearDescending(refs: (LiteratureReference | Publication)[]) {
   return refs.sort((a, b) => {
     if (a.year === undefined && b.year === undefined) return 0;
@@ -107,7 +113,8 @@ export function isReplacedResidue(obj: DatabaseObject): obj is ReplacedResidue {
 export function isReferenceGroup(obj: DatabaseObject): obj is ReferenceGroup {
   return obj.schemaClass === SchemaClasses.REFERENCE_GROUP;
 }
-export function isReferenceMolecule(obj:DatabaseObject): obj is ReferenceMolecule{
+
+export function isReferenceMolecule(obj: DatabaseObject): obj is ReferenceMolecule {
   return obj.schemaClass === SchemaClasses.REFERENCE_MOLECULE
 }
 

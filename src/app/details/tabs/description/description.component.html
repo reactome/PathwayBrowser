@@ -176,11 +176,13 @@
 <!-- Literature References-->
 <ng-template #literatureRefsTemplate>
   <div class="element-container">
-    @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
+    @for (group of groupedReferences(); track group.key) {
       <div class="row">
-        <div class="label-container">{{ ref.year }}</div>
+        <div class="label-container">{{ group.key }}</div>
         <div class="composition-container">
-          <cr-publication [publication]=ref [showYear]="false"></cr-publication>
+          @for (ref of group.elements; track ref.dbId) {
+            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+          }
         </div>
       </div>
     }
