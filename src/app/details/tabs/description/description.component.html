@@ -35,6 +35,7 @@
 
     @for (element of elements; track element.key; let i = $index) {
       @if (element.isPresent ? element.isPresent() : obj()[element.key]) {
+        <!-- Avoid overview label -->
         @if (i > 0) {
           <div class="divider-container" [id]="element.key">
             <div class="divider-name-container">

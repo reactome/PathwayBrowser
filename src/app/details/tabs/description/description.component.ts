@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
+import {Component, computed, effect, input, signal, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {getProperty, groupAndSortBy, isEntity} from "../../../services/utils";
@@ -59,22 +59,21 @@ export class DescriptionComponent {
   referenceEntity: Signal<ReferenceEntity> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
   section = toSignal(this.route.fragment)
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
+    const arrayWrap = <E>(a: E[] | E) => Array.isArray(a) ? a : [a];
 
     const obj = this.obj();
-    const authored = getProperty(obj, DataKeys.AUTHORED) || [];
     // Ensure it's an array, either returning the existing array or wrapping it in one, it complains without this line.
-    const finalAuthored = Array.isArray(authored) ? authored : authored ? [authored] : [];
+    const finalAuthored = arrayWrap(getProperty(obj, DataKeys.AUTHORED) || getProperty(obj, DataKeys.CREATED) || []);
     const reviewed = getProperty(obj, DataKeys.REVIEWED) || [];
     const edited = getProperty(obj, DataKeys.EDITED) || [];
     const revised = getProperty(obj, DataKeys.REVISED) || [];
 
     return [
-      ...(authored.length > 0 ? [{label: Labels.AUTHOR, data: finalAuthored}] : []),
+      ...(finalAuthored.length > 0 ? [{label: Labels.AUTHOR, data: finalAuthored}] : []),
       ...(reviewed.length > 0 ? [{label: Labels.REVIEWER, data: reviewed}] : []),
       ...(edited.length > 0 ? [{label: Labels.EDITOR, data: edited}] : []),
       ...(revised.length > 0 ? [{label: Labels.REVISER, data: revised}] : []),
     ];
-
   });
 
   inferences = computed(() => {
@@ -112,7 +111,6 @@ export class DescriptionComponent {
   });
 
 
-
   proteinMarkers: Signal<EntityWithAccessionedSequence[]> = computed(() => getProperty(this.obj(), DataKeys.PROTEIN_MARKER) || [])
   rnaMarkers: Signal<EntityWithAccessionedSequence[]> = computed(() => getProperty(this.obj(), DataKeys.RNA_MARKERS) || [])
 
@@ -148,14 +146,14 @@ export class DescriptionComponent {
     hasDepthControl?: boolean,
     manual?: boolean,
     template?: Signal<TemplateRef<any>>,
-    isPresent?: () => boolean,
+    isPresent?: Signal<boolean>,
   }[] = [
     {
       key: DataKeys.OVERVIEW,
       label: Labels.OVERVIEW,
       manual: true,
       template: this.overviewTemplate$,
-      isPresent: () => true
+      isPresent: signal(true)
     },
     {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true, template: this.referenceTemplate$},
     {
@@ -174,7 +172,7 @@ export class DescriptionComponent {
       label: Labels.MARKERS,
       manual: true,
       template: this.markerTemplate$,
-      isPresent: () => this.proteinMarkers().length + this.rnaMarkers().length > 0
+      isPresent: computed(() => this.proteinMarkers().length + this.rnaMarkers().length > 0)
     },
 
     {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
@@ -185,7 +183,7 @@ export class DescriptionComponent {
       label: Labels.CATALYST_ACTIVITY,
       manual: true,
       template: this.catalystActivityTemplate$,
-      isPresent: () => this.catalystActivity()?.length > 0
+      isPresent: computed(() => this.catalystActivity()?.length > 0)
     },
 
     {
@@ -193,7 +191,7 @@ export class DescriptionComponent {
       label: Labels.CROSS_REFERENCES,
       manual: true,
       template: this.crossReferencesTemplate$,
-      isPresent: () => this.crossReference()?.length > 0
+      isPresent: computed(() => this.crossReference()?.length > 0)
     },
 
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
@@ -208,7 +206,7 @@ export class DescriptionComponent {
       label: Labels.OTHER_FORMS,
       manual: true,
       template: this.otherFormsTemplate$,
-      isPresent: () => this.otherForms()?.size > 0
+      isPresent: computed(() => this.otherForms()?.size > 0)
     },
 
     {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true, template: this.literatureRefsTemplate$},
@@ -217,14 +215,14 @@ export class DescriptionComponent {
       label: Labels.AUTHORSHIP,
       manual: true,
       template: this.authorsTemplate$,
-      isPresent: () => this.authorship()?.length > 0
+      isPresent: computed(() => this.authorship()?.length > 0)
     },
     {
       key: DataKeys.INTERACTORS,
       label: Labels.INTERACTORS,
       manual: true,
       template: this.interactorsTemplate$,
-      isPresent: () => this.interactorsLength() > 0
+      isPresent: computed(() => this.interactorsLength() > 0)
     },
   ]
 
