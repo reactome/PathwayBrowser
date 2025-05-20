@@ -14,7 +14,6 @@ import {MarkerReference} from "../../../model/graph/control-reference/marker-ref
 export class CellMarkerComponent {
   readonly proteinMarkers = input.required<EntityWithAccessionedSequence[]>();
   readonly rnaMarkers = input.required<EntityWithAccessionedSequence[]>();
-  readonly markers = computed(() => [...this.proteinMarkers(), ...this.rnaMarkers()]);
   readonly markerRefs = input.required<MarkerReference[]>();
 
   constructor() {

@@ -1,5 +1,4 @@
 import {Publication} from "./publication.model";
-import {Person} from "../person.model";
 
 export interface LiteratureReference extends Publication {
   journal: string;

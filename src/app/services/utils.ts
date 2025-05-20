@@ -29,13 +29,7 @@ export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, o
   return [...grouped.keys()].sort(orderBy).map(key => ({key, elements: grouped.get(key)!}));
 }
 
-export function sortByYearDescending(refs: (LiteratureReference | Publication)[]) {
-  return refs.sort((a, b) => {
-    if (a.year === undefined && b.year === undefined) return 0;
-    if (a.year === undefined) return 1;
-    if (b.year === undefined) return -1;
 export function sortByYearDescending(refs: Publication[]) {
-
   // Filter refs (i.e., LiteratureReference or Book)
   const withYear = refs.filter(isRefOrBook);
 
