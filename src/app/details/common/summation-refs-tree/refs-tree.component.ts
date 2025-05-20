@@ -1,11 +1,11 @@
 import {Component, computed, effect, input} from '@angular/core';
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {sortByYearDescending} from "../../../services/utils";
-import {Summation} from "../../../model/graph/summation.model";
-import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
+import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
+import {Publication} from "../../../model/graph/publication/publication.model";
 
 
-export type RefTree = Summation | MarkerReference;
+type ReferenceHolder = { literatureReference: (LiteratureReference | Publication)[] };
 
 @Component({
   selector: 'cr-refs-tree',
@@ -16,24 +16,25 @@ export type RefTree = Summation | MarkerReference;
 export class RefsTreeComponent {
 
 
-  readonly refs = input.required({
-    transform: (refTree: RefTree) => {
-      refTree.literatureReference = sortByYearDescending(refTree.literatureReference);
-      return refTree;
+  readonly referenceHolder = input.required<ReferenceHolder, ReferenceHolder>({
+    transform: (holder: ReferenceHolder) => {
+      holder.literatureReference = sortByYearDescending(holder.literatureReference);
+      return holder;
     }
   });
-  title = computed(() => `${this.refs()?.literatureReference.length} references`);
+  title = computed(() => `${this.referenceHolder()?.literatureReference.length} references`);
 
-  dataSource = new MatTreeNestedDataSource<RefTree>();
+  dataSource = new MatTreeNestedDataSource<ReferenceHolder>();
 
 
   constructor() {
-    effect(() => this.dataSource.data = [this.refs()]);
+    effect(() => this.dataSource.data = [this.referenceHolder()]);
   }
 
 //@ts-ignore
-  childrenAccessor = (refTree: RefTree): RefTree[] => refTree.literatureReference ?? [];
+  childrenAccessor = (holder: ReferenceHolder): ReferenceHolder[] => holder.literatureReference ?? [];
 
-  hasChild = (_: number, refTree: RefTree) => !!refTree.literatureReference && refTree.literatureReference.length > 0;
+  hasChild = (_: number, holder: ReferenceHolder) => !!holder.literatureReference && holder.literatureReference.length > 0;
+
 
 }

@@ -35,6 +35,7 @@
 
     @for (element of elements; track element.key; let i = $index) {
       @if (element.isPresent ? element.isPresent() : obj()[element.key]) {
+        <!-- Avoid overview label -->
         @if (i > 0) {
           <div class="divider-container" [id]="element.key">
             <div class="divider-name-container">
@@ -90,7 +91,10 @@
 <!-- Cell markers -->
 <ng-template #markerTemplate>
   <div class="element-container">
-    <cr-cell-marker [markers]="marker()" [markerRefs]="markerReference()"></cr-cell-marker>
+    <cr-cell-marker
+      [proteinMarkers]="proteinMarkers()"
+      [rnaMarkers]="rnaMarkers()"
+      [markerRefs]="markerReference()"/>
   </div>
 </ng-template>
 
@@ -173,11 +177,13 @@
 <!-- Literature References-->
 <ng-template #literatureRefsTemplate>
   <div class="element-container">
-    @for (ref of literatureRefs() | sortByDate:'year'; track ref.dbId) {
+    @for (group of groupedReferences(); track group.key) {
       <div class="row">
-        <div class="label-container">{{ ref.year }}</div>
+        <div class="label-container">{{ group.key }}</div>
         <div class="composition-container">
-          <cr-publication [publication]=ref [showYear]="false"></cr-publication>
+          @for (ref of group.elements; track ref.dbId) {
+            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+          }
         </div>
       </div>
     }

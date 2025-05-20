@@ -119,16 +119,20 @@
     </div>
   }
 
-  @if (summation()) {
+  @if (summations()) {
     <div class="row">
       <div class="label">Summation</div>
-      <div class="value flex-grow" *ngIf="summation() && summation()[0].text as summationText">
-        <div [innerHTML]="summationText | includeRef: allRefs()" [class.columns]="summationText.length > 500"></div>
+      <div class="value flex-grow" >
+        @for (summation of summations(); track $index) {
+          <div [innerHTML]="summation.text | includeRef: allRefs()" [class.columns]="summation.text.length > 500"></div>
 
-        <!--Display summation refs if is available-->
-        <div class="summation-refs-container" *ngIf="summation() && summation()[0].literatureReference">
-          <cr-refs-tree [refs]=summation()[0]></cr-refs-tree>
-        </div>
+          <!--Display summation refs if is available-->
+          @if (summation.literatureReference && summation.literatureReference.length > 0) {
+            <div class="summation-refs-container">
+              <cr-refs-tree [referenceHolder]=summation></cr-refs-tree>
+            </div>
+          }
+        }
       </div>
     </div>
   }

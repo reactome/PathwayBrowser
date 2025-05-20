@@ -1,24 +1,43 @@
 <div id="markers">
-@for (maker of markers(); track maker.dbId) {
-  <div class="marker-container">
-    <div class="row">
-      <div class="label-container">Marker</div>
-      <div class="composition-container">
-        <cr-entity-tree [type]="maker.referenceType=== SchemaClasses.REFERENCE_RNA_SEQUENCE ? DataKeys.RNA_MARKERS :DataKeys.PROTEIN_MARKER"
-                        [data]="[maker]"></cr-entity-tree>
+
+  @if (rnaMarkers().length !== 0) {
+    <div class="marker-container">
+      <div class="row">
+        <div class="label-container">RNA Marker</div>
+        <div class="composition-container">
+          @for (marker of rnaMarkers(); track marker.dbId) {
+            <cr-entity-tree
+              [type]=" DataKeys.RNA_MARKERS"
+              [data]="[marker]"></cr-entity-tree>
+
+            @let literatureRefs = refs().get(marker.dbId);
+            @if (literatureRefs) {
+              <cr-refs-tree [referenceHolder]="literatureRefs"></cr-refs-tree>
+            }
+          }
+        </div>
       </div>
     </div>
+  }
 
-    <div class="row">
-      <div class="label-container"></div>
-      <div class="composition-container ref-padding">
-        @let markerRef = refs().get(maker.dbId);
-        @if (markerRef) {
-          <cr-refs-tree [refs]=markerRef></cr-refs-tree>
-        }
+  @if (proteinMarkers().length !== 0) {
+    <div class="marker-container">
+      <div class="row">
+        <div class="label-container">Protein Marker</div>
+        <div class="composition-container">
+          @for (marker of proteinMarkers(); track marker.dbId) {
+            <cr-entity-tree
+              [type]="DataKeys.PROTEIN_MARKER"
+              [data]="[marker]"></cr-entity-tree>
+
+            @let literatureRefs = refs().get(marker.dbId);
+            @if (literatureRefs) {
+              <cr-refs-tree [referenceHolder]="literatureRefs"></cr-refs-tree>
+            }
+          }
+        </div>
       </div>
     </div>
+  }
 
-  </div>
-}
 </div>
