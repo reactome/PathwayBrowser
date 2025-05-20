@@ -127,7 +127,7 @@
 
         <!--Display summation refs if is available-->
         <div class="summation-refs-container" *ngIf="summation() && summation()[0].literatureReference">
-          <cr-summation-refs-tree [summation]=summation()[0]></cr-summation-refs-tree>
+          <cr-refs-tree [refs]=summation()[0]></cr-refs-tree>
         </div>
       </div>
     </div>

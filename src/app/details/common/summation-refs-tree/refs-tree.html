@@ -18,7 +18,7 @@
     </div>
     <!-- There is inline padding applied to this div using styles.
           This padding value depends on the mat-icon-button width.  -->
-    <div [class.refs-tree-invisible]="!tree.isExpanded(node)" role="group">
+    <div [class.refs-tree-invisible]="!tree.isExpanded(node)" role="group" class="tree-group">
       <ng-container matTreeNodeOutlet></ng-container>
     </div>
 

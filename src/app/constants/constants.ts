@@ -137,7 +137,10 @@ export enum SchemaClasses {
   TRANSCRIPTIONAL_MODIFICATION = 'TranscriptionalModification',
   MODIFIED_NUCLEOTIDE = 'ModifiedNucleotide',
 
-  REFERENCE_RNA_SEQUENCE = 'ReferenceRNASequence'
+  REFERENCE_RNA_SEQUENCE = 'ReferenceRNASequence',
+
+  LITERATURE_REFERENCE = 'LiteratureReference',
+  BOOK = 'Book'
 
 
 }

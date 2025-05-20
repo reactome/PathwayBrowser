@@ -16,18 +16,28 @@ import {ReplacedResidue} from "../model/graph/abstract-modified-residue/replaced
 import {FragmentModification} from "../model/graph/abstract-modified-residue/fragment-modification.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molecule.model";
+import {Publication} from "../model/graph/publication/publication.model";
+import {Book} from "../model/graph/publication/book.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
 }
 
-export function sortByYearDescending(refs: LiteratureReference[]) {
-  return refs.sort((a, b) => {
-    if (a.year === undefined && b.year === undefined) return 0;
-    if (a.year === undefined) return 1;
-    if (b.year === undefined) return -1;
+export function sortByYearDescending(refs: Publication[]) {
+
+  // Filter refs (i.e., LiteratureReference or Book)
+  const withYear = refs.filter(isRefOrBook);
+
+  withYear.sort((a, b) => {
+    if (a.year && b.year) return 0;
+    if (a.year) return 1;
+    if (b.year) return -1;
     return b.year - a.year;
   });
+
+  // Return the sorted items along with the others (without year) at the end
+  const withoutYear = refs.filter(ref => !isRefOrBook(ref));
+  return [...withYear, ...withoutYear];
 }
 
 // Type guards to narrow the type
@@ -106,8 +116,13 @@ export function isReplacedResidue(obj: DatabaseObject): obj is ReplacedResidue {
 export function isReferenceGroup(obj: DatabaseObject): obj is ReferenceGroup {
   return obj.schemaClass === SchemaClasses.REFERENCE_GROUP;
 }
-export function isReferenceMolecule(obj:DatabaseObject): obj is ReferenceMolecule{
+
+export function isReferenceMolecule(obj: DatabaseObject): obj is ReferenceMolecule {
   return obj.schemaClass === SchemaClasses.REFERENCE_MOLECULE
+}
+
+export function isRefOrBook(publication: Publication): publication is LiteratureReference | Book {
+  return publication.schemaClass === SchemaClasses.LITERATURE_REFERENCE || publication.schemaClass === SchemaClasses.BOOK
 }
 
 /** Generic function to dynamic access child property

@@ -10,13 +10,11 @@
     </div>
 
     <div class="row">
-      <div class="label-container">References</div>
+      <div class="label-container"></div>
       <div class="composition-container ref-padding">
-        @let literatureRefs = refs().get(maker.dbId)?.literatureReference;
-        @if (literatureRefs){
-          @for (ref of literatureRefs| sortByDate:'year'; track ref.dbId) {
-            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
-          }
+        @let markerRef = refs().get(maker.dbId);
+        @if (markerRef) {
+          <cr-refs-tree [refs]=markerRef></cr-refs-tree>
         }
       </div>
     </div>

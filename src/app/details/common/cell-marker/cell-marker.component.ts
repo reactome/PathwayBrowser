@@ -15,13 +15,8 @@ export class CellMarkerComponent {
   readonly markers = input.required<EntityWithAccessionedSequence[]>();
   readonly markerRefs = input.required<MarkerReference[]>();
 
-   constructor() {
-     effect(() => {
-       console.log('marker ',this.markers())
-       console.log('margerRefs',this.markerRefs())
-       console.log('Refs',this.refs())
-     });
-   }
+  constructor() {
+  }
 
 
   refs = computed(() => {

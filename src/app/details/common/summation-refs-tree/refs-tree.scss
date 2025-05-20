@@ -1,8 +1,14 @@
+@use '@angular/material' as mat;
+
 :host {
   width: 100%;
 }
 
 .refs-tree {
+
+  @include mat.tree-overrides((
+    node-min-height: 1
+  ));
 
   .refs-tree-invisible {
     display: none;
@@ -58,4 +64,9 @@
   line-height: 20px;
   letter-spacing: 0.25px;
   gap: 5px
+}
+
+
+.tree-group {
+  padding-top: 5px;
 }

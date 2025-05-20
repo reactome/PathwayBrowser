@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SummationRefsTreeComponent } from './summation-refs-tree.component';
+import { RefsTreeComponent } from './refs-tree.component';
 
 describe('TreeComponent', () => {
-  let component: SummationRefsTreeComponent;
-  let fixture: ComponentFixture<SummationRefsTreeComponent>;
+  let component: RefsTreeComponent;
+  let fixture: ComponentFixture<RefsTreeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SummationRefsTreeComponent]
+      imports: [RefsTreeComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SummationRefsTreeComponent);
+    fixture = TestBed.createComponent(RefsTreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
