@@ -16,12 +16,13 @@ import {ReplacedResidue} from "../model/graph/abstract-modified-residue/replaced
 import {FragmentModification} from "../model/graph/abstract-modified-residue/fragment-modification.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molecule.model";
+import {Publication} from "../model/graph/publication/publication.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
 }
 
-export function sortByYearDescending(refs: LiteratureReference[]) {
+export function sortByYearDescending(refs: (LiteratureReference | Publication)[]) {
   return refs.sort((a, b) => {
     if (a.year === undefined && b.year === undefined) return 0;
     if (a.year === undefined) return 1;

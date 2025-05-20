@@ -90,7 +90,10 @@
 <!-- Cell markers -->
 <ng-template #markerTemplate>
   <div class="element-container">
-    <cr-cell-marker [markers]="marker()" [markerRefs]="markerReference()"></cr-cell-marker>
+    <cr-cell-marker
+      [proteinMarkers]="proteinMarkers()"
+      [rnaMarkers]="rnaMarkers()"
+      [markerRefs]="markerReference()"/>
   </div>
 </ng-template>
 

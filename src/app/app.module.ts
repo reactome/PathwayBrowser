@@ -43,7 +43,7 @@ import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details/details.component";
 import {DescriptionComponent} from "./details/tabs/description/description.component";
-import {SummationRefsTreeComponent} from "./details/common/summation-refs-tree/summation-refs-tree.component";
+import {RefsTreeComponent} from "./details/common/summation-refs-tree/refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
 import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
 import {IncludeRefPipe} from "./pipes/include-ref.pipe";
@@ -92,7 +92,7 @@ import {OntologyTermComponent} from "./details/common/ontology-term/ontology-ter
     DetailsComponent,
     DescriptionComponent,
     DescriptionOverviewComponent,
-    SummationRefsTreeComponent,
+    RefsTreeComponent,
     PublicationComponent,
     InteractorsTableComponent,
     ControllerTreeComponent,

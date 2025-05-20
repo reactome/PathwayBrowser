@@ -110,11 +110,9 @@ export class DescriptionComponent {
   });
 
 
-  marker: Signal<EntityWithAccessionedSequence[]> = computed(() => {
-    const rnaMarker = getProperty(this.obj(), DataKeys.RNA_MARKERS) || [];
-    const proteinMarker = getProperty(this.obj(), DataKeys.PROTEIN_MARKER) || [];
-    return [...rnaMarker, ...proteinMarker];
-  })
+
+  proteinMarkers: Signal<EntityWithAccessionedSequence[]> = computed(() => getProperty(this.obj(), DataKeys.PROTEIN_MARKER) || [])
+  rnaMarkers: Signal<EntityWithAccessionedSequence[]> = computed(() => getProperty(this.obj(), DataKeys.RNA_MARKERS) || [])
 
   markerReference: Signal<MarkerReference[]> = computed(() => getProperty(this.obj(), DataKeys.MARKER_REFERENCE))
 
@@ -174,7 +172,7 @@ export class DescriptionComponent {
       label: Labels.MARKERS,
       manual: true,
       template: this.markerTemplate$,
-      isPresent: () => this.marker()?.length > 0
+      isPresent: () => this.proteinMarkers().length + this.rnaMarkers().length > 0
     },
 
     {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
@@ -268,7 +266,7 @@ export class DescriptionComponent {
       case DataKeys.OVERVIEW:
         return obj;
       case DataKeys.PROTEIN_MARKER:
-        return this.marker() && this.marker().length > 0;
+        return this.proteinMarkers().length + this.rnaMarkers().length > 0;
       case DataKeys.CATALYST_ACTIVITY:
         return this.catalystActivity() && this.catalystActivity().length > 0;
       case DataKeys.CROSS_REFERENCE:

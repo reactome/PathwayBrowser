@@ -1,4 +1,4 @@
-import {Component, computed, effect, input} from '@angular/core';
+import {Component, computed, effect, input, signal} from '@angular/core';
 import {
   EntityWithAccessionedSequence
 } from "../../../model/graph/physical-entity/entity-with-accessioned-sequence.model";
@@ -12,7 +12,9 @@ import {MarkerReference} from "../../../model/graph/control-reference/marker-ref
   standalone: false,
 })
 export class CellMarkerComponent {
-  readonly markers = input.required<EntityWithAccessionedSequence[]>();
+  readonly proteinMarkers = input.required<EntityWithAccessionedSequence[]>();
+  readonly rnaMarkers = input.required<EntityWithAccessionedSequence[]>();
+  readonly markers = computed(() => [...this.proteinMarkers(), ...this.rnaMarkers()]);
   readonly markerRefs = input.required<MarkerReference[]>();
 
    constructor() {
