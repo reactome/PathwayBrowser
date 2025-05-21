@@ -87,6 +87,7 @@ export const Labels = {
 export enum SchemaClasses {
   EWAS = 'EntityWithAccessionedSequence',
   PE = 'PhysicalEntity',
+  CELL = 'Cell',
   COMPLEX = 'Complex',
   DRUG = 'Drug',
   CHEMICAL_DRUG = 'ChemicalDrug',
