@@ -220,15 +220,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     }
 
 
-    // Handle both expand and collapse with one timeout to get depthIndex
-    // Defer so the tree has time to update its expansion state
-    setTimeout(() => {
-      const depth = this.getTreeDepth(this.dataSource.data, 1, true);
-      if (this.depthIndex() !== depth) {
-        this.depthIndex.set(depth);
-        this.depthChangeSource.set('tree');
-      }
-    }, 500);
+    if (this.hasDepthControl()) {
+      // Handle both expand and collapse with one timeout to get depthIndex
+      // Defer so the tree has time to update its expansion state
+      setTimeout(() => {
+        const depth = this.getTreeDepth(this.dataSource.data, 1, true);
+        if (this.depthIndex() !== depth) {
+          this.depthIndex.set(depth);
+          this.depthChangeSource.set('tree');
+        }
+      }, 500);
+    }
   }
 
   fetchTreeAtDepth(node: R, depth: number) {
