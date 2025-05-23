@@ -127,7 +127,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   minZoom = signal<number>(0.1);
   maxZoom = signal<number>(15);
 
-  thumbnailRxA = computed(() => (END_RX - INIT_RX) / (this.maxZoom() - this.minZoom()) );
+  thumbnailRxA = computed(() => (END_RX - INIT_RX) / (this.maxZoom() - this.minZoom()));
   thumbnailRxB = computed(() => INIT_RX - this.thumbnailRxA() * this.minZoom());
   thumbnailRx = computed(() => this.zoomLevel() * this.thumbnailRxA() + this.thumbnailRxB());
 

@@ -118,7 +118,7 @@ export class DescriptionComponent {
 
   repeatedUnits: Signal<PhysicalEntity[]> = computed(() => getProperty(this.obj(), DataKeys.REPEATED_UNIT))
 
-  overview$ = viewChild<HTMLDivElement>('#overview');
+  overview$ = viewChild<HTMLDivElement>('overview');
 
 
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
