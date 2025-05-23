@@ -1,5 +1,3 @@
-import {DrawingContext} from "@carrotsearch/foamtree";
-
 declare module "@carrotsearch/foamtree" {
 
   export type Options =
