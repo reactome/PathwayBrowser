@@ -8,7 +8,7 @@ $small-breakpoint-width: 959px;
   overflow-y: auto;
   height: 100%;
   background: var(--surface);
-  font-family: 'Roboto Flex', sans-serif;
+  font-family: 'Roboto', sans-serif;
   gap: var(--gap);
   padding-left: var(--gap);
   align-content: space-between;
@@ -267,7 +267,7 @@ $small-breakpoint-width: 959px;
   border-left: 2px solid var(--outline-variant);
   flex: 1;
 
-  font-family: 'Roboto Flex', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
