@@ -11,7 +11,7 @@
 
 declare module "@carrotsearch/foamtree" {
 
-  export class FoamTree {
+  export class FoamTree<D extends DataObject = DataObject> {
 
     /**
      * A static property on hFoamTree equal to true if visualization is supported on the current browser environment.
@@ -28,28 +28,28 @@ declare module "@carrotsearch/foamtree" {
     static readonly supported: boolean
     static readonly geometry: GeometryUtils
 
-    constructor(options: InitialOptions)
+    constructor(options: InitialOptions<D>)
 
     /**
      * Returns an object containing current values of all options. Properties of the returned object correspond to option names, values are option values.
      * @example
      * console.log(foamtree.get());
      */
-    get(): Options
+    get(): Options<D>
     /**
      * Returns the current value of the requested option. If the provided string does not correspond to any option name, the result is undefined.
      * @param option The requested option
      * @example
      * console.log(foamtree.get("dataObject"));
      */
-    get<O extends Option>(option: O): OptionValue<O>
+    get<O extends Option<D>>(option: O): OptionValue<O, D>
     /**
      * Returns the current value of the requested option. If the provided string does not correspond to any option name, the result is undefined.
      * @param option The requested option
      * @example
      * console.log(foamtree.get("selection"));
      */
-    get<O extends InteractionOption>(option: O): InteractionOptionGetterValue<O>
+    get<O extends InteractionOption>(option: O): InteractionOptionGetterValue<O, D>
     /**
      * Returns the current value of the requested read-only option, parameterized by the provided args.
      *
@@ -59,7 +59,7 @@ declare module "@carrotsearch/foamtree" {
      * @example
      * console.log(foamtree.get("geometry", "1", true));
      */
-    get<O extends ReadOnlyOption>(option: O, ...args: ReadOnlyOptionParameters<O>): ReadOnlyOptionValue<O>
+    get<O extends ReadOnlyOption>(option: O, ...args: ReadOnlyOptionParameters<O, D>): ReadOnlyOptionValue<O, D>
 
     /**
      * Sets the provided option to the desired value. If the provided option string does not correspond to any option, the call is ignored.
@@ -73,7 +73,7 @@ declare module "@carrotsearch/foamtree" {
      * @example
      * foamtree.set("exposure", "1");
      */
-    set<O extends Option>(option: O, value: OptionValue<O>): void
+    set<O extends Option<D>>(option: O, value: OptionValue<O, D>): void
     /**
      * Sets the provided option to the desired value. If the provided option string does not correspond to any option, the call is ignored.
      *
@@ -86,7 +86,7 @@ declare module "@carrotsearch/foamtree" {
      * @example
      * foamtree.set("exposure", "1");
      */
-    set<O extends InteractionOption>(option: O, value: InteractionOptionSetterValue<O>): void
+    set<O extends InteractionOption>(option: O, value: InteractionOptionSetterValue<O, D>): void
     /**
      * Sets new values for all options included in the provided options object. Properties of the object should correspond to attribute names,
      * values of the object will be treated as values to set. Any properties of the options object that do not correspond to any attributes of the visualization will be ignored.
@@ -103,14 +103,14 @@ declare module "@carrotsearch/foamtree" {
      *   groupSelectionOutlineColor: "red"
      * });
      */
-    set(options: Partial<Options> & Partial<InteractionSetterOptions> & Partial<EventOptions>): void
+    set(options: Partial<Options<D>> & Partial<InteractionSetterOptions<D>> & Partial<EventOptions<D>>): void
     /**
      * Replace listener for the provided event by the provided callback or array of callback .
      *
      * @param event The event to set listeners for.
      * @param listeners Listener or array of listeners to set.
      */
-    set<E extends EventType>(event: E, listeners: EventListener<E> | EventListener<E>[]): void
+    set<E extends EventType>(event: E, listeners: EventListener<E, D> | EventListener<E, D>[]): void
 
     /**
      * Registers a listener for a FoamTree event. As opposed to using the `set` method, the `on` method preserves the previously registered listeners.
@@ -120,7 +120,7 @@ declare module "@carrotsearch/foamtree" {
      * @param listener The event listener function to invoke when the event is triggered.
      * @see FoamTree.Events
      */
-    on<E extends EventType>(type: E, listener: EventListener<E>): void
+    on<E extends EventType>(type: E, listener: EventListener<E, D>): void
     /**
      * Registers a listener for a FoamTree low level event. As opposed to using the `set` method, the `on` method preserves the previously registered listeners.
      * @param type A string that specifies which event to listen to. To get type string to use with this method, take the event option name,
@@ -129,7 +129,7 @@ declare module "@carrotsearch/foamtree" {
      * @param listener The event listener function to invoke when the event is triggered.
      * @see FoamTree.Events
      */
-    on<E extends LowLevelEventType>(type: E, listener: LowLevelEventListener<E>): void
+    on<E extends LowLevelEventType>(type: E, listener: LowLevelEventListener<E, D>): void
 
     /**
      * Removes the requested listener from the list of listeners of the specified type. As opposed to using the `set` method, this method will preserve the other listeners registered for the event.
@@ -138,7 +138,7 @@ declare module "@carrotsearch/foamtree" {
      * For example, the type string corresponding to the `onGroupSelectionChanged` event is `groupSelectionChanged`.
      * @param listener The event listener function to remove.
      */
-    off<E extends EventType>(type: E, listener: EventListener<E>): void
+    off<E extends EventType>(type: E, listener: EventListener<E, D>): void
     /**
      * Removes the requested listener from the list of listeners of the specified type. As opposed to using the `set` method, this method will preserve the other listeners registered for the event.
      * @param type A string that specifies which event to remove the listener from. To get type string to use with this method,
@@ -146,7 +146,7 @@ declare module "@carrotsearch/foamtree" {
      * For example, the type string corresponding to the `onGroupSelectionChanged` event is `groupSelectionChanged`.
      * @param listener The event listener function to remove.
      */
-    off<E extends LowLevelEventType>(type: E, listener: LowLevelEventListener<E>): void
+    off<E extends LowLevelEventType>(type: E, listener: LowLevelEventListener<E, D>): void
 
     /**
      * Triggers a complete redraw of the visualization. If one or more visual options of the visualization have been
@@ -338,7 +338,7 @@ declare module "@carrotsearch/foamtree" {
      *
      * For this reason, calling the trigger method in event listeners may lead to the visualization falling in an endless loop.
      */
-    trigger<E extends LowLevelEventType>(type: E, event: Omit<LowLevelEventValue<E>, 'preventDefault' | 'allowOriginalEventDefault' | 'preventOriginalEventDefault'>): void
+    trigger<E extends LowLevelEventType>(type: E, event: Omit<LowLevelEventValue<E, D>, 'preventDefault' | 'allowOriginalEventDefault' | 'preventOriginalEventDefault'>): void
 
     /**
      * Initializes internal data structures for the provided groups. Full example on <a href="https://get.carrotsearch.com/foamtree/latest/demos/deferred-layout.html"> this demo</a>

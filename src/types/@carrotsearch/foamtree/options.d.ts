@@ -1,29 +1,29 @@
 declare module "@carrotsearch/foamtree" {
 
-  export type Options =
-    CoreOptions
+  export type Options<D extends DataObject = DataObject> =
+    CoreOptions<D>
     & RelaxationOptions
     & GroupBorderOptions
     & GroupFillOptions
     & GroupStrokeOptions
     & GroupSelectionOptions
     & GroupHoverOptions
-    & GroupLabelOptions
+    & GroupLabelOptions<D>
     & GroupExposureOptions
     & GroupOpeningClosingOptions
     & GroupHierarchyOptions
-    & GroupColorsOptions
+    & GroupColorsOptions<D>
     & RolloutOptions
     & PullbackOptions
     & FadingOptions
     & ZoomOptions
-    & TitleBarOptions
+    & TitleBarOptions<D>
     & AttributionOptions
-    & RenderingOptions
+    & RenderingOptions<D>
     & InteractionStandardOptions
     & DebuggingOptions;
-  export type Option = keyof Options;
-  export type OptionValue<O extends Option> = Options[O];
+  export type Option<D extends DataObject = DataObject> = keyof Options<D>;
+  export type OptionValue<O extends Option<D>, D extends DataObject = DataObject> = Options<D>[O];
 
   interface IdEmbedding {
     /**
@@ -46,9 +46,13 @@ declare module "@carrotsearch/foamtree" {
 
   type Embeddings = IdEmbedding | ElementEmbedding;
   type RequiredOptionsT = Embeddings & RequiredOptions
-  export type InitialOptions = RequiredOptionsT & Partial<Options> & Partial<EventOptions>;
+  export type InitialOptions<D extends DataObject> = RequiredOptionsT & Partial<Options<D>> & Partial<EventOptions<D>>;
 
-  export interface CoreOptions {
+  export interface CoreOptions<D extends DataObject> {
+    /**
+     * Root of hierarchy to visualize
+     */
+    dataObject: {groups: D[]}
     /**
      * Determines the general type of layout to generate. Depending on this option, FoamTree will produce polygon-based organic-looking visualization or the traditional rectangular tree map.
      *
@@ -748,7 +752,7 @@ declare module "@carrotsearch/foamtree" {
   /**
    * Options documented in this section determine how FoamTree will lay out and draw group labels.
    */
-  export interface GroupLabelOptions {
+  export interface GroupLabelOptions<D extends DataObject> {
     /**
      * Font family to use for drawing group labels. CSS-compliant font family specifications are supported, including webfonts imported using the @font-face syntax.
      * @assert (value is a string) or (value is null) or (value is undefined)
@@ -819,7 +823,7 @@ declare module "@carrotsearch/foamtree" {
      *   }
      * });
      */
-    groupLabelDecorator: (options: Options, properties: InternalProperties, variables: { labelText: string }) => void
+    groupLabelDecorator: (options: Options, properties: InternalProperties<D>, variables: { labelText: string }) => void
     /**
      * The line height to use when rendering labels in multiple lines.
      * @assert (value is not empty) and (value is a number in range [1,infinity))
@@ -1006,7 +1010,7 @@ declare module "@carrotsearch/foamtree" {
   /**
    * This section describes options that determine the base colors assigned for groups.
    */
-  export interface GroupColorsOptions {
+  export interface GroupColorsOptions<D extends DataObject> {
     /**
      * Start color to use if rainbow color model is used for coloring groups. The rainbow color model will radially or linearly spread the color hue among top-level groups, starting at rainbowStartColor and ending at rainbowEndColor. Sub-groups will be painted with the parent group's hue but with varying degrees of saturation and lightness.
      *
@@ -1156,7 +1160,7 @@ declare module "@carrotsearch/foamtree" {
      *   setTimeout(redraw, 16); // next frame
      * }, 16);
      */
-    groupColorDecorator: (options: Options, properties: InternalProperties, variables: {
+    groupColorDecorator: (options: Options, properties: InternalProperties<D>, variables: {
       /**
        * the group color computed by the default rainbow color model
        */
@@ -1590,7 +1594,7 @@ declare module "@carrotsearch/foamtree" {
     zoomMouseWheelEasing: Easing
   }
 
-  export interface TitleBarOptions {
+  export interface TitleBarOptions<D extends DataObject> {
     /**
      * Font family for the title bar, if shown. CSS-compliant font family specifications are supported, including webfonts imported using the @font-face syntax. If not specified, the same font as specified for the groupLabelFontFamily will be used.
      * @assert (value is a string) or (value is null) or (value is undefined)
@@ -1686,7 +1690,7 @@ declare module "@carrotsearch/foamtree" {
      * </ul>
      * @param variables object with title-bar-related variables this function can change.
      */
-    titleBarDecorator: (options: Options, properties: InternalProperties & {
+    titleBarDecorator: (options: Options, properties: InternalProperties<D> & {
       /**
        * the width of the title bar area, in pixels
        */
@@ -1806,7 +1810,7 @@ declare module "@carrotsearch/foamtree" {
     attributionTheme: 'light' | 'dark'
   }
 
-  export interface RenderingOptions {
+  export interface RenderingOptions<D extends DataObject> {
     /**
      * The physical-to-display pixel count ratio to assume when drawing the final visualization. On modern devices with high-density screens (such as the Retina display) one logical pixel can be mapped to more than one physical pixel. You can use this option to increase the resolution at which the visualization is drawn to make the image clearer and labels more legible. You can also decrease this resolution to make rendering faster at the cost of quality.
      *
@@ -1904,7 +1908,7 @@ declare module "@carrotsearch/foamtree" {
      */
     groupContentDecorator: (
       options: Options,
-      properties: InternalProperties & GeometryUtils & {
+      properties: InternalProperties<D> & GeometryUtils & {
         /**
          * a drawing context that behaves like the standard CanvasRenderingContext2D. The decorator should call the appropriate drawing methods on this object to render the contents of the polygon.
          *
@@ -2006,7 +2010,7 @@ declare module "@carrotsearch/foamtree" {
      * @param properties an object with properties describing the group being rendered. The object will be a union of objects retrieved from the hierarchy, state and geometry options.
      * @param variables object with a number of variables this decorator can change.
      */
-    groupLabelLayoutDecorator: (options: Options, properties: InternalProperties, variables: {
+    groupLabelLayoutDecorator: (options: Options, properties: InternalProperties<D>, variables: {
       /**
        * the font family to assume when filling the polygon with text, sans-serif by default.
        */
@@ -2178,20 +2182,20 @@ declare module "@carrotsearch/foamtree" {
 
 // ------ Read-only options objects ------
 
-  export type InternalProperties = HierarchyObject & GeometryObject & StateObject;
+  export type InternalProperties<D extends DataObject> = HierarchyObject<D> & GeometryObject<D> & StateObject;
 
   /**
    * Returns hierarchy-related information about a group. The returned object contains the following properties:
    */
-  export interface HierarchyObject {
+  export interface HierarchyObject<D extends DataObject> {
     /**
      * a reference to the data object representing the related group
      */
-    group: DataObject
+    group: D
     /**
      * a reference to the data object representing the immediate parent of the group or null
      */
-    parent: DataObject | null
+    parent: D | null
     /**
      * the nesting level of the group. Level numbers start at 0.
      */
@@ -2232,7 +2236,7 @@ declare module "@carrotsearch/foamtree" {
   /**
    * Returns information about the geometry of the polygon representing a group or null if the group's polygon is not drawn. The returned object contains the following properties:
    */
-  export interface GeometryObject {
+  export interface GeometryObject<D extends DataObject> {
     /**
      * the X coordinate of the group's polygon. The coordinate is absolute, it does not take into account the transformations resulting from zooming, panning and exposure.
      */
@@ -2303,7 +2307,7 @@ declare module "@carrotsearch/foamtree" {
      * @remarks The neighbors array is available only when the layout option is set to relaxed.
      * The array is only returned if true is passed as the third parameter of the get method.
      */
-    neighbors: (DataObject | null)[]
+    neighbors: (D | null)[]
   }
 
   /**
@@ -2381,16 +2385,16 @@ declare module "@carrotsearch/foamtree" {
   }
 
 
-  export interface ReadOnlyOptions {
+  export interface ReadOnlyOptions<D extends DataObject> {
     /**
      * Returns hierarchy-related information about a group. The returned object contains the following properties:
      */
-    hierarchy: ParametrizedOption<[IndividualGroupSelector], HierarchyObject>
+    hierarchy: ParametrizedOption<[IndividualGroupSelector], HierarchyObject<D>>
 
     /**
      * To retrieve the full geometry information, including coordinates of the polygon's vertices, pass true as the third parameter of the get method:
      */
-    geometry: ParametrizedOption<[IndividualGroupSelector, boolean], GeometryObject>
+    geometry: ParametrizedOption<[IndividualGroupSelector, boolean], GeometryObject<D>>
 
     /**
      * Returns information about the state of the group. The returned object contains the following properties:
@@ -2467,23 +2471,23 @@ declare module "@carrotsearch/foamtree" {
     return: Return
   }
 
-  export type ReadOnlyOption = keyof ReadOnlyOptions;
-  export type ReadOnlyOptionValue<O extends ReadOnlyOption> = ReadOnlyOptions[O]['return'];
-  export type ReadOnlyOptionParameters<O extends ReadOnlyOption> = ReadOnlyOptions[O]['parameters'];
+  export type ReadOnlyOption = keyof ReadOnlyOptions<DataObject>;
+  export type ReadOnlyOptionValue<O extends ReadOnlyOption, D extends DataObject> = ReadOnlyOptions<D>[O]['return'];
+  export type ReadOnlyOptionParameters<O extends ReadOnlyOption, D extends DataObject> = ReadOnlyOptions<D>[O]['parameters'];
 
-  export interface InteractionOptions {
+  export interface InteractionOptions<D extends DataObject> {
     /**
      * You can use this option to obtain or alter the current selection.
      */
-    selection: ReadWriteOption<GroupSelector, { groups: DataObject[] }>
+    selection: ReadWriteOption<GroupSelector, { groups: D[] }>
     /**
      * You can use this option to obtain or alter the set of open groups.
      */
-    open: ReadWriteOption<GroupSelector, { groups: DataObject[] }>
+    open: ReadWriteOption<GroupSelector, { groups: D[] }>
     /**
      * You can use this option to obtain or alter the set of exposed groups.
      */
-    exposure: ReadWriteOption<GroupSelector, { groups: DataObject[] }>
+    exposure: ReadWriteOption<GroupSelector, { groups: D[] }>
   }
 
   type ReadWriteOption<Input, Output> = {
@@ -2491,15 +2495,15 @@ declare module "@carrotsearch/foamtree" {
     output: Output
   }
 
-  export type InteractionOption = keyof InteractionOptions;
-  export type InteractionOptionSetterValue<O extends InteractionOption> = InteractionOptions[O]['input'];
-  export type InteractionOptionGetterValue<O extends InteractionOption> = InteractionOptions[O]['output'];
+  export type InteractionOption = keyof InteractionOptions<DataObject>;
+  export type InteractionOptionSetterValue<O extends InteractionOption, D extends DataObject> = InteractionOptions<D>[O]['input'];
+  export type InteractionOptionGetterValue<O extends InteractionOption, D extends DataObject> = InteractionOptions<D>[O]['output'];
 
-  export type InteractionGetterOptions = {
-    [O in keyof InteractionOptions]: InteractionOptions[O]['output']
+  export type InteractionGetterOptions<D extends DataObject> = {
+    [O in keyof InteractionOptions<D>]: InteractionOptions<D>[O]['output']
   }
 
-  export type InteractionSetterOptions = {
-    [O in keyof InteractionOptions]: InteractionOptions[O]['input']
+  export type InteractionSetterOptions<D extends DataObject> = {
+    [O in keyof InteractionOptions<D>]: InteractionOptions<D>[O]['input']
   }
 }
