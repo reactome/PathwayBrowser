@@ -205,6 +205,10 @@ export class AnalysisService {
       )
   })
 
+  resourceFilter = signal<Analysis.Resource>("TOTAL")
+  speciesFilter = signal<number | undefined>(undefined)
+
+
   dark = toSignal(this.darkS.$dark, {initialValue: false})
 
   constructor(private http: HttpClient, private state: UrlStateService, private darkS: DarkService) {
