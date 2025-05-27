@@ -1,15 +1,17 @@
-import {computed, Injectable, Signal} from '@angular/core';
+import {computed, Injectable, Signal, untracked} from '@angular/core';
 import {SpeciesService} from "../services/species.service";
 import {environment} from "../../environments/environment";
 import {map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Species} from "../model/graph/species.model";
 import {UrlStateService} from "../services/url-state.service";
-import {InteractorService} from "../interactors/services/interactor.service";
 import {DataObject, Position} from "@carrotsearch/foamtree";
 import {rxResource} from "@angular/core/rxjs-interop";
 import chroma from "chroma-js";
 import {AnalysisService} from "../services/analysis.service";
+import {DarkService} from "../services/dark.service";
+import {Analysis} from "../model/analysis.model";
+import {extract, Style} from "reactome-cytoscape-style";
 
 const LAYOUT_URL = "assets/reacfoam/layout.tsv";
 export namespace EventsHierarchy {
@@ -20,6 +22,8 @@ export namespace EventsHierarchy {
     type: 'TopLevelPathway' | 'Pathway' | 'CellLineagePath'
     species: string,
     children: Data[]
+    reactions?: Analysis.Pathway['reactions']
+    entities?: Analysis.Pathway['entities']
   }
 
   export interface QueryParams {
@@ -76,20 +80,30 @@ export interface PathwayGroup extends DataObject {
   stId: string,
   weight: number,
   family: string,
-  color: string
+  familyColor: chroma.Color
+  depthColor: chroma.Color
+  depth: number
   flag?: boolean
+  expressions?: number[]
+  fdr?: number
+  pValue?: number
 }
+
+export const LIGHT_SURFACE_COLOR = '#effbff';
+export const DARK_SURFACE_COLOR = '#00161b';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReacfoamService {
 
+  style: Style = new Style(document.body);
+
   constructor(
     private http: HttpClient,
     private species: SpeciesService,
     private state: UrlStateService,
-    private interactors: InteractorService,
+    private dark: DarkService,
     private analysis: AnalysisService
   ) {
   }
@@ -158,6 +172,7 @@ export class ReacfoamService {
   } : undefined)
 
   familyColorMap = computed(() => {
+    this.dark.isDark(); // Compute on dark update
     if (!this.layoutMap.value()) return new Map<string, chroma.Color>()
     const layoutMap = this.layoutMap.value()!;
     const familyColorMap = new Map([...layoutMap.values()].map(tlp => [tlp.family, chroma('blue')]))
@@ -165,30 +180,42 @@ export class ReacfoamService {
     const offset = 0;
 
     [...familyColorMap.keys()].forEach((family, i) => {
-      const color = chroma.oklch(0.98, 0.05, (offset + dH * i) % 360);
+      const color = this.dark.isDark() ?
+        chroma.oklch(0.02, 0.05, (offset + dH * i) % 360) :
+        chroma.oklch(0.98, 0.05, (offset + dH * i) % 360);
       familyColorMap.set(family, color);
     })
 
     return familyColorMap
   })
 
+  surfaceColor = computed(() => {
+    this.dark.isDark(); // Compute on dark update
+    return chroma(extract(this.style.properties.global.surface))
+  } )
+
   data: Signal<PathwayGroup[] | undefined> = computed(() => {
+      this.dark.isDark();  // Compute on dark update
       if (!this.mergedData()) return;
-      console.log('data making')
       const {layoutMap, fireworksNodeMap, events} = this.mergedData()!
-      return events.map(e => this.event2group(e, layoutMap, fireworksNodeMap, chroma('#ffffff')))
+      return events.map(e => this.event2group(e, layoutMap, fireworksNodeMap))
     }
   )
 
-  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, color?: chroma.Color, parentFamily?: string): PathwayGroup {
+  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, parentFamily?: string, parentColor?: chroma.Color, depth = 0): PathwayGroup {
+    const humanStId = event.stId.replace(this.species.currentSpecies().abbreviation, 'HSA');
     const fireworksNode = fireworksNodeMap.get(event.stId);
-    const layoutNode = layoutMap.get(event.stId);
-    const family = parentFamily || layoutNode!.family;
-    const currentColor = color || this.familyColorMap().get(family)!;
-    const childColor = currentColor.hex() === '#ffffff' ? chroma('#e4ebf3') : currentColor.darken(0.2).saturate(0.2);
+    const layoutNode = layoutMap.get(humanStId);
+
+    const family = parentFamily || layoutNode?.family || 'Unknown family'; // Unknown family with M. tuberculosis
+    const familyColor = this.familyColorMap().get(family) || this.surfaceColor(); // Unknown family with M. tuberculosis
+
+    const depthColor = this.dark.isDark() ?
+      parentColor ? parentColor.brighten(0.2).saturate(0.2) : this.surfaceColor() :
+      parentColor ? parentColor.darken(0.2).saturate(0.2) : this.surfaceColor();
 
     return {
-      groups: event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, childColor, family)) : undefined,
+      groups: event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, family, depthColor, depth + 1)) : undefined,
       id: event.stId,
       stId: event.stId,
       label: event.name,
@@ -196,8 +223,14 @@ export class ReacfoamService {
       disease: fireworksNode?.disease || false,
       weight: fireworksNode && fireworksNode.ratio !== 0 ? fireworksNode.ratio * 1000 : 9,
       initialPosition: layoutNode,
-      color: currentColor.hex(),
+      familyColor: familyColor,
+      depthColor: depthColor,
       family,
+      depth,
+      expressions: event.entities?.exp,
+      fdr: event.entities?.fdr,
+      pValue: event.entities?.pValue,
+      selected: untracked(this.state.select) === event.stId // Untracked to avoid full reloading if select is updated
     }
   }
 }

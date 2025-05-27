@@ -2,6 +2,10 @@ import {Component, computed, effect, ElementRef, OnDestroy, Signal, viewChild} f
 import {FoamTree, InitialOptions} from "@carrotsearch/foamtree";
 import {PathwayGroup, ReacfoamService} from "./reacfoam.service";
 import {Router} from "@angular/router";
+import {DarkService} from "../services/dark.service";
+import {UrlStateService} from "../services/url-state.service";
+import {AnalysisService} from "../services/analysis.service";
+import {extract} from "reactome-cytoscape-style";
 
 
 @Component({
@@ -29,7 +33,7 @@ export class ReacfoamComponent implements OnDestroy {
     rolloutDuration: 0,
     pullbackDuration: 0,
     // Lower the border radius a bit to fit more groups
-    groupBorderWidth: 0,
+    groupBorderWidth: 2,
     groupInsetWidth: 10,
     groupBorderRadius: 0.4,
     groupBorderWidthScaling: 0.5,
@@ -47,8 +51,12 @@ export class ReacfoamComponent implements OnDestroy {
     maxGroupLevelsAttached: 12,
     maxGroupLevelsDrawn: 12,
     maxGroupLabelLevelsDrawn: 12,
+
     // Width of the selection outline to draw around selected groups
-    groupSelectionOutlineWidth: 3,
+    groupSelectionOutlineWidth: 5,
+    // groupSelectionStrokeLightnessShift: 10,
+    groupSelectionOutlineColor: extract(this.reacfoam.style.properties.global.primary),
+
     // Show labels during relaxation
     wireframeLabelDrawing: "always",
     // Make the description group (in flattened view) smaller to make more space for child groups
@@ -61,16 +69,16 @@ export class ReacfoamComponent implements OnDestroy {
     finalToWireframeFadeDuration: 0,
     fadeDuration: 0,
     wireframeToFinalFadeDuration: 0,
+    groupLabelColorThreshold: 0.5,
+    relaxationMaxDuration: 3000,
+    groupLabelFontFamily: 'Roboto',
 
     onGroupHold: (event) => {
       event.preventDefault();
       this.router.navigate([event.group.stId], {queryParamsHandling: 'preserve', preserveFragment: true})
     },
 
-    groupColorDecorator: (options, props, values) => {
-      values.groupColor = props.group.color;
-      values.labelColor = 'auto';
-    }
+    onGroupClick: (event) => this.state.select.set(event.group.stId),
   } as InitialOptions<PathwayGroup>));
 
   foamTree = computed(() => new FoamTree<PathwayGroup>(this.options()));
@@ -78,16 +86,65 @@ export class ReacfoamComponent implements OnDestroy {
   sizeObserver = new ResizeObserver(() => {
     console.log('resize')
     setTimeout(() => {
-      this.foamTree().resize()
+      this.foamTree().resize();
+      this.foamTree().set('dataObject', {groups: this.reacfoam.data()!}) // Force initial position to be used for TLP to ensure stable position
     })
   });
 
   constructor(
     private reacfoam: ReacfoamService,
+    private state: UrlStateService,
+    private analysis: AnalysisService,
+    private dark: DarkService,
     private router: Router) {
     effect(() => this.container()?.nativeElement && this.sizeObserver.observe(this.container().nativeElement));
     effect(() => {
-      this.reacfoam.data() && this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
+      this.analysis.sampleIndex(); // Update colors on expression column shifting
+      this.foamTree().redraw();
+    });
+    effect(() => this.reacfoam.data() && this.foamTree().set('dataObject', {groups: this.reacfoam.data()!}));
+    effect(() => {
+      this.foamTree().set({
+        groupStrokePlainLightnessShift: this.dark.isDark() ? 70 : -70,
+        groupStrokePlainSaturationShift: 0,
+        groupColorDecorator: (options, props, values) => {
+          const depth = props.group.depth;
+          if (this.analysis.resultSignal()) { // Analysis
+            values.labelColor = 'auto'
+            const pValue = props.group.pValue;
+
+            const notFoundColor = this.reacfoam.surfaceColor().hex();
+
+            if (!pValue || pValue > 0.05) values.groupColor = notFoundColor;
+            else {
+              if (this.analysis.type() === 'OVERREPRESENTATION') { // pValue ~ color
+                values.groupColor = this.analysis.palette().scale(props.group.fdr).hex()
+              } else { // expression ~ color
+                if (props.group.expressions) {
+                  values.groupColor = this.analysis.palette().scale(props.group.expressions[this.analysis.sampleIndex()]).hex()
+                } else {
+                  values.groupColor = notFoundColor;
+                }
+              }
+            }
+
+          } else { // No analysis
+            if (this.dark.isDark()) {
+              values.groupColor = props.group.familyColor.brighten(depth * 0.2).saturate(depth * 0.2).hex();
+              values.labelColor = props.group.familyColor.brighten(3.5).saturate(3).hex();
+            } else {
+              values.groupColor = props.group.familyColor.darken(depth * 0.2).saturate(depth * 0.2).hex();
+              values.labelColor = props.group.familyColor.darken(4).saturate(5).hex();
+            }
+
+            // values.groupColor =  props.group.depthColor.hex();
+            // values.labelColor = 'auto'
+          }
+
+
+        }
+      })
+      this.foamTree().redraw()
     });
 
   }

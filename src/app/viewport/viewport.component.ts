@@ -25,7 +25,7 @@ import {isPathwayOrTLP} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, style, transition, trigger} from "@angular/animations";
 
-const DETAIL_MIN_HEIGHT = 30;
+const DETAIL_MIN_HEIGHT = 0;
 
 @Component({
   selector: 'cr-viewport',
@@ -72,7 +72,7 @@ export class ViewportComponent implements AfterViewInit {
   })
 
   contentHeight = computed(() => this.content().nativeElement.clientHeight)
-  detailShare = computed(() => this.state.pathwayId() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
+  detailShare = computed(() => this.state.pathwayId() || this.state.select() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
   viewShare = computed(() => 100 - this.detailShare())
 
   diagram = viewChild(DiagramComponent);

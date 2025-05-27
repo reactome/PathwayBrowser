@@ -710,7 +710,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
           entity.mapsTo
             .flatMap(diagramEntity => diagramEntity.ids)
-            .map(id => [id, entity.exp[analysisIndex] || 1]))
+            .map(id => [id, entity.exp[analysisIndex] || 0]))
         )
         console.log(analysisEntityMap)
 
@@ -724,7 +724,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
           cy.batch(() => {
             const style: Style = cy.data('reactome');
             const min = style.properties.analysis.min = result.expression.min || 0;
-            const max = style.properties.analysis.max = result.expression.max || 1;
+            const max = style.properties.analysis.max = result.expression.max || 0.05;
 
             const hasExpression = result.summary.type !== 'OVERREPRESENTATION';
 
@@ -735,7 +735,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
                 .map(leaf => analysisEntityMap.get(leaf.identifier))
                 .sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
 
-              // console.log(node.data('reactomeId'), leaves, exp)
+              console.log(node.data('reactomeId'), leaves, exp)
 
               // if (hasExpression) exp = exp.map(e => e !== undefined ? 1 - e : undefined);
               node.data('exp', exp);
@@ -746,9 +746,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               if (!pathwayData) {
                 node.data('exp', [undefined]);
               } else {
-                console.log(dbId, normalize(pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, min, max))
+                console.log(dbId, normalize(pathwayData.exp[analysisIndex] || pathwayData.pValue, min, max))
                 node.data('exp', [
-                  [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
+                  [pathwayData.exp[analysisIndex] || pathwayData.pValue, pathwayData.found],
                   [undefined, pathwayData.total - pathwayData.found]
                 ])
               }

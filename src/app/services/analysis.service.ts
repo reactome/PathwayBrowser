@@ -66,7 +66,7 @@ export class PaletteSummary {
 
   set dark(isDark: boolean) {
     this.isDark = isDark;
-    this.scale = chroma.scale(this.colors).mode('oklab').classes(this.n).padding(this.padding)
+    this.scale = chroma.scale(this.colors).mode('oklab').classes(this.n).padding(this.padding).domain(this.scale.domain())
   }
 }
 
@@ -83,15 +83,15 @@ export class AnalysisService {
     ...Object.keys(chroma.brewer)
       .filter(name => name.toLowerCase() !== name)
       .map(name => ([name, new PaletteSummary(name as StandardPalette)] as [StandardPalette, PaletteSummary])),
-    ['ancient', new PaletteSummary(['#1532b3', '#fff', '#e5e61d'])],
-    ['primary', new PaletteSummary(['#fff', extract(this.style.properties.global.primary)])]
+    ['ancient', new PaletteSummary(['#1532b3', extract(this.style.properties.global.surface), '#e5e61d'])],
+    ['primary', new PaletteSummary([extract(this.style.properties.global.surface), extract(this.style.properties.global.primary)])]
   ]);
 
 
   typeToDefaultPalette = new Map<Analysis.Type, PaletteName>([
     ['GSA_REGULATION', 'ancient'],
     ['EXPRESSION', 'RdPu'],
-    ['OVERREPRESENTATION', 'RdPu'],
+    ['OVERREPRESENTATION', 'primary'],
   ]);
 
   palette: WritableSignal<PaletteSummary> = linkedSignal({
@@ -178,7 +178,7 @@ export class AnalysisService {
         //@ts-ignore
         summary.scale.nodata(extract(this.style.properties.analysis.notFound))
         summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : -1);
-        summary.domain(result.expression.min || 0, result.expression.max || 1);
+        summary.domain(result.expression.min || 0.05, result.expression.max || 0);
       }
 
       this.state.sample.set(result?.expression.columnNames[0] || null)

@@ -156,7 +156,7 @@
         <div class="content" #content>
           <as-split direction="vertical" gutterSize="4">
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
-            <as-split-area [size]="viewShare()" id="view" class="hide-overflow">
+            <as-split-area [size]="viewShare()" id="view" class="hide-overflow" >
               @if (pathwayId()) {
                 @if (hasEHLD()) {
                   <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
