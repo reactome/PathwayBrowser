@@ -9,8 +9,8 @@ export const routes: Routes = [
   {path: 'iterate', component: DiagramIteratorComponent},
   {path: 'iterate/:pathwayId', component: DiagramIteratorComponent},
   {path: 'diagram/:pathwayId', component: DiagramHomeComponent},
-  {path: 'PathwayBrowser/:pathwayId', component: ViewportComponent},
   {path: ':pathwayId', component: ViewportComponent},
+  {path: '', component: ViewportComponent},
   {path: '**', component: ViewportComponent, canActivate: [legacyGuard], runGuardsAndResolvers: 'always'}
 ]
 

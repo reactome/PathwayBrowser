@@ -59,7 +59,7 @@ export class UrlStateService implements State {
 
     effect(() => {
       console.log('Updating patwhayId to ',  this.pathwayId())
-      this.router.navigate([this.pathwayId()], {queryParamsHandling:'preserve', preserveFragment: true});
+      this.router.navigate(this.pathwayId() ? [this.pathwayId()] : [], {queryParamsHandling:'preserve', preserveFragment: true});
     });
 
 

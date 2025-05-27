@@ -8,7 +8,7 @@ export const legacyGuard: CanActivateFn = (route, state) => {
   const router: Router = inject(Router);
   const {fragment, queryParams} = route;
   let params = {...queryParams} as Params;
-  let id = 'R-HSA-453279'; // Default routing
+  let id = ''; // Default routing
 
   if (fragment) {
     const match = fragment.match(URL_PATTERN);
@@ -28,5 +28,5 @@ export const legacyGuard: CanActivateFn = (route, state) => {
     return router.navigate([id], {fragment: undefined, queryParams: params})
   }
 
-  return router.navigate([id]); // Default routing
+  return router.navigate([]); // Default routing
 };

@@ -1,8 +1,11 @@
 <div id="hierarchy-container">
-  <div id="breadcrumb-container" *ngIf="this.breadcrumbs.length > 0">
-    <ng-container class="icon-container">
-      <mat-icon class='home-icon custom-icon primary' svgIcon="home"></mat-icon>
-    </ng-container>
+  <div id="breadcrumb-container">
+    <a routerLink="" preserveFragment="true" queryParamsHandling="preserve" matTooltip="Pathways overview">
+      <ng-container class="icon-container">
+        <mat-icon class='home-icon custom-icon primary' svgIcon="home"></mat-icon>
+      </ng-container>
+    </a>
+
     <nav class="breadcrumb">
       <div class="gradient-holder-left"></div>
 
