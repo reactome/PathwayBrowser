@@ -109,6 +109,10 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       this._loadAnalysisFn &&
       this._loadAnalysisFn(this.analysis.sampleIndex())
     );
+    effect(() => { // Update style upon dark change
+      this.dark.isDark();
+      this.updateStyle();
+    })
   }
 
   zoomToCytoscapeTransform = (x: number) => this.minZoom() * Math.pow(this.maxZoom() / this.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
@@ -183,9 +187,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   selecting = false // Avoid zooming in diagram when selection came from in diagram
   flagging = false // Avoid flagging in diagram when flagging came from in diagram
 
-  ngAfterViewInit(): void {
-    this.dark.$dark.subscribe(this.updateStyle.bind(this))
 
+  ngAfterViewInit(): void {
     const container = this.cytoscapeContainer!.nativeElement;
     const compareContainer = this.compareContainer!.nativeElement;
     const legendContainer = this.legendContainer!.nativeElement;

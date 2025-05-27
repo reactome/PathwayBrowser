@@ -1,4 +1,4 @@
-import {computed, effect, Injectable, linkedSignal, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, effect, Injectable, linkedSignal, signal, WritableSignal} from '@angular/core';
 import {catchError, Observable, of, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
@@ -209,11 +209,10 @@ export class AnalysisService {
   speciesFilter = signal<number | undefined>(undefined)
 
 
-  dark = toSignal(this.darkS.$dark, {initialValue: false})
 
   constructor(private http: HttpClient, private state: UrlStateService, private darkS: DarkService) {
     effect(() => {
-      [...this.paletteOptions.values()].forEach(summary => summary.dark = this.dark())
+      [...this.paletteOptions.values()].forEach(summary => summary.dark = this.darkS.isDark())
     });
 
   }
