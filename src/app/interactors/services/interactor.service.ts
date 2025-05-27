@@ -1,5 +1,5 @@
-import {Injectable} from "@angular/core";
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import {Injectable, signal} from "@angular/core";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import cytoscape, {NodeCollection, NodeSingular} from "cytoscape";
 import {catchError, map, Observable, of, Subject, switchMap} from "rxjs";
 import {
@@ -46,16 +46,10 @@ export class InteractorService {
   identifiers: string = '';
   cyToSelectedResource = new Map<cytoscape.Core, string>();
 
-  private currentInteractorResourceSubject = new Subject<ResourceAndType>();
-  public currentInteractorResource$ = this.currentInteractorResourceSubject.asObservable();
+  currentResource = signal<ResourceAndType>({type: null, name: null})
 
   constructor(private http: HttpClient, private diagramService: DiagramService) {
   }
-
-  setCurrentResource(r: ResourceAndType) {
-    this.currentInteractorResourceSubject.next(r);
-  }
-
   private getIdentifiers(cy: cytoscape.Core): void {
     this.identifiers = this.getIdentifiersFromGraph(cy);
   }
@@ -110,7 +104,7 @@ export class InteractorService {
 
   public getCustomInteractorsByAcc(acc: string) {
     const url = `${environment.host}/ContentService/interactors/static/molecule/enhanced/${acc}/details`;
-    return this.http.get<CustomInteraction[]>(url, )
+    return this.http.get<CustomInteraction[]>(url,)
   }
 
   public addInteractorOccurrenceNode(interactors: Interactors, cy: cytoscape.Core, resource: string) {
@@ -220,7 +214,10 @@ export class InteractorService {
           ...targetNode.data(),
           id: id,
           displayName: displayName.replace(/([/,:;-])/g, "$1\u200b"),
-          html: this.diagramService.getStructureVideoHtml({id, type: interactor.type || "Protein"}, width, height, interactor.acc),
+          html: this.diagramService.getStructureVideoHtml({
+            id,
+            type: interactor.type || "Protein"
+          }, width, height, interactor.acc),
           width: width,
           height: height,
           accURL: interactor.accURL,

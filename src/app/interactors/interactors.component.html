@@ -22,41 +22,44 @@
         </button>
       </div>
 
+
       <!--Using $implicit allows you to pass a value into a template without explicitly naming the context variable-->
       <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Main' }"></ng-container>
 
       <div class="main-resource">
         <button class="full-width" mat-button  [disabled]="hasEHLD()" (click)="getInteractors(INTACT_RESOURCE)"
-                [ngClass]="{'active-button': currentResource?.type === ResourceType.STATIC}">IntAct
+                [ngClass]="{'active-button': currentResource().type === ResourceType.STATIC}">IntAct
         </button>
 
         <button class="full-width" mat-button [disabled]="hasEHLD()" (click)="getInteractors(DISEASE_RESOURCE)"
-                [ngClass]="{'active-button': currentResource?.type === ResourceType.DISGENET}">DisGeNet
+                [ngClass]="{'active-button': currentResource().type === ResourceType.DISGENET}">DisGeNet
         </button>
       </div>
 
-      <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'PSICQUIC' }"></ng-container>
+      @if (psicquicResources.length > 0 && !isDataFromPsicquicLoading) {
+        <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'PSICQUIC' }"></ng-container>
 
-      <mat-grid-list cols="2" rowHeight="28px" [gutterSize]="'5px'">
-        <mat-grid-tile *ngFor="let resource of psicquicResources" class="rounded-corner">
-          <button class="full-width psicquic-button" mat-button [disabled]="hasEHLD()"
-                  (click)="getInteractors(resource.name)"
-                  [ngClass]="{'active-button': currentResource?.name === resource.name}">
-            <div class="resource-name">
-              <span>{{ resource.name }}</span>
-              <mat-spinner class="spinner-color" diameter="20"
-                           *ngIf="isDataFromPsicquicLoading && currentResource?.name === resource.name"></mat-spinner>
-            </div>
-          </button>
-        </mat-grid-tile>
-      </mat-grid-list>
+        <mat-grid-list cols="2" rowHeight="28px" [gutterSize]="'5px'">
+          <mat-grid-tile *ngFor="let resource of psicquicResources" class="rounded-corner">
+            <button class="full-width psicquic-button" mat-button [disabled]="hasEHLD()"
+                    (click)="getInteractors(resource.name)"
+                    [ngClass]="{'active-button': currentResource().name === resource.name}">
+              <div class="resource-name">
+                <span>{{ resource.name }}</span>
+                <mat-spinner class="spinner-color" diameter="20"
+                             *ngIf="isDataFromPsicquicLoading && currentResource()?.name === resource.name"></mat-spinner>
+              </div>
+            </button>
+          </mat-grid-tile>
+        </mat-grid-list>
+      }
 
       <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Custom' }"></ng-container>
 
       <mat-selection-list *ngIf="resourceTokens?.length != 0" [multiple]=false hideSingleSelectionIndicator=true>
         <mat-list-option *ngFor="let resourceToken of resourceTokens" [value]="resourceToken"
                          [selected]="isSelected(resourceToken)" (click)="getInteractors(resourceToken)"
-                         [ngClass]="{'active-button': currentResource?.name === resourceToken.summary.name}"
+                         [ngClass]="{'active-button': currentResource().name === resourceToken.summary.name}"
                          class="full-width">
           <div class="resource-name surface-variant">
             <div>{{ resourceToken.summary.name }}</div>

@@ -11,19 +11,17 @@ import {Subscription} from "rxjs";
 
 
 @Component({
-    selector: 'cr-interactors',
-    templateUrl: './interactors.component.html',
-    styleUrls: ['./interactors.component.scss'],
-    standalone: false
+  selector: 'cr-interactors',
+  templateUrl: './interactors.component.html',
+  styleUrls: ['./interactors.component.scss'],
+  standalone: false
 })
-export class InteractorsComponent implements AfterViewInit, OnDestroy {
+export class InteractorsComponent implements AfterViewInit {
 
   isDataFromPsicquicLoading: boolean = false;
   resourceTokens: InteractorToken[] = [];
   clear = false;
   psicquicResources: PsicquicResource[] = [];
-  currentResource: ResourceAndType | undefined = {name: null, type: null};
-  currentResourceSubscription!: Subscription;
 
   DISEASE_RESOURCE = 'DisGeNet';
   INTACT_RESOURCE = 'IntAct';
@@ -32,27 +30,22 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
   readonly hasEHLD = input<boolean>();
   readonly cy = input<cytoscape.Core>();
   readonly cys = input<cytoscape.Core[] | undefined>([]);
+  readonly currentResource = this.interactors.currentResource;
   @Output('initialiseReplaceElements') initialiseReplaceElements: EventEmitter<any> = new EventEmitter();
 
-  constructor(private diagram: DiagramService, public dark: DarkService, private interactorsService: InteractorService, private state: UrlStateService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
+  constructor(private diagram: DiagramService, public dark: DarkService, private interactors: InteractorService, private state: UrlStateService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
 
   }
 
   ngAfterViewInit(): void {
     this.getPsicquicResources();
-    this.currentResourceSubscription = this.interactorsService.currentInteractorResource$.subscribe(resource => {
-      this.currentResource = resource;
-    });
   }
 
-  ngOnDestroy(): void {
-    this.currentResourceSubscription.unsubscribe()
-  }
 
   getInteractors(resource: string | null | InteractorToken) {
     if (!resource) return;
 
-    this.interactorsService.getResourceType(resource as string).subscribe({
+    this.interactors.getResourceType(resource as string).subscribe({
       next: (resourceType) => {
         switch (resourceType) {
           case ResourceType.STATIC:
@@ -86,11 +79,11 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.cys()?.forEach(cy => {
-      this.interactorsService.fetchInteractorData(cy, resource).subscribe(interactors => {
-        this.interactorsService.addInteractorOccurrenceNode(interactors, cy, resource);
+      this.interactors.fetchInteractorData(cy, resource).subscribe(interactors => {
+        this.interactors.addInteractorOccurrenceNode(interactors, cy, resource);
         this.initialiseReplaceElements.emit();
       });
-        this.state.overlay.set(resource);
+      this.state.overlay.set(resource);
     })
   }
 
@@ -99,10 +92,10 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
     this.clear = false;
     this.updateCurrentResource(selectedResource, ResourceType.PSICQUIC);
     this.cys()?.forEach(cy => {
-      this.interactorsService.fetchInteractorData(cy, selectedResource).subscribe(interactors => {
-        this.interactorsService.addInteractorOccurrenceNode(interactors, cy, selectedResource);
+      this.interactors.fetchInteractorData(cy, selectedResource).subscribe(interactors => {
+        this.interactors.addInteractorOccurrenceNode(interactors, cy, selectedResource);
         this.isDataFromPsicquicLoading = false;
-          this.state.overlay.set(selectedResource);
+        this.state.overlay.set(selectedResource);
       });
     });
   }
@@ -124,7 +117,7 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
           this.resourceTokens!.push(resource);
           this.clear = false;
           this.updateCurrentResource(resource.summary.name, ResourceType.CUSTOM);
-            this.state.overlay.set(resource.summary.token);
+          this.state.overlay.set(resource.summary.token);
         }
         this.cdr.detectChanges();
       })
@@ -140,11 +133,11 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
     if (!resource.summary) return
 
     this.cys()?.forEach(cy => {
-      this.interactorsService.fetchCustomInteractors(resource, cy).subscribe((result) => {
-        this.interactorsService.addInteractorOccurrenceNode(result.interactors, cy, result.interactors.resource);
+      this.interactors.fetchCustomInteractors(resource, cy).subscribe((result) => {
+        this.interactors.addInteractorOccurrenceNode(result.interactors, cy, result.interactors.resource);
         this.clear = false;
         this.updateCurrentResource(resource!.summary.name, ResourceType.CUSTOM);
-          this.state.overlay.set(resource.summary.token);
+        this.state.overlay.set(resource.summary.token);
       })
     })
   }
@@ -155,31 +148,31 @@ export class InteractorsComponent implements AfterViewInit, OnDestroy {
       this.resourceTokens!.splice(index, 1);
       this.cys()?.forEach(cy => {
         cy.elements(`[resource = '${resource}']`).remove();
-          this.state.overlay.set(null);
+        this.state.overlay.set(null);
       })
     }
   }
 
   clearInteractors() {
     this.cys()?.forEach(cy => {
-      this.interactorsService.clearAllInteractorNodes(cy);
+      this.interactors.clearAllInteractorNodes(cy);
       this.clear = true;
       this.updateCurrentResource(null, null);
-        this.state.overlay.set(null);
+      this.state.overlay.set(null);
     })
   }
 
   updateCurrentResource(name: string | null, type: ResourceType | null) {
     if (name && type) {
       const resource: ResourceAndType = {name, type};
-      this.interactorsService.setCurrentResource(resource);
+      this.interactors.currentResource.set(resource);
     } else {
-      this.interactorsService.setCurrentResource({name: null, type: null});
+      this.interactors.currentResource.set({name: null, type: null});
     }
   }
 
   getPsicquicResources() {
-    this.interactorsService.getPsicquicResources().subscribe(resources => {
+    this.interactors.getPsicquicResources().subscribe(resources => {
       this.psicquicResources = resources;
     })
   }
