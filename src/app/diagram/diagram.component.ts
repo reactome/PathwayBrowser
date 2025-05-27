@@ -67,7 +67,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
   readonly thumbnailRef = viewChild.required<ElementRef<HTMLImageElement>>('thumbnail');
 
-
   readonly interactorsComponent = input<InteractorsComponent>(undefined, {alias: "interactor"});
   readonly pathwayId = model.required<string>();
 

@@ -24,7 +24,7 @@
             <div class="overlay-content">
               <span>Overlay</span>
               <!--todo: fix the space for long name-->
-              <span *ngIf="currentInteractorResource?.name">{{ currentInteractorResource?.name }}</span>
+              <span *ngIf="currentInteractorResource().name">{{ currentInteractorResource().name }}</span>
             </div>
             <mat-icon class="custom-icon">arrow_drop_down</mat-icon>
           </div>
@@ -153,10 +153,10 @@
             </div>
           </div>
         </div>
-        <div class="content">
+        <div class="content" #content>
           <as-split direction="vertical" gutterSize="4">
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
-            <as-split-area [size]="80" id="view" class="hide-overflow">
+            <as-split-area [size]="viewShare()" id="view" class="hide-overflow">
               @if (pathwayId()) {
                 @if (hasEHLD()) {
                   <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
@@ -164,11 +164,11 @@
                   <cr-diagram [(pathwayId)]="pathwayId" #diagram
                               [interactor]="interactors"></cr-diagram>
                 }
+              } @else {
+                <cr-reacfoam/>
               }
-
-              <cr-reacfoam></cr-reacfoam>
             </as-split-area>
-            <as-split-area [size]="20">
+            <as-split-area [size]="detailShare()">
               <cr-details-panel></cr-details-panel>
             </as-split-area>
           </as-split>

@@ -4,16 +4,16 @@ import {
   Component,
   computed,
   effect,
-  model, viewChild,
-  ViewChild,
+  ElementRef,
+  model,
+  viewChild,
   WritableSignal
 } from '@angular/core';
 import {DiagramComponent} from "../diagram/diagram.component";
-import {ResourceAndType} from "../interactors/model/interactor.model";
 import {InteractorsComponent} from "../interactors/interactors.component";
 import {SpeciesService} from "../services/species.service";
 import {InteractorService} from "../interactors/services/interactor.service";
-import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
@@ -24,6 +24,8 @@ import {DataStateService} from "../services/data-state.service";
 import {isPathwayOrTLP} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, style, transition, trigger} from "@angular/animations";
+
+const DETAIL_MIN_HEIGHT = 30;
 
 @Component({
   selector: 'cr-viewport',
@@ -69,11 +71,16 @@ export class ViewportComponent implements AfterViewInit {
     return undefined;
   })
 
+  contentHeight = computed(() => this.content().nativeElement.clientHeight)
+  detailShare = computed(() => this.state.pathwayId() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
+  viewShare = computed(() => 100 - this.detailShare())
+
   diagram = viewChild(DiagramComponent);
+  content = viewChild.required<ElementRef<HTMLDivElement>>('content');
   interactors = viewChild.required(InteractorsComponent);
   darkToggle = viewChild.required<MatSlideToggle>('darkToggle');
 
-  currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
+  currentInteractorResource = this.interactorService.currentResource;
 
 
   visibility = {
@@ -105,10 +112,6 @@ export class ViewportComponent implements AfterViewInit {
     //   // Updated the content after ngAfterContentChecked to avoid ExpressionChangedAfterItHasBeenCheckedError
     //   this.cdRef.detectChanges();
     // });
-
-    this.interactorService.currentInteractorResource$.pipe(untilDestroyed(this)).subscribe(resource => {
-      this.currentInteractorResource = resource;
-    });
 
 
     this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
