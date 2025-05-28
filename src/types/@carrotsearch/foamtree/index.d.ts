@@ -1,5 +1,5 @@
 // Type definitions for @carrotsearch/foamtree 3.5.2
-// Project: https://github.com/carrotsearch/foamtree
+// Project: https://carrotsearch.com/foamtree/
 // Definitions by: EliotRagueneau <https://github.com/EliotRagueneau>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 //

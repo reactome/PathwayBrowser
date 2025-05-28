@@ -823,7 +823,7 @@ declare module "@carrotsearch/foamtree" {
      *   }
      * });
      */
-    groupLabelDecorator: (options: Options, properties: InternalProperties<D>, variables: { labelText: string }) => void
+    groupLabelDecorator: (options: Options, properties: InternalProperties<D>, variables: { labelText: string }) => any
     /**
      * The line height to use when rendering labels in multiple lines.
      * @assert (value is not empty) and (value is a number in range [1,infinity))
@@ -1172,7 +1172,7 @@ declare module "@carrotsearch/foamtree" {
        * @defaultValue "auto"
        */
       labelColor: 'auto' | string | ColorObject
-    }) => void
+    }) => any
 
   }
 
@@ -1720,7 +1720,7 @@ declare module "@carrotsearch/foamtree" {
        * the maximum font size to be used for drawing text in the title bar, by default equal to the titleBarMaxFontSize option. Change this variable to override the the max font size for the currently rendered title bar.
        */
       titleBarMaxFontSize: number
-    }) => void
+    }) => any
     /**
      * Maximum group label size in pixels whose label to show in the title bar. Small size of a group may cause its label to be drawn in a small font and thus appear illegible. For this reason, when the user hovers the mouse pointer over a group with a small label, the label can be shown in a dedicated title bar.
      *
@@ -1954,7 +1954,7 @@ declare module "@carrotsearch/foamtree" {
          * @defaultValue true
          */
         groupPolygonDrawn: boolean
-      }) => void
+      }) => any
 
     /**
      * Determines when the groupContentDecorator will be triggered:
@@ -2047,7 +2047,7 @@ declare module "@carrotsearch/foamtree" {
        * the maximum font size in pixels to use for filling the text, 72 by default.
        */
       maxFontSize: number
-    }) => void
+    }) => any
 
     /**
      * When true, the polygon corresponding to the description group will be drawn. By default, the polygon is not drawn to make an impression that the description group is linked to the parent polygon.
