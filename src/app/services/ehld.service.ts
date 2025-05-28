@@ -259,14 +259,14 @@ export class EhldService {
 
       const textInfoElement = analysisInfoElement.getElementsByTagName('text')[0];
       // "1.23E4";
-      textInfoElement.innerHTML = "Hit: " + analysisPathway.found + "/" + analysisPathway.total + " - FDR: " + analysisPathway.fdr.toExponential(2).replace('e', 'E');
+      textInfoElement.innerHTML = `Hit: ${analysisPathway.found}/${analysisPathway.total} - FDR: ${analysisPathway.fdr.toExponential(2).replace('e', 'E')}`;
 
       textInfoElement.removeAttribute("transform");
       textInfoElement.classList.add('analysis-text');
 
-      const rectBox = analysisInfoElement.getElementsByTagName('rect')[0];
-      const centerX = rectBox.getBBox().x + rectBox.getBBox().width / 2;
-      const centerY = rectBox.getBBox().y + rectBox.getBBox().height / 2;
+      const rectBox = (analysisInfoElement.firstChild! as SVGGraphicsElement).getBBox();
+      const centerX = rectBox.x + rectBox.width / 2;
+      const centerY = rectBox.y + rectBox.height / 2;
 
       textInfoElement.setAttribute("x", String(centerX));
       textInfoElement.setAttribute("y", String(centerY));
