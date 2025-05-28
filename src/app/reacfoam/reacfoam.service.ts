@@ -5,7 +5,7 @@ import {map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Species} from "../model/graph/species.model";
 import {UrlStateService} from "../services/url-state.service";
-import {DataObject, Position} from "@carrotsearch/foamtree";
+import {FoamTree} from "@carrotsearch/foamtree";
 import {rxResource} from "@angular/core/rxjs-interop";
 import chroma from "chroma-js";
 import {AnalysisService} from "../services/analysis.service";
@@ -70,12 +70,12 @@ export namespace Layout {
   }
 }
 
-export interface PathwayGroup extends DataObject {
+export interface PathwayGroup extends FoamTree.DataObject {
   id: string,
   disease: boolean,
   diagram: boolean,
   groups?: PathwayGroup[],
-  initialPosition?: Position
+  initialPosition?: FoamTree.Position
   label: string,
   stId: string,
   weight: number,

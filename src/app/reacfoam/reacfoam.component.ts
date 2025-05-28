@@ -1,5 +1,5 @@
 import {Component, computed, effect, ElementRef, OnDestroy, Signal, viewChild} from '@angular/core';
-import {FoamTree, InitialOptions} from "@carrotsearch/foamtree";
+import {FoamTree} from "@carrotsearch/foamtree";
 import {PathwayGroup, ReacfoamService} from "./reacfoam.service";
 import {Router} from "@angular/router";
 import {DarkService} from "../services/dark.service";
@@ -18,7 +18,7 @@ export class ReacfoamComponent implements OnDestroy {
 
   container = viewChild.required<ElementRef<HTMLDivElement>>('container');
 
-  options: Signal<InitialOptions<PathwayGroup>> = computed(() => ({
+  options: Signal<FoamTree.InitialOptions<PathwayGroup>> = computed(() => ({
     element: this.container().nativeElement,
     layout: "relaxed",
     stacking: "flattened",
@@ -79,7 +79,7 @@ export class ReacfoamComponent implements OnDestroy {
     },
 
     onGroupClick: (event) => this.state.select.set(event.group.stId),
-  } as InitialOptions<PathwayGroup>));
+  } as FoamTree.InitialOptions<PathwayGroup>));
 
   foamTree = computed(() => new FoamTree<PathwayGroup>(this.options()));
 

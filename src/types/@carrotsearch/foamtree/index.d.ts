@@ -6,12 +6,102 @@
 // TypeScript Version: 5.7.3
 
 /// <reference path="./core.d.ts" />
-/// <reference path="./options.d.ts" />
 /// <reference path="./events.d.ts" />
+/// <reference path="./options.d.ts" />
+
 
 declare module "@carrotsearch/foamtree" {
+  namespace FoamTree {
 
-  export class FoamTree<D extends DataObject = DataObject> {
+    /**
+     * FoamTree exposes a number of geometry utilities useful when implementing groupContentDecorators.
+     *
+     * The utilities are grouped into a static object available from CarrotSearchFoamTree.geometry.
+     * Please see below for a detailed list of utility methods.
+     */
+    interface GeometryUtils {
+      /**
+       * Given an array of points, returns the bounding box of the points.
+       *
+       * @param points the array of point coordinates. Each element of the array must be an object containing the x and y properties representing the coordinates of the point.
+       */
+      boundingBox(points: Coordinate[]): Rectangle;
+
+      /**
+       * Computes the centroid (center of mass) and area of the provided polygon.
+       *
+       * @param polygon the input polygon. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
+       * The polygon must be non-self-intersecting, vertex coordinates must be enumerated in clockwise or anti-clockwise order.
+       * For performance reasons, this method will not verify if the criteria are met.
+       * If the provided polygon does not satisfy the criteria, the result will be unspecified.
+       * Note that the polygons returned when getting the geometry option meet both criteria.
+       */
+      polygonCentroid(polygon: Coordinate[]): {
+        /**
+         * coordinates of the centroid
+         */
+        x: number,
+        /**
+         * coordinates of the centroid
+         */
+        y: number,
+        /**
+         * area of the polygon in pixels
+         */
+        area: number
+      }
+
+      /**
+       * Given a convex polygon, finds the largest inscribed rectangle of given aspect ratio wTH, centered around the provided center point (cx, cy).
+       * Additionally, the resulting rectangle can be scaled by the provided scale factor.
+       * Also, the alignment of the center point relative to the rectangle can be defined by the (fx, fy) point.
+       *
+       * @param polygon the polygon to inscribe the rectangle into. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
+       * The polygon must be convex, vertex coordinates must be enumerated in clockwise or anti-clockwise order. For performance reasons, this method will not verify if the criteria are met. If the provided polygon does not satisfy the criteria, the result will be unspecified. Note that the polygons returned when getting the geometry option meet both criteria.
+       * @param cx coordinates of the point inside the polygon around which the rectangle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
+       * @param cy coordinates of the point inside the polygon around which the rectangle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
+       * @param wTH (optional) the aspect ratio of the polygon to inscribe, the ratio is assumed to be the polygons width divided by the polygon's height. If not provided, the ratio of 1.0 will be used, which will produce a square.
+       * @param scale (optional) the scale factor to apply to the resulting rectangle. The rectangle will be scaled relative to the alignment point determined by (fx, fy). If not provided, the scale of 1.0 will be used, which will produce the largest possible rectangle that fits inside the polygon and meets the center and alignment criteria.
+       * @param fx (optional) defines what the the position of the center point (cx, cy) should be relative to the rectangle. The default value is (0.5, 0.5), which will position the rectangle in such a way that the center point is at the center of the rectangle. For (fx, fy) = (0.0, 0.0), the center point will overlap with the top-left corner of the rectangle. Similarly, when (fx, fy) = (1.0, 1.0), the center point will be at the bottom-right corner of the rectangle. Values larger than 1.0 or lower than 0.0 are also supported, in which case the center point will lie outside of the rectangle.
+       * @param fy (optional) defines what the the position of the center point (cx, cy) should be relative to the rectangle. The default value is (0.5, 0.5), which will position the rectangle in such a way that the center point is at the center of the rectangle. For (fx, fy) = (0.0, 0.0), the center point will overlap with the top-left corner of the rectangle. Similarly, when (fx, fy) = (1.0, 1.0), the center point will be at the bottom-right corner of the rectangle. Values larger than 1.0 or lower than 0.0 are also supported, in which case the center point will lie outside of the rectangle.
+       * @return {Rectangle} the nested rectangle
+       */
+      rectangleInPolygon(polygon: Coordinate[], cx: number, cy: number, wTH?: number, scale?: number, fx?: number, fy?: number): Rectangle
+
+      /**
+       * Given a convex polygon, finds the largest inscribed circle centered around the provided point.
+       * @param polygon the polygon to inscribe the circle into. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
+       * The polygon must be convex, vertex coordinates must be enumerated in clockwise or anti-clockwise order. For performance reasons, this method will not verify if the criteria are met. If the provided polygon does not satisfy the criteria, the result will be unspecified. Note that the polygons returned when getting the geometry option meet both criteria.
+       * @param cx coordinates of the point inside the polygon around which the circle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
+       * @param cy coordinates of the point inside the polygon around which the circle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
+       * @return {number} the radius of the inscribed circle in pixels.
+       */
+      circleInPolygon(polygon: Coordinate[], cx: number, cy: number): number
+
+      /**
+       * Splits the given convex polygon into two polygons along the line defined by the provided point and angle.
+       *
+       * @param polygon the polygon to split. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
+       * The polygon must be convex, vertex coordinates must be enumerated in clockwise or anti-clockwise order. For performance reasons, this method will not verify if the criteria are met. If the provided polygon does not satisfy the criteria, the result will be unspecified. Note that the polygons returned when getting the geometry option meet both criteria.
+       * @param cx coordinates of the point that defines the splitting line.
+       * @param cy coordinates of the point that defines the splitting line.
+       * @param angle the angle defining the splitting line, in radians.
+       * @return {[Coordinate[], Coordinate[]]} an array of two polygons being the result of the split or undefined if the provided line does not intersect the provided polygon.
+       * An example result is shown in the figure, where one of the resulting polygons (drawn in white dashed line) has 4 vertices and the other (drawn in black dashed line) has 5 vertices.
+       * Please note the following properties of the returned polygons:
+       * <ul>
+       *   <li>Each polygon is represented by an array of objects representing the polygon's vertices; each such object has the x and y properties defining the coordinates of the vertex.</li>
+       *   <li>Both returned polygons are convex with vertices enumerated in the clockwise order.</li>
+       *   <li>The returned polygons have one edge in common as shown by the black-white dashed in the figure. The two points defining the common edge in both polygons are always at indices 0 and 1 in the corresponding arrays, although not in the same order to preserve the clockwise enumeration order of the vertices.</li>
+       *   <li>The order of the two resulting polygons in the returned array is deterministic. For example, if angle = 0, the polygon at index 0 will be the upper one, polygon at index 1 will be the lower one. When the angle becomes 90 degrees, polygon at index 0 will be on the left, polygon at index 1 will be on the right.</li>
+       *   <li>If the provided line overlaps with any edge of the provided polygon or contains any vertex of the provided polygon, the returned polygons may be degenerate (e.g. have zero area and duplicated vertices).</li>
+       * </ul>
+       */
+      stabPolygon(polygon: Coordinate[], cx: number, cy: number, angle: number): [Coordinate[], Coordinate[]]
+    }
+  }
+
+  export class FoamTree<D extends FoamTree.DataObject = FoamTree.DataObject> {
 
     /**
      * A static property on hFoamTree equal to true if visualization is supported on the current browser environment.
@@ -26,30 +116,30 @@ declare module "@carrotsearch/foamtree" {
      * }
      */
     static readonly supported: boolean
-    static readonly geometry: GeometryUtils
+    static readonly geometry: FoamTree.GeometryUtils
 
-    constructor(options: InitialOptions<D>)
+    constructor(options: FoamTree.InitialOptions<D>)
 
     /**
      * Returns an object containing current values of all options. Properties of the returned object correspond to option names, values are option values.
      * @example
      * console.log(foamtree.get());
      */
-    get(): Options<D>
+    get(): FoamTree.Options<D>
     /**
      * Returns the current value of the requested option. If the provided string does not correspond to any option name, the result is undefined.
      * @param option The requested option
      * @example
      * console.log(foamtree.get("dataObject"));
      */
-    get<O extends Option<D>>(option: O): OptionValue<O, D>
+    get<O extends FoamTree.Option<D>>(option: O): FoamTree.OptionValue<O, D>
     /**
      * Returns the current value of the requested option. If the provided string does not correspond to any option name, the result is undefined.
      * @param option The requested option
      * @example
      * console.log(foamtree.get("selection"));
      */
-    get<O extends InteractionOption>(option: O): InteractionOptionGetterValue<O, D>
+    get<O extends FoamTree.InteractionOption>(option: O): FoamTree.InteractionOptionGetterValue<O, D>
     /**
      * Returns the current value of the requested read-only option, parameterized by the provided args.
      *
@@ -59,7 +149,7 @@ declare module "@carrotsearch/foamtree" {
      * @example
      * console.log(foamtree.get("geometry", "1", true));
      */
-    get<O extends ReadOnlyOption>(option: O, ...args: ReadOnlyOptionParameters<O, D>): ReadOnlyOptionValue<O, D>
+    get<O extends FoamTree.ReadOnlyOption>(option: O, ...args: FoamTree.ReadOnlyOptionParameters<O, D>): FoamTree.ReadOnlyOptionValue<O, D>
 
     /**
      * Sets the provided option to the desired value. If the provided option string does not correspond to any option, the call is ignored.
@@ -73,7 +163,7 @@ declare module "@carrotsearch/foamtree" {
      * @example
      * foamtree.set("exposure", "1");
      */
-    set<O extends Option<D>>(option: O, value: OptionValue<O, D>): void
+    set<O extends FoamTree.Option<D>>(option: O, value: FoamTree.OptionValue<O, D>): void
     /**
      * Sets the provided option to the desired value. If the provided option string does not correspond to any option, the call is ignored.
      *
@@ -86,7 +176,7 @@ declare module "@carrotsearch/foamtree" {
      * @example
      * foamtree.set("exposure", "1");
      */
-    set<O extends InteractionOption>(option: O, value: InteractionOptionSetterValue<O, D>): void
+    set<O extends FoamTree.InteractionOption>(option: O, value: FoamTree.InteractionOptionSetterValue<O, D>): void
     /**
      * Sets new values for all options included in the provided options object. Properties of the object should correspond to attribute names,
      * values of the object will be treated as values to set. Any properties of the options object that do not correspond to any attributes of the visualization will be ignored.
@@ -103,14 +193,14 @@ declare module "@carrotsearch/foamtree" {
      *   groupSelectionOutlineColor: "red"
      * });
      */
-    set(options: Partial<Options<D>> & Partial<InteractionSetterOptions<D>> & Partial<EventOptions<D>>): void
+    set(options: Partial<FoamTree.Options<D>> & Partial<FoamTree.InteractionSetterOptions<D>> & Partial<FoamTree.EventOptions<D>>): void
     /**
      * Replace listener for the provided event by the provided callback or array of callback .
      *
      * @param event The event to set listeners for.
      * @param listeners Listener or array of listeners to set.
      */
-    set<E extends EventType>(event: E, listeners: EventListener<E, D> | EventListener<E, D>[]): void
+    set<E extends FoamTree.EventType>(event: E, listeners: FoamTree.EventListener<E, D> | FoamTree.EventListener<E, D>[]): void
 
     /**
      * Registers a listener for a FoamTree event. As opposed to using the `set` method, the `on` method preserves the previously registered listeners.
@@ -120,7 +210,7 @@ declare module "@carrotsearch/foamtree" {
      * @param listener The event listener function to invoke when the event is triggered.
      * @see FoamTree.Events
      */
-    on<E extends EventType>(type: E, listener: EventListener<E, D>): void
+    on<E extends FoamTree.EventType>(type: E, listener: FoamTree.EventListener<E, D>): void
     /**
      * Registers a listener for a FoamTree low level event. As opposed to using the `set` method, the `on` method preserves the previously registered listeners.
      * @param type A string that specifies which event to listen to. To get type string to use with this method, take the event option name,
@@ -129,7 +219,7 @@ declare module "@carrotsearch/foamtree" {
      * @param listener The event listener function to invoke when the event is triggered.
      * @see FoamTree.Events
      */
-    on<E extends LowLevelEventType>(type: E, listener: LowLevelEventListener<E, D>): void
+    on<E extends FoamTree.LowLevelEventType>(type: E, listener: FoamTree.LowLevelEventListener<E, D>): void
 
     /**
      * Removes the requested listener from the list of listeners of the specified type. As opposed to using the `set` method, this method will preserve the other listeners registered for the event.
@@ -138,7 +228,7 @@ declare module "@carrotsearch/foamtree" {
      * For example, the type string corresponding to the `onGroupSelectionChanged` event is `groupSelectionChanged`.
      * @param listener The event listener function to remove.
      */
-    off<E extends EventType>(type: E, listener: EventListener<E, D>): void
+    off<E extends FoamTree.EventType>(type: E, listener: FoamTree.EventListener<E, D>): void
     /**
      * Removes the requested listener from the list of listeners of the specified type. As opposed to using the `set` method, this method will preserve the other listeners registered for the event.
      * @param type A string that specifies which event to remove the listener from. To get type string to use with this method,
@@ -146,7 +236,7 @@ declare module "@carrotsearch/foamtree" {
      * For example, the type string corresponding to the `onGroupSelectionChanged` event is `groupSelectionChanged`.
      * @param listener The event listener function to remove.
      */
-    off<E extends LowLevelEventType>(type: E, listener: LowLevelEventListener<E, D>): void
+    off<E extends FoamTree.LowLevelEventType>(type: E, listener: FoamTree.LowLevelEventListener<E, D>): void
 
     /**
      * Triggers a complete redraw of the visualization. If one or more visual options of the visualization have been
@@ -162,7 +252,7 @@ declare module "@carrotsearch/foamtree" {
      * Default value of this parameter is `undefined`, which means FoamTree will always redraw all groups.
      * @see Foamtree.GroupSelector
      */
-    redraw(animated?: boolean, groups?: GroupSelector): void
+    redraw(animated?: boolean, groups?: FoamTree.GroupSelector): void
 
     /**
      * If the size of the HTML container element has changed, resizes and redraws the visualization to accommodate to the new size. See the Resizing section for code snippets related to this function.
@@ -209,7 +299,7 @@ declare module "@carrotsearch/foamtree" {
      * Hierarchy changes, such as adding or removing groups, cannot be performed using this method.
      * The only way to visualize an updated hierarchy is to set a new value for the dataObject option.
      */
-    update(groups?: GroupSelector): void
+    update(groups?: FoamTree.GroupSelector): void
 
     /**
      * Changes the group selection. The groups parameter must be a multiple group selector designating the groups to select or deselect:
@@ -226,7 +316,7 @@ declare module "@carrotsearch/foamtree" {
      * foamtree.select({ groups: [], keepPrevious: false }); // Clear selection
      * foamtree.select({ all: true, selected: false }); // Clear selection
      */
-    select(groups: IndividualGroupSelector | IndividualGroupSelector[] | (SelectorObject & {
+    select(groups: FoamTree.IndividualGroupSelector | FoamTree.IndividualGroupSelector[] | (FoamTree.SelectorObject & {
       /**
        * If true or not provided, the designated groups will get selected. If false, the designated groups will be deselected.
        */
@@ -257,7 +347,7 @@ declare module "@carrotsearch/foamtree" {
      * @remarks when exposure is changed using this method, the event listeners will not be called.
      * @remarks there are some limitations when relaxation is visible.
      */
-    expose(groups: IndividualGroupSelector | IndividualGroupSelector[] | (SelectorObject & {
+    expose(groups: FoamTree.IndividualGroupSelector | FoamTree.IndividualGroupSelector[] | (FoamTree.SelectorObject & {
       /**
        * If true or not provided, the designated groups will get selected. If false, the designated groups will be deselected.
        */
@@ -276,7 +366,7 @@ declare module "@carrotsearch/foamtree" {
      * @example Chaining after exposure animation
      * foamtree.open("1").then(() => console.log("Animation finished"))
      */
-    open(groups: IndividualGroupSelector | IndividualGroupSelector[] | (SelectorObject & {
+    open(groups: FoamTree.IndividualGroupSelector | FoamTree.IndividualGroupSelector[] | (FoamTree.SelectorObject & {
       /**
        * If true or not provided, the designated groups will get selected. If false, the designated groups will be deselected.
        */
@@ -295,7 +385,7 @@ declare module "@carrotsearch/foamtree" {
      * @param groups must be an individual group selector designating the group to zoom to. You can also zoom to the dataObject group, in which case the whole visualization area will be shown.
      * @return Promise<void>
      */
-    zoom(groups: IndividualGroupSelector): Promise<void>
+    zoom(groups: FoamTree.IndividualGroupSelector): Promise<void>
 
     /**
      * Resets the visualization view back to the initial state, which includes:
@@ -338,7 +428,7 @@ declare module "@carrotsearch/foamtree" {
      *
      * For this reason, calling the trigger method in event listeners may lead to the visualization falling in an endless loop.
      */
-    trigger<E extends LowLevelEventType>(type: E, event: Omit<LowLevelEventValue<E, D>, 'preventDefault' | 'allowOriginalEventDefault' | 'preventOriginalEventDefault'>): void
+    trigger<E extends FoamTree.LowLevelEventType>(type: E, event: Omit<FoamTree.LowLevelEventValue<E, D>, 'preventDefault' | 'allowOriginalEventDefault' | 'preventOriginalEventDefault'>): void
 
     /**
      * Initializes internal data structures for the provided groups. Full example on <a href="https://get.carrotsearch.com/foamtree/latest/demos/deferred-layout.html"> this demo</a>
@@ -347,7 +437,7 @@ declare module "@carrotsearch/foamtree" {
      * @param maxLevels indicates how many group levels to attach, assuming that the group being attached is on level 0.
      * @return the number of child groups for which layout has been computed
      */
-    attach(groups: MultipleGroupSelector, maxLevels: number): number
+    attach(groups: FoamTree.MultipleGroupSelector, maxLevels: number): number
 
     /**
      * Stops all running animations and removes all HTML event listeners registered by FoamTree.
@@ -358,90 +448,5 @@ declare module "@carrotsearch/foamtree" {
     dispose(): void
   }
 
-  /**
-   * FoamTree exposes a number of geometry utilities useful when implementing groupContentDecorators.
-   *
-   * The utilities are grouped into a static object available from CarrotSearchFoamTree.geometry.
-   * Please see below for a detailed list of utility methods.
-   */
-  export interface GeometryUtils {
-    /**
-     * Given an array of points, returns the bounding box of the points.
-     *
-     * @param points the array of point coordinates. Each element of the array must be an object containing the x and y properties representing the coordinates of the point.
-     */
-    boundingBox(points: Coordinate[]): Rectangle;
 
-    /**
-     * Computes the centroid (center of mass) and area of the provided polygon.
-     *
-     * @param polygon the input polygon. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
-     * The polygon must be non-self-intersecting, vertex coordinates must be enumerated in clockwise or anti-clockwise order.
-     * For performance reasons, this method will not verify if the criteria are met.
-     * If the provided polygon does not satisfy the criteria, the result will be unspecified.
-     * Note that the polygons returned when getting the geometry option meet both criteria.
-     */
-    polygonCentroid(polygon: Coordinate[]): {
-      /**
-       * coordinates of the centroid
-       */
-      x: number,
-      /**
-       * coordinates of the centroid
-       */
-      y: number,
-      /**
-       * area of the polygon in pixels
-       */
-      area: number
-    }
-
-    /**
-     * Given a convex polygon, finds the largest inscribed rectangle of given aspect ratio wTH, centered around the provided center point (cx, cy).
-     * Additionally, the resulting rectangle can be scaled by the provided scale factor.
-     * Also, the alignment of the center point relative to the rectangle can be defined by the (fx, fy) point.
-     *
-     * @param polygon the polygon to inscribe the rectangle into. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
-     * The polygon must be convex, vertex coordinates must be enumerated in clockwise or anti-clockwise order. For performance reasons, this method will not verify if the criteria are met. If the provided polygon does not satisfy the criteria, the result will be unspecified. Note that the polygons returned when getting the geometry option meet both criteria.
-     * @param cx coordinates of the point inside the polygon around which the rectangle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
-     * @param cy coordinates of the point inside the polygon around which the rectangle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
-     * @param wTH (optional) the aspect ratio of the polygon to inscribe, the ratio is assumed to be the polygons width divided by the polygon's height. If not provided, the ratio of 1.0 will be used, which will produce a square.
-     * @param scale (optional) the scale factor to apply to the resulting rectangle. The rectangle will be scaled relative to the alignment point determined by (fx, fy). If not provided, the scale of 1.0 will be used, which will produce the largest possible rectangle that fits inside the polygon and meets the center and alignment criteria.
-     * @param fx (optional) defines what the the position of the center point (cx, cy) should be relative to the rectangle. The default value is (0.5, 0.5), which will position the rectangle in such a way that the center point is at the center of the rectangle. For (fx, fy) = (0.0, 0.0), the center point will overlap with the top-left corner of the rectangle. Similarly, when (fx, fy) = (1.0, 1.0), the center point will be at the bottom-right corner of the rectangle. Values larger than 1.0 or lower than 0.0 are also supported, in which case the center point will lie outside of the rectangle.
-     * @param fy (optional) defines what the the position of the center point (cx, cy) should be relative to the rectangle. The default value is (0.5, 0.5), which will position the rectangle in such a way that the center point is at the center of the rectangle. For (fx, fy) = (0.0, 0.0), the center point will overlap with the top-left corner of the rectangle. Similarly, when (fx, fy) = (1.0, 1.0), the center point will be at the bottom-right corner of the rectangle. Values larger than 1.0 or lower than 0.0 are also supported, in which case the center point will lie outside of the rectangle.
-     * @return {Rectangle} the nested rectangle
-     */
-    rectangleInPolygon(polygon: Coordinate[], cx: number, cy: number, wTH?: number, scale?: number, fx?: number, fy?: number): Rectangle
-
-    /**
-     * Given a convex polygon, finds the largest inscribed circle centered around the provided point.
-     * @param polygon the polygon to inscribe the circle into. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
-     * The polygon must be convex, vertex coordinates must be enumerated in clockwise or anti-clockwise order. For performance reasons, this method will not verify if the criteria are met. If the provided polygon does not satisfy the criteria, the result will be unspecified. Note that the polygons returned when getting the geometry option meet both criteria.
-     * @param cx coordinates of the point inside the polygon around which the circle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
-     * @param cy coordinates of the point inside the polygon around which the circle should be centered. For performance reasons, this method will not verify if the point lies inside the polygon. For points outside or on the boundary of the polygon, the result is not specified.
-     * @return {number} the radius of the inscribed circle in pixels.
-     */
-    circleInPolygon(polygon: Coordinate[], cx: number, cy: number): number
-
-    /**
-     * Splits the given convex polygon into two polygons along the line defined by the provided point and angle.
-     *
-     * @param polygon the polygon to split. The polygon must be specified as an array of objects, each object containing the x and y property representing the coordinates of the polygon's vertex.
-     * The polygon must be convex, vertex coordinates must be enumerated in clockwise or anti-clockwise order. For performance reasons, this method will not verify if the criteria are met. If the provided polygon does not satisfy the criteria, the result will be unspecified. Note that the polygons returned when getting the geometry option meet both criteria.
-     * @param cx coordinates of the point that defines the splitting line.
-     * @param cy coordinates of the point that defines the splitting line.
-     * @param angle the angle defining the splitting line, in radians.
-     * @return {[Coordinate[], Coordinate[]]} an array of two polygons being the result of the split or undefined if the provided line does not intersect the provided polygon.
-     * An example result is shown in the figure, where one of the resulting polygons (drawn in white dashed line) has 4 vertices and the other (drawn in black dashed line) has 5 vertices.
-     * Please note the following properties of the returned polygons:
-     * <ul>
-     *   <li>Each polygon is represented by an array of objects representing the polygon's vertices; each such object has the x and y properties defining the coordinates of the vertex.</li>
-     *   <li>Both returned polygons are convex with vertices enumerated in the clockwise order.</li>
-     *   <li>The returned polygons have one edge in common as shown by the black-white dashed in the figure. The two points defining the common edge in both polygons are always at indices 0 and 1 in the corresponding arrays, although not in the same order to preserve the clockwise enumeration order of the vertices.</li>
-     *   <li>The order of the two resulting polygons in the returned array is deterministic. For example, if angle = 0, the polygon at index 0 will be the upper one, polygon at index 1 will be the lower one. When the angle becomes 90 degrees, polygon at index 0 will be on the left, polygon at index 1 will be on the right.</li>
-     *   <li>If the provided line overlaps with any edge of the provided polygon or contains any vertex of the provided polygon, the returned polygons may be degenerate (e.g. have zero area and duplicated vertices).</li>
-     * </ul>
-     */
-    stabPolygon(polygon: Coordinate[], cx: number, cy: number, angle: number): [Coordinate[], Coordinate[]]
-  }
 }
