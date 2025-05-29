@@ -17,6 +17,7 @@ R-HSA-1266738	Developmental Biology	1	330	Growth
 #
 # DNA to proteins #
 R-HSA-69306	DNA Replication	0.45	345	DNA to proteins
+R-GGA-1670466	DNA Replication and repair (G. gallus)	0.45	350	DNA to proteins
 R-HSA-1852241	Organelle biogenesis and maintenance	1	345	DNA to proteins
 R-HSA-1640170	Cell Cycle	0.7	15	DNA to proteins
 R-HSA-73894	DNA Repair	1	15	DNA to proteins
@@ -38,9 +39,11 @@ R-HSA-112316	Neuronal System	0.65	135	Physiological systems
 R-HSA-109582	Hemostasis	0.6	150	Physiological systems
 R-HSA-9909396	Circadian clock	1	150	Physiological systems
 R-HSA-168256	Immune System	0.85	165	Physiological systems
+R-GGA-2422406	Innate Immune System (G. gallus)	0.85	170	Physiological systems
 #
 # Metabolisms #
 R-HSA-1430728	Metabolism	0.25	315	Metabolisms
+R-GGA-1660598	Metabolism (G. gallus)	0.25	315	Metabolisms
 R-HSA-392499	Metabolism of proteins	0.25	135	Metabolisms
 R-HSA-8953854	Metabolism of RNA	0.25	45	Metabolisms
 R-HSA-8963743	Digestion and absorption	0.25	225	Metabolisms

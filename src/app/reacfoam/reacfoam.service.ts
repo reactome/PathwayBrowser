@@ -205,7 +205,7 @@ export class ReacfoamService {
   event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, parentFamily?: string, parentColor?: chroma.Color, depth = 0): PathwayGroup {
     const humanStId = event.stId.replace(this.species.currentSpecies().abbreviation, 'HSA');
     const fireworksNode = fireworksNodeMap.get(event.stId);
-    const layoutNode = layoutMap.get(humanStId);
+    const layoutNode = layoutMap.get(humanStId) || layoutMap.get(event.stId);
 
     const family = parentFamily || layoutNode?.family || 'Unknown family'; // Unknown family with M. tuberculosis
     const familyColor = this.familyColorMap().get(family) || this.surfaceColor(); // Unknown family with M. tuberculosis
