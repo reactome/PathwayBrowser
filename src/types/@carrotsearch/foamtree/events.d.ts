@@ -98,7 +98,7 @@ declare module "@carrotsearch/foamtree" {
        * @param relaxationComplete - When true, this is the last step of relaxation because the requested relaxationQualityThreshold has been achieved.
        * @param relaxationTimeout - When true, this is the last step of relaxation because the relaxationMaxDuration has been exceeded.
        */
-      onRelaxationStep: (relaxationProgress: number, relaxationComplete: boolean, relaxationTimeout: number) => any
+      onRelaxationStep: (relaxationProgress: number, relaxationComplete: boolean, relaxationTimeout: boolean) => any
 
       /**
        * Called after the internal- or API-triggered redraw of the visualization.
