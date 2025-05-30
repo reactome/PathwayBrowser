@@ -12,14 +12,14 @@ R-HSA-5653656	Vesicle-mediated transport	1	255	Transport
 R-HSA-9609507	Protein localization	1	285	Transport
 #
 # Growth #
-R-HSA-1474165	Reproduction	0.65	315	Growth
-R-HSA-1266738	Developmental Biology	1	330	Growth
+R-HSA-1474165	Reproduction	1	345	Growth
+R-HSA-1266738	Developmental Biology	1	315	Growth
+R-HSA-1852241	Organelle biogenesis and maintenance	0.7	330	Growth
 #
 # DNA to proteins #
-R-HSA-69306	DNA Replication	0.45	345	DNA to proteins
+R-HSA-69306	DNA Replication	0.65	15	DNA to proteins
 R-GGA-1670466	DNA Replication and repair (G. gallus)	0.45	350	DNA to proteins
-R-HSA-1852241	Organelle biogenesis and maintenance	1	345	DNA to proteins
-R-HSA-1640170	Cell Cycle	0.7	15	DNA to proteins
+R-HSA-1640170	Cell Cycle	0.8	0	DNA to proteins
 R-HSA-73894	DNA Repair	1	15	DNA to proteins
 R-HSA-74160	Gene expression (Transcription)	0.65	45	DNA to proteins
 R-HSA-4839726	Chromatin organization	1	45	DNA to proteins
@@ -29,16 +29,16 @@ R-HSA-1474244	Extracellular matrix organization	1	60	Tissue structuration
 R-HSA-1500931	Cell-Cell communication	0.85	60	Tissue structuration
 #
 # Information transmission #
-R-HSA-8953897	Cellular responses to stimuli	1	105	Information transmission
-R-HSA-9709957	Sensory Perception	0.8	90	Information transmission
-R-HSA-162582	Signal Transduction	1	75	Information transmission
+R-HSA-8953897	Cellular responses to stimuli	0.8	120	Information transmission
+R-HSA-9709957	Sensory Perception	0.6	105	Information transmission
+R-HSA-162582	Signal Transduction	0.9	90	Information transmission
 #
 # Physiological systems #
-R-HSA-397014	Muscle contraction	0.9	135	Physiological systems
-R-HSA-112316	Neuronal System	0.65	135	Physiological systems
-R-HSA-109582	Hemostasis	0.6	150	Physiological systems
-R-HSA-9909396	Circadian clock	1	150	Physiological systems
-R-HSA-168256	Immune System	0.85	165	Physiological systems
+R-HSA-397014	Muscle contraction	0.8	135	Physiological systems
+R-HSA-112316	Neuronal System	0.6	135	Physiological systems
+R-HSA-109582	Hemostasis	1	150	Physiological systems
+R-HSA-9909396	Circadian clock	0.85	165	Physiological systems
+R-HSA-168256	Immune System	0.6	165	Physiological systems
 R-GGA-2422406	Innate Immune System (G. gallus)	0.85	170	Physiological systems
 #
 # Metabolisms #
