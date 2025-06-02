@@ -7,6 +7,8 @@ export interface Properties extends PropertiesType {
     onSurface: Property<string>
     primary: Property<string>
     onPrimary: Property<string>
+    primaryContainer: Property<string>
+    onPrimaryContainer: Property<string>
     positive: Property<string>
     negative: Property<string>
     negativeContrast: Property<string>
@@ -122,6 +124,8 @@ export function setDefaults(properties: UserProperties = {}, css: CSSStyleDeclar
     .setDefault('onSurface', () => css.getPropertyValue('--on-surface') || '#001F24')
     .setDefault('primary', () => css.getPropertyValue('--primary') || '#006782')
     .setDefault('onPrimary', () => css.getPropertyValue('--on-primary') || '#FFFFFF')
+    .setDefault('primaryContainer', () => css.getPropertyValue('--primary-container') || '#baeaff')
+    .setDefault('onPrimaryContainer', () => css.getPropertyValue('--on-primary-container') || '#001f29')
     .setDefault('positive', () => css.getPropertyValue('--positive') || '#0C9509')
     .setDefault('negative', () => css.getPropertyValue('--negative') || '#BA1A1A')
     .setDefault('negativeContrast', () => css.getPropertyValue('--negative-contrast') || '#ea7d7d')

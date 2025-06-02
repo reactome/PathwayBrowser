@@ -1,6 +1,6 @@
 <div id="container" class="variables">
   <!--A third party library Angular split helps to build resize layout, more details are : https://angular-split.github.io/-->
-  <as-split direction="horizontal" gutterSize="4" #sideSplit>
+  <as-split direction="horizontal" gutterSize="4" #sideSplit useTransition="true">
     <div *asSplitGutter="let isDragged = isDragged" class="custom-left-gutter" [class.dragged]="isDragged"></div>
     <as-split-area [size]="20">
       <div class="left-panel">
@@ -154,7 +154,7 @@
           </div>
         </div>
         <div class="content" #content>
-          <as-split direction="vertical" gutterSize="4">
+          <as-split direction="vertical" gutterSize="4" useTransition="true">
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
             <as-split-area [size]="viewShare()" id="view" class="hide-overflow" >
               @if (pathwayId()) {

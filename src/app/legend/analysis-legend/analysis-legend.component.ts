@@ -6,6 +6,8 @@ import {animate, style, transition, trigger} from "@angular/animations";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 
+type ValueSummary = { min: number, max: number, average: number, sum: number, multiValued?: boolean };
+
 @Component({
   selector: 'cr-analysis-legend',
   imports: [
@@ -41,6 +43,23 @@ export class AnalysisLegendComponent {
     v -3
     H 0
     Z`)
+
+  floating = input(true);
+  //TODO support values representation
+  values = input<number[]>([]);
+  valuesSummary = computed(() => {
+    if (this.values().length === 0) return;
+    const summary: ValueSummary = this.values().reduce((acc: ValueSummary, value) => {
+      if (value < acc.min) acc.min = value;
+      if (value > acc.max) acc.max = value;
+      acc.sum += value;
+      return acc;
+    }, {min: Number.MAX_VALUE, max: Number.MIN_VALUE, sum: 0, average: 0});
+    summary.average = summary.sum / this.values().length
+    summary.multiValued = this.values().length === 1
+    return summary;
+  })
+  name = computed(() => this.state.sample() || "pValue")
 
   selectingPalette = false;
 

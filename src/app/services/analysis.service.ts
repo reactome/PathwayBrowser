@@ -84,7 +84,7 @@ export class AnalysisService {
       .filter(name => name.toLowerCase() !== name)
       .map(name => ([name, new PaletteSummary(name as StandardPalette)] as [StandardPalette, PaletteSummary])),
     ['ancient', new PaletteSummary(['#1532b3', extract(this.style.properties.global.surface), '#e5e61d'])],
-    ['primary', new PaletteSummary([extract(this.style.properties.global.surface), extract(this.style.properties.global.primary)])]
+    ['primary', new PaletteSummary([extract(this.style.properties.global.primaryContainer), extract(this.style.properties.global.primary)])]
   ]);
 
 
@@ -107,7 +107,7 @@ export class AnalysisService {
   paletteGroups: { name: PaletteGroup, palettes: PaletteName[], valid: boolean }[] = [
     {
       name: 'sequential', valid: false, palettes: [
-        // 'primary',
+        'primary',
         // 'Greys',
         // 'Purples',
         // 'Blues', 'Greens', 'Oranges', 'Reds',
@@ -115,7 +115,7 @@ export class AnalysisService {
         'RdPu',
         // 'PuRd',
         // 'GnBu', 'YlGnBu', 'PuBu',
-        'PuBuGn',
+        // 'PuBuGn',
         'BuGn',
         // 'YlGn',
         // 'YlOrBr',

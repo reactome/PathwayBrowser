@@ -72,7 +72,9 @@ export class ViewportComponent implements AfterViewInit {
   })
 
   contentHeight = computed(() => this.content().nativeElement.clientHeight)
-  detailShare = computed(() => this.state.pathwayId() || this.state.select() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
+  // Use bellow when fixed layout solution found
+  // detailShare = computed(() => this.state.pathwayId() || this.state.select() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
+  detailShare = computed(() => 20)
   viewShare = computed(() => 100 - this.detailShare())
 
   diagram = viewChild(DiagramComponent);

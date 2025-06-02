@@ -26,7 +26,7 @@
         <div class="legend-group" [class.has-analysis]="analysis.resultSignal()"
              [style.--handle-height.px]="handle.clientHeight">
           <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
-          @if (analysis.resultSignal() && analysis.resultSignal()?.expression?.min !== undefined) {
+          @if (analysis.resultSignal()) {
             <div class="analysis-legend">
               <cr-analysis-legend></cr-analysis-legend>
             </div>

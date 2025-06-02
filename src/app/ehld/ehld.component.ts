@@ -191,7 +191,7 @@ export class EhldComponent implements AfterViewInit {
 
         const exps: [number | undefined, number][] = pathwayData
           ? [
-            [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
+            [pathwayData.exp?.[analysisIndex] || pathwayData.pValue, pathwayData.found],
             [undefined, pathwayData.total - pathwayData.found],
           ]
           : [[undefined, 1]];

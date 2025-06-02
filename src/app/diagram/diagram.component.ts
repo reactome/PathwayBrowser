@@ -341,7 +341,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         this.reactomeStyle.clearCache();
         this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
           queryParamsHandling: "preserve",
-          relativeTo: this.route
+          preserveFragment: true
         }))
 
         const shadowNodes = this.cy?.nodes('.Shadow');

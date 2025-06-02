@@ -1,3 +1,8 @@
 <div class="container" #container>
 
 </div>
+@if (analysis.resultSignal()) {
+  <div class="analysis-legend">
+    <cr-analysis-legend [floating]="false"></cr-analysis-legend>
+  </div>
+}

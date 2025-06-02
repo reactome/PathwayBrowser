@@ -1,6 +1,18 @@
+:host {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  align-items: center;
+}
+
 .container {
   position: relative;
   height: 100%;
   //background: var(--primary);
   background: var(--surface);
+  flex: 1 1 auto;
+}
+
+.analysis-legend {
+  height: 100%;
 }

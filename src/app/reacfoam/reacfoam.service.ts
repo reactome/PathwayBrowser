@@ -87,10 +87,8 @@ export interface PathwayGroup extends FoamTree.DataObject {
   expressions?: number[]
   fdr?: number
   pValue?: number
+  path: string[]
 }
-
-export const LIGHT_SURFACE_COLOR = '#effbff';
-export const DARK_SURFACE_COLOR = '#00161b';
 
 @Injectable({
   providedIn: 'root'
@@ -112,16 +110,19 @@ export class ReacfoamService {
 
   fetchEventsHierarchy(species: Species, params: Partial<EventsHierarchy.QueryParams>): Observable<EventsHierarchy.Data[]> {
     cleanObject(params)
+    console.log('fetch events hierarchy')
     return this.http.get<EventsHierarchy.Data[]>(`${environment.host}/ContentService/data/eventsHierarchy/${species.taxId}`, {params})
   }
 
   fetchFireworksNodeMap(species: string): Observable<Map<string, Fireworks.Node>> {
+    console.log('fetch fireworks node map')
     return this.http.get<Fireworks.Data>(`${environment.host}/download/current/fireworks/${species}.json`).pipe(
       map(data => new Map(data.nodes.map(node => [node.stId, node])))
     )
   }
 
   fetchTLPLayoutMap(): Observable<Map<string, Layout.Data>> {
+    console.log('fetch tlp layout')
     return this.http.get(LAYOUT_URL, {responseType: "text"}).pipe(
       map((text) => new Map(
           text.split("\n") // Split lines
@@ -165,13 +166,17 @@ export class ReacfoamService {
     loader: ({request}) => this.fetchEventsHierarchy(request.species, request.params)
   })
 
-  mergedData = computed(() => this.layoutMap.value() && this.fireworksNodeMap.value() && this.eventsHierarchyData.value() ? {
-    layoutMap: this.layoutMap.value()!,
-    fireworksNodeMap: this.fireworksNodeMap.value()!,
-    events: this.eventsHierarchyData.value()!,
-  } : undefined)
+  mergedData = computed(() => {
+    console.log('signal mergedData')
+    return this.layoutMap.value() && this.fireworksNodeMap.value() && this.eventsHierarchyData.value() ? {
+      layoutMap: this.layoutMap.value()!,
+      fireworksNodeMap: this.fireworksNodeMap.value()!,
+      events: this.eventsHierarchyData.value()!,
+    } : undefined
+  })
 
   familyColorMap = computed(() => {
+    console.log('signal familyColorMap')
     this.dark.isDark(); // Compute on dark update
     if (!this.layoutMap.value()) return new Map<string, chroma.Color>()
     const layoutMap = this.layoutMap.value()!;
@@ -181,7 +186,7 @@ export class ReacfoamService {
 
     [...familyColorMap.keys()].forEach((family, i) => {
       const color = this.dark.isDark() ?
-        chroma.oklch(0.02, 0.05, (offset + dH * i) % 360) :
+        chroma.oklch(0.01, 0.03, (offset + dH * i) % 360) :
         chroma.oklch(0.98, 0.05, (offset + dH * i) % 360);
       familyColorMap.set(family, color);
     })
@@ -190,19 +195,26 @@ export class ReacfoamService {
   })
 
   surfaceColor = computed(() => {
+    console.log('signal surfaceColor')
     this.dark.isDark(); // Compute on dark update
     return chroma(extract(this.style.properties.global.surface))
-  } )
+  })
 
-  data: Signal<PathwayGroup[] | undefined> = computed(() => {
-      this.dark.isDark();  // Compute on dark update
-      if (!this.mergedData()) return;
-      const {layoutMap, fireworksNodeMap, events} = this.mergedData()!
-      return events.map(e => this.event2group(e, layoutMap, fireworksNodeMap))
+  dataAndIdResolver: Signal<{ data: PathwayGroup[], idResolver: Map<string, string> } | undefined> = computed(() => {
+    this.dark.isDark();  // Compute on dark update
+    if (!this.mergedData()) return;
+    const {layoutMap, fireworksNodeMap, events} = this.mergedData()!
+    const stIdToFirstId = new Map<string, string>();
+    return {
+      data: events.map(e => this.event2group(e, layoutMap, fireworksNodeMap, stIdToFirstId)),
+      idResolver: stIdToFirstId
     }
-  )
+  })
 
-  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, parentFamily?: string, parentColor?: chroma.Color, depth = 0): PathwayGroup {
+  data = computed(() => this.dataAndIdResolver()?.data)
+  idToStId = computed(() => this.dataAndIdResolver()?.idResolver)
+
+  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, stIdToFirstId: Map<string, string>, parentFamily?: string, parentColor?: chroma.Color, depth = 0, path: string[] = []): PathwayGroup {
     const humanStId = event.stId.replace(this.species.currentSpecies().abbreviation, 'HSA');
     const fireworksNode = fireworksNodeMap.get(event.stId);
     const layoutNode = layoutMap.get(humanStId) || layoutMap.get(event.stId);
@@ -214,9 +226,12 @@ export class ReacfoamService {
       parentColor ? parentColor.brighten(0.2).saturate(0.2) : this.surfaceColor() :
       parentColor ? parentColor.darken(0.2).saturate(0.2) : this.surfaceColor();
 
-    return {
-      groups: event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, family, depthColor, depth + 1)) : undefined,
-      id: event.stId,
+    const id = this.buildId(event.stId, path)!; // If no path or wrong path given, will use first occurrence of stId
+    if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
+
+    const pathwayGroup: PathwayGroup = {
+      groups: event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])) : undefined,
+      id: id,
       stId: event.stId,
       label: event.name,
       diagram: event.diagram,
@@ -227,11 +242,17 @@ export class ReacfoamService {
       depthColor: depthColor,
       family,
       depth,
+      path,
       expressions: event.entities?.exp,
       fdr: event.entities?.fdr,
-      pValue: event.entities?.pValue,
-      selected: untracked(this.state.select) === event.stId // Untracked to avoid full reloading if select is updated
-    }
+      pValue: event.entities?.pValue
+      // exposed: untracked(this.state.select) === event.stId // Untracked to avoid full reloading if select is updated
+    };
+    return pathwayGroup
+  }
+
+  buildId(stId: string | null, path: string[]): string | null {
+    return stId ? path.join('/') + '/' + stId : null;
   }
 }
 

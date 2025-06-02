@@ -1,16 +1,18 @@
-import {Component, computed, effect, ElementRef, OnDestroy, Signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, OnDestroy, Signal, untracked, viewChild} from '@angular/core';
 import {FoamTree} from "@carrotsearch/foamtree";
 import {PathwayGroup, ReacfoamService} from "./reacfoam.service";
 import {Router} from "@angular/router";
 import {DarkService} from "../services/dark.service";
 import {UrlStateService} from "../services/url-state.service";
 import {AnalysisService} from "../services/analysis.service";
-import {extract} from "reactome-cytoscape-style";
+import {AnalysisLegendComponent} from "../legend/analysis-legend/analysis-legend.component";
 
 
 @Component({
   selector: 'cr-reacfoam',
-  imports: [],
+  imports: [
+    AnalysisLegendComponent
+  ],
   templateUrl: './reacfoam.component.html',
   styleUrl: './reacfoam.component.scss'
 })
@@ -40,13 +42,12 @@ export class ReacfoamComponent implements OnDestroy {
     groupStrokeWidth: 1.5,
     groupBorderRadiusCorrection: 0.5,
     groupStrokePlainLightnessShift: -50,
+    // Parents
     parentFillOpacity: 1,
-    parentStrokeOpacity: 1,
     parentLabelOpacity: 1,
+    parentStrokeOpacity: 1,
     // Don't use gradients and rounded corners for faster rendering
     groupFillType: "plain",
-    // Lower the minimum label font size a bit to show more labels
-    groupLabelMinFontSize: 3,
     // Attach and draw a maximum of 8 levels of groups
     maxGroupLevelsAttached: 12,
     maxGroupLevelsDrawn: 12,
@@ -54,8 +55,6 @@ export class ReacfoamComponent implements OnDestroy {
 
     // Width of the selection outline to draw around selected groups
     groupSelectionOutlineWidth: 5,
-    // groupSelectionStrokeLightnessShift: 10,
-    groupSelectionOutlineColor: extract(this.reacfoam.style.properties.global.primary),
 
     // Show labels during relaxation
     wireframeLabelDrawing: "always",
@@ -70,39 +69,97 @@ export class ReacfoamComponent implements OnDestroy {
     fadeDuration: 0,
     wireframeToFinalFadeDuration: 0,
     groupLabelColorThreshold: 0.5,
-    relaxationMaxDuration: 3000,
-    groupLabelFontFamily: 'Roboto',
+    relaxationMaxDuration: 2500,
+    relaxationQualityThreshold: 0.5,
 
-    onGroupHold: (event) => {
+    // Labels
+    groupLabelFontFamily: 'Roboto',
+    groupLabelHorizontalPadding: 0,
+    groupLabelVerticalPadding: 0,
+    groupLabelMaxFontSize: 20,
+    // Lower the minimum label font size a bit to show more labels
+    groupLabelMinFontSize: 3,
+
+    // Roll out in groups
+    rolloutMethod: "groups",
+
+    onGroupDoubleClick: (event) => {
       event.preventDefault();
       this.router.navigate([event.group.stId], {queryParamsHandling: 'preserve', preserveFragment: true})
     },
 
-    onGroupClick: (event) => this.state.select.set(event.group.stId),
+    onGroupClick: (event) => {
+      event.preventDefault();
+      if (!event.secondary) {
+        this.state.select.set(event.group.stId)
+        this.state.path.set(event.group.path)
+      } else {
+        const exposed = this.foamTree().get('exposure').groups.at(0);
+        const parent = this.foamTree().get('hierarchy', exposed).parent;
+        this.state.select.set(parent?.stId || null)
+        this.state.path.set(parent?.path || [])
+      }
+    },
+
+    // For now, add exposure at end of relaxation, useful upon resizing reset. to be removed when alternative solution found for stable layout
+    onRelaxationStep: (relaxationProgress, relaxationComplete, relaxationTimeout) => {
+      if ((relaxationTimeout || relaxationComplete) && this.correctedSelectedId()) {
+        setTimeout(() => {
+          console.log('Relaxation complete ==> final expose ');
+          this.foamTree().select({groups: this.correctedSelectedId(), keepPrevious: false})
+          this.foamTree().expose({groups: null, keepPrevious: false})
+            .then(() => this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})) // Needs to force recenter upon initial loading
+        })
+      }
+    }
   } as FoamTree.InitialOptions<PathwayGroup>));
 
   foamTree = computed(() => new FoamTree<PathwayGroup>(this.options()));
+  selectedId = computed(() => this.reacfoam.buildId(this.state.select(), this.state.path()));
+  correctedSelectedId = computed(() => this.state.select() ?
+    (
+      this.foamTree().get('hierarchy', this.selectedId()) ?
+        this.selectedId() :
+        this.reacfoam.idToStId()?.get(this.state.select()!)
+    ) :
+    null
+  );
 
   sizeObserver = new ResizeObserver(() => {
-    console.log('resize')
-    setTimeout(() => {
+    console.log('Resize ==> Reset layout')
+    setTimeout(() => { // Avoid white flickering
       this.foamTree().resize();
-      this.foamTree().set('dataObject', {groups: this.reacfoam.data()!}) // Force initial position to be used for TLP to ensure stable position
+      this.foamTree().set('dataObject', this.foamTree().get('dataObject')) // Force initial position to be used for TLP to ensure stable position. Triggers relaxation
+      this.foamTree().select({groups: this.correctedSelectedId(), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
     })
   });
 
   constructor(
     private reacfoam: ReacfoamService,
     private state: UrlStateService,
-    private analysis: AnalysisService,
+    public analysis: AnalysisService,
     private dark: DarkService,
     private router: Router) {
+    effect(() => { // Initialise
+      this.reacfoam.data(); // Set data whenever it is updated
+      console.log("Setting data object", this.reacfoam.data())
+      this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
+
+      if (untracked(this.correctedSelectedId)) { // Initial select
+        this.foamTree().select({groups: untracked(this.correctedSelectedId), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
+      }
+    });
     effect(() => this.container()?.nativeElement && this.sizeObserver.observe(this.container().nativeElement));
-    effect(() => {
+    effect(() => { // Update colors upon analysis column switching
       this.analysis.sampleIndex(); // Update colors on expression column shifting
+      this.analysis.palette(); // Update colors on palette shifting
       this.foamTree().redraw();
     });
-    effect(() => this.reacfoam.data() && this.foamTree().set('dataObject', {groups: this.reacfoam.data()!}));
+    effect(() => { // Upon selection (UI or URL), expos & select group
+      this.foamTree().select({groups: this.correctedSelectedId(), keepPrevious: false})
+      this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false}) // Trigger on select update
+    });
+
     effect(() => {
       this.foamTree().set({
         groupStrokePlainLightnessShift: this.dark.isDark() ? 70 : -70,
@@ -133,7 +190,7 @@ export class ReacfoamComponent implements OnDestroy {
               values.groupColor = props.group.familyColor.brighten(depth * 0.2).saturate(depth * 0.2).hex();
               values.labelColor = props.group.familyColor.brighten(3.5).saturate(3).hex();
             } else {
-              values.groupColor = props.group.familyColor.darken(depth * 0.2).saturate(depth * 0.2).hex();
+              values.groupColor = props.group.familyColor.darken(depth * 0.15).saturate(depth * 0.3).hex();
               values.labelColor = props.group.familyColor.darken(4).saturate(5).hex();
             }
 
@@ -153,4 +210,15 @@ export class ReacfoamComponent implements OnDestroy {
     this.sizeObserver.disconnect();
   }
 
+}
+
+function throttle<Args extends any[]>(func: (...args: Args) => void, delay: number): (...args: Args) => void {
+  let lastCall = 0;
+  return (...args: Args) => {
+    const now = new Date().getTime();
+    if (now - lastCall >= delay) {
+      func(...args);
+      lastCall = now;
+    }
+  };
 }

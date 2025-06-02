@@ -1,76 +1,90 @@
 @let result = analysis.resultSignal();
-@if (analysis.type() !== 'OVERREPRESENTATION') {
 
-  <div class="wrapper" [style.--radius]="radius()">
-    @if (analysis.type() === 'EXPRESSION') {
-      <div class="point-wrapper top">
-        <div class="point" [innerHTML]="result?.expression?.max | number: '1.1-1'"></div>
+<div class="wrapper" [style.--radius]="radius()">
+  @if (name() && result?.summary?.type === 'GSA_REGULATION') {
+    <div class="name">
+      <!--      {{name()}}-->
+    </div>
+  }
+  @if (analysis.type() !== 'GSA_REGULATION') {
+    <div class="point-wrapper top" [class.vertical]="!floating()">
+      <div class="point" [innerHTML]="(result?.expression?.max || 0)  | number: '1.0-2'"></div>
+      @if (floating()) {
         <svg class="pointy"
              [attr.viewBox]="viewBox()"
              [attr.width]="2 * radius() + 'px'"
              [attr.height]="radius()+ 'px'">
           <path stroke="var(--primary)" stroke-width="var(--border)" [attr.d]="d()"></path>
         </svg>
-      </div>
-    }
-    <!-- Actual content -->
-    <div class="container" [class.gsa]="analysis.type() === 'GSA_REGULATION'">
+      }
+    </div>
+  }
+  <!-- Actual content -->
+  <div class="container" [class.gsa]="analysis.type() === 'GSA_REGULATION'" [class.floating]="floating()">
 
-      <div (click)="selectingPalette = !selectingPalette">
-        <ng-container *ngTemplateOutlet="display; context: {$implicit: analysis.palette()}"/>
-      </div>
-      @if (selectingPalette) {
-        <div class="palette-selector" [@selectAnim]>
-          @for (group of analysis.paletteGroups; track group.name) {
-            @if (group.valid) {
-              @for (pName of group.palettes; track pName) {
-                @let palette = analysis.paletteOptions.get(pName)!;
-                @if (palette !== analysis.palette()) {
-                  <div (click)="selectPalette(pName)">
-                    <ng-container *ngTemplateOutlet="display; context: {$implicit: palette}"/>
-                  </div>
-                }
+    <div (click)="selectingPalette = !selectingPalette">
+      <ng-container *ngTemplateOutlet="display; context: {$implicit: analysis.palette(), displayLabels: true}"/>
+    </div>
+    @if (selectingPalette) {
+      <div class="palette-selector" [@selectAnim]>
+        @for (group of analysis.paletteGroups; track group.name) {
+          @if (group.valid) {
+            @for (pName of group.palettes; track pName) {
+              @let palette = analysis.paletteOptions.get(pName)!;
+              @if (palette !== analysis.palette()) {
+                <div (click)="selectPalette(pName)">
+                  <ng-container *ngTemplateOutlet="display; context: {$implicit: palette, displayLabels: false}"/>
+                </div>
               }
             }
           }
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
+  </div>
 
-    @if (analysis.type() === 'EXPRESSION') {
-      <div class="point-wrapper bottom">
-        <div class="point" [innerHTML]="result?.expression?.min | number: '1.1-1'"></div>
+  @if (analysis.type() !== 'GSA_REGULATION') {
+    <div class="point-wrapper bottom" [class.vertical]="!floating()">
+      <div class="point" [innerHTML]="(result?.expression?.min || 0.05) | number: '1.0-2'"></div>
+      @if (floating()) {
         <svg class="pointy"
              [attr.viewBox]="viewBox()"
              [attr.width]="2 * radius() + 'px'"
              [attr.height]="radius() + 'px'">
           <path fill="white" stroke="var(--primary)" stroke-width="var(--border)" [attr.d]="d()"></path>
         </svg>
-      </div>
-    }
-  </div>
-}
+      }
+    </div>
+  }
+</div>
 
-<ng-template #display let-palette>
+<ng-template #display let-palette let-displayLabels="displayLabels">
   <div class="palette" [style.background]="palette.gradient">
 
-    @if (result?.summary?.type === 'GSA_REGULATION') {
-      <span class="even" matTooltip="Significantly down regulated">
+    @if (displayLabels) {
+      @if (result?.summary?.type === 'GSA_REGULATION') {
+        <span class="even" matTooltip="Significantly down regulated">
         <mat-icon fontSet="symbols" data-icon="keyboard_double_arrow_down"/>
       </span>
-      <span class="even" matTooltip="Non-significantly down regulated">
+        <span class="even" matTooltip="Non-significantly down regulated">
         <mat-icon fontSet="symbols" data-icon="keyboard_arrow_down"/>
       </span>
-      <span class="even" matTooltip="No regulation">
+        <span class="even" matTooltip="No regulation">
         <mat-icon fontSet="symbols" data-icon="remove"/>
       </span>
-      <span class="even" matTooltip="Non-significantly up regulated">
+        <span class="even" matTooltip="Non-significantly up regulated">
         <mat-icon fontSet="symbols" data-icon="keyboard_arrow_up"/>
         </span>
-      <span class="even" matTooltip="Significantly up regulated">
+        <span class="even" matTooltip="Significantly up regulated">
         <mat-icon fontSet="symbols" data-icon="keyboard_double_arrow_up"/>
       </span>
+      } @else if (name()) {
+        <span class="even">
+        <span class="name" [attr.data-value]="name()">{{ name() }}</span>
+      </span>
+      }
     }
+
   </div>
 </ng-template>
 
