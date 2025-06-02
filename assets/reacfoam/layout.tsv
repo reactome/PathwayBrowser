@@ -1,0 +1,49 @@
+#stId	Name	distance	angle (deg)	Family
+#
+# Death, disease and drugs #
+R-HSA-9612973	Autophagy	0.9	195	Death, disease and drugs
+R-HSA-5357801	Programmed Cell Death	0.5	210	Death, disease and drugs
+R-HSA-1643685	Disease	1	210	Death, disease and drugs
+R-HSA-9748784	Drug ADME	0.75	240	Death, disease and drugs
+#
+# Transport #
+R-HSA-382551	Transport of small molecules	0.7	270	Transport
+R-HSA-5653656	Vesicle-mediated transport	1	255	Transport
+R-HSA-9609507	Protein localization	1	285	Transport
+#
+# Growth #
+R-HSA-1474165	Reproduction	1	345	Growth
+R-HSA-1266738	Developmental Biology	1	315	Growth
+R-HSA-1852241	Organelle biogenesis and maintenance	0.7	330	Growth
+#
+# DNA to proteins #
+R-HSA-69306	DNA Replication	0.65	15	DNA to proteins
+R-GGA-1670466	DNA Replication and repair (G. gallus)	0.45	350	DNA to proteins
+R-HSA-1640170	Cell Cycle	0.8	0	DNA to proteins
+R-HSA-73894	DNA Repair	1	15	DNA to proteins
+R-HSA-74160	Gene expression (Transcription)	0.65	45	DNA to proteins
+R-HSA-4839726	Chromatin organization	1	45	DNA to proteins
+#
+# Tissue structuration #
+R-HSA-1474244	Extracellular matrix organization	1	60	Tissue structuration
+R-HSA-1500931	Cell-Cell communication	0.85	60	Tissue structuration
+#
+# Information transmission #
+R-HSA-8953897	Cellular responses to stimuli	0.8	120	Information transmission
+R-HSA-9709957	Sensory Perception	0.6	105	Information transmission
+R-HSA-162582	Signal Transduction	0.9	90	Information transmission
+#
+# Physiological systems #
+R-HSA-397014	Muscle contraction	0.8	135	Physiological systems
+R-HSA-112316	Neuronal System	0.6	135	Physiological systems
+R-HSA-109582	Hemostasis	1	150	Physiological systems
+R-HSA-9909396	Circadian clock	0.85	165	Physiological systems
+R-HSA-168256	Immune System	0.6	165	Physiological systems
+R-GGA-2422406	Innate Immune System (G. gallus)	0.85	170	Physiological systems
+#
+# Metabolisms #
+R-HSA-1430728	Metabolism	0.25	315	Metabolisms
+R-GGA-1660598	Metabolism (G. gallus)	0.25	315	Metabolisms
+R-HSA-392499	Metabolism of proteins	0.25	135	Metabolisms
+R-HSA-8953854	Metabolism of RNA	0.25	45	Metabolisms
+R-HSA-8963743	Digestion and absorption	0.25	225	Metabolisms

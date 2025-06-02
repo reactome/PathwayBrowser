@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/reacfoam/reacfoam.component.scss"],
+  "sourcesContent": [":host {\n  display: flex;\n  height: 100%;\n  flex-direction: row;\n  align-items: center;\n}\n\n.container {\n  position: relative;\n  height: 100%;\n  //background: var(--primary);\n  background: var(--surface);\n  flex: 1 1 auto;\n}\n\n.analysis-legend {\n  height: 100%;\n}\n"],
+  "mappings": ";AAAA;AACE,WAAA;AACA,UAAA;AACA,kBAAA;AACA,eAAA;;AAGF,CAAA;AACE,YAAA;AACA,UAAA;AAEA,cAAA,IAAA;AACA,QAAA,EAAA,EAAA;;AAGF,CAAA;AACE,UAAA;;",
+  "names": []
+}
