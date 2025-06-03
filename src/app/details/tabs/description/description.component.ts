@@ -175,6 +175,7 @@ export class DescriptionComponent {
       isPresent: computed(() => this.proteinMarkers().length + this.rnaMarkers().length > 0)
     },
 
+    {key: DataKeys.EVENTS, label: Labels.EVENTS, hasDepthControl: true},
     {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, hasDepthControl: true},
     {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual: true, template: this.regulationTemplate$},

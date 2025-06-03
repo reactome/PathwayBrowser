@@ -1,0 +1,42 @@
+@if (state.pathwayId()) {
+  @if (ehld.hasEHLD()) {
+    <h3>🖼️ EHLD: The Big Picture of Biology</h3>
+    Explore pathways through beautifully illustrated, textbook-style overviews — designed to show how major biological mechanisms fit together.
+    <ul>
+      <li><b>Drag</b> to navigate across the biological landscape.</li>
+      <li><b>Zoom in</b> to focus on specific mechanisms or sub-pathways.</li>
+      <li><b>Hover and click</b> a section to understand its role </li>
+      <li><b>Double-click</b> on a section to dive deeper into the relevant detailed diagram.</li>
+      <li><b>Use the toolbar</b> to search, and overlay experimental data.</li>
+    </ul>
+    See the system at a glance — and zoom into the science beneath.
+  } @else {
+    <h3>🧬 Dive into the Details: Pathway Diagram View</h3>
+    See how biology actually happens — with interactive, step-by-step pathway diagrams.
+    <ul>
+      <li><b>Drag</b> to move around the pathway map.</li>
+      <li><b>Zoom</b> in to reveal more detail — down to the molecular structure.</li>
+      <li><b>Hover</b> over molecules and reactions to highlight them — get close enough, and you’ll see structures come
+        to life.
+      </li>
+      <li><b>Click</b> for in-depth info on participants and processes.</li>
+      <li *ngIf="interactor.currentResource().name !== null"><b>Click on the bubbles</b> to display related molecules
+        and concepts within context
+      </li>
+      <li><b>Use the toolbar</b> to search, compare to variation of the pathway, and overlay experimental data.</li>
+    </ul>
+    Explore biology in motion — from pathways to molecules.
+  }
+} @else {
+  <h3>🔍 Explore Reactome Pathways</h3>
+  Discover all pathways in a dynamic Voronoi map — each cell scaled by its molecular content.
+  <ul>
+    <li><b>Drag & zoom</b> to explore.</li>
+    <li><b>Click</b> to select a pathway.</li>
+    <li><b>Right-click</b> to move up a level.</li>
+    <li><b>Double-click</b> to see how the pathway works — a detailed, step-by-step molecular view.</li>
+    <li><b>Press Esc</b> to reset.</li>
+  </ul>
+
+  Dive in and uncover the biology behind the map!
+}

@@ -1,8 +1,8 @@
-import {AfterViewInit, Component} from '@angular/core';
-import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+import {Component, computed, linkedSignal} from '@angular/core';
+import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
-import {Analysis} from "../model/analysis.model";
 import {DataStateService} from "../services/data-state.service";
+import {UrlStateService} from "../services/url-state.service";
 
 
 @Component({
@@ -12,23 +12,24 @@ import {DataStateService} from "../services/data-state.service";
   standalone: false
 })
 @UntilDestroy()
-export class DetailsComponent implements AfterViewInit {
+export class DetailsComponent {
 
   obj = this.dataState.selectedElement;
-  analysisResult?: Analysis.Result;
+
+  hasResult = computed(() => !!(this.analysis.resultSignal()))
+  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()))
+
+  selectedTabIndex = linkedSignal<number>(
+    () => this.hasResult() ? 2 : // Has results => results tab
+      this.hasDetail() ? 0 : // Has detail ==> detail tab
+        4 // Nothing ==> Info tab
+  )
 
 
   constructor(
-    private analysis: AnalysisService,
-    private dataState: DataStateService,) {
-  }
-
-  ngAfterViewInit(): void {
-
-    this.analysis.result$.pipe(untilDestroyed(this)).subscribe(result => {
-      this.analysisResult = result;
-    })
-
+    protected analysis: AnalysisService,
+    private dataState: DataStateService,
+    private state: UrlStateService) {
   }
 
 }

@@ -111,6 +111,11 @@ export class ReacfoamComponent implements OnDestroy {
             .then(() => this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})) // Needs to force recenter upon initial loading
         })
       }
+    },
+
+    onViewReset: () =>  { // Reset selection on esc pressed
+      this.state.select.set(null)
+      this.state.path.set([])
     }
   } as FoamTree.InitialOptions<PathwayGroup>));
 

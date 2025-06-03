@@ -280,7 +280,7 @@ export class EventService {
     if (isEntity(obj)) {
       return this.buildTreeWithSelectedEntity(obj, diagramId, tree, hitReactions);
     } else {
-      if (this.ehldService.hasEHLD) {
+      if (this.ehldService.hasEHLD()) {
         return this.buildTreeWithSelectedEvent(obj, diagramId, true, tree, hitReactions);
       } else {
         return this.buildTreeWithSelectedEvent(obj, diagramId, false, tree, hitReactions);

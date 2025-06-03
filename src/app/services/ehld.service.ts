@@ -1,4 +1,4 @@
-import {ElementRef, Injectable} from '@angular/core';
+import {computed, ElementRef, Injectable, signal} from '@angular/core';
 import {BehaviorSubject, forkJoin, map, Observable} from "rxjs";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
@@ -6,6 +6,7 @@ import {Graph} from "../model/graph.model";
 import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
+import {DataStateService} from "./data-state.service";
 
 export interface LegendItem {
   name: string;
@@ -24,11 +25,7 @@ export interface LegendGroup {
 })
 export class EhldService {
 
-  private readonly _HAS_EHLD = `${environment.host}/ContentService/data/query/`;
-
-  private _hasEHLD = new BehaviorSubject<boolean | undefined>(undefined);
-  hasEHLD$ = this._hasEHLD.asObservable();
-  hasEHLD?: boolean
+  hasEHLD = computed(() => this.data.currentPathway()?.hasEHLD);
 
   overlay = "OVERLAY-";
   analysisInfoId = "ANALINFO";
@@ -55,7 +52,7 @@ export class EhldService {
     }
   ];
 
-  constructor(private http: HttpClient, private analysis: AnalysisService) {
+  constructor(private http: HttpClient, private analysis: AnalysisService, private data: DataStateService) {
   }
 
 

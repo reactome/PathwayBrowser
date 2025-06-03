@@ -56,7 +56,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   selectedIdFromUrl?: string;
   selectedTreeEvent?: Event;
   selectedObj?: DatabaseObject;
-  lastSpecieId?:string;
+  lastSpecieId?: string;
 
 
   constructor(protected eventService: EventService,
@@ -193,16 +193,13 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     )
 
     // Fetch EHLD and color data
-    const ehldAndSubpathwayColors$ = this.ehldService.hasEHLD$.pipe(
-      take(1),
-      switchMap(hasEHLD => hasEHLD
-        ? of({hasEHLD, colors: undefined}) // If EHLD exists, no colors needed
+    const ehldAndSubpathwayColors$ =
+      this.ehldService.hasEHLD()
+        ? of({hasEHLD: true, colors: undefined}) // If EHLD exists, no colors needed
         : this.eventService.subpathwayColors$.pipe(
           take(1),
-          map(colors => ({hasEHLD, colors}))
-        )
-      )
-    );
+          map(colors => ({hasEHLD: false, colors}))
+        );
 
     // Fetch analysis result
     const analysisResult$ = this.analysis.result$.pipe(
@@ -223,7 +220,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
     // Combine all data and merged into one object
     initialData$.pipe(
-      tap(d => console.log('Initial data',d)),
+      tap(d => console.log('Initial data', d)),
       switchMap(initialData =>
         enhancedEventData$.pipe(
           combineLatestWith(
@@ -240,7 +237,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
           }))
         )
       ),
-      tap(d => console.log('Combined data',d)),
+      tap(d => console.log('Combined data', d)),
 
       // Build the tree with all data
       switchMap(({
@@ -251,8 +248,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
                    analysisResult,
                    hitReactions
                  }) => this.eventService.buildTree(enhancedEvent, this.pathwayId()!, this.tree, hitReactions)),
-    tap(d => console.log('Final data',d)),
-
+      tap(d => console.log('Final data', d)),
     ).subscribe({
       next: () => {
         // Give pathway id when idToUse is PEs
@@ -287,7 +283,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   onTreeEventSelect(treeEvent: Event) {
     this.handleSelectionFromTree(treeEvent);
   }
-
 
 
   onBreadcrumbSelect(navEvent: Event) {
