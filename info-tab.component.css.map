@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/details/tabs/info/info-tab/info-tab.component.scss"],
+  "sourcesContent": [":host {\n  padding: 0 20px;\n  display: block;\n}\n"],
+  "mappings": ";AAAA;AACE,WAAA,EAAA;AACA,WAAA;;",
+  "names": []
+}
