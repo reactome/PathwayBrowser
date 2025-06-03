@@ -26,6 +26,7 @@ export class PaletteSummary {
   n = -1
   isDark = false;
   padding = 0
+  private _domain: [number, number] = [0, 1]
 
   constructor(private data: StandardPalette | string[]) {
     if (typeof data === "string") {
@@ -51,7 +52,8 @@ export class PaletteSummary {
   }
 
   domain(min: number, max: number) {
-    this.scale = this.scale.domain([min, max])
+    this._domain = [min, max]
+    this.scale = this.scale.domain(this._domain)
   }
 
   get gradient(): string {
@@ -66,7 +68,11 @@ export class PaletteSummary {
 
   set dark(isDark: boolean) {
     this.isDark = isDark;
-    this.scale = chroma.scale(this.colors).mode('oklab').classes(this.n).padding(this.padding).domain(this.scale.domain())
+    this.scale = chroma.scale(this.colors)
+      .mode('oklab')
+      .padding(this.padding)
+      .domain(this._domain)
+      .classes(this.n) // ALWAYS put classes after domain otherwise create bugs https://github.com/gka/chroma.js/issues/371
   }
 }
 
@@ -177,8 +183,8 @@ export class AnalysisService {
       for (let summary of this.paletteOptions.values()) {
         //@ts-ignore
         summary.scale.nodata(extract(this.style.properties.analysis.notFound))
-        summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : -1);
         summary.domain(result.expression.min || 0.05, result.expression.max || 0);
+        summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : -1); // ALWAYS put classes after domain otherwise create bugs https://github.com/gka/chroma.js/issues/371
       }
 
       this.state.sample.set(result?.expression.columnNames[0] || null)
@@ -207,7 +213,6 @@ export class AnalysisService {
 
   resourceFilter = signal<Analysis.Resource>("TOTAL")
   speciesFilter = signal<number | undefined>(undefined)
-
 
 
   constructor(private http: HttpClient, private state: UrlStateService, private darkS: DarkService) {
