@@ -1,7 +1,7 @@
 <div *ngIf="obj" id="details-container">
 
   <mat-tab-group class="custom-tab-group" #tabGroup [(selectedIndex)]="selectedTabIndex">
-    <mat-tab id="firstTab" #detailTab>
+    <mat-tab id="firstTab" #detailTab [disabled]="!hasDetail()">
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="details-tab"></mat-icon>
