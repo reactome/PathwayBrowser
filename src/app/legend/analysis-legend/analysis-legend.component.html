@@ -64,20 +64,20 @@
     @if (displayLabels) {
       @if (result?.summary?.type === 'GSA_REGULATION') {
         <span class="even" matTooltip="Significantly down regulated">
-        <mat-icon fontSet="symbols" data-icon="keyboard_double_arrow_down"/>
-      </span>
+          <mat-icon fontSet="symbols" data-icon="keyboard_double_arrow_down"/>
+        </span>
         <span class="even" matTooltip="Non-significantly down regulated">
-        <mat-icon fontSet="symbols" data-icon="keyboard_arrow_down"/>
-      </span>
+          <mat-icon fontSet="symbols" data-icon="keyboard_arrow_down"/>
+        </span>
         <span class="even" matTooltip="No regulation">
-        <mat-icon fontSet="symbols" data-icon="remove"/>
-      </span>
+          <mat-icon fontSet="symbols" data-icon="remove"/>
+        </span>
         <span class="even" matTooltip="Non-significantly up regulated">
-        <mat-icon fontSet="symbols" data-icon="keyboard_arrow_up"/>
+          <mat-icon fontSet="symbols" data-icon="keyboard_arrow_up"/>
         </span>
         <span class="even" matTooltip="Significantly up regulated">
-        <mat-icon fontSet="symbols" data-icon="keyboard_double_arrow_up"/>
-      </span>
+          <mat-icon fontSet="symbols" data-icon="keyboard_double_arrow_up"/>
+        </span>
       } @else if (name()) {
         <span class="even">
         <span class="name" [attr.data-value]="name()">{{ name() }}</span>

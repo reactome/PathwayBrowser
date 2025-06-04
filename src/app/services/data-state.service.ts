@@ -1,6 +1,5 @@
 import {computed, effect, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Event} from "../model/graph/event/event.model";
 import {map, Observable, of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {UrlStateService} from "./url-state.service";
@@ -38,6 +37,7 @@ export class DataStateService {
   })
 
   public selectedElement = this._selectedElement.asReadonly().value
+  public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
 
   constructor(private state: UrlStateService, private http: HttpClient) {

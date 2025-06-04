@@ -42,7 +42,7 @@ import {DiagramHomeComponent} from './diagram-home/diagram-home.component';
 import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details/details.component";
-import {DescriptionComponent} from "./details/tabs/description/description.component";
+import {DescriptionTabComponent} from "./details/tabs/description-tab/description-tab.component";
 import {RefsTreeComponent} from "./details/common/refs-tree/refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
 import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
@@ -58,7 +58,10 @@ import {
   MatColumnDef,
   MatHeaderCell,
   MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
   MatTable
 } from "@angular/material/table";
 import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
@@ -77,7 +80,10 @@ import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {CellMarkerComponent} from "./details/common/cell-marker/cell-marker.component";
 import {OntologyTermComponent} from "./details/common/ontology-term/ontology-term.component";
 import {ReacfoamComponent} from "./reacfoam/reacfoam.component";
-import {InfoTabComponent} from "./details/tabs/info/info-tab/info-tab.component";
+import {InfoTabComponent} from "./details/tabs/info-tab/info-tab.component";
+import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component";
+import {TypeSafeMatCellDef} from "./utils/type-safe-mat-cell-def.directive";
+import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
 
 @NgModule({
   declarations: [
@@ -92,7 +98,7 @@ import {InfoTabComponent} from "./details/tabs/info/info-tab/info-tab.component"
     EhldComponent,
     DiagramHomeComponent,
     DetailsComponent,
-    DescriptionComponent,
+    DescriptionTabComponent,
     DescriptionOverviewComponent,
     RefsTreeComponent,
     PublicationComponent,
@@ -105,67 +111,69 @@ import {InfoTabComponent} from "./details/tabs/info/info-tab/info-tab.component"
     RegulationComponent,
     ModificationComponent,
     MolecularProcessComponent,
-    CellMarkerComponent
+    CellMarkerComponent,
   ],
   bootstrap: [AppComponent],
-    imports: [
-        BrowserModule,
-        FormsModule,
-        CommonModule,
-        RouterOutlet,
-        AppRoutingModule,
-        // NoopAnimationsModule,
-        MatButtonModule,
-        MatSlideToggleModule,
-        CdkDragHandle,
-        CdkDrag,
-        MatInputModule,
-        MatSelectModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
-        BrowserAnimationsModule,
-        MatDialogModule,
-        MatTabsModule,
-        MatCheckboxModule,
-        MatRadioModule,
-        MatIconModule,
-        MatListModule,
-        MatExpansionModule,
-        MatGridListModule,
-        AngularSplitModule,
-        MatCardModule,
-        MatIconModule,
-        MatRippleModule,
-        MatTreeModule,
-        MatTooltipModule,
-        MatMenuModule,
-        MaterialFileInputModule,
-        CdkNestedTreeNode,
-        AuthorshipDateFormatPipe,
-        SortByDatePipe,
-        IncludeRefPipe,
-        SafePipe,
-        SortByTextPipe,
-        MatTable,
-        MatColumnDef,
-        MatHeaderCell,
-        MatCell,
-        MatHeaderCellDef,
-        MatCellDef,
-        MatHeaderRow,
-        MatRow,
-        MatHeaderRowDef,
-        MatRowDef,
-        AnalysisLegendComponent,
-        ExtractCompartmentPipe,
-        FormatClassNamePipe,
-        CastPipe,
-        MatSlider,
-        MatSliderThumb,
-        OntologyTermComponent,
-        ReacfoamComponent,
-        InfoTabComponent
-    ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    CommonModule,
+    RouterOutlet,
+    AppRoutingModule,
+    // NoopAnimationsModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    CdkDragHandle,
+    CdkDrag,
+    MatInputModule,
+    MatSelectModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    BrowserAnimationsModule,
+    MatDialogModule,
+    MatTabsModule,
+    MatCheckboxModule,
+    MatRadioModule,
+    MatIconModule,
+    MatListModule,
+    MatExpansionModule,
+    MatGridListModule,
+    AngularSplitModule,
+    MatCardModule,
+    MatIconModule,
+    MatRippleModule,
+    MatTreeModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MaterialFileInputModule,
+    CdkNestedTreeNode,
+    AuthorshipDateFormatPipe,
+    SortByDatePipe,
+    IncludeRefPipe,
+    SafePipe,
+    SortByTextPipe,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCell,
+    MatCell,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatHeaderRow,
+    MatRow,
+    MatHeaderRowDef,
+    MatRowDef,
+    AnalysisLegendComponent,
+    ExtractCompartmentPipe,
+    FormatClassNamePipe,
+    CastPipe,
+    MatSlider,
+    MatSliderThumb,
+    OntologyTermComponent,
+    ReacfoamComponent,
+    InfoTabComponent,
+    ResultTabComponent,
+
+  ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     {

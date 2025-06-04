@@ -701,7 +701,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
     forkJoin({
       entities: this.analysis.foundEntities(diagramId, token),
-      pathways: this.analysis.pathwaysResults(this.cy.nodes('.Pathway').map(p => p.data('reactomeId')), token),
+      pathways: this.analysis.pathwaysResults(this.cy?.nodes('.Pathway').map(p => p.data('reactomeId')) || [], token),
       result: this.analysis.result$.pipe(filter(isDefined), take(1))
     }).subscribe(({entities, result, pathways}) => {
 
@@ -712,11 +712,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
             .flatMap(diagramEntity => diagramEntity.ids)
             .map(id => [id, entity.exp[analysisIndex] || 0]))
         )
-        console.log(analysisEntityMap)
 
         let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
-
-        console.log(analysisPathwayMap)
 
         const normalize = (x: number, min: number, max: number) => (x - min) / (max - min)
 
@@ -735,8 +732,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
                 .map(leaf => analysisEntityMap.get(leaf.identifier))
                 .sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
 
-              console.log(node.data('reactomeId'), leaves, exp)
-
               // if (hasExpression) exp = exp.map(e => e !== undefined ? 1 - e : undefined);
               node.data('exp', exp);
             })
@@ -746,7 +741,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               if (!pathwayData) {
                 node.data('exp', [undefined]);
               } else {
-                console.log(dbId, normalize(pathwayData.exp[analysisIndex] || pathwayData.pValue, min, max))
                 node.data('exp', [
                   [pathwayData.exp[analysisIndex] || pathwayData.pValue, pathwayData.found],
                   [undefined, pathwayData.total - pathwayData.found]
