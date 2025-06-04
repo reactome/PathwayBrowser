@@ -77,7 +77,14 @@ export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequenc
   return obj.schemaClass === SchemaClasses.EWAS;
 }
 
-const reactionLikeEventClasses: Set<string> = new Set([SchemaClasses.REACTION, SchemaClasses.BLACK_BOX_EVENT, SchemaClasses.POLYMERISATION, SchemaClasses.DEPOLYMERISATION, SchemaClasses.FAILED_REACTION, SchemaClasses.CELL_DEVELOPMENT_STEP]);
+const reactionLikeEventClasses: Set<string> = new Set([
+  SchemaClasses.REACTION,
+  SchemaClasses.BLACK_BOX_EVENT,
+  SchemaClasses.POLYMERISATION,
+  SchemaClasses.DEPOLYMERISATION,
+  SchemaClasses.FAILED_REACTION,
+  SchemaClasses.CELL_DEVELOPMENT_STEP
+]);
 
 export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
   return reactionLikeEventClasses.has(obj.schemaClass);

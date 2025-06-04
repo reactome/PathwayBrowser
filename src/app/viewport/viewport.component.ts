@@ -21,7 +21,7 @@ import {UrlStateService} from "../services/url-state.service";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GeneralService} from "../services/general.service";
 import {DataStateService} from "../services/data-state.service";
-import {isPathwayOrTLP} from "../services/utils";
+import {isPathway} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, style, transition, trigger} from "@angular/animations";
 
@@ -52,20 +52,20 @@ export class ViewportComponent implements AfterViewInit {
 
   hasEHLD = computed(() => {
     const pathway = this.dataState.currentPathway();
-    return pathway && isPathwayOrTLP(pathway) && (pathway?.hasEHLD !== undefined) ? pathway.hasEHLD : true;
+    return pathway && isPathway(pathway) && (pathway?.hasEHLD !== undefined) ? pathway.hasEHLD : true;
   })
   title = computed(() => this.dataState.currentPathway()?.displayName)
 
   diseasePathways = computed(() => {
     const pathway = this.dataState.currentPathway();
-    if (pathway && isPathwayOrTLP(pathway)) {
+    if (pathway && isPathway(pathway)) {
       return pathway.diseasePathways || [];
     }
     return [] as Pathway[];
   })
   normalPathway = computed(() => {
     const pathway = this.dataState.currentPathway();
-    if (pathway && isPathwayOrTLP(pathway)) {
+    if (pathway && isPathway(pathway)) {
       return pathway.normalPathway
     }
     return undefined;
