@@ -47,23 +47,23 @@ export function sortByYearDescending(refs: Publication[]) {
 
 // Type guards to narrow the type
 export function isEvent(obj: DatabaseObject): obj is Event {
-  return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj) || isRLE(obj);
+  return isExactlyPathway(obj) || isExactlyTLP(obj) || isExactlyCellLineagePath(obj) || isRLE(obj);
 }
 
-export function isPathway(obj: DatabaseObject): obj is Pathway {
+export function isExactlyPathway(obj: DatabaseObject): obj is Pathway {
   return obj.schemaClass === SchemaClasses.PATHWAY;
 }
 
-export function isTLP(obj: DatabaseObject): obj is TopLevelPathway {
+export function isExactlyTLP(obj: DatabaseObject): obj is TopLevelPathway {
   return obj.schemaClass === SchemaClasses.TLP;
 }
 
-export function isCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
+export function isExactlyCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
   return obj.schemaClass === SchemaClasses.CELL_LINEAGE_PATH;
 }
 
-export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPathway | CellLineagePath {
-  return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
+export function isPathway(obj: DatabaseObject): obj is Pathway | TopLevelPathway | CellLineagePath {
+  return isExactlyPathway(obj) || isExactlyTLP(obj) || isExactlyCellLineagePath(obj);
 }
 
 const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
@@ -84,7 +84,7 @@ export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
 }
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
-  return isPathwayOrTLP(obj) && obj.hasDiagram;
+  return isPathway(obj) && obj.hasDiagram;
 }
 
 const regulationClasses: Set<string> = new Set([SchemaClasses.REGULATION, SchemaClasses.NEGATIVE_REGULATION, SchemaClasses.NEGATIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.POSITIVE_REGULATION, SchemaClasses.POSITIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.REQUIREMENT]);
