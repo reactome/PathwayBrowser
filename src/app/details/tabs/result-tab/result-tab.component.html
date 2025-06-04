@@ -1,0 +1,133 @@
+<!--ToDO investigate virtual scroll instead of pagination: https://material.angular.dev/cdk/scrolling/overview -->
+<div class="container">
+  <table mat-table [dataSource]="dataSource" matSort matSortActive="entities-pValue" matSortDirection="asc"
+         matSortDisableClear recycleRows (matSortChange)="currentSort.set($event)" >
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Pathway Name</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="entities-found">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Found</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.entities.found }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="entities-total">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Total</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.entities.total }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="entities-ratio">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Ratio</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.entities.ratio | number: '1.0-4' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="entities-pValue">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="no-wrap">Entities p-value</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">
+      <span class="p-value"
+            [style]="stylePValue(element.entities.pValue)"
+            [innerHTML]="element.entities.pValue | scientificNumber"></span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="entities-fdr">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities FDR</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">
+            <span class=""
+                  [innerHTML]="element.entities.fdr | scientificNumber"></span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="reactions-found">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Reactions Found</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.reactions.found }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="reactions-total">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Reactions Total</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.reactions.total }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="reactions-ratio">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Reactions Ratio</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.reactions.ratio | number: '1.0-4' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="species-name">
+      <th mat-header-cell *matHeaderCellDef>Species</th>
+      <td mat-cell *matCellDef="let element, dataSource: dataSource">{{ element.species.name }}</td>
+    </ng-container>
+
+    @if (isGSA()) {
+      @for (expression of expressionColumnIds(); track expression; let i = $index; ) {
+        <ng-container [matColumnDef]="expression">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ expressionColumnNames()[i] }}</th>
+          <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+            @switch (pathway.entities.exp[i]) {
+              @case (2) {
+                <span matTooltip="Significantly up regulated" class="expression-value gsa"
+                      [style]="stylePathwayExpression(pathway, i)">
+                <mat-icon fontSet="symbols">keyboard_double_arrow_up</mat-icon>
+              </span>
+              }
+              @case (1) {
+                <span matTooltip="Non-significantly up regulated" class="expression-value gsa"
+                      [style]="stylePathwayExpression(pathway, i)">
+                <mat-icon fontSet="symbols">keyboard_arrow_up</mat-icon>
+              </span>
+              }
+              @case (0) {
+                <span matTooltip="No regulation" class="expression-value gsa"
+                      [style]="stylePathwayExpression(pathway, i)">
+                <mat-icon fontSet="symbols">remove</mat-icon>
+              </span>
+              }
+              @case (-1) {
+                <span matTooltip="Non-significantly down regulated" class="expression-value gsa"
+                      [style]="stylePathwayExpression(pathway, i)">
+                <mat-icon fontSet="symbols">keyboard_arrow_down</mat-icon>
+              </span>
+              }
+              @case (-2) {
+                <span matTooltip="Significantly down regulated" class="expression-value gsa"
+                      [style]="stylePathwayExpression(pathway, i)"
+                >
+                <mat-icon fontSet="symbols">keyboard_double_arrow_down</mat-icon>
+              </span>
+              }
+              @default {
+                <span class="expression-value" [style]="stylePathwayExpression(pathway, i)">
+              {{ pathway.entities.exp[i] | number: '1.0-4' }}
+              </span>
+              }
+            }
+          </td>
+        </ng-container>>
+      }
+    } @else {
+      @for (expression of expressionColumnIds(); track expression; let i = $index; ) {
+        <ng-container [matColumnDef]="expression">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ expressionColumnNames()[i] }}</th>
+          <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span class="expression-value" [style]="stylePathwayExpression(pathway, i)">
+              {{ pathway.entities.exp[i] | number: '1.3-3' }}
+          </span>
+          </td>
+        </ng-container>>
+      }
+    }
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true" #headerRow></tr>
+    <tr mat-row *matRowDef="let pathway; columns: displayedColumns(); dataSource: dataSource;"
+        (click)="selectPathway(pathway)"
+        (dblclick)="visitPathway(pathway)"
+        class="row" [id]="'pathway-' + pathway.stId + '-row'"
+        [class.selected]="pathway.stId === selectedPathwayStId()"
+        [style.--scroll-margin-top]="scrollOffset()"
+    ></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons></mat-paginator>
+</div>
+

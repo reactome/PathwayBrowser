@@ -10,7 +10,7 @@
       </ng-template>
       <ng-template matTabContent>
         @if (obj()) {
-          <cr-description [obj]="obj()!" [analysisResult]="analysis.resultSignal()"></cr-description>
+          <cr-description-tab [obj]="obj()!" [analysisResult]="analysis.resultSignal()"></cr-description-tab>
         }
       </ng-template>
     </mat-tab>
@@ -35,7 +35,7 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-        Analysis Result Content
+        <cr-result-tab></cr-result-tab>
       </ng-template>
     </mat-tab>
 

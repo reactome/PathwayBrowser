@@ -46,14 +46,22 @@ export class PaletteSummary {
     this.scale.mode('oklab')
   }
 
-  classes(n: number) {
-    this.scale = this.scale.classes(n)
-    this.n = n
+  noData(color: string | chroma.Color) {
+    // @ts-ignore
+    this.scale.nodata(color)
+    return this
   }
 
   domain(min: number, max: number) {
     this._domain = [min, max]
     this.scale = this.scale.domain(this._domain)
+    return this;
+  }
+
+  classes(n: number) {
+    this.scale = this.scale.classes(n)
+    this.n = n
+    return this;
   }
 
   get gradient(): string {
@@ -93,10 +101,17 @@ export class AnalysisService {
     ['primary', new PaletteSummary([extract(this.style.properties.global.primaryContainer), extract(this.style.properties.global.primary)])]
   ]);
 
+  pValueScale = computed(() => new PaletteSummary([
+    extract(this.style.properties.global.primaryContainer),
+    extract(this.style.properties.global.primary)])
+    .domain(0.05, 0)
+    .noData(extract(this.style.properties.analysis.notFound))
+  )
+
 
   typeToDefaultPalette = new Map<Analysis.Type, PaletteName>([
     ['GSA_REGULATION', 'ancient'],
-    ['EXPRESSION', 'RdPu'],
+    ['EXPRESSION', 'Viridis'],
     ['OVERREPRESENTATION', 'primary'],
   ]);
 

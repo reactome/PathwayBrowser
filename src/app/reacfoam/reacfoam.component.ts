@@ -68,7 +68,7 @@ export class ReacfoamComponent implements OnDestroy {
     finalToWireframeFadeDuration: 0,
     fadeDuration: 0,
     wireframeToFinalFadeDuration: 0,
-    groupLabelColorThreshold: 0.5,
+    groupLabelColorThreshold: 1- 0.179,
     relaxationMaxDuration: 2500,
     relaxationQualityThreshold: 0.5,
 

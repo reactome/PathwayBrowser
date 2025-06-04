@@ -1,0 +1,57 @@
+.container {
+  padding-left: 20px;
+  padding-right: 5px;
+
+  table {
+    min-width: 0;
+    width: 100%;
+  }
+
+}
+
+.row {
+  cursor: pointer;
+  scroll-margin-top: var(--scroll-margin-top);
+
+  &:hover {
+    background: var(--surface1);
+  }
+
+  &.selected {
+    background: var(--primary);
+    color: var(--on-primary);
+
+    &:hover {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    .p-value,
+    .expression-value {
+      box-shadow: 0 0 0 2px var(--on-primary);
+    }
+  }
+
+}
+
+.expression-value {
+  padding: 4px 8px;
+  border-radius: 50px;
+  background: var(--background);
+  display: inline-flex;
+
+  &.gsa {
+    padding: 4px;
+  }
+}
+
+.p-value {
+  padding: 6px 8px 4px;
+  border-radius: 50px;
+}
+
+.mat-sort-header-content,
+.mat-column-name{
+  text-wrap: balance;
+}
+

@@ -28,12 +28,12 @@ import {MarkerReference} from "../../../model/graph/control-reference/marker-ref
 
 
 @Component({
-  selector: 'cr-description',
-  templateUrl: './description.component.html',
-  styleUrl: './description.component.scss',
+  selector: 'cr-description-tab',
+  templateUrl: './description-tab.component.html',
+  styleUrl: './description-tab.component.scss',
   standalone: false
 })
-export class DescriptionComponent {
+export class DescriptionTabComponent {
 
   icon = rxResource({
     request: () => this.referenceEntity()?.identifier,

@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
-import {UrlStateService} from "../../../../services/url-state.service";
-import {EhldService} from "../../../../services/ehld.service";
-import {InteractorService} from "../../../../interactors/services/interactor.service";
+import {UrlStateService} from "../../../services/url-state.service";
+import {EhldService} from "../../../services/ehld.service";
+import {InteractorService} from "../../../interactors/services/interactor.service";
 import {NgIf} from "@angular/common";
 
 @Component({
