@@ -92,8 +92,7 @@ td.mat-column-name {
   bottom: 2px;
   width: fit-content;
   right: 0;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 20px auto;
   background: color-mix(in srgb, var(--surface) 80%, transparent);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
