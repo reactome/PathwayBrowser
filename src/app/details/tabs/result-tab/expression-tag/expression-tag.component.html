@@ -1,0 +1,12 @@
+<span [class.expression-value]="!isPValue()" [class.p-value]="isPValue()" [class.gsa]="isGSA()" [style]="style()">
+  @if (isGSA()) {
+    @let label = gsaValueToLabel.get(value())!;
+    <mat-icon fontSet="symbols" [matTooltip]="label.tooltip">{{ label.text }}</mat-icon>
+  } @else {
+    @if (isPValue()) {
+      <span [innerHTML]="value() | scientificNumber"></span>
+    } @else {
+      {{ value() | number: format() }}
+    }
+  }
+</span>

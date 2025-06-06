@@ -91,7 +91,7 @@
                 </div>
               }
 
-              @if (analysis.resultSignal()) {
+              @if (analysis.result()) {
                 <button class="error" mat-ripple (click)="clear()" matTooltip="Clear analyis" [@appear]>
                   <mat-icon>close</mat-icon>
                 </button>
@@ -110,7 +110,8 @@
             <mat-menu #an="matMenu">
               <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
               <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
-              <button mat-menu-item (click)="analysis.loadAnalysis('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
+              <button mat-menu-item (click)="analysis.example('cancer-gene-census', {disableProjectToHuman: true}).subscribe()">Gene Names (n Species)</button>
+              <button mat-menu-item (click)="state.analysis.set('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>
             </mat-menu>
 
             @if (normalPathway()) {

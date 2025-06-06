@@ -171,7 +171,7 @@ export class ReacfoamComponent implements OnDestroy {
         groupStrokePlainSaturationShift: 0,
         groupColorDecorator: (options, props, values) => {
           const depth = props.group.depth;
-          if (this.analysis.resultSignal()) { // Analysis
+          if (this.analysis.result()) { // Analysis
             values.labelColor = 'auto'
             const pValue = props.group.pValue;
 

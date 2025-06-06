@@ -1,4 +1,4 @@
-import {computed, effect, Injectable} from '@angular/core';
+import {computed, effect, Injectable, linkedSignal} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {map, Observable, of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
@@ -8,6 +8,13 @@ import {JSOGDeserializer, JSOGObject} from "../utils/JSOGDeserializer";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {SelectableObject} from "./event.service";
+import {isPathway} from "./utils";
+
+type SelectionData = {
+  selectedElement: SelectableObject | undefined,
+  selectedElementLoading: boolean,
+  currentPathway: string | undefined
+}
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +46,21 @@ export class DataStateService {
   public selectedElement = this._selectedElement.asReadonly().value
   public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
+  selectionData = computed<SelectionData>(() => ({
+    selectedElement: this.selectedElement(),
+    selectedElementLoading: this.selectedElementLoading(),
+    currentPathway: this.state.pathwayId()
+  }))
+
+  selectedPathwayStId = linkedSignal<SelectionData, string | undefined>({
+    source: this.selectionData,
+    computation: (source: SelectionData, previous?: { source: SelectionData, value: string | undefined }) => {
+      if (source.selectedElementLoading && previous) return previous.value;
+      if (source.selectedElement && isPathway(source.selectedElement)) return source.selectedElement.stId
+      return source.currentPathway
+    }
+  })
+
 
   constructor(private state: UrlStateService, private http: HttpClient) {
     effect(() => {
@@ -56,7 +78,7 @@ export class DataStateService {
     let url = `${environment.host}/ContentService/data/event/${stId}/ancestors?includeRef=true&view=nested-aggregated`;
     if (stId === null) return of();
     return this.http.get<Pathway[][]>(url).pipe(
-      map(ancestors => ancestors.flatMap(a => a )),
+      map(ancestors => ancestors.flatMap(a => a)),
       map(this.flattenReferences))
   }
 

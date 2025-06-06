@@ -1,4 +1,4 @@
-@let result = analysis.resultSignal();
+@let result = analysis.result();
 
 <div class="wrapper" [style.--radius]="radius()">
   @if (name() && result?.summary?.type === 'GSA_REGULATION') {
@@ -8,7 +8,7 @@
   }
   @if (analysis.type() !== 'GSA_REGULATION') {
     <div class="point-wrapper top" [class.vertical]="!floating()">
-      <div class="point" [innerHTML]="(result?.expression?.max || 0)  | number: '1.0-2'"></div>
+      <div class="point" [innerHTML]="analysis.palette().domainRange[1]  | number: '1.0-2'"></div>
       @if (floating()) {
         <svg class="pointy"
              [attr.viewBox]="viewBox()"
@@ -45,7 +45,7 @@
 
   @if (analysis.type() !== 'GSA_REGULATION') {
     <div class="point-wrapper bottom" [class.vertical]="!floating()">
-      <div class="point" [innerHTML]="(result?.expression?.min || 0.05) | number: '1.0-2'"></div>
+      <div class="point" [innerHTML]="analysis.palette().domainRange[0] | number: '1.0-2'"></div>
       @if (floating()) {
         <svg class="pointy"
              [attr.viewBox]="viewBox()"

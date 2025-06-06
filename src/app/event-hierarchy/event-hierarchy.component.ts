@@ -96,7 +96,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       )
     }),
     switchMap(({idToUse, enhancedEvent}) => {
-      const token = this.analysis.result?.summary.token;
+      const token = this.analysis.result()?.summary.token;
       if (!token) {
         return of({idToUse, enhancedEvent, hitReactions: []}); // Return empty hitReactions if there is no token
       }
@@ -123,7 +123,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       );
     })
   ).subscribe(({hitReactions}) => {
-    this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result);
+    this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result());
 
     // TODO add hit reactions on all opened pathways, not just current one + Make sure it gets updated upon selection / opening of a new pathway
     if (this.selectedTreeEvent && isPathway(this.selectedTreeEvent)) {
@@ -202,21 +202,15 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         );
 
     // Fetch analysis result
-    const analysisResult$ = this.analysis.result$.pipe(
-      take(1),
-      map(analysisResult => ({analysisResult}))
-    );
 
     // Fetch reactions based on token and pathway ID
-    const hitReactions$ = analysisResult$.pipe(
-      switchMap(({analysisResult}) => {
-        const token = analysisResult?.summary.token;
-        if (!token || !this.pathwayId()) return of({hitReactions: []}); // Return empty if no token
-        return this.analysis.getHitReactions(this.pathwayId()!, token).pipe(
+    const hitReactions$ =
+      !this.state.analysis() || !this.pathwayId() ?
+        of({hitReactions: []}) : // Return empty if no token
+        this.analysis.getHitReactions(this.pathwayId()!, this.state.analysis()!).pipe(
           map(hitReactions => ({hitReactions}))
         );
-      })
-    );
+    console.log(this.state.analysis(), this.pathwayId())
 
     // Combine all data and merged into one object
     initialData$.pipe(
@@ -225,14 +219,12 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         enhancedEventData$.pipe(
           combineLatestWith(
             ehldAndSubpathwayColors$,
-            analysisResult$,
             hitReactions$
           ),
-          map(([enhancedEvent, ehldAndColors, analysisResult, hitReactions]) => ({
+          map(([enhancedEvent, ehldAndColors, hitReactions]) => ({
             ...initialData,
             ...enhancedEvent,
             ...ehldAndColors,
-            ...analysisResult,
             ...hitReactions
           }))
         )
@@ -242,10 +234,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       // Build the tree with all data
       switchMap(({
                    enhancedEvent,
-                   initialTreeData,
-                   colors,
-                   hasEHLD,
-                   analysisResult,
                    hitReactions
                  }) => this.eventService.buildTree(enhancedEvent, this.pathwayId()!, this.tree, hitReactions)),
       tap(d => console.log('Final data', d)),

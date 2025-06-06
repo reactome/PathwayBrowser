@@ -84,12 +84,20 @@ export namespace Analysis {
      * Default: false
      */
     importableOnly?: boolean;
+
+    /**
+     *  All non-human identifiers are converted to their human equivalents. (default = true)
+     */
+    disableProjectToHuman?: boolean;
   }
 
-  export interface Pathway  {
+  export interface Pathway {
     dbId: number,
     stId: string,
     name: string,
+    /**
+     * Lower Level Pathway
+     */
     llp: boolean,
     inDisease: boolean,
     entities: {
@@ -183,5 +191,10 @@ export namespace Analysis {
       mapsTo: string[],
       exp: number[]
     }[]
+  }
+
+  export interface NotFoundIdentifier {
+    id: string,
+    exp: number[]
   }
 }

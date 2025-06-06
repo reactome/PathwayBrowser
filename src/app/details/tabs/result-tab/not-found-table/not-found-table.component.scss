@@ -1,12 +1,7 @@
-@use '@angular/material' as mat;
-
 .container {
-  padding-left: 20px;
-  padding-right: 5px;
 
   .found-section {
     position: relative;
-
     table#result-table {
       min-width: 0;
       width: 100%;
@@ -16,8 +11,6 @@
       }
     }
   }
-
-
 }
 
 .icon {
@@ -31,9 +24,9 @@
   }
 }
 
-.pathway-row {
+.row {
   cursor: pointer;
-  scroll-margin-top: var(--header-row-height);
+  scroll-margin-top: var(--scroll-margin-top);
 
   &:hover {
     background: var(--surface1);
@@ -42,13 +35,6 @@
   &.selected {
     background: var(--primary);
     color: var(--on-primary);
-    position: sticky;
-    z-index: 99;
-    top: var(--header-row-height);
-
-    td {
-      border-bottom: 0;
-    }
 
     &:hover {
       background: var(--primary-container);
@@ -71,6 +57,23 @@
 
 }
 
+.expression-value {
+  padding: 4px 8px;
+  border-radius: 50px;
+  background: var(--background);
+  display: inline-flex;
+
+  &.gsa {
+    padding: 4px;
+  }
+}
+
+.p-value {
+  padding: 6px 8px 4px;
+  border-radius: 50px;
+}
+
+
 td.mat-column-name {
   text-wrap: balance;
   font-family: 'Roboto', sans-serif;
@@ -83,27 +86,6 @@ td.mat-column-name {
 .selected-expression {
   text-decoration: underline;
 }
-
-//.found-entity-row:not(.expanded) {
-//  height: 0;
-//  td {
-//    border-bottom: 0;
-//  }
-//}
-
-.found-entity-row.expanded {
-  .mat-column-expand-container {
-    background: var(--primary);
-    overflow: visible;
-    padding: 0 20px 20px 20px;
-
-    ::ng-deep th {
-      top: calc(var(--header-row-height) + var(--selected-row-height)) !important;
-      z-index: 98 !important;
-    }
-  }
-}
-
 
 .controls {
   position: sticky;
@@ -123,7 +105,6 @@ td.mat-column-name {
   align-items: center;
   gap: 5px;
 
-
   *:first-child {
     margin-left: 5px;
   }
@@ -132,9 +113,8 @@ td.mat-column-name {
     background: transparent;
   }
 
-  @include mat.slide-toggle-overrides((
-    label-text-font: var(--mat-sys-body-small-font),
-    label-text-size: var(--mat-sys-body-small-size)
-  ))
-}
+  mat-progress-spinner {
+    margin-left: 10px;
+  }
 
+}

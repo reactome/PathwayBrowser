@@ -4,7 +4,7 @@
     <mat-menu #an="matMenu">
       <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
       <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
-      <button mat-menu-item (click)="clearAnalysis()" *ngIf="analysis.result">Remove analysis</button>
+      <button mat-menu-item (click)="clearAnalysis()" *ngIf="analysis.result()">Remove analysis</button>
       <!--      <button mat-menu-item>GSA</button>-->
     </mat-menu>
     <button mat-stroked-button [matMenuTriggerFor]="overlay">Overlay</button>
@@ -14,7 +14,7 @@
 
     <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark">Dark mode</mat-slide-toggle>
 
-    <ng-container *ngIf="analysis.result">
+    <ng-container *ngIf="analysis.result()">
       <mat-form-field style="width: 200px" appearance="outline" [subscriptSizing]="'dynamic'">
         <mat-label>Palette</mat-label>
         <mat-select [(value)]="analysis.palette"

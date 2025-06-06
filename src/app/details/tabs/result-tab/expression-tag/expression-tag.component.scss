@@ -1,0 +1,23 @@
+.expression-value {
+  padding: 4px 8px;
+  border-radius: 50px;
+  background: var(--background);
+  display: inline-flex;
+
+  &.gsa {
+    padding: 4px;
+  }
+}
+
+.p-value {
+  padding: 6px 8px 4px;
+  border-radius: 50px;
+}
+
+
+
+::ng-deep.selected {
+  .expression-value,.p-value {
+    box-shadow: 0 0 0 2px var(--on-primary);
+  }
+}

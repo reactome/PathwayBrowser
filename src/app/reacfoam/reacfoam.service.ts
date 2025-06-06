@@ -12,6 +12,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {Analysis} from "../model/analysis.model";
 import {extract, Style} from "reactome-cytoscape-style";
+import {isArray} from "lodash";
 
 const LAYOUT_URL = "assets/reacfoam/layout.tsv";
 export namespace EventsHierarchy {
@@ -159,7 +160,7 @@ export class ReacfoamService {
         pathwaysOnly: true,
         token: this.state.analysis() || undefined,
         resource: this.analysis.resourceFilter(),
-        interactors: this.analysis.resultSignal()?.summary?.interactors,
+        interactors: this.analysis.result()?.summary?.interactors,
         view: 'nested-aggregated',
       } as EventsHierarchy.QueryParams
     }),
@@ -256,9 +257,9 @@ export class ReacfoamService {
   }
 }
 
-function cleanObject<O extends Object>(object: O): O {
+export function cleanObject<O extends Object>(object: O): O {
   for (const key in object) {
-    if (object[key] === null || object[key] === undefined) {
+    if (object[key] === null || object[key] === undefined || (isArray(object[key]) && object[key].length === 0)) {
       delete object[key];
     }
   }

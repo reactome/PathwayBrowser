@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="found-section">
+    <table mat-table [dataSource]="data()" recycleRows id="result-table">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>Identifier not found</th>
+        <td mat-cell *matCellDef="let notFound, dataSource: data()">
+          {{ notFound.id }}
+        </td>
+      </ng-container>
+
+
+      @for (expression of expressionColumnIds(); track expression; let i = $index; ) {
+        <ng-container [matColumnDef]="expression">
+          <th mat-header-cell *matHeaderCellDef
+              [class.selected-expression]="state.sample() === expressionColumnNames()[i]">
+            {{ expressionColumnNames()[i] }}
+          </th>
+          <td mat-cell *matCellDef="let notFound, dataSource: data()">
+            <cr-expression-tag [value]="notFound.exp[i]" [isGSA]="isGSA()"/>
+          </td>
+        </ng-container>>
+      }
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true" #headerRow></tr>
+      <tr mat-row *matRowDef="let notFound; columns: displayedColumns(); dataSource: data();"
+          [style.--scroll-margin-top]="scrollOffset()"></tr>
+    </table>
+
+    <div class="controls">
+      @if (analysis.notFoundIdentifiersResource.isLoading()) {
+        <mat-progress-spinner [diameter]="35" mode="indeterminate"></mat-progress-spinner>
+      }
+      <mat-paginator
+        [pageSizeOptions]="[50,  analysis.result()?.identifiersNotFound || 1000]"
+        (page)="analysis.notFoundPagination.set({page: $event.pageIndex + 1, pageSize: $event.pageSize})"
+        showFirstLastButtons
+        [length]="analysis.result()?.identifiersNotFound || 0"
+      ></mat-paginator>
+    </div>
+  </div>
+</div>

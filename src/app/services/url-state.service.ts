@@ -1,18 +1,20 @@
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {filter, firstValueFrom, map, of, switchMap} from "rxjs";
+import {catchError, filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isBoolean, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {PaletteName} from "./analysis.service";
+import {Analysis} from "../model/analysis.model";
 
 
-export type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T};
+export type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T, containsId: boolean};
 
-export function urlParam<T>(initialValue: T, otherTokens?: string[]): UrlParam<T> {
+export function urlParam<T>(initialValue: T, otherTokens?: string[], containsId = false): UrlParam<T> {
   const writableSignal = signal<T>(initialValue) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
   writableSignal.initialValue = initialValue;
+  writableSignal.containsId = containsId;
   return writableSignal;
 }
 
@@ -25,14 +27,18 @@ type State = UrlStateService['values']
 export class UrlStateService implements State {
 
   readonly values = {
-    select: urlParam<string | null>(null, ['SEL']),
-    flag: urlParam<string[]>([], ['FLG']),
-    path: urlParam<string[]>([], ['PATH']),
+    select: urlParam<string | null>(null, ['SEL'], true),
+    flag: urlParam<string[]>([], ['FLG'], true),
+    path: urlParam<string[]>([], ['PATH'], true),
     flagInteractors: urlParam<boolean>(false, ['FLGINT']),
     overlay: urlParam<string | null>(null),
     analysis: urlParam<string | null>(null, ['ANALYSIS']),
-    palette: urlParam<PaletteName | null>(null),
     sample: urlParam<string | null>(null),
+    palette: urlParam<PaletteName | null>(null),
+    speciesFilter: urlParam<string[]>([]),
+    resourceFilter: urlParam<Analysis.Resource | null>(null),
+    notDiseaseFilter: urlParam<boolean>(false),
+    groupingFilter: urlParam<boolean>(false),
   };
 
   public readonly select = this.values.select
@@ -43,6 +49,10 @@ export class UrlStateService implements State {
   public readonly analysis = this.values.analysis
   public readonly sample = this.values.sample
   public readonly palette = this.values.palette
+  public readonly speciesFilter = this.values.speciesFilter
+  public readonly resourceFilter = this.values.resourceFilter
+  public readonly notDiseaseFilter = this.values.notDiseaseFilter
+  public readonly groupingFilter = this.values.groupingFilter
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 
@@ -69,18 +79,19 @@ export class UrlStateService implements State {
         const tokens: string[] = [mainToken, ...param.otherTokens || []];
         const token = tokens.find(token => params.has(token));
         if (token) {
-          const formerValue = param();
+          const initialValue = param.initialValue;
           let value = params.get(token)!;
-          if (isArray(formerValue)) {
-            let values = value.split(',').map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
-            if (values.some(isNumber)) {
-              values = await Promise.all(values.map((v: string | number) => this.ensureStId(v)));
+          if (isArray(initialValue)) {
+            let values = value.split(',');
+            if (param.containsId) {
+              const mixedValues = values.map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
+              values = await Promise.all(mixedValues.map(v => this.ensureStId(v)));
             }
             param.set(values);
-          } else if (isBoolean(formerValue)) {
+          } else if (isBoolean(initialValue)) {
             param.set(value === 'true');
           } else if (!isNaN(+value)) {
-            param.set(await this.dbIdToStId(+value))
+            param.set(param.containsId ? await this.dbIdToStId(+value) : value )
           } else {
             param.set(value.replaceAll('__', ' '))
           }
@@ -107,7 +118,9 @@ export class UrlStateService implements State {
   }
 
   async dbIdToStId(dbId: number): Promise<string> {
-    return firstValueFrom(this.http.get(`${environment.host}/ContentService/data/query/${dbId}/stId`, {responseType: "text"}))
+    return firstValueFrom(this.http.get(`${environment.host}/ContentService/data/query/${dbId}/stId`, {responseType: "text"}).pipe(
+      catchError(() => of(dbId + '')))
+    );
   }
 
 }

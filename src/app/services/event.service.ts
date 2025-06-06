@@ -104,7 +104,7 @@ export class EventService {
         }
       }),
       switchMap(({dbo, treeEvent, colors}) => {
-        const token = this.analysisService.result?.summary.token;
+        const token = this.analysisService.result()?.summary.token;
         if (!token) {
           return of({dbo, treeEvent, colors, hitReactions: []}); // Return empty hitReactions if token is missing
         }
@@ -119,7 +119,7 @@ export class EventService {
       }
       this.setCurrentEventAndObj(treeEvent, dbo);
       if (isPathway(dbo)) {
-        this.addAnalysisTag(dbo.events?.map(e => e.element), this.analysisService.result);
+        this.addAnalysisTag(dbo.events?.map(e => e.element), this.analysisService.result());
         this.addHitReactions(dbo.events?.map(e => e.element), hitReactions);
       }
       this.setTreeData(this.treeData$.value);
@@ -407,7 +407,7 @@ export class EventService {
       }),
       last(), // Wait until all ancestors are processed, then update display names
       map(() => {
-        this.addAnalysisTag(tree, this.analysisService.result); // Add analysis result
+        this.addAnalysisTag(tree, this.analysisService.result()); // Add analysis result
         this.addHitReactions(tree, hitReactions);
         return tree;
       }),
