@@ -109,6 +109,7 @@ td.mat-column-name {
   width: fit-content;
   right: 0;
   margin: 20px auto;
+  //margin-right: 0;
   background: color-mix(in srgb, var(--surface) 80%, transparent);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
@@ -129,10 +130,16 @@ td.mat-column-name {
     background: transparent;
   }
 
+  @include mat.paginator-overrides((
+    form-field-container-height: 20px,
+    form-field-container-vertical-padding: 2px,
+    container-size: 32px,
+  ));
+
   @include mat.slide-toggle-overrides((
     label-text-font: var(--mat-sys-body-small-font),
     label-text-size: var(--mat-sys-body-small-size)
-  ))
+  ));
 }
 
 mat-expansion-panel {

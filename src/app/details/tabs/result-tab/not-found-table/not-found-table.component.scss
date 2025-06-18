@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .container {
 
   .found-section {
@@ -115,5 +117,11 @@ td.mat-column-name {
   mat-progress-spinner {
     margin-left: 10px;
   }
+
+  @include mat.paginator-overrides((
+    form-field-container-height: 20px,
+    form-field-container-vertical-padding: 2px,
+    container-size: 32px,
+  ));
 
 }
