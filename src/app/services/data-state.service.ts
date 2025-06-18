@@ -78,7 +78,7 @@ export class DataStateService {
     let url = `${environment.host}/ContentService/data/event/${stId}/ancestors?includeRef=true&view=nested-aggregated`;
     if (stId === null) return of();
     return this.http.get<Pathway[][]>(url).pipe(
-      map(ancestors => ancestors.flatMap(a => a)),
+      map(ancestors => ancestors.flatMap(a => a.reverse())),
       map(this.flattenReferences))
   }
 
