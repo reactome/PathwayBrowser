@@ -20,6 +20,21 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="expand-entities">
+        <th mat-header-cell *matHeaderCellDef>Matches</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <button
+            [matTooltip]="'Open matching identifiers of ' + pathway.stId "
+            mat-icon-button
+            aria-label="expand row"
+            (click)="toggle(pathway);"
+            class="expand-button"
+            [class.expanded]="isExpanded(0, pathway)">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="entities-found">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Found</th>
         <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.entities.found }}</td>
@@ -87,7 +102,7 @@
               [value]="pathway.entities.exp[i]"
               [pValue]="pathway.entities.pValue"
               [scientificFormat]="analysis.expressionScientificFormat()"
-              [isGSA]="isGSA()"/>
+              [isGSA]="analysis.isGSA()"/>
           </td>
         </ng-container>>
       }
@@ -95,58 +110,13 @@
       <ng-container matColumnDef="expand-container">
         <td mat-cell *matCellDef="let pathway, dataSource: dataSource" [colSpan]="displayedColumns().length"
             [class.expanded]="isExpanded(0, pathway)">
-            <table mat-table [dataSource]="foundEntities()" recycleRows id="result-table">
+          @if (isExpanded(0, pathway)) {
+            <cr-found-table [pathway]="pathway"
+                            [headerRowHeight]="headerRowHeight()"
+                            [parentRowHeight]="expandedRowHeight()"
 
-              <ng-container matColumnDef="expand-id">
-                <th mat-header-cell *matHeaderCellDef>Identifier</th>
-                <td mat-cell *matCellDef="let found, dataSource: foundEntities()">
-                  <div class="found-entity id">
-                    {{ found.id }}
-                  </div>
-                </td>
-              </ng-container>
-
-              @for (resource of resourceColumnIds(); track resource; ) {
-                <ng-container [matColumnDef]="resource">
-                  <th mat-header-cell *matHeaderCellDef>
-                    Match in {{ resource }}
-                  </th>
-                  <td mat-cell *matCellDef="let found, dataSource: foundEntities()">
-                    <div class="found-entity matching">
-                      @for (match of found.mapsTo; track match) {
-                        @if (match.resource === resource) {
-                          {{ match.ids.join(',') }}
-                        }
-                      }
-                    </div>
-                  </td>
-                </ng-container>
-              }
-
-              @for (expandedExpression of expandedExpressionColumnIds(); track expandedExpression; let i = $index; ) {
-                <ng-container [matColumnDef]="expandedExpression">
-                  <th mat-header-cell *matHeaderCellDef
-                      [class.selected-expression]="state.sample() === expressionColumnNames()[i]">
-                    {{ expressionColumnNames()[i] }}
-                  </th>
-                  <td mat-cell *matCellDef="let found, dataSource: foundEntities()">
-                    <div class="found-entity expression">
-                      <cr-expression-tag
-                        [value]="found.exp[i]"
-                        [isGSA]="isGSA()"
-                        [scientificFormat]="analysis.expressionScientificFormat()"
-                      />
-                    </div>
-                  </td>
-                </ng-container>>
-              }
-
-              <tr mat-header-row *matHeaderRowDef="expandedColumns(); sticky: true"
-                  [style.--header-row-height]="headerRowHeight()"
-                  [style.--selected-row-height]="selectedRowHeight()"
-              ></tr>
-              <tr mat-row *matRowDef="let found; columns: expandedColumns(); dataSource: foundEntities() "></tr>
-            </table>
+            ></cr-found-table>
+          }
         </td>
       </ng-container>
 
@@ -157,10 +127,12 @@
           (dblclick)="visitPathway(pathway)"
           class="pathway-row" [id]="'pathway-' + pathway.stId + '-row'"
           [class.selected]="pathway.stId === data.selectedPathwayStId()"
+          [class.expanded]="isExpanded(0, pathway)"
           [style.--header-row-height]="headerRowHeight()"
+          [style.--row-height]="expandedRowHeight()"
       ></tr>
       <tr mat-row class="found-entity-row" [class.expanded]="isExpanded(0, pathway)"
-          *matRowDef="let pathway; columns: ['expand-container']; dataSource: dataSource; when: isExpanded">
+          *matRowDef="let pathway; columns: ['expand-container']; dataSource: dataSource;">
       </tr>
     </table>
 

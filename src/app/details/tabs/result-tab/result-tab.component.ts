@@ -1,13 +1,13 @@
 import {Component, computed, effect, ElementRef, signal, Signal, untracked, viewChild} from '@angular/core';
 import {AnalysisService} from "../../../services/analysis.service";
-import {MatHeaderRow, MatTableDataSource, MatTableModule} from "@angular/material/table";
+import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {Analysis} from "../../../model/analysis.model";
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
 import {MatSort, MatSortModule, Sort} from "@angular/material/sort";
 import {DecimalPipe} from "@angular/common";
 import {ScientificNumberPipe} from "../../../pipes/scientific-number.pipe";
 import {UrlStateService} from "../../../services/url-state.service";
-import {MatIcon} from "@angular/material/icon";
+import {MatIconModule} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
 import {DataStateService} from "../../../services/data-state.service";
 import {Router} from "@angular/router";
@@ -15,12 +15,14 @@ import {TypeSafeMatCellDef} from "../../../utils/type-safe-mat-cell-def.directiv
 import {TypeSafeMatRowDef} from "../../../utils/type-safe-mat-row-def.directive";
 import {NotFoundTableComponent} from "./not-found-table/not-found-table.component";
 import {FormsModule} from "@angular/forms";
-import {MatIconButton} from "@angular/material/button";
+import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
 import {MatCheckbox, MatCheckboxChange} from "@angular/material/checkbox";
 import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 import {ExpressionTagComponent} from "./expression-tag/expression-tag.component";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {FoundTableComponent} from "./found-table/found-table.component";
+import {exp} from "vectorious";
 
 
 @Component({
@@ -31,19 +33,20 @@ import {MatExpansionModule} from "@angular/material/expansion";
     MatPaginatorModule,
     DecimalPipe,
     ScientificNumberPipe,
-    MatIcon,
+    MatIconModule,
     MatTooltip,
     TypeSafeMatCellDef,
     TypeSafeMatRowDef,
     NotFoundTableComponent,
     FormsModule,
-    MatIconButton,
+    MatButtonModule,
     MatMenuModule,
     MatCheckbox,
     MatRadioGroup,
     MatRadioButton,
     ExpressionTagComponent,
-    MatExpansionModule
+    MatExpansionModule,
+    FoundTableComponent
   ],
   templateUrl: './result-tab.component.html',
   styleUrl: './result-tab.component.scss'
@@ -52,7 +55,6 @@ export class ResultTabComponent {
 
   trackBy = (index: number, pathway: Analysis.Pathway) => pathway.stId + '-' + index;
 
-  isGSA = computed(() => this.analysis.result()?.summary?.type === 'GSA_REGULATION');
 
   expressionColumnNames = computed(() => this.analysis.result()?.expression?.columnNames || []);
 
@@ -60,6 +62,7 @@ export class ResultTabComponent {
 
   displayedColumns: Signal<string[]> = computed(() => [
     'name',
+    'expand-entities',
     'entities-found', 'entities-total',
     // 'entities-ratio',
     'entities-pValue', 'entities-fdr',
@@ -76,12 +79,12 @@ export class ResultTabComponent {
   container = viewChild.required<ElementRef<HTMLDivElement>>('container')
 
   headerRowHeight = signal('56px')
-  selectedRowHeight = signal('56px')
+  expandedRowHeight = signal('56px')
 
   sizeObserver = new ResizeObserver(() => {
     setTimeout(() => {
       this.headerRowHeight.set((document.querySelector('tr.pathway-header-row')?.clientHeight || 56) + 'px')
-      this.selectedRowHeight.set((document.querySelector('tr.pathway-row.selected')?.clientHeight || 56) + 'px')
+      this.expandedRowHeight.set((document.querySelector('tr.pathway-row.expanded')?.clientHeight || 56) + 'px')
     })
   });
 
@@ -144,24 +147,14 @@ export class ResultTabComponent {
       })
     });
 
-    effect(() => {
-      this.analysis.selectedPathwayFoundEntities.value() // When found entity finished loading
-      const stId = untracked(this.data.selectedPathwayStId);
-      setTimeout(() => {
-        document.getElementById(`pathway-${stId}-row`)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'start'
-        })
-      })
 
-    });
   }
 
   selectPathway(pathway: Analysis.Pathway) {
     // if (this.state.select() !== pathway.stId) {
     this.data.selectedPathwayStId.set(pathway.stId)
     this.state.select.set(pathway.stId)
+    if (this.expandedPathway() !== undefined && this.expandedPathway() !== pathway) this.expandedPathway.set(pathway)
     // } else {
     //   this.data.selectedPathwayStId.set(undefined)
     //   this.state.select.set(null)
@@ -189,24 +182,15 @@ export class ResultTabComponent {
     )
   }
 
-  foundEntities = computed(() => {
-    const found = this.analysis.selectedPathwayFoundEntities.value();
-    return [...found?.entities || []]
-  })
-
-  resourceColumnIds = computed(() => this.analysis.selectedPathwayFoundEntities.value()?.resources || [])
-  expandedExpressionColumnIds = computed(() => this.expressionColumnIds().map(id => "expand-" + id));
-
-
-  expandedColumns = computed(() => this.analysis.selectedPathwayFoundEntities.value() ? [
-    'expand-id',
-    ...this.resourceColumnIds(),
-    ...this.expandedExpressionColumnIds()
-  ] : [])
 
   isExpanded = (index: number, pathway: Analysis.Pathway) => {
-    return pathway.stId === this.data?.selectedPathwayStId()
+    return this.expandedPathway() === pathway
   }
 
+  expandedPathway = signal<Analysis.Pathway | undefined>(undefined)
+  toggle(pathway: Analysis.Pathway) {
+    this.expandedPathway.set(this.isExpanded(0, pathway) ? undefined : pathway)
+  }
 
+  protected readonly exp = exp;
 }

@@ -180,17 +180,19 @@ export namespace Analysis {
 
     expNames: string[],
     resources: Resource[]
-    entities: {
-      id: string,
-      mapsTo: Identifiers[],
-      exp: number[]
-    }[],
+    entities: FoundEntity[],
     interactors?: {
       id: string,
       interactsWith: Identifiers[],
       mapsTo: string[],
       exp: number[]
     }[]
+  }
+
+  export interface FoundEntity {
+    id: string,
+    mapsTo: Identifiers[],
+    exp: number[]
   }
 
   export interface NotFoundIdentifier {

@@ -205,6 +205,8 @@ export class AnalysisService {
 
 
   type = computed(() => this.result()?.summary.type as Analysis.Type | undefined)
+  isGSA = computed(() => this.type() === 'GSA_REGULATION');
+
   samples = computed(() => this.result()?.expression.columnNames || [])
   sampleIndex = linkedSignal({
     source: () => ({result: this.result(), sample: this.state.sample()}),
@@ -232,17 +234,6 @@ export class AnalysisService {
   resourceFilter = this.state.resourceFilter
   resourceOptions = computed(() => this.result()?.resourceSummary || [])
   speciesOptions = computed(() => this.result()?.speciesSummary || [])
-
-  selectedPathwayFoundEntities = rxResource({
-    request: () => ({
-      pathway: this.data.selectedPathwayStId(),
-      token: this.state.analysis(),
-      resource: this.resourceFilter()
-    }),
-    loader: ({request}) => request.pathway && request.token ?
-      this.foundEntities(request.pathway, request.token, request.resource || undefined) :
-      of()
-  })
 
 
   constructor(private http: HttpClient,
