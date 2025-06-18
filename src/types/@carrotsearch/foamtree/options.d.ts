@@ -373,6 +373,18 @@ declare module "@carrotsearch/foamtree" {
       relaxationQualityThreshold: number
 
       /**
+       * The transform to apply to polygon centers when resizing the visualization container.
+       * <ul>
+       *   <li>morph - Transforms the current polygon centers in such a way that their relative positions with respect to the container remain the same after resizing. With relaxationVisible set to true, this transformation mode ensures smooth polygon transition animations. However, the morphing transformation does not preserve the original positions of the polygons. This means that polygons may gradually "migrate" to arbitrary areas of the visualization as a result of a series of container resizing events.</li>
+       *   <li>initialize - Re-initializes polygon positions from scratch on every container size change. This transformation helps to ensure the polygons remain in the same area of the visualization after multiple resize events. When using this transformation keep relaxationVisible set to false to avoid jittery polygon animations.
+       * </ul>
+       * @assert (value is not empty) and (value one of [morph, initialize])
+       * @since 3.5.3
+       * @defaultValue "morph"
+       */
+      resizeTransform: 'morph' | 'initialize'
+
+      /**
        * The duration of the animation that grows the group to its final weight, in milliseconds. Applicable only when relaxationVisible is true.
        *
        * Value in [0,infinity]

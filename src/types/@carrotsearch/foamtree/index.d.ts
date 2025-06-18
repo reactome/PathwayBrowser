@@ -448,5 +448,7 @@ declare module "@carrotsearch/foamtree" {
     dispose(): void
   }
 
-
+  global {
+    const CarrotSearchFoamTree: typeof FoamTree
+  }
 }
