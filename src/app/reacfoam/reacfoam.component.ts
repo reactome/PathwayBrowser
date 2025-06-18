@@ -36,7 +36,7 @@ export class ReacfoamComponent implements OnDestroy {
     pullbackDuration: 0,
     // Lower the border radius a bit to fit more groups
     groupBorderWidth: 2,
-    groupInsetWidth: 10,
+    groupInsetWidth: 8,
     groupBorderRadius: 0.4,
     groupBorderWidthScaling: 0.5,
     groupStrokeWidth: 1.5,
