@@ -48,7 +48,11 @@ export class FoundTableComponent {
       console.log('sortingData', data, header)
       const value = header.split('-').reduce((a: any, b) => a?.[b], data);
       if (value) return value;
-      else return data.mapsTo.find(m => m.resource === header)?.ids.length || 0 // Sort by mapping length for matches column
+      else { // Sort by mapping length, then alphabetical for matches column
+        const mappedIds = data.mapsTo.find(m => m.resource === header)?.ids;
+        if (!mappedIds) return '0-'
+        return mappedIds.length + '-' + mappedIds.join(', ')
+      }
     }
 
     effect(() => this.dataSource.data = this.foundEntities());
