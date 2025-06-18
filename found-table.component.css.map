@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/details/tabs/result-tab/found-table/found-table.component.scss"],
+  "sourcesContent": ["@use '@angular/material' as mat;\n\nth {\n  top: calc(var(--header-row-height) + var(--row-height)) !important;\n  z-index: 98 !important;\n}\n\ntd.mat-column-name {\n  text-wrap: balance;\n  font-family: 'Roboto', sans-serif;\n  font-style: normal;\n  font-weight: 400;\n  font-size: 14px;\n  line-height: 20px;\n}\n\n.selected-expression {\n  text-decoration: underline;\n}\n\n\n.expand-button {\n  transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);\n  &.expanded {\n    transform: rotate(180deg);\n  }\n}\n"],
+  "mappings": ";AAEA;AACE,OAAA,KAAA,IAAA,qBAAA,EAAA,IAAA;AACA,WAAA;;AAGF,EAAA,CAAA;AACE,aAAA;AACA,eAAA,QAAA,EAAA;AACA,cAAA;AACA,eAAA;AACA,aAAA;AACA,eAAA;;AAGF,CAAA;AACE,mBAAA;;AAIF,CAAA;AACE,cAAA,UAAA,MAAA,aAAA,GAAA,EAAA,CAAA,EAAA,GAAA,EAAA;;AACA,CAFF,aAEE,CAAA;AACE,aAAA,OAAA;;",
+  "names": []
+}
