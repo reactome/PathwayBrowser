@@ -1,4 +1,4 @@
-.expression-value {
+.value-tag {
   padding: 4px 8px;
   border-radius: 50px;
   background: var(--background);
@@ -7,17 +7,16 @@
   &.gsa {
     padding: 4px;
   }
-}
 
-.p-value {
-  padding: 6px 8px 4px;
-  border-radius: 50px;
+  &.scientific {
+    padding: 6px 8px 4px;
+    display: inherit;
+  }
 }
-
 
 
 ::ng-deep.selected {
-  .expression-value,.p-value {
+  .value-tag {
     box-shadow: 0 0 0 2px var(--on-primary);
   }
 }

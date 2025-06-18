@@ -30,11 +30,13 @@ const gsaValueToLabel = new Map<number, Label>([
 export class ExpressionTagComponent {
 
   value = input.required<number>()
+  scientificFormat = input.required<boolean>()
+
   pValue = input<number>(0)
   isPValue = input<boolean>(false)
   isSignificant = computed(() => ((this.isPValue() && this.value()) || this.pValue()) < 0.05)
-  isGSA = input<boolean>(false)
 
+  isGSA = input<boolean>(false)
 
   format = input<string>('1.3-3')
 
