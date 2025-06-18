@@ -23,7 +23,10 @@ export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
 }
 
-export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, orderBy: (key1: K, key2: K) => number): {key: K, elements: E[]}[] {
+export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, orderBy: (key1: K, key2: K) => number): {
+  key: K,
+  elements: E[]
+}[] {
   const grouped = new Map<K, E[]>();
   elements.forEach(element => grouped.set(getKey(element), [...(grouped.get(getKey(element)) || []), element]))
   return [...grouped.keys()].sort(orderBy).map(key => ({key, elements: grouped.get(key)!}));
@@ -147,3 +150,17 @@ export function isRefOrBook(publication: Publication): publication is Literature
 export function getProperty<T extends DatabaseObject, K extends keyof T>(obj: T, key: K): T[K] | undefined {
   return key in obj ? obj[key] : undefined;
 }
+
+
+/**
+ * If any value among the representative sample has an exponent part above +3 or bellow -3, then it should be scientificFormat.
+ *
+ * @param representativeSample e.g. [firstValue, lastValue, min, max]
+ */
+export const shouldBeScientificFormat = (representativeSample: number[]) => representativeSample.some(shouldBeScientificFormatValue)
+
+/**
+ * if value has an exponent part above +3 or bellow -3, then it should be scientificFormat
+ * @param value a number
+ */
+const shouldBeScientificFormatValue = (value: number) => parseInt(value.toExponential(0).split(/e[+-]/)[1]) > 3;

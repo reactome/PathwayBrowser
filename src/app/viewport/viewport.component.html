@@ -109,6 +109,7 @@
 
             <mat-menu #an="matMenu">
               <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
+              <button mat-menu-item (click)="analysis.example('extreme').subscribe()">Extreme</button>
               <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
               <button mat-menu-item (click)="analysis.example('cancer-gene-census', {disableProjectToHuman: true}).subscribe()">Gene Names (n Species)</button>
               <button mat-menu-item (click)="state.analysis.set('MjAyNTAxMjMxNzMxMzlfMTM%3D')">GSA</button>

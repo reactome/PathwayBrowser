@@ -6,12 +6,13 @@ import {Analysis} from "../model/analysis.model";
 import {UrlStateService} from "./url-state.service";
 import chroma, {Color, Scale} from "chroma-js";
 import {extract, Style} from "reactome-cytoscape-style";
-import {rxResource, toObservable, toSignal} from "@angular/core/rxjs-interop";
+import {rxResource, toObservable} from "@angular/core/rxjs-interop";
 import {DarkService} from "./dark.service";
 import {DataStateService} from "./data-state.service";
-import NotFoundIdentifier = Analysis.NotFoundIdentifier;
 import {Params} from "@angular/router";
 import {cleanObject} from "../reacfoam/reacfoam.service";
+import {isDefined, shouldBeScientificFormat} from "./utils";
+import NotFoundIdentifier = Analysis.NotFoundIdentifier;
 
 export interface Pagination extends Params {
   page: number,
@@ -97,7 +98,7 @@ export class PaletteSummary {
 }
 
 
-export type Examples = 'uniprot' | 'microarray' | 'cancer-gene-census';
+export type Examples = 'uniprot' | 'microarray' | 'cancer-gene-census' | 'extreme';
 
 @Injectable({
   providedIn: 'root'
@@ -215,6 +216,18 @@ export class AnalysisService {
         0, 0
       )
   })
+
+  expressionScientificFormat = computed(() => {
+    const result = this.result();
+    const expressions = result?.expression;
+    if (!result || ! expressions) return false
+    return shouldBeScientificFormat([
+      expressions.min,
+      expressions.max,
+      result!.pathways.at(0)?.entities.exp.at(0),
+      result!.pathways.at(-1)?.entities.exp.at(-1)
+    ].filter(isDefined))
+  } )
 
   resourceFilter = this.state.resourceFilter
   resourceOptions = computed(() => this.result()?.resourceSummary || [])

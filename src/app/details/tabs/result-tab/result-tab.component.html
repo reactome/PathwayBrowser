@@ -41,6 +41,7 @@
         <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
           <cr-expression-tag
             [value]="pathway.entities.pValue"
+            [scientificFormat]="true"
             [isPValue]="true"/>
         </td>
       </ng-container>

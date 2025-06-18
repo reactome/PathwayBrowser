@@ -17,7 +17,8 @@
             {{ expressionColumnNames()[i] }}
           </th>
           <td mat-cell *matCellDef="let notFound, dataSource: data()">
-            <cr-expression-tag [value]="notFound.exp[i]" [isGSA]="isGSA()"/>
+            <cr-expression-tag [value]="notFound.exp[i]" [isGSA]="isGSA()"
+                               [scientificFormat]="analysis.expressionScientificFormat()"/>
           </td>
         </ng-container>>
       }
