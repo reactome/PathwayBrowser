@@ -63,12 +63,14 @@ export class ReacfoamComponent implements OnDestroy {
     // Maximum duration of a complete high-quality redraw of the visualization
     finalCompleteDrawMaxDuration: 40000,
     finalIncrementalDrawMaxDuration: 40000,
-    wireframeDrawMaxDuration: 4000,
+    wireframeDrawMaxDuration: 40_000, // Controls whether edges are rendered during wireframe
+
+    resizeTransform: 'initialize',
 
     finalToWireframeFadeDuration: 0,
     fadeDuration: 0,
     wireframeToFinalFadeDuration: 0,
-    groupLabelColorThreshold: 1- 0.179,
+    groupLabelColorThreshold: 1 - 0.179,
     relaxationMaxDuration: 2500,
     relaxationQualityThreshold: 0.5,
 
@@ -105,21 +107,19 @@ export class ReacfoamComponent implements OnDestroy {
     onRelaxationStep: (relaxationProgress, relaxationComplete, relaxationTimeout) => {
       if ((relaxationTimeout || relaxationComplete) && this.correctedSelectedId()) {
         setTimeout(() => {
-          console.log('Relaxation complete ==> final expose ');
-          this.foamTree().select({groups: this.correctedSelectedId(), keepPrevious: false})
-          this.foamTree().expose({groups: null, keepPrevious: false})
-            .then(() => this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})) // Needs to force recenter upon initial loading
+          console.log('Relaxation complete ==> Put back exposure');
+          this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})
         })
       }
     },
 
-    onViewReset: () =>  { // Reset selection on esc pressed
+    onViewReset: () => { // Reset selection on esc pressed
       this.state.select.set(null)
       this.state.path.set([])
     }
   } as FoamTree.InitialOptions<PathwayGroup>));
 
-  foamTree = computed(() => new FoamTree<PathwayGroup>(this.options()));
+  foamTree = computed(() => new CarrotSearchFoamTree<PathwayGroup>(this.options()));
   selectedId = computed(() => this.reacfoam.buildId(this.state.select(), this.state.path()));
   correctedSelectedId = computed(() => this.state.select() ?
     (
@@ -133,9 +133,17 @@ export class ReacfoamComponent implements OnDestroy {
   sizeObserver = new ResizeObserver(() => {
     console.log('Resize ==> Reset layout')
     setTimeout(() => { // Avoid white flickering
-      this.foamTree().resize();
-      this.foamTree().set('dataObject', this.foamTree().get('dataObject')) // Force initial position to be used for TLP to ensure stable position. Triggers relaxation
-      this.foamTree().select({groups: this.correctedSelectedId(), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
+      if (this.reacfoam.data()) { // Avoid null pointer exception happening when resizing on undefined data with relaxation visible and initialize resizeTransform.
+        // Remove exposure instantly while resizing as they conflict with one another. Will be put back when relaxation is finished
+        this.foamTree().set('exposeDuration', 0) // Make removal of exposure instant
+        this.foamTree().expose({
+          groups: undefined,
+          keepPrevious: false
+        }).then(() => {
+          this.foamTree().set('exposeDuration', this.options().exposeDuration!) // Put back initial exposure time
+          this.foamTree().resize()
+        })
+      }
     })
   });
 
