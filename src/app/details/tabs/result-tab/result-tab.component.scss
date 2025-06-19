@@ -41,6 +41,10 @@
     position: sticky;
     z-index: 99;
     top: var(--header-row-height);
+
+    td {
+      border-bottom: 0;
+    }
   }
 
   &.selected {
@@ -48,11 +52,6 @@
     color: var(--on-primary);
 
     --mat-icon-color: var(--on-primary);
-
-
-    td {
-      border-bottom: 0;
-    }
 
     &:hover {
       background: var(--primary-container);
