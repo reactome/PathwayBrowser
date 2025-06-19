@@ -41,6 +41,8 @@ export class UrlStateService implements State {
     groupingFilter: urlParam<boolean>(false),
     pathwayMinSizeFilter: urlParam<number | undefined>(undefined),
     pathwayMaxSizeFilter: urlParam<number | undefined>(undefined),
+    minExpressionFilter: urlParam<number | undefined>(undefined),
+    maxExpressionFilter: urlParam<number | undefined>(undefined),
     pValueFilter: urlParam<number | undefined>(undefined),
   };
 
@@ -58,6 +60,8 @@ export class UrlStateService implements State {
   public readonly groupingFilter = this.values.groupingFilter
   public readonly pathwayMinSizeFilter = this.values.pathwayMinSizeFilter
   public readonly pathwayMaxSizeFilter = this.values.pathwayMaxSizeFilter
+  public readonly minExpressionFilter = this.values.minExpressionFilter
+  public readonly maxExpressionFilter = this.values.maxExpressionFilter
   public readonly pValueFilter = this.values.pValueFilter
 
   public readonly pathwayId = signal<string | undefined>(undefined);
@@ -110,7 +114,7 @@ export class UrlStateService implements State {
       const queryParams = {} as any;
       for (const key in this.values) {
         let param = this.values[key as keyof State]();
-        if (!param || (isArray(param) && param.length === 0)) continue;
+        if (param === undefined || param === null || (isArray(param) && param.length === 0)) continue;
         if (typeof param === 'string') param = param.replaceAll(' ', '__')
         queryParams[key] = isArray(param) ? param.join(',') : param;
       }

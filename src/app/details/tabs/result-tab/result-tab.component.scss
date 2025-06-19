@@ -138,11 +138,12 @@ td.mat-column-name {
 }
 
 mat-expansion-panel {
-  overflow: clip!important; // Avoid sticky not working inside
+  overflow: clip !important; // Avoid sticky not working inside
 }
 
 .expand-button {
   transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+
   &.expanded {
     transform: rotate(180deg);
   }
@@ -160,6 +161,7 @@ mat-expansion-panel {
 .slider-container {
   overflow: visible;
   max-width: 99.5%;
+
   label {
     display: flex;
     align-items: center;
@@ -177,4 +179,56 @@ mat-expansion-panel {
       margin-right: 8px; // Align to double thumb
     }
   }
+
+  &.expression {
+
+    ::ng-deep {
+      .mdc-slider__track--inactive {
+        background: var(--gradient);
+      }
+      .mdc-slider__track--active {
+        background: var(--gradient);
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: color-mix(in srgb, var(--surface) 70%, transparent);
+          mask-image: var(--gradient-mask);
+        }
+        .mdc-slider__track--active_fill {
+          opacity: 0;
+        }
+      }
+
+      mat-slider-visual-thumb:first-of-type {
+        --expression-color: var(--expression-color-start);
+        --faded-color: color-mix(in srgb, var(--expression-color) 80%, transparent);
+        @include mat.slider-overrides((
+          handle-color: var(--expression-color),
+          label-container-color: var(--expression-color),
+          focus-handle-color: var(--faded-color),
+          hover-handle-color: var(--faded-color),
+        ));
+
+      }
+      mat-slider-visual-thumb:last-of-type {
+        --expression-color: var(--expression-color-stop);
+        --faded-color: color-mix(in srgb, var(--expression-color) 80%, transparent);
+        @include mat.slider-overrides((
+          handle-color: var(--expression-color),
+          label-container-color: var(--expression-color),
+          focus-handle-color: var(--faded-color),
+          hover-handle-color: var(--faded-color),
+        ));
+      }
+    }
+  }
+
+  @include mat.slider-overrides((
+    value-indicator-width: 35px,
+    value-indicator-height: 35px,
+  ));
+
+
 }

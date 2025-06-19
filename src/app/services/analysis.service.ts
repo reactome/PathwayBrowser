@@ -73,10 +73,19 @@ export class PaletteSummary {
     return this;
   }
 
-  get gradient(): string {
+
+  getGradient(direction: 'top' | 'bottom' | 'left' | 'right') {
     return this.n === -1 ?
-      `linear-gradient(to top in oklab, ${this.colors.join(', ')})` :
-      `linear-gradient(to top in oklab, ${this.scale.colors(this.n).map((c, i) => `${c} ${i / this.n * 100}%, ${c} ${(i + 1) / this.n * 100}%`).join(', ')})`
+      `linear-gradient(to ${direction} in oklab, ${this.colors.join(', ')})` :
+      `linear-gradient(to ${direction} in oklab, ${this.scale.colors(this.n).map((c, i) => `${c} ${i / this.n * 100}%, ${c} ${(i + 1) / this.n * 100}%`).join(', ')})`
+  }
+
+  get verticalGradient(): string {
+    return this.getGradient('top')
+  }
+
+  get horizontalGradient(): string {
+    return this.getGradient('right')
   }
 
   get colors() {
@@ -184,7 +193,10 @@ export class AnalysisService {
     loader: ({request}) => {
       console.log("Loading ", request)
       return request.token ?
-        this.loadAnalysis(request.token, {resource: request.resource || undefined, species: request.species.join(',')}) :
+        this.loadAnalysis(request.token, {
+          resource: request.resource || undefined,
+          species: request.species.join(',')
+        }) :
         of(undefined)
     }
   });
@@ -224,14 +236,14 @@ export class AnalysisService {
   expressionScientificFormat = computed(() => {
     const result = this.result();
     const expressions = result?.expression;
-    if (!result || ! expressions) return false
+    if (!result || !expressions) return false
     return shouldBeScientificFormat([
       expressions.min,
       expressions.max,
       result!.pathways.at(0)?.entities.exp.at(0),
       result!.pathways.at(-1)?.entities.exp.at(-1)
     ].filter(isDefined))
-  } )
+  })
 
   resourceFilter = this.state.resourceFilter
   resourceOptions = computed(() => this.result()?.resourceSummary || [])

@@ -20,7 +20,7 @@
         <mat-select [(value)]="analysis.palette"
                     [hideSingleSelectionIndicator]="true">
           <mat-select-trigger>
-            <div class="palette" [style.background]="analysis.palette().gradient" style="vertical-align: center">
+            <div class="palette" [style.background]="analysis.palette().verticalGradient" style="vertical-align: center">
             </div>
           </mat-select-trigger>
           <ng-container *ngFor="let group of analysis.paletteGroups ">
@@ -28,7 +28,7 @@
               <mat-label align="center">{{ group.name }}</mat-label>
               <mat-option *ngFor="let palette of group.palettes" [value]="analysis.paletteOptions.get(palette)">
                 {{ palette }}
-                <div class="palette option-content" [style.background]="analysis.paletteOptions.get(palette)?.gradient">
+                <div class="palette option-content" [style.background]="analysis.paletteOptions.get(palette)?.verticalGradient">
                 </div>
               </mat-option>
             </mat-optgroup>

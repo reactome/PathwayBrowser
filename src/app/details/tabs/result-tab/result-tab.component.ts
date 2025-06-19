@@ -32,7 +32,6 @@ import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 import {ExpressionTagComponent} from "./expression-tag/expression-tag.component";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {FoundTableComponent} from "./found-table/found-table.component";
-import {exp} from "vectorious";
 import {MatSliderModule} from "@angular/material/slider";
 import {getArrayStats} from "../../../services/utils";
 
@@ -68,6 +67,9 @@ export class ResultTabComponent {
 
   trackBy = (index: number, pathway: Analysis.Pathway) => pathway.stId + '-' + index;
 
+  hasExpression = computed(() => this.analysis.result()?.expression !== undefined)
+  minExpression = computed(() => this.analysis.result()?.expression?.min || 0)
+  maxExpression = computed(() => this.analysis.result()?.expression?.max || 100)
 
   expressionColumnNames = computed(() => this.analysis.result()?.expression?.columnNames || []);
 
@@ -107,6 +109,10 @@ export class ResultTabComponent {
   filterPValue = linkedSignal(() => this.state.pValueFilter() !== undefined ? this.state.pValueFilter() : 1)
   filterMinSize = linkedSignal(() => this.state.pathwayMinSizeFilter() !== undefined ? this.state.pathwayMinSizeFilter() : this.pathwaySizeStats().min)
   filterMaxSize = linkedSignal(() => this.state.pathwayMaxSizeFilter() !== undefined ? this.state.pathwayMaxSizeFilter() : this.pathwaySizeStats().max)
+
+  filterMinExpression = linkedSignal(() => this.state.minExpressionFilter() !== undefined ? this.state.minExpressionFilter() : this.minExpression())
+  filterMaxExpression = linkedSignal(() => this.state.maxExpressionFilter() !== undefined ? this.state.maxExpressionFilter() : this.maxExpression())
+
   filterLLP = this.state.groupingFilter
   filterNotDisease = this.state.notDiseaseFilter
 
@@ -126,6 +132,14 @@ export class ResultTabComponent {
     if (this.state.pValueFilter() !== undefined) {
       data = data.filter(p => p.entities.pValue <= this.state.pValueFilter()!)
       console.log('Filter pValue', size, '==>', data.length)
+    }
+    if (this.state.minExpressionFilter() !== undefined) {
+      data = data.filter(p => p.entities.exp[this.analysis.sampleIndex()] >= this.state.minExpressionFilter()!)
+      console.log('Filter minExpression', size, '==>', data.length)
+    }
+    if (this.state.maxExpressionFilter() !== undefined) {
+      data = data.filter(p => p.entities.exp[this.analysis.sampleIndex()] <= this.state.maxExpressionFilter()!)
+      console.log('Filter minExpression', size, '==>', data.length)
     }
     return data
   })
@@ -198,6 +212,8 @@ export class ResultTabComponent {
     // Update URL from value change
     effect(() => this.state.pathwayMinSizeFilter.set(this.filterMinSize() !== this.pathwaySizeStats().min ? this.filterMinSize() : undefined));
     effect(() => this.state.pathwayMaxSizeFilter.set(this.filterMaxSize() !== this.pathwaySizeStats().max ? this.filterMaxSize() : undefined));
+    effect(() => this.state.minExpressionFilter.set(this.filterMinExpression() !== this.minExpression() ? this.filterMinExpression() : undefined));
+    effect(() => this.state.maxExpressionFilter.set(this.filterMaxExpression() !== this.maxExpression() ? this.filterMaxExpression() : undefined));
     effect(() => this.state.pValueFilter.set(this.filterPValue() !== 1 ? this.filterPValue() : undefined));
   }
 
@@ -244,5 +260,23 @@ export class ResultTabComponent {
     this.expandedPathway.set(this.isExpanded(0, pathway) ? undefined : pathway)
   }
 
-  protected readonly exp = exp;
+  formatExpression = (expression: number) => this.analysis.expressionScientificFormat() ?
+    expression.toExponential(0) :
+    expression.toFixed(0)
+
+  colorExpression = (expression: number | undefined) => this.analysis.palette().scale(expression).hex()
+
+  localMinExpression = linkedSignal(() => this.filterMinExpression() || this.minExpression())
+  localMaxExpression = linkedSignal(() => this.filterMaxExpression() || this.maxExpression())
+  expressionRange = computed(() => this.maxExpression() - this.minExpression())
+  gradientMask = computed(() => {
+    const startPercentage = (this.localMinExpression() - this.minExpression()) / this.expressionRange() * 100;
+    const endPercentage = (this.localMaxExpression() - this.minExpression()) / this.expressionRange() * 100;
+    return `linear-gradient(to right,
+                             black       ${startPercentage}%,
+                             transparent ${startPercentage}%,
+                             transparent ${endPercentage}%,
+                             black       ${endPercentage}%)`
+  })
+
 }

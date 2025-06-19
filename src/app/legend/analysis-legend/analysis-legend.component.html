@@ -59,7 +59,7 @@
 </div>
 
 <ng-template #display let-palette let-displayLabels="displayLabels">
-  <div class="palette" [style.background]="palette.gradient">
+  <div class="palette" [style.background]="palette.verticalGradient">
 
     @if (displayLabels) {
       @if (result?.summary?.type === 'GSA_REGULATION') {
