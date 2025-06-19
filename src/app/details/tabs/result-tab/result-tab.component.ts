@@ -1,4 +1,14 @@
-import {Component, computed, effect, ElementRef, signal, Signal, untracked, viewChild} from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  linkedSignal,
+  signal,
+  Signal,
+  untracked,
+  viewChild
+} from '@angular/core';
 import {AnalysisService} from "../../../services/analysis.service";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {Analysis} from "../../../model/analysis.model";
@@ -23,6 +33,8 @@ import {ExpressionTagComponent} from "./expression-tag/expression-tag.component"
 import {MatExpansionModule} from "@angular/material/expansion";
 import {FoundTableComponent} from "./found-table/found-table.component";
 import {exp} from "vectorious";
+import {MatSlider, MatSliderModule, MatSliderRangeThumb, MatSliderThumb} from "@angular/material/slider";
+import {getArrayStats} from "../../../services/utils";
 
 
 @Component({
@@ -46,7 +58,8 @@ import {exp} from "vectorious";
     MatRadioButton,
     ExpressionTagComponent,
     MatExpansionModule,
-    FoundTableComponent
+    FoundTableComponent,
+    MatSliderModule
   ],
   templateUrl: './result-tab.component.html',
   styleUrl: './result-tab.component.scss'
@@ -91,13 +104,48 @@ export class ResultTabComponent {
   currentSort = signal<Sort>({active: 'entities-pValue', direction: 'desc'})
 
 
+  filterPValue = linkedSignal(() => this.state.pValueFilter() !== undefined ? this.state.pValueFilter() : 1)
+  filterMinSize = linkedSignal(() => this.state.pathwayMinSizeFilter() !== undefined ? this.state.pathwayMinSizeFilter() : this.pathwaySizeStats().min)
+  filterMaxSize = linkedSignal(() => this.state.pathwayMaxSizeFilter() !== undefined ? this.state.pathwayMaxSizeFilter() : this.pathwaySizeStats().max)
   filterLLP = this.state.groupingFilter
   filterNotDisease = this.state.notDiseaseFilter
 
-  filteredData = computed(() => {
+  filteredDataNoSize = computed(() => {
     let data = this.analysis.result()?.pathways || [];
-    if (this.filterLLP()) data = data.filter(p => p.llp)
-    if (this.filterNotDisease()) data = data.filter(p => !p.inDisease)
+    let size = data.length
+    if (this.filterLLP()) {
+      data = data.filter(p => p.llp)
+      console.log('Filter llp', size, '==>', data.length)
+      size = data.length
+    }
+    if (this.filterNotDisease()) {
+      data = data.filter(p => !p.inDisease)
+      console.log('Filter disease', size, '==>', data.length)
+      size = data.length
+    }
+    if (this.state.pValueFilter() !== undefined) {
+      data = data.filter(p => p.entities.pValue <= this.state.pValueFilter()!)
+      console.log('Filter pValue', size, '==>', data.length)
+    }
+    return data
+  })
+
+  pathwaySizeStats = computed(() => getArrayStats(this.filteredDataNoSize().map(p => p.entities.total)))
+
+  filteredData = computed(() => {
+    let data = this.filteredDataNoSize();
+    let size = data.length
+    if (this.state.pathwayMinSizeFilter()) {
+      data = data.filter(p => p.entities.total >= this.state.pathwayMinSizeFilter()!)
+      console.log('Filter min size', size, '==>', data.length)
+      size = data.length
+    }
+    if (this.state.pathwayMaxSizeFilter()) {
+      data = data.filter(p => p.entities.total <= this.state.pathwayMaxSizeFilter()!)
+      console.log('Filter max size', size, '==>', data.length)
+      size = data.length
+    }
+    console.log("Total filter", this.analysis.result()?.pathways.length, '==>', size)
     return data;
   })
 
@@ -147,7 +195,10 @@ export class ResultTabComponent {
       })
     });
 
-
+    // Update URL from value change
+    effect(() => this.state.pathwayMinSizeFilter.set(this.filterMinSize() !== this.pathwaySizeStats().min ? this.filterMinSize() : undefined));
+    effect(() => this.state.pathwayMaxSizeFilter.set(this.filterMaxSize() !== this.pathwaySizeStats().max ? this.filterMaxSize() : undefined));
+    effect(() => this.state.pValueFilter.set(this.filterPValue() !== 1 ? this.filterPValue() : undefined));
   }
 
   selectPathway(pathway: Analysis.Pathway) {

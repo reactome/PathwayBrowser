@@ -39,6 +39,9 @@ export class UrlStateService implements State {
     resourceFilter: urlParam<Analysis.Resource | null>(null),
     notDiseaseFilter: urlParam<boolean>(false),
     groupingFilter: urlParam<boolean>(false),
+    pathwayMinSizeFilter: urlParam<number | undefined>(undefined),
+    pathwayMaxSizeFilter: urlParam<number | undefined>(undefined),
+    pValueFilter: urlParam<number | undefined>(undefined),
   };
 
   public readonly select = this.values.select
@@ -53,6 +56,9 @@ export class UrlStateService implements State {
   public readonly resourceFilter = this.values.resourceFilter
   public readonly notDiseaseFilter = this.values.notDiseaseFilter
   public readonly groupingFilter = this.values.groupingFilter
+  public readonly pathwayMinSizeFilter = this.values.pathwayMinSizeFilter
+  public readonly pathwayMaxSizeFilter = this.values.pathwayMaxSizeFilter
+  public readonly pValueFilter = this.values.pValueFilter
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 
@@ -91,7 +97,7 @@ export class UrlStateService implements State {
           } else if (isBoolean(initialValue)) {
             param.set(value === 'true');
           } else if (!isNaN(+value)) {
-            param.set(param.containsId ? await this.dbIdToStId(+value) : value )
+            param.set(param.containsId ? await this.dbIdToStId(+value) : parseFloat(value) )
           } else {
             param.set(value.replaceAll('__', ' '))
           }

@@ -157,3 +157,25 @@ mat-expansion-panel {
 .interactor {
   text-decoration: underline;
 }
+
+.slider-container {
+  overflow: visible;
+  max-width: 99.5%;
+  label {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 5px;
+
+    .mat-mdc-slider {
+      flex: 1 1 auto;
+    }
+  }
+
+  &.single-thumb {
+    .mat-mdc-slider {
+      margin-right: 8px; // Align to double thumb
+    }
+  }
+}

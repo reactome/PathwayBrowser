@@ -166,23 +166,17 @@ export const shouldBeScientificFormat = (representativeSample: number[]) => repr
 const shouldBeScientificFormatValue = (value: number) => parseInt(value.toExponential(0).split(/e[+-]/)[1]) > 3;
 
 
-export const toMap = <I, K, V>(
-  items: I[],
-  map: Map<K, V> = new Map<K, V>(),
-  toKey: (item: I) => K,
-  init: (item: I) => () => V,
-  aggregate: (item: I) => (value: V) => void ) => {
-  items.forEach((item) => fillMapEntry(map, toKey(item), init(item),  aggregate(item)))
-  return map;
-}
+export type ArrayStats = { min: number, max: number, average: number, sum: number, multiValued?: boolean };
 
-export const fillMapEntry = <K, V>(
-  map: Map<K, V>,
-  key: K,
-  init: () => V,
-  aggregate: (value: V, key: K) => void
-) => {
-  if (!map.has(key)) map.set(key, init());
-  aggregate(map.get(key)!, key)
-  return map;
+export function getArrayStats(values: number[]): ArrayStats {
+  if (values === undefined || values.length === 0) return {min: 0, max: 0, average: 0, sum: 0, multiValued: false};
+  const summary: ArrayStats = values.reduce((acc: ArrayStats, value) => {
+    if (value < acc.min) acc.min = value;
+    if (value > acc.max) acc.max = value;
+    acc.sum += value;
+    return acc;
+  }, {min: Number.MAX_VALUE, max: Number.MIN_VALUE, sum: 0, average: 0});
+  summary.average = summary.sum / values.length
+  summary.multiValued = values.length > 1
+  return summary;
 }
