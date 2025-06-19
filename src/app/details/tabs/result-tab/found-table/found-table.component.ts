@@ -48,9 +48,11 @@ export class FoundTableComponent {
 
   constructor(public analysis: AnalysisService, public state: UrlStateService) {
     this.dataSource.sortingDataAccessor = (data, header) => {
-      console.log('sortingData', data, header)
       const value = header.split('-').reduce((a: any, b) => a?.[b], data);
       if (value) return value;
+      // No value ==> facing a resource
+      const entities = data.entities.get(header.split('-')[1] as Resource)!;
+      return entities.length + '-' + entities.join('-'); // sorting first by amount, then alphabetically
     }
 
     effect(() => this.dataSource.data = this.foundEntities());
