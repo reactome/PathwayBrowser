@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["src/app/details/tabs/result-tab/expression-tag/expression-tag.component.scss"],
-  "sourcesContent": [".value-tag {\n  padding: 4px 10px;\n  border-radius: 50px;\n  background: var(--background);\n  display: inline-flex;\n  //font-family: Roboto Mono, monospace;\n\n  &.gsa {\n    padding: 4px;\n  }\n\n  &.scientific {\n    padding: 6px 8px 4px;\n    display: inherit;\n  }\n}\n\n\n::ng-deep.selected {\n  .value-tag {\n    box-shadow: 0 0 0 2px var(--on-primary);\n  }\n}\n"],
-  "mappings": ";AAAA,CAAA;AACE,WAAA,IAAA;AACA,iBAAA;AACA,cAAA,IAAA;AACA,WAAA;;AAGA,CAPF,SAOE,CAAA;AACE,WAAA;;AAGF,CAXF,SAWE,CAAA;AACE,WAAA,IAAA,IAAA;AACA,WAAA;;AAMF,UAAA,CAAA,SAAA,CAnBF;AAoBI,cAAA,EAAA,EAAA,EAAA,IAAA,IAAA;;",
+  "sourcesContent": [".value-tag {\n  padding: 4px 10px;\n  border-radius: 50px;\n  background: var(--background);\n  display: inline-flex;\n  vertical-align: middle;\n  //font-family: Roboto Mono, monospace;\n\n  &.gsa {\n    padding: 4px;\n  }\n\n  &.scientific {\n    padding: 6px 8px 4px;\n    display: inherit;\n  }\n\n  .mat-icon {\n    margin: 0;\n    color: inherit;\n  }\n}\n\n\n::ng-deep.selected {\n  .value-tag {\n    box-shadow: 0 0 0 2px var(--on-primary);\n  }\n}\n"],
+  "mappings": ";AAAA,CAAA;AACE,WAAA,IAAA;AACA,iBAAA;AACA,cAAA,IAAA;AACA,WAAA;AACA,kBAAA;;AAGA,CARF,SAQE,CAAA;AACE,WAAA;;AAGF,CAZF,SAYE,CAAA;AACE,WAAA,IAAA,IAAA;AACA,WAAA;;AAGF,CAjBF,UAiBE,CAAA;AACE,UAAA;AACA,SAAA;;AAMF,UAAA,CAAA,SAAA,CAzBF;AA0BI,cAAA,EAAA,EAAA,EAAA,IAAA,IAAA;;",
   "names": []
 }
