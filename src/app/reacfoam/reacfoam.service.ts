@@ -211,6 +211,7 @@ export class ReacfoamService {
     maxExpression: this.state.maxExpressionFilter(),
     grouping: this.state.groupingFilter(),
     pValue: this.state.pValueFilter(),
+    gsa: new Set(this.state.gsaFilter()),
   }))
 
   dataAndIdResolver: Signal<{ data: PathwayGroup[], idResolver: Map<string, string> } | undefined> = computed(() => {
@@ -253,6 +254,8 @@ export class ReacfoamService {
         if (this.filters().maxSize !== undefined && (event.entities?.total || Number.MAX_VALUE) > this.filters().maxSize!) return [];
         if (this.filters().minExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MIN_VALUE) < this.filters().minExpression!) return [];
         if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.filters().maxExpression!) return [];
+        if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.filters().maxExpression!) return [];
+        if (this.filters().gsa.size !== 0  && !this.filters().gsa.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
       }
     }
 

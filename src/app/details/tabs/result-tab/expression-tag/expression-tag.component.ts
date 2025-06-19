@@ -7,7 +7,7 @@ import {ScientificNumberPipe} from "../../../../pipes/scientific-number.pipe";
 
 type Label = { text: string, tooltip: string }
 
-const gsaValueToLabel = new Map<number, Label>([
+export const gsaValueToLabel = new Map<number, Label>([
     [2, {text: 'keyboard_double_arrow_up', tooltip: 'Significantly up regulated'}],
     [1, {text: 'keyboard_arrow_up', tooltip: 'Non-significantly up regulated'}],
     [0, {text: 'remove', tooltip: 'No regulation'}],

@@ -3,6 +3,7 @@
   border-radius: 50px;
   background: var(--background);
   display: inline-flex;
+  vertical-align: middle;
   //font-family: Roboto Mono, monospace;
 
   &.gsa {
@@ -12,6 +13,11 @@
   &.scientific {
     padding: 6px 8px 4px;
     display: inherit;
+  }
+
+  .mat-icon {
+    margin: 0;
+    color: inherit;
   }
 }
 

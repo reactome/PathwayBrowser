@@ -207,20 +207,24 @@
       </mat-slider>
     </label>
   </div>
-  @if (hasExpression()) {
+  @if (hasExpression() && !analysis.isGSA()) {
     <div mat-menu-item class="slider-container expression"
          [style.--gradient]="analysis.palette().horizontalGradient"
          [style.--gradient-mask]="gradientMask()"
          [style.--expression-color-start]="colorExpression(localMinExpression())"
          [style.--expression-color-stop]="colorExpression(localMaxExpression())">
       <label (click)="$event.stopPropagation()">
-        {{state.sample() }}
+        {{ state.sample() }}
         <mat-slider [min]="minExpression()" [max]="maxExpression()" step="1" discrete [displayWith]="formatExpression">
-          <input matSliderStartThumb [(value)]="filterMinExpression" #start (input)="localMinExpression.set(+start.value)" >
+          <input matSliderStartThumb [(value)]="filterMinExpression" #start
+                 (input)="localMinExpression.set(+start.value)">
           <input matSliderEndThumb [(value)]="filterMaxExpression" #end (input)="localMaxExpression.set(+end.value)">
         </mat-slider>
       </label>
     </div>
+  }
+  @if (analysis.isGSA()) {
+    <button mat-menu-item [matMenuTriggerFor]="gsaMenu">{{ state.sample() }}</button>
   }
   <button mat-menu-item [matMenuTriggerFor]="resourcesMenu" [disabled]="analysis.resourceOptions().length <= 2">
     Resources
@@ -252,6 +256,20 @@
                     (click)="$event.stopPropagation()">
         {{ speciesOption.name }}
         <span class="facet">({{ speciesOption.filtered }} / {{ speciesOption.pathways }})</span>
+      </mat-checkbox>
+    </div>
+  }
+</mat-menu>
+
+<mat-menu #gsaMenu=matMenu>
+  @for (gsaOption of gsaOptions(); track gsaOption.exp) {
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-checkbox [value]="gsaOption.exp + ''"
+                    [checked]="gsaOption.value"
+                    (change)="onToggleGsaFilter($event)"
+                    (click)="$event.stopPropagation()" class="no-wrap">
+        <cr-expression-tag [value]="gsaOption.exp" [scientificFormat]="false" [isGSA]="true"></cr-expression-tag>
+        {{ gsaOption.label }}
       </mat-checkbox>
     </div>
   }

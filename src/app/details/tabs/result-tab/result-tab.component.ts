@@ -34,6 +34,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {FoundTableComponent} from "./found-table/found-table.component";
 import {MatSliderModule} from "@angular/material/slider";
 import {getArrayStats} from "../../../services/utils";
+import {MatButtonToggleModule} from "@angular/material/button-toggle";
 
 
 @Component({
@@ -58,7 +59,8 @@ import {getArrayStats} from "../../../services/utils";
     ExpressionTagComponent,
     MatExpansionModule,
     FoundTableComponent,
-    MatSliderModule
+    MatSliderModule,
+    MatButtonToggleModule
   ],
   templateUrl: './result-tab.component.html',
   styleUrl: './result-tab.component.scss'
@@ -141,6 +143,10 @@ export class ResultTabComponent {
       data = data.filter(p => p.entities.exp[this.analysis.sampleIndex()] <= this.state.maxExpressionFilter()!)
       console.log('Filter minExpression', size, '==>', data.length)
     }
+    if (this.state.gsaFilter().length !== 0) {
+      data = data.filter(p => this.gsaFilterSet().has(p.entities.exp[this.analysis.sampleIndex()]))
+      console.log('Filter gsa', size, '==>', data.length)
+    }
     return data
   })
 
@@ -165,8 +171,14 @@ export class ResultTabComponent {
 
   speciesOptions = computed(() => {
     const activatedFilters = new Set(untracked(this.state.speciesFilter));
-    console.log(activatedFilters, this.analysis.speciesOptions().map(s => s.taxId))
     return this.analysis.speciesOptions().map(s => ({...s, value: activatedFilters.has(s.taxId)}))
+  })
+
+  gsaFilterSet = computed(() => new Set(this.state.gsaFilter()))
+
+  gsaOptions = computed(() => {
+    const activatedFilters = untracked(this.gsaFilterSet);
+    return [2, 1, 0, -1, -2].map(exp => ({exp, value: activatedFilters.has(exp), label: gsaValueToLabel.get(exp)! }))
   })
 
   constructor(
@@ -249,6 +261,15 @@ export class ResultTabComponent {
     )
   }
 
+  onToggleGsaFilter(event: MatCheckboxChange) {
+    const value = +event.source.value;
+    this.state.gsaFilter.update(filters =>
+      event.checked ?
+        [...filters, value] :
+        filters.filter(f => f !== value)
+    )
+  }
+
 
   isExpanded = (index: number, pathway: Analysis.Pathway) => {
     return this.expandedPathway() === pathway
@@ -278,5 +299,16 @@ export class ResultTabComponent {
                              transparent ${endPercentage}%,
                              black       ${endPercentage}%)`
   })
+  gsaValues = this.state.gsaFilter;
 
 }
+
+const gsaValueToLabel = new Map([
+  [2, 'Sig. up regulated'],
+  [1, 'Up regulated'],
+  [0, 'Not regulated'],
+  [-1, 'Down regulated'],
+  [-2, 'Sig. down regulated'],
+])
+
+

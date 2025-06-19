@@ -8,13 +8,17 @@ import {PaletteName} from "./analysis.service";
 import {Analysis} from "../model/analysis.model";
 
 
-export type UrlParam<T> = WritableSignal<T> & { otherTokens?: string[], initialValue: T, containsId: boolean};
+export type UrlParam<T> = WritableSignal<T> & {
+  otherTokens?: string[],
+  initialValue: T,
+  type: 'number' | 'boolean' | 'string' | 'id'
+};
 
-export function urlParam<T>(initialValue: T, otherTokens?: string[], containsId = false): UrlParam<T> {
+export function urlParam<T>(initialValue: T, type: UrlParam<T>['type'], otherTokens?: string[]): UrlParam<T> {
   const writableSignal = signal<T>(initialValue) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
   writableSignal.initialValue = initialValue;
-  writableSignal.containsId = containsId;
+  writableSignal.type = type;
   return writableSignal;
 }
 
@@ -27,23 +31,24 @@ type State = UrlStateService['values']
 export class UrlStateService implements State {
 
   readonly values = {
-    select: urlParam<string | null>(null, ['SEL'], true),
-    flag: urlParam<string[]>([], ['FLG'], true),
-    path: urlParam<string[]>([], ['PATH'], true),
-    flagInteractors: urlParam<boolean>(false, ['FLGINT']),
-    overlay: urlParam<string | null>(null),
-    analysis: urlParam<string | null>(null, ['ANALYSIS']),
-    sample: urlParam<string | null>(null),
-    palette: urlParam<PaletteName | null>(null),
-    speciesFilter: urlParam<string[]>([]),
-    resourceFilter: urlParam<Analysis.Resource | null>(null),
-    notDiseaseFilter: urlParam<boolean>(false),
-    groupingFilter: urlParam<boolean>(false),
-    pathwayMinSizeFilter: urlParam<number | undefined>(undefined),
-    pathwayMaxSizeFilter: urlParam<number | undefined>(undefined),
-    minExpressionFilter: urlParam<number | undefined>(undefined),
-    maxExpressionFilter: urlParam<number | undefined>(undefined),
-    pValueFilter: urlParam<number | undefined>(undefined),
+    select: urlParam<string | null>(null, "id", ['SEL']),
+    flag: urlParam<string[]>([], "id", ['FLG'],),
+    path: urlParam<string[]>([], "id", ['PATH']),
+    flagInteractors: urlParam<boolean>(false, "boolean", ['FLGINT']),
+    overlay: urlParam<string | null>(null, "string"),
+    analysis: urlParam<string | null>(null, "string", ['ANALYSIS']),
+    sample: urlParam<string | null>(null, "string"),
+    palette: urlParam<PaletteName | null>(null, "string"),
+    speciesFilter: urlParam<string[]>([], "string"),
+    resourceFilter: urlParam<Analysis.Resource | null>(null, "string"),
+    notDiseaseFilter: urlParam<boolean>(false, "boolean"),
+    groupingFilter: urlParam<boolean>(false, "boolean"),
+    pathwayMinSizeFilter: urlParam<number | undefined>(undefined, "number"),
+    pathwayMaxSizeFilter: urlParam<number | undefined>(undefined, "number"),
+    minExpressionFilter: urlParam<number | undefined>(undefined, "number"),
+    maxExpressionFilter: urlParam<number | undefined>(undefined, "number"),
+    pValueFilter: urlParam<number | undefined>(undefined, "number"),
+    gsaFilter: urlParam<number[]>([], "number"),
   };
 
   public readonly select = this.values.select
@@ -63,6 +68,7 @@ export class UrlStateService implements State {
   public readonly minExpressionFilter = this.values.minExpressionFilter
   public readonly maxExpressionFilter = this.values.maxExpressionFilter
   public readonly pValueFilter = this.values.pValueFilter
+  public readonly gsaFilter = this.values.gsaFilter
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 
@@ -72,14 +78,17 @@ export class UrlStateService implements State {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       switchMap(() => this.router.routerState.root.firstChild?.params || of()),
-      map( params  => params['pathwayId'])
+      map(params => params['pathwayId'])
     ).subscribe((id) => {
       this.pathwayId.set(id)
     });
 
     effect(() => {
-      console.log('Updating patwhayId to ',  this.pathwayId())
-      this.router.navigate(this.pathwayId() ? [this.pathwayId()] : [], {queryParamsHandling:'preserve', preserveFragment: true});
+      console.log('Updating patwhayId to ', this.pathwayId())
+      this.router.navigate(this.pathwayId() ? [this.pathwayId()] : [], {
+        queryParamsHandling: 'preserve',
+        preserveFragment: true
+      });
     });
 
 
@@ -92,16 +101,18 @@ export class UrlStateService implements State {
           const initialValue = param.initialValue;
           let value = params.get(token)!;
           if (isArray(initialValue)) {
-            let values = value.split(',');
-            if (param.containsId) {
+            let values:any[] = value.split(';');
+            if (param.type === 'id') {
               const mixedValues = values.map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
               values = await Promise.all(mixedValues.map(v => this.ensureStId(v)));
             }
+            if (param.type === 'number') values = values.map(v => +v);
+            if (param.type === 'boolean') values = values.map(v => v === 'true');
             param.set(values);
           } else if (isBoolean(initialValue)) {
             param.set(value === 'true');
           } else if (!isNaN(+value)) {
-            param.set(param.containsId ? await this.dbIdToStId(+value) : parseFloat(value) )
+            param.set(param.type === 'id' ? await this.dbIdToStId(+value) : parseFloat(value))
           } else {
             param.set(value.replaceAll('__', ' '))
           }
@@ -116,7 +127,7 @@ export class UrlStateService implements State {
         let param = this.values[key as keyof State]();
         if (param === undefined || param === null || (isArray(param) && param.length === 0)) continue;
         if (typeof param === 'string') param = param.replaceAll(' ', '__')
-        queryParams[key] = isArray(param) ? param.join(',') : param;
+        queryParams[key] = isArray(param) ? param.join(';') : param;
       }
       console.log('Updating URL from state', queryParams)
       this.router.navigate([], {queryParams});

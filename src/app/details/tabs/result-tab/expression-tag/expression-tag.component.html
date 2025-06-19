@@ -1,7 +1,7 @@
 <span class="value-tag" [class.scientific]="scientificFormat()" [class.gsa]="isGSA()" [style]="style()">
   @if (isGSA()) {
     @let label = gsaValueToLabel.get(value())!;
-    <mat-icon fontSet="symbols" [matTooltip]="label.tooltip">{{ label.text }}</mat-icon>
+    <mat-icon fontSet="symbols" [matTooltip]="label.tooltip" >{{ label.text }}</mat-icon>
   } @else {
     @if (scientificFormat()) {
       <span [innerHTML]="value() | scientificNumber"></span>
