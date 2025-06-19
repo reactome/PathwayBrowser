@@ -36,13 +36,41 @@
       </ng-container>
 
       <ng-container matColumnDef="entities-found">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Found</th>
-        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.entities.found }}</td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="entity-header-cell">
+            <span class="curated" [class.interactor]="analysis.hasInteractors()">Entities Found</span>
+            @if (analysis.hasInteractors()) {
+              = &#123;<span class="curated">curated</span> + <span class="interactor">interactors</span>&#125;
+            }
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span class="curated" [class.interactor]="analysis.hasInteractors()">{{ pathway.entities.found }}</span>
+          @if (analysis.hasInteractors()) {
+            = &#123;<span class="curated">{{ pathway.entities.curatedFound }}</span>
+            +
+            <span class="interactor">{{ pathway.entities.interactorsFound }}</span>&#125;
+          }
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="entities-total">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Total</th>
-        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.entities.total }}</td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="entity-header-cell">
+            <span class="curated" [class.interactor]="analysis.hasInteractors()">Entities Total</span>
+            @if (analysis.hasInteractors()) {
+              = &#123;<span class="curated">curated</span> + <span class="interactor">interactors</span>&#125;
+            }
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span class="curated" [class.interactor]="analysis.hasInteractors()">{{ pathway.entities.total }}</span>
+          @if (analysis.hasInteractors()) {
+            = &#123;<span class="curated">{{ pathway.entities.curatedTotal }}</span>
+            +
+            <span class="interactor">{{ pathway.entities.interactorsTotal }}</span>&#125;
+          }
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="entities-ratio">

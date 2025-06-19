@@ -1,8 +1,9 @@
 .value-tag {
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 50px;
   background: var(--background);
   display: inline-flex;
+  font-family: Roboto Mono, monospace;
 
   &.gsa {
     padding: 4px;

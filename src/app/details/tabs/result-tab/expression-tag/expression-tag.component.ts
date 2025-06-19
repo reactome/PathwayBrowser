@@ -38,7 +38,7 @@ export class ExpressionTagComponent {
 
   isGSA = input<boolean>(false)
 
-  format = input<string>('1.3-3')
+  format = input<string | undefined>('1.3-3')
 
   scale = computed(() => this.isPValue() ? this.analysis.pValueScale().scale : this.analysis.palette().scale)
   color = computed(() => this.scale()(this.value()))

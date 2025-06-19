@@ -1,14 +1,6 @@
-import {Component, computed, effect, input, untracked, viewChild} from '@angular/core';
+import {Component, computed, effect, input, Signal, untracked, viewChild} from '@angular/core';
 import {ExpressionTagComponent} from "../expression-tag/expression-tag.component";
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRecycleRows, MatRow, MatRowDef, MatTable, MatTableDataSource, MatTableModule
-} from "@angular/material/table";
+import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {TypeSafeMatCellDef} from "../../../../utils/type-safe-mat-cell-def.directive";
 import {TypeSafeMatRowDef} from "../../../../utils/type-safe-mat-row-def.directive";
 import {Analysis} from "../../../../model/analysis.model";
@@ -17,8 +9,17 @@ import {rxResource} from "@angular/core/rxjs-interop";
 import {of} from "rxjs";
 import {UrlStateService} from "../../../../services/url-state.service";
 import {MatSort, MatSortModule} from "@angular/material/sort";
-import FoundEntities = Analysis.FoundEntities;
-import FoundEntity = Analysis.FoundEntity;
+import {TitleCasePipe} from "@angular/common";
+import {toMap} from "../../../../services/utils";
+import {MatIcon} from "@angular/material/icon";
+import Resource = Analysis.Resource;
+
+type FoundIdentifier = {
+  id: string
+  exp: number[]
+  entities: Map<Resource, string[]>
+  interactors?: string[],
+}
 
 @Component({
   selector: 'cr-found-table',
@@ -27,7 +28,9 @@ import FoundEntity = Analysis.FoundEntity;
     MatTableModule,
     TypeSafeMatCellDef,
     TypeSafeMatRowDef,
-    MatSortModule
+    MatSortModule,
+    TitleCasePipe,
+    MatIcon
   ],
   templateUrl: './found-table.component.html',
   styleUrl: './found-table.component.scss'
@@ -39,7 +42,7 @@ export class FoundTableComponent {
   headerRowHeight = input<string>('56px')
   parentRowHeight = input<string>('56px')
 
-  dataSource = new MatTableDataSource<FoundEntity>([]);
+  dataSource = new MatTableDataSource<FoundIdentifier>([]);
 
   sort = viewChild.required(MatSort)
 
@@ -48,11 +51,6 @@ export class FoundTableComponent {
       console.log('sortingData', data, header)
       const value = header.split('-').reduce((a: any, b) => a?.[b], data);
       if (value) return value;
-      else { // Sort by mapping length, then alphabetical for matches column
-        const mappedIds = data.mapsTo.find(m => m.resource === header)?.ids;
-        if (!mappedIds) return '0-'
-        return mappedIds.length + '-' + mappedIds.join(', ')
-      }
     }
 
     effect(() => this.dataSource.data = this.foundEntities());
@@ -82,17 +80,40 @@ export class FoundTableComponent {
       of()
   })
 
-  foundEntities = computed(() => {
+  foundEntities: Signal<FoundIdentifier[]> = computed(() => {
     const found = this.pathwayFoundEntities.value();
-    return [...found?.entities || []]
+    if (!found) return []
+    return [
+      ...found.entities.map(entity => ({
+        id: entity.id,
+        exp: entity.exp,
+        entities: toMap(
+          entity.mapsTo,
+          new Map<Resource, string[]>(),
+          i => i.resource,
+          i => () => [],
+          i => acc => acc.push(...i.ids)
+        ),
+      })),
+      ...found.interactors?.map(interactor => ({
+        id: interactor.id,
+        exp: interactor.exp,
+        entities: new Map([[interactor.interactsWith.resource, interactor.interactsWith.ids]]),
+        interactors: interactor.mapsTo,
+      })) || []
+    ]
+
   })
 
-  resourceColumnIds = computed(() => this.pathwayFoundEntities.value()?.resources || [])
+
+  resources = computed(() => this.pathwayFoundEntities.value()?.resources || [])
+  resourceColumnIds = computed(() => this.resources().map(r => `entities-${r}`))
   expressionColumnNames = computed(() => this.analysis.result()?.expression?.columnNames || []);
   expressionColumnIds = computed(() => this.expressionColumnNames().map((_, i) => `exp-${i}`));
 
   expandedColumns = computed(() => this.pathwayFoundEntities.value() ? [
     'id',
+    ...(this.analysis.hasInteractors() ? ['interactors'] : []),
     ...this.resourceColumnIds(),
     ...this.expressionColumnIds()
   ] : [])

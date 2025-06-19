@@ -110,6 +110,8 @@ export namespace Analysis {
       exp: number[],
       curatedFound?: number,
       curatedTotal?: number,
+      interactorsFound?: number,
+      interactorsTotal?: number,
     }
     reactions: {
       resource: Resource,
@@ -183,7 +185,7 @@ export namespace Analysis {
     entities: FoundEntity[],
     interactors?: {
       id: string,
-      interactsWith: Identifiers[],
+      interactsWith: Identifiers,
       mapsTo: string[],
       exp: number[]
     }[]

@@ -188,6 +188,7 @@ export class ResultTabComponent {
   }
 
   expandedPathway = signal<Analysis.Pathway | undefined>(undefined)
+
   toggle(pathway: Analysis.Pathway) {
     this.expandedPathway.set(this.isExpanded(0, pathway) ? undefined : pathway)
   }

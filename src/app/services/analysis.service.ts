@@ -204,7 +204,9 @@ export class AnalysisService {
   result$ = toObservable(this.result)
 
 
-  type = computed(() => this.result()?.summary.type as Analysis.Type | undefined)
+  summary = computed(() => this.result()?.summary)
+  hasInteractors = computed(() => this.summary()?.interactors === true)
+  type = computed(() => this.summary()?.type as Analysis.Type | undefined)
   isGSA = computed(() => this.type() === 'GSA_REGULATION');
 
   samples = computed(() => this.result()?.expression.columnNames || [])

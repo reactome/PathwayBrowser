@@ -164,3 +164,25 @@ export const shouldBeScientificFormat = (representativeSample: number[]) => repr
  * @param value a number
  */
 const shouldBeScientificFormatValue = (value: number) => parseInt(value.toExponential(0).split(/e[+-]/)[1]) > 3;
+
+
+export const toMap = <I, K, V>(
+  items: I[],
+  map: Map<K, V> = new Map<K, V>(),
+  toKey: (item: I) => K,
+  init: (item: I) => () => V,
+  aggregate: (item: I) => (value: V) => void ) => {
+  items.forEach((item) => fillMapEntry(map, toKey(item), init(item),  aggregate(item)))
+  return map;
+}
+
+export const fillMapEntry = <K, V>(
+  map: Map<K, V>,
+  key: K,
+  init: () => V,
+  aggregate: (value: V, key: K) => void
+) => {
+  if (!map.has(key)) map.set(key, init());
+  aggregate(map.get(key)!, key)
+  return map;
+}

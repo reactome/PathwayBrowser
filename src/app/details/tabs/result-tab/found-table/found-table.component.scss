@@ -21,7 +21,24 @@ td.mat-column-name {
 
 .expand-button {
   transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+
   &.expanded {
     transform: rotate(180deg);
   }
+}
+
+.curated {
+  font-weight: bold;
+}
+
+.interactor {
+  text-decoration: underline;
+}
+
+.mat-icon {
+  vertical-align: bottom;
+}
+
+.intact-icon {
+  color: var(--interactor-fill);
 }
