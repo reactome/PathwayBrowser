@@ -173,6 +173,12 @@ export class ReacfoamComponent implements OnDestroy {
       this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false}) // Trigger on select update
     });
 
+    effect(() => { // Avoid error when no init position because no tlp
+      this.foamTree().set({
+        resizeTransform: this.state.groupingFilter() ? 'morph' : 'initialize',
+      })
+    });
+
     effect(() => {
       this.foamTree().set({
         groupStrokePlainLightnessShift: this.dark.isDark() ? 70 : -70,

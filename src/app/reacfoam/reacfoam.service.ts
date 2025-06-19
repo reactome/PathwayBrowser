@@ -1,4 +1,4 @@
-import {computed, Injectable, Signal, untracked} from '@angular/core';
+import {computed, Injectable, Signal} from '@angular/core';
 import {SpeciesService} from "../services/species.service";
 import {environment} from "../../environments/environment";
 import {map, Observable} from "rxjs";
@@ -22,6 +22,7 @@ export namespace EventsHierarchy {
     stId: string
     type: 'TopLevelPathway' | 'Pathway' | 'CellLineagePath'
     species: string,
+    llp?: boolean,
     children: Data[]
     reactions?: Analysis.Pathway['reactions']
     entities?: Analysis.Pathway['entities']
@@ -81,6 +82,7 @@ export interface PathwayGroup extends FoamTree.DataObject {
   stId: string,
   weight: number,
   family: string,
+  llp: boolean,
   familyColor: chroma.Color
   depthColor: chroma.Color
   depth: number
@@ -201,13 +203,22 @@ export class ReacfoamService {
     return chroma(extract(this.style.properties.global.surface))
   })
 
+  filters = computed(() => ({
+    noDisease: this.state.notDiseaseFilter(),
+    minSize: this.state.pathwayMinSizeFilter(),
+    maxSize: this.state.pathwayMaxSizeFilter(),
+    grouping: this.state.groupingFilter(),
+    pValue: this.state.pValueFilter(),
+  }))
+
   dataAndIdResolver: Signal<{ data: PathwayGroup[], idResolver: Map<string, string> } | undefined> = computed(() => {
     this.dark.isDark();  // Compute on dark update
+    this.filters(); // Compute on filters update
     if (!this.mergedData()) return;
     const {layoutMap, fireworksNodeMap, events} = this.mergedData()!
     const stIdToFirstId = new Map<string, string>();
     return {
-      data: events.map(e => this.event2group(e, layoutMap, fireworksNodeMap, stIdToFirstId)),
+      data: events.map(e => this.event2group(e, layoutMap, fireworksNodeMap, stIdToFirstId)).flatMap(g => g),
       idResolver: stIdToFirstId
     }
   })
@@ -215,7 +226,7 @@ export class ReacfoamService {
   data = computed(() => this.dataAndIdResolver()?.data)
   idToStId = computed(() => this.dataAndIdResolver()?.idResolver)
 
-  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, stIdToFirstId: Map<string, string>, parentFamily?: string, parentColor?: chroma.Color, depth = 0, path: string[] = []): PathwayGroup {
+  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, stIdToFirstId: Map<string, string>, parentFamily?: string, parentColor?: chroma.Color, depth = 0, path: string[] = []): PathwayGroup[] {
     const humanStId = event.stId.replace(this.species.currentSpecies().abbreviation, 'HSA');
     const fireworksNode = fireworksNodeMap.get(event.stId);
     const layoutNode = layoutMap.get(humanStId) || layoutMap.get(event.stId);
@@ -230,14 +241,26 @@ export class ReacfoamService {
     const id = this.buildId(event.stId, path)!; // If no path or wrong path given, will use first occurrence of stId
     if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
 
+    const children = event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])).flatMap(g => g) : [];
+    if (this.analysis.result()) { // Apply filters only if we have an analysis
+      if (this.filters().noDisease && humanStId === 'R-HSA-1643685') return [];
+      if (this.filters().grouping && !event.llp) return children;
+      if (children.length === 0) { // if no children because of filters or simple leaf, then apply filters
+        if (this.filters().pValue !== undefined && (event.entities?.pValue || 1) > this.filters().pValue!) return [];
+        if (this.filters().minSize !== undefined && (event.entities?.total || Number.MAX_VALUE) < this.filters().minSize!) return [];
+        if (this.filters().maxSize !== undefined && (event.entities?.total || Number.MIN_VALUE) > this.filters().maxSize!) return [];
+      }
+    }
+
+
     const pathwayGroup: PathwayGroup = {
-      groups: event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])) : undefined,
+      groups: children,
       id: id,
       stId: event.stId,
       label: event.name,
       diagram: event.diagram,
       disease: fireworksNode?.disease || false,
-      weight: fireworksNode && fireworksNode.ratio !== 0 ? fireworksNode.ratio * 1000 : 9,
+      weight: event.entities?.total || (fireworksNode && fireworksNode.ratio !== 0 ? fireworksNode.ratio * 1000 : 9),
       initialPosition: layoutNode,
       familyColor: familyColor,
       depthColor: depthColor,
@@ -246,10 +269,12 @@ export class ReacfoamService {
       path,
       expressions: event.entities?.exp,
       fdr: event.entities?.fdr,
-      pValue: event.entities?.pValue
+      pValue: event.entities?.pValue,
+      llp: event?.llp || false
+
       // exposed: untracked(this.state.select) === event.stId // Untracked to avoid full reloading if select is updated
     };
-    return pathwayGroup
+    return [pathwayGroup]
   }
 
   buildId(stId: string | null, path: string[]): string | null {
