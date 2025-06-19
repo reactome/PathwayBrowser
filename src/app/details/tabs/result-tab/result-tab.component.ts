@@ -33,7 +33,7 @@ import {ExpressionTagComponent} from "./expression-tag/expression-tag.component"
 import {MatExpansionModule} from "@angular/material/expansion";
 import {FoundTableComponent} from "./found-table/found-table.component";
 import {exp} from "vectorious";
-import {MatSlider, MatSliderModule, MatSliderRangeThumb, MatSliderThumb} from "@angular/material/slider";
+import {MatSliderModule} from "@angular/material/slider";
 import {getArrayStats} from "../../../services/utils";
 
 
