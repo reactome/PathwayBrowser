@@ -10,14 +10,13 @@ import {of} from "rxjs";
 import {UrlStateService} from "../../../../services/url-state.service";
 import {MatSort, MatSortModule} from "@angular/material/sort";
 import {TitleCasePipe} from "@angular/common";
-import {toMap} from "../../../../services/utils";
 import {MatIcon} from "@angular/material/icon";
-import Resource = Analysis.Resource;
 
+type ResourceMap = { [resource: string]: string[] };
 type FoundIdentifier = {
   id: string
   exp: number[]
-  entities: Map<Resource, string[]>
+  entities: ResourceMap
   interactors?: string[],
 }
 
@@ -49,10 +48,8 @@ export class FoundTableComponent {
   constructor(public analysis: AnalysisService, public state: UrlStateService) {
     this.dataSource.sortingDataAccessor = (data, header) => {
       const value = header.split('-').reduce((a: any, b) => a?.[b], data);
-      if (value) return value;
-      // No value ==> facing a resource
-      const entities = data.entities.get(header.split('-')[1] as Resource)!;
-      return entities.length + '-' + entities.join('-'); // sorting first by amount, then alphabetically
+      if (value instanceof Array) return arrayToSortableString(value); // Interactors
+      if (value) return value; // Expressions + identifier
     }
 
     effect(() => this.dataSource.data = this.foundEntities());
@@ -89,22 +86,15 @@ export class FoundTableComponent {
       ...found.entities.map(entity => ({
         id: entity.id,
         exp: entity.exp,
-        entities: toMap(
-          entity.mapsTo,
-          new Map<Resource, string[]>(),
-          i => i.resource,
-          i => () => [],
-          i => acc => acc.push(...i.ids)
-        ),
+        entities: entity.mapsTo.reduce((entities, i) => ({[i.resource]: i.ids, ...entities}), {} as ResourceMap)
       })),
       ...found.interactors?.map(interactor => ({
         id: interactor.id,
         exp: interactor.exp,
-        entities: new Map([[interactor.interactsWith.resource, interactor.interactsWith.ids]]),
+        entities: {[interactor.interactsWith.resource]: interactor.interactsWith.ids},
         interactors: interactor.mapsTo,
       })) || []
-    ]
-
+    ];
   })
 
 
@@ -121,4 +111,9 @@ export class FoundTableComponent {
   ] : [])
 
 
+}
+
+function arrayToSortableString(values: string[] | undefined): string {
+  if (!values) return '0';
+  return `${values.length}-${values.join('-')}`;
 }
