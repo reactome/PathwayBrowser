@@ -69,9 +69,9 @@ export class ResultTabComponent {
 
   trackBy = (index: number, pathway: Analysis.Pathway) => pathway.stId + '-' + index;
 
-  hasExpression = computed(() => this.analysis.result()?.expression !== undefined)
-  minExpression = computed(() => this.analysis.result()?.expression?.min || 0)
-  maxExpression = computed(() => this.analysis.result()?.expression?.max || 100)
+  hasExpression = computed(() => this.analysis.result()?.expression?.min !== undefined)
+  minExpression = computed(() => this.hasExpression() ? this.analysis.result()!.expression.min : 0)
+  maxExpression = computed(() => this.hasExpression() ? this.analysis.result()!.expression.max : 1)
 
   expressionColumnNames = computed(() => this.analysis.result()?.expression?.columnNames || []);
 
