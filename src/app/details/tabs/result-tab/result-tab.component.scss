@@ -237,3 +237,30 @@ mat-expansion-panel {
   text-wrap: nowrap;
   flex-wrap: nowrap;
 }
+
+
+.mat-mdc-menu-item .mat-icon {
+  vertical-align: middle;
+  margin-right: 0;
+  margin-left: -10px; // Stick to checkbox
+  color: var(--on-surface-variant);
+}
+
+.mat-mdc-checkbox-checked {
+  .mat-icon {
+    color: var(--primary);
+  }
+
+  &.exclusion-filter {
+    @include mat.checkbox-overrides((
+      selected-icon-color: var(--error),
+      selected-hover-icon-color: var(--error),
+      selected-focus-icon-color: var(--error),
+
+    ));
+
+    .mat-icon {
+      color: var(--error);
+    }
+  }
+}

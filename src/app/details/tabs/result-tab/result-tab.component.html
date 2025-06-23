@@ -183,15 +183,21 @@
 
 <mat-menu #filterMenu="matMenu">
   <button mat-menu-item (click)="onTogglableFilterClick($event, lockViewCB)">
-    <mat-checkbox [(ngModel)]="lockView" #lockViewCB (click)="$event.stopPropagation()">Preserve view
+    <mat-checkbox [(ngModel)]="lockView" #lockViewCB (click)="$event.stopPropagation()">
+      <mat-icon fontSet="symbols">visibility_lock</mat-icon>
+      Preserve view
     </mat-checkbox>
   </button>
   <button mat-menu-item (click)="onTogglableFilterClick($event, llp)">
-    <mat-checkbox [(ngModel)]="filterLLP" #llp (click)="$event.stopPropagation()">Exclude pathway grouping
+    <mat-checkbox [(ngModel)]="filterLLP" #llp (click)="$event.stopPropagation()" class="exclusion-filter">
+      <mat-icon fontSet="symbols">graph_2</mat-icon>
+      Exclude pathway grouping
     </mat-checkbox>
   </button>
   <button mat-menu-item (click)="onTogglableFilterClick($event, disease)">
-    <mat-checkbox [(ngModel)]="filterNotDisease" #disease (click)="$event.stopPropagation()">Exclude diseases
+    <mat-checkbox [(ngModel)]="filterNotDisease" #disease (click)="$event.stopPropagation()" class="exclusion-filter">
+      <mat-icon fontSet="symbols">microbiology</mat-icon>
+      Exclude diseases
     </mat-checkbox>
   </button>
   <div mat-menu-item class="slider-container single-thumb">
