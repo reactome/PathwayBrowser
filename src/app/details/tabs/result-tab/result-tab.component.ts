@@ -300,8 +300,6 @@ export class ResultTabComponent {
                              transparent ${endPercentage}%,
                              black       ${endPercentage}%)`
   })
-  gsaValues = this.state.gsaFilter;
-
 }
 
 const gsaValueToLabel = new Map([
