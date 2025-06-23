@@ -1,7 +1,7 @@
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {catchError, filter, firstValueFrom, map, of, switchMap} from "rxjs";
-import {isArray, isBoolean, isNumber} from "lodash";
+import {isArray, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {PaletteName} from "./analysis.service";
@@ -39,6 +39,7 @@ export class UrlStateService implements State {
     analysis: urlParam<string | null>(null, "string", ['ANALYSIS']),
     sample: urlParam<string | null>(null, "string"),
     palette: urlParam<PaletteName | null>(null, "string"),
+    lockView: urlParam<boolean>(false, "boolean"),
     speciesFilter: urlParam<string[]>([], "string"),
     resourceFilter: urlParam<Analysis.Resource | null>(null, "string"),
     notDiseaseFilter: urlParam<boolean>(false, "boolean"),
@@ -59,6 +60,7 @@ export class UrlStateService implements State {
   public readonly analysis = this.values.analysis
   public readonly sample = this.values.sample
   public readonly palette = this.values.palette
+  public readonly lockView = this.values.lockView
   public readonly speciesFilter = this.values.speciesFilter
   public readonly resourceFilter = this.values.resourceFilter
   public readonly notDiseaseFilter = this.values.notDiseaseFilter
@@ -101,7 +103,7 @@ export class UrlStateService implements State {
           const initialValue = param.initialValue;
           let value = params.get(token)!;
           if (isArray(initialValue)) {
-            let values:any[] = value.split(';');
+            let values: any[] = value.split(';');
             if (param.type === 'id') {
               const mixedValues = values.map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
               values = await Promise.all(mixedValues.map(v => this.ensureStId(v)));
@@ -109,10 +111,12 @@ export class UrlStateService implements State {
             if (param.type === 'number') values = values.map(v => +v);
             if (param.type === 'boolean') values = values.map(v => v === 'true');
             param.set(values);
-          } else if (isBoolean(initialValue)) {
+          } else if (param.type === 'boolean') {
             param.set(value === 'true');
-          } else if (!isNaN(+value)) {
-            param.set(param.type === 'id' ? await this.dbIdToStId(+value) : parseFloat(value))
+          } else if (param.type === 'id') {
+            param.set(!isNaN(+value) ? await this.dbIdToStId(+value) : value)
+          } else if (param.type === 'number') {
+            param.set(parseFloat(value))
           } else {
             param.set(value.replaceAll('__', ' '))
           }
@@ -124,10 +128,15 @@ export class UrlStateService implements State {
     effect(() => {
       const queryParams = {} as any;
       for (const key in this.values) {
-        let param = this.values[key as keyof State]();
-        if (param === undefined || param === null || (isArray(param) && param.length === 0)) continue;
-        if (typeof param === 'string') param = param.replaceAll(' ', '__')
-        queryParams[key] = isArray(param) ? param.join(';') : param;
+        let param = this.values[key as keyof State];
+        let paramValue = param();
+        if (paramValue === undefined
+          || paramValue === null
+          || (isArray(paramValue) && paramValue.length === 0)
+          || (param.type === 'boolean' && paramValue === false)
+        ) continue;
+        if (typeof paramValue === 'string') paramValue = paramValue.replaceAll(' ', '__')
+        queryParams[key] = isArray(paramValue) ? paramValue.join(';') : paramValue;
       }
       console.log('Updating URL from state', queryParams)
       this.router.navigate([], {queryParams});

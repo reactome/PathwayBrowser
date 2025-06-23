@@ -115,6 +115,7 @@ export class ResultTabComponent {
   filterMinExpression = linkedSignal(() => this.state.minExpressionFilter() !== undefined ? this.state.minExpressionFilter() : this.minExpression())
   filterMaxExpression = linkedSignal(() => this.state.maxExpressionFilter() !== undefined ? this.state.maxExpressionFilter() : this.maxExpression())
 
+  lockView = this.state.lockView
   filterLLP = this.state.groupingFilter
   filterNotDisease = this.state.notDiseaseFilter
 

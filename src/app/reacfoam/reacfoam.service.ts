@@ -203,16 +203,28 @@ export class ReacfoamService {
     return chroma(extract(this.style.properties.global.surface))
   })
 
-  filters = computed(() => ({
+  mergedFilters = computed(() => ({
+    grouping: this.state.groupingFilter(),
     noDisease: this.state.notDiseaseFilter(),
     minSize: this.state.pathwayMinSizeFilter(),
     maxSize: this.state.pathwayMaxSizeFilter(),
     minExpression: this.state.minExpressionFilter(),
     maxExpression: this.state.maxExpressionFilter(),
-    grouping: this.state.groupingFilter(),
     pValue: this.state.pValueFilter(),
     gsa: new Set(this.state.gsaFilter()),
   }))
+
+  // Avoid triggering data update if lockView is enabled by firing same default object
+  filters = computed(() => this.state.lockView() ? {
+    grouping: undefined,
+    noDisease: undefined,
+    minSize: undefined,
+    maxSize: undefined,
+    minExpression: undefined,
+    maxExpression: undefined,
+    pValue: undefined,
+    gsa: undefined,
+  } : this.mergedFilters())
 
   dataAndIdResolver: Signal<{ data: PathwayGroup[], idResolver: Map<string, string> } | undefined> = computed(() => {
     this.dark.isDark();  // Compute on dark update
@@ -245,17 +257,17 @@ export class ReacfoamService {
     if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
 
     const children = event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])).flatMap(g => g) : [];
-    if (this.analysis.result()) { // Apply filters only if we have an analysis
+    if (this.analysis.result() && !this.state.lockView()) { // Apply filters only if we have an analysis
       if (this.filters().noDisease && humanStId === 'R-HSA-1643685') return [];
       if (this.filters().grouping && !event.llp) return children;
       if (children.length === 0) { // if no children because of filters or simple leaf, then apply filters
-        if (this.filters().pValue !== undefined && (event.entities?.pValue || 1) > this.filters().pValue!) return [];
-        if (this.filters().minSize !== undefined && (event.entities?.total || Number.MIN_VALUE) < this.filters().minSize!) return [];
-        if (this.filters().maxSize !== undefined && (event.entities?.total || Number.MAX_VALUE) > this.filters().maxSize!) return [];
-        if (this.filters().minExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MIN_VALUE) < this.filters().minExpression!) return [];
-        if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.filters().maxExpression!) return [];
-        if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.filters().maxExpression!) return [];
-        if (this.filters().gsa.size !== 0  && !this.filters().gsa.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
+        if (this.filters().pValue !== undefined && (event.entities?.pValue || 1) > this.mergedFilters().pValue!) return [];
+        if (this.filters().minSize !== undefined && (event.entities?.total || Number.MIN_VALUE) < this.mergedFilters().minSize!) return [];
+        if (this.filters().maxSize !== undefined && (event.entities?.total || Number.MAX_VALUE) > this.mergedFilters().maxSize!) return [];
+        if (this.filters().minExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MIN_VALUE) < this.mergedFilters().minExpression!) return [];
+        if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.mergedFilters().maxExpression!) return [];
+        if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.mergedFilters().maxExpression!) return [];
+        if (this.filters().gsa?.size !== 0  && !this.filters().gsa?.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
       }
     }
 

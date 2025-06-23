@@ -182,6 +182,10 @@
 </div>
 
 <mat-menu #filterMenu="matMenu">
+  <button mat-menu-item (click)="onTogglableFilterClick($event, lockViewCB)">
+    <mat-checkbox [(ngModel)]="lockView" #lockViewCB (click)="$event.stopPropagation()">Preserve view
+    </mat-checkbox>
+  </button>
   <button mat-menu-item (click)="onTogglableFilterClick($event, llp)">
     <mat-checkbox [(ngModel)]="filterLLP" #llp (click)="$event.stopPropagation()">Exclude pathway grouping
     </mat-checkbox>
