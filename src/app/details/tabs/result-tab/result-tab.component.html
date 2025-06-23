@@ -189,15 +189,15 @@
     </mat-checkbox>
   </button>
   <button mat-menu-item (click)="onTogglableFilterClick($event, llp)">
-    <mat-checkbox [(ngModel)]="filterLLP" #llp (click)="$event.stopPropagation()" class="exclusion-filter">
+    <mat-checkbox [(ngModel)]="includeGrouping" #llp (click)="$event.stopPropagation()">
       <mat-icon fontSet="symbols">graph_2</mat-icon>
-      Exclude pathway grouping
+      Pathway grouping
     </mat-checkbox>
   </button>
   <button mat-menu-item (click)="onTogglableFilterClick($event, disease)">
-    <mat-checkbox [(ngModel)]="filterNotDisease" #disease (click)="$event.stopPropagation()" class="exclusion-filter">
+    <mat-checkbox [(ngModel)]="includeDisease" #disease (click)="$event.stopPropagation()">
       <mat-icon fontSet="symbols">microbiology</mat-icon>
-      Exclude diseases
+      Diseases
     </mat-checkbox>
   </button>
   <div mat-menu-item class="slider-container single-thumb">

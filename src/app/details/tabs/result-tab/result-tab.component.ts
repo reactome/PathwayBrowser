@@ -116,18 +116,18 @@ export class ResultTabComponent {
   filterMaxExpression = linkedSignal(() => this.state.maxExpressionFilter() !== undefined ? this.state.maxExpressionFilter() : this.maxExpression())
 
   lockView = this.state.lockView
-  filterLLP = this.state.groupingFilter
-  filterNotDisease = this.state.notDiseaseFilter
+  includeGrouping = this.state.includeGrouping
+  includeDisease = this.state.includeDisease
 
   filteredDataNoSize = computed(() => {
     let data = this.analysis.result()?.pathways || [];
     let size = data.length
-    if (this.filterLLP()) {
+    if (this.includeGrouping() === false) {
       data = data.filter(p => p.llp)
       console.log('Filter llp', size, '==>', data.length)
       size = data.length
     }
-    if (this.filterNotDisease()) {
+    if (this.includeDisease() === false) {
       data = data.filter(p => !p.inDisease)
       console.log('Filter disease', size, '==>', data.length)
       size = data.length

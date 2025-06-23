@@ -42,8 +42,8 @@ export class UrlStateService implements State {
     lockView: urlParam<boolean>(false, "boolean"),
     speciesFilter: urlParam<string[]>([], "string"),
     resourceFilter: urlParam<Analysis.Resource | null>(null, "string"),
-    notDiseaseFilter: urlParam<boolean>(false, "boolean"),
-    groupingFilter: urlParam<boolean>(false, "boolean"),
+    includeDisease: urlParam<boolean | undefined>(undefined, "boolean"),
+    includeGrouping: urlParam<boolean | undefined>(undefined, "boolean"),
     pathwayMinSizeFilter: urlParam<number | undefined>(undefined, "number"),
     pathwayMaxSizeFilter: urlParam<number | undefined>(undefined, "number"),
     minExpressionFilter: urlParam<number | undefined>(undefined, "number"),
@@ -63,8 +63,8 @@ export class UrlStateService implements State {
   public readonly lockView = this.values.lockView
   public readonly speciesFilter = this.values.speciesFilter
   public readonly resourceFilter = this.values.resourceFilter
-  public readonly notDiseaseFilter = this.values.notDiseaseFilter
-  public readonly groupingFilter = this.values.groupingFilter
+  public readonly includeDisease = this.values.includeDisease
+  public readonly includeGrouping = this.values.includeGrouping
   public readonly pathwayMinSizeFilter = this.values.pathwayMinSizeFilter
   public readonly pathwayMaxSizeFilter = this.values.pathwayMaxSizeFilter
   public readonly minExpressionFilter = this.values.minExpressionFilter
@@ -133,7 +133,6 @@ export class UrlStateService implements State {
         if (paramValue === undefined
           || paramValue === null
           || (isArray(paramValue) && paramValue.length === 0)
-          || (param.type === 'boolean' && paramValue === false)
         ) continue;
         if (typeof paramValue === 'string') paramValue = paramValue.replaceAll(' ', '__')
         queryParams[key] = isArray(paramValue) ? paramValue.join(';') : paramValue;

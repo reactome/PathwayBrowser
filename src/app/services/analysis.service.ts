@@ -266,8 +266,8 @@ export class AnalysisService {
         this.state.gsaFilter.set([])
         this.state.pathwayMinSizeFilter.set(undefined)
         this.state.pathwayMaxSizeFilter.set(undefined)
-        this.state.groupingFilter.set(false)
-        this.state.notDiseaseFilter.set(false)
+        this.state.includeGrouping.set(undefined)
+        this.state.includeDisease.set(undefined)
       }
     });
 

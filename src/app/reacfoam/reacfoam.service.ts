@@ -204,8 +204,8 @@ export class ReacfoamService {
   })
 
   mergedFilters = computed(() => ({
-    grouping: this.state.groupingFilter(),
-    noDisease: this.state.notDiseaseFilter(),
+    grouping: this.state.includeGrouping(),
+    diseases: this.state.includeDisease(),
     minSize: this.state.pathwayMinSizeFilter(),
     maxSize: this.state.pathwayMaxSizeFilter(),
     minExpression: this.state.minExpressionFilter(),
@@ -217,7 +217,7 @@ export class ReacfoamService {
   // Avoid triggering data update if lockView is enabled by firing same default object
   filters = computed(() => this.state.lockView() ? {
     grouping: undefined,
-    noDisease: undefined,
+    diseases: undefined,
     minSize: undefined,
     maxSize: undefined,
     minExpression: undefined,
@@ -258,8 +258,8 @@ export class ReacfoamService {
 
     const children = event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])).flatMap(g => g) : [];
     if (this.analysis.result() && !this.state.lockView()) { // Apply filters only if we have an analysis
-      if (this.filters().noDisease && humanStId === 'R-HSA-1643685') return [];
-      if (this.filters().grouping && !event.llp) return children;
+      if (!this.filters().diseases && humanStId === 'R-HSA-1643685') return [];
+      if (!this.filters().grouping && !event.llp) return children;
       if (children.length === 0) { // if no children because of filters or simple leaf, then apply filters
         if (this.filters().pValue !== undefined && (event.entities?.pValue || 1) > this.mergedFilters().pValue!) return [];
         if (this.filters().minSize !== undefined && (event.entities?.total || Number.MIN_VALUE) < this.mergedFilters().minSize!) return [];

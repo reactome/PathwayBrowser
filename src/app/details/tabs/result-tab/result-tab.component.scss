@@ -250,17 +250,4 @@ mat-expansion-panel {
   .mat-icon {
     color: var(--primary);
   }
-
-  &.exclusion-filter {
-    @include mat.checkbox-overrides((
-      selected-icon-color: var(--error),
-      selected-hover-icon-color: var(--error),
-      selected-focus-icon-color: var(--error),
-
-    ));
-
-    .mat-icon {
-      color: var(--error);
-    }
-  }
 }
