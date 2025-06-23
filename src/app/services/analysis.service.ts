@@ -258,6 +258,19 @@ export class AnalysisService {
       [...this.paletteOptions.values()].forEach(summary => summary.dark = this.darkS.isDark())
     });
 
+    effect(() => { // clear filters
+      if (this.state.analysis()) { // on token update
+        this.state.minExpressionFilter.set(undefined)
+        this.state.maxExpressionFilter.set(undefined)
+        this.state.pValueFilter.set(undefined)
+        this.state.gsaFilter.set([])
+        this.state.pathwayMinSizeFilter.set(undefined)
+        this.state.pathwayMaxSizeFilter.set(undefined)
+        this.state.groupingFilter.set(false)
+        this.state.notDiseaseFilter.set(false)
+      }
+    });
+
     effect(() => {
       const result = this.result();
       console.log('Result updated', result)
