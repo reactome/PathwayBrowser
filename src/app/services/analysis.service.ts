@@ -247,7 +247,9 @@ export class AnalysisService {
 
   resourceFilter = this.state.resourceFilter
   resourceOptions = computed(() => this.result()?.resourceSummary || [])
+  resourceFilterActive = computed(() => this.state.resourceFilter() !== null && this.state.resourceFilter() !== 'TOTAL')
   speciesOptions = computed(() => this.result()?.speciesSummary || [])
+  speciesFilterActive = computed(() => this.state.speciesFilter().length !== 0)
 
 
   constructor(private http: HttpClient,
@@ -256,19 +258,6 @@ export class AnalysisService {
               private darkS: DarkService) {
     effect(() => {
       [...this.paletteOptions.values()].forEach(summary => summary.dark = this.darkS.isDark())
-    });
-
-    effect(() => { // clear filters
-      if (this.state.analysis()) { // on token update
-        this.state.minExpressionFilter.set(undefined)
-        this.state.maxExpressionFilter.set(undefined)
-        this.state.pValueFilter.set(undefined)
-        this.state.gsaFilter.set([])
-        this.state.pathwayMinSizeFilter.set(undefined)
-        this.state.pathwayMaxSizeFilter.set(undefined)
-        this.state.includeGrouping.set(undefined)
-        this.state.includeDisease.set(undefined)
-      }
     });
 
     effect(() => {
@@ -310,16 +299,29 @@ export class AnalysisService {
 
   }
 
+  private clearFilters() {
+    this.state.minExpressionFilter.set(undefined)
+    this.state.maxExpressionFilter.set(undefined)
+    this.state.pValueFilter.set(undefined)
+    this.state.gsaFilter.set([])
+    this.state.pathwayMinSizeFilter.set(undefined)
+    this.state.pathwayMaxSizeFilter.set(undefined)
+    this.state.includeGrouping.set(undefined)
+    this.state.includeDisease.set(undefined)
+  }
+
   clearAnalysis() {
     // this.result = undefined;
     this.state.analysis.set(null);
     this.state.sample.set(null);
+    this.clearFilters();
   }
 
   analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
     return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/${params?.disableProjectToHuman ? '' : 'projection'}`, data, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
+      tap(result => this.clearFilters()),
       tap(result => this.state.analysis.set(result.summary.token)),
     )
   }

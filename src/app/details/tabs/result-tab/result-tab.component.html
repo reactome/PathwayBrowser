@@ -188,19 +188,19 @@
       Preserve view
     </mat-checkbox>
   </button>
-  <button mat-menu-item (click)="onTogglableFilterClick($event, llp)">
+  <button mat-menu-item (click)="onTogglableFilterClick($event, llp)" [class.filter-active]="includeGrouping()">
     <mat-checkbox [(ngModel)]="includeGrouping" #llp (click)="$event.stopPropagation()">
       <mat-icon fontSet="symbols">graph_2</mat-icon>
       Pathway grouping
     </mat-checkbox>
   </button>
-  <button mat-menu-item (click)="onTogglableFilterClick($event, disease)">
+  <button mat-menu-item (click)="onTogglableFilterClick($event, disease)" [class.filter-active]="includeDisease()">
     <mat-checkbox [(ngModel)]="includeDisease" #disease (click)="$event.stopPropagation()">
       <mat-icon fontSet="symbols">microbiology</mat-icon>
       Diseases
     </mat-checkbox>
   </button>
-  <div mat-menu-item class="slider-container single-thumb">
+  <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="pValueFilterActive()">
     <label (click)="$event.stopPropagation()">
       pValue
       <mat-slider min="0.05" max="1" step="0.05" discrete>
@@ -208,7 +208,7 @@
       </mat-slider>
     </label>
   </div>
-  <div mat-menu-item class="slider-container">
+  <div mat-menu-item class="slider-container" [class.filter-active]="sizeFilterActive()">
     <label (click)="$event.stopPropagation()">
       Size
       <mat-slider [min]="pathwaySizeStats().min" [max]="pathwaySizeStats().max" step="1" discrete>
@@ -219,6 +219,7 @@
   </div>
   @if (hasExpression() && !analysis.isGSA()) {
     <div mat-menu-item class="slider-container expression"
+         [class.filter-active]="expressionFilterActive()"
          [style.--gradient]="analysis.palette().horizontalGradient"
          [style.--gradient-mask]="gradientMask()"
          [style.--expression-color-start]="colorExpression(localMinExpression())"
@@ -234,12 +235,12 @@
     </div>
   }
   @if (analysis.isGSA()) {
-    <button mat-menu-item [matMenuTriggerFor]="gsaMenu">{{ state.sample() }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="gsaMenu" [class.filter-active]="gsaFilterActive()">{{ state.sample() }}</button>
   }
-  <button mat-menu-item [matMenuTriggerFor]="resourcesMenu" [disabled]="analysis.resourceOptions().length <= 2">
+  <button mat-menu-item [matMenuTriggerFor]="resourcesMenu" [disabled]="analysis.resourceOptions().length <= 2" [class.filter-active]="analysis.resourceFilterActive()">
     Resources
   </button>
-  <button mat-menu-item [matMenuTriggerFor]="speciesMenu" [disabled]="analysis.speciesOptions().length <= 1">
+  <button mat-menu-item [matMenuTriggerFor]="speciesMenu" [disabled]="analysis.speciesOptions().length <= 1" [class.filter-active]="analysis.speciesFilterActive()">
     Species
   </button>
 </mat-menu>

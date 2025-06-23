@@ -251,3 +251,8 @@ mat-expansion-panel {
     color: var(--primary);
   }
 }
+
+.filter-active {
+  color: var(--primary);
+  text-decoration: underline;
+}

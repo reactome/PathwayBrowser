@@ -108,12 +108,16 @@ export class ResultTabComponent {
   currentSort = signal<Sort>({active: 'entities-pValue', direction: 'desc'})
 
 
-  filterPValue = linkedSignal(() => this.state.pValueFilter() !== undefined ? this.state.pValueFilter() : 1)
-  filterMinSize = linkedSignal(() => this.state.pathwayMinSizeFilter() !== undefined ? this.state.pathwayMinSizeFilter() : this.pathwaySizeStats().min)
-  filterMaxSize = linkedSignal(() => this.state.pathwayMaxSizeFilter() !== undefined ? this.state.pathwayMaxSizeFilter() : this.pathwaySizeStats().max)
+  filterPValue = linkedSignal(() => this.state.pValueFilter() !== undefined ? this.state.pValueFilter()! : 1)
+  pValueFilterActive = computed(() => this.filterPValue() < 1)
 
-  filterMinExpression = linkedSignal(() => this.state.minExpressionFilter() !== undefined ? this.state.minExpressionFilter() : this.minExpression())
-  filterMaxExpression = linkedSignal(() => this.state.maxExpressionFilter() !== undefined ? this.state.maxExpressionFilter() : this.maxExpression())
+  filterMinSize = linkedSignal(() => this.state.pathwayMinSizeFilter() !== undefined ? this.state.pathwayMinSizeFilter()! : this.pathwaySizeStats().min)
+  filterMaxSize = linkedSignal(() => this.state.pathwayMaxSizeFilter() !== undefined ? this.state.pathwayMaxSizeFilter()! : this.pathwaySizeStats().max)
+  sizeFilterActive = computed(() => this.filterMinSize() !== this.pathwaySizeStats().min || this.filterMaxSize() !== this.pathwaySizeStats().max)
+
+  filterMinExpression = linkedSignal(() => this.state.minExpressionFilter() !== undefined ? this.state.minExpressionFilter()! : this.minExpression())
+  filterMaxExpression = linkedSignal(() => this.state.maxExpressionFilter() !== undefined ? this.state.maxExpressionFilter()! : this.maxExpression())
+  expressionFilterActive = computed(() => this.filterMinExpression() !== this.minExpression() || this.filterMaxExpression() !== this.maxExpression())
 
   lockView = this.state.lockView
   includeGrouping = this.state.includeGrouping
@@ -175,11 +179,13 @@ export class ResultTabComponent {
     return this.analysis.speciesOptions().map(s => ({...s, value: activatedFilters.has(s.taxId)}))
   })
 
+  gsaFilterActive = computed(() => this.state.gsaFilter().length !== 0 && this.state.gsaFilter().length !== 5)
+
   gsaFilterSet = computed(() => new Set(this.state.gsaFilter()))
 
   gsaOptions = computed(() => {
     const activatedFilters = untracked(this.gsaFilterSet);
-    return [2, 1, 0, -1, -2].map(exp => ({exp, value: activatedFilters.has(exp), label: gsaValueToLabel.get(exp)! }))
+    return [2, 1, 0, -1, -2].map(exp => ({exp, value: activatedFilters.has(exp), label: gsaValueToLabel.get(exp)!}))
   })
 
   constructor(
