@@ -120,8 +120,8 @@ export class ResultTabComponent {
   expressionFilterActive = computed(() => this.filterMinExpression() !== this.minExpression() || this.filterMaxExpression() !== this.maxExpression())
 
   lockView = this.state.lockView
-  includeGrouping = this.state.includeGrouping
-  includeDisease = this.state.includeDisease
+  includeGrouping =  linkedSignal(() => this.state.includeGrouping() !== false)
+  includeDisease = linkedSignal(() => this.state.includeDisease() !== false)
 
   filteredDataNoSize = computed(() => {
     let data = this.analysis.result()?.pathways || [];
@@ -229,6 +229,9 @@ export class ResultTabComponent {
     });
 
     // Update URL from value change
+    effect(() => this.state.includeGrouping.set(this.includeGrouping() ? undefined : false));
+    effect(() => this.state.includeDisease.set(this.includeDisease() ? undefined : false));
+    effect(() => this.state.pathwayMinSizeFilter.set(this.filterMinSize() !== this.pathwaySizeStats().min ? this.filterMinSize() : undefined));
     effect(() => this.state.pathwayMinSizeFilter.set(this.filterMinSize() !== this.pathwaySizeStats().min ? this.filterMinSize() : undefined));
     effect(() => this.state.pathwayMaxSizeFilter.set(this.filterMaxSize() !== this.pathwaySizeStats().max ? this.filterMaxSize() : undefined));
     effect(() => this.state.minExpressionFilter.set(this.filterMinExpression() !== this.minExpression() ? this.filterMinExpression() : undefined));
