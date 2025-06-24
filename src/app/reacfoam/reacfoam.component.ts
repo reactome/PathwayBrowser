@@ -106,7 +106,7 @@ export class ReacfoamComponent implements OnDestroy {
     // For now, add exposure at end of relaxation, useful upon resizing reset. to be removed when alternative solution found for stable layout
     onRelaxationStep: (relaxationProgress, relaxationComplete, relaxationTimeout) => {
       this.relaxing.set(true)
-      if ((relaxationTimeout || relaxationComplete) ) {
+      if ((relaxationTimeout || relaxationComplete)) {
         this.relaxing.set(false)
         if (this.correctedSelectedId()) {
           setTimeout(() => {
@@ -139,17 +139,14 @@ export class ReacfoamComponent implements OnDestroy {
   sizeObserver = new ResizeObserver(() => {
     console.log('Resize ==> Reset layout')
     setTimeout(() => { // Avoid white flickering
-      if (this.reacfoam.data()) { // Avoid null pointer exception happening when resizing on undefined data with relaxation visible and initialize resizeTransform.
-        // Remove exposure instantly while resizing as they conflict with one another. Will be put back when relaxation is finished
-        this.foamTree().set('exposeDuration', 0) // Make removal of exposure instant
-        this.foamTree().expose({
-          groups: undefined,
-          keepPrevious: false
-        }).then(() => {
-          this.foamTree().set('exposeDuration', this.options().exposeDuration!) // Put back initial exposure time
-          this.foamTree().resize()
-        })
-      }
+      this.foamTree().set('exposeDuration', 0) // Make removal of exposure instant
+      this.foamTree().expose({
+        groups: undefined,
+        keepPrevious: false
+      }).then(() => {
+        this.foamTree().set('exposeDuration', this.options().exposeDuration!) // Put back initial exposure time
+        this.foamTree().resize()
+      })
     })
   });
 
@@ -163,7 +160,7 @@ export class ReacfoamComponent implements OnDestroy {
       this.reacfoam.data(); // Set data whenever it is updated
       console.log("Setting data object", this.reacfoam.data())
       // if (!untracked(this.relaxing)) // Avoid errors happening when setting data while relaxing
-        this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
+      this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
 
       if (untracked(this.correctedSelectedId)) { // Initial select
         this.foamTree().select({groups: untracked(this.correctedSelectedId), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
