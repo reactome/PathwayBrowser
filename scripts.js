@@ -6021,9 +6021,7 @@
           case "initialize":
             N.stop();
             I(J, K);
-            u.O = false;
-            u.Da = true;
-            V();
+            u.empty() || (u.O = false, u.Da = true, V());
             break;
           default:
           case "morph":
@@ -6224,7 +6222,7 @@
     }(), ca = false;
   }
   function sb() {
-    return { version: "3.5.3-SNAPSHOT", build: "bugfix/3.5.x/423e07ed", brandingAllowed: false };
+    return { version: "3.5.3-SNAPSHOT", build: "bugfix/3.5.x/465f4e7b", brandingAllowed: false };
   }
   ;
   ea.qd(function() {

@@ -56,9 +56,9 @@ Build information
 Build type    : Carrot Search FoamTree HTML5 (demo variant)
 Build version : 3.5.3-SNAPSHOT
 Build number  : [unset]
-Build time    : Jun 09, 2025
+Build time    : Jun 24, 2025
 Built by      : runner
-Build revision: bugfix/3.5.x/423e07ed
+Build revision: bugfix/3.5.x/465f4e7b
 
 
 Carrot Search Confidential
