@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, OnDestroy, Signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, OnDestroy, signal, Signal, untracked, viewChild} from '@angular/core';
 import {FoamTree} from "@carrotsearch/foamtree";
 import {PathwayGroup, ReacfoamService} from "./reacfoam.service";
 import {Router} from "@angular/router";
@@ -105,11 +105,15 @@ export class ReacfoamComponent implements OnDestroy {
 
     // For now, add exposure at end of relaxation, useful upon resizing reset. to be removed when alternative solution found for stable layout
     onRelaxationStep: (relaxationProgress, relaxationComplete, relaxationTimeout) => {
-      if ((relaxationTimeout || relaxationComplete) && this.correctedSelectedId()) {
-        setTimeout(() => {
-          console.log('Relaxation complete ==> Put back exposure');
-          this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})
-        })
+      this.relaxing.set(true)
+      if ((relaxationTimeout || relaxationComplete) ) {
+        this.relaxing.set(false)
+        if (this.correctedSelectedId()) {
+          setTimeout(() => {
+            console.log('Relaxation complete ==> Put back exposure');
+            this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})
+          })
+        }
       }
     },
 
@@ -129,6 +133,8 @@ export class ReacfoamComponent implements OnDestroy {
     ) :
     null
   );
+
+  relaxing = signal(false)
 
   sizeObserver = new ResizeObserver(() => {
     console.log('Resize ==> Reset layout')
@@ -156,7 +162,8 @@ export class ReacfoamComponent implements OnDestroy {
     effect(() => { // Initialise
       this.reacfoam.data(); // Set data whenever it is updated
       console.log("Setting data object", this.reacfoam.data())
-      this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
+      // if (!untracked(this.relaxing)) // Avoid errors happening when setting data while relaxing
+        this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
 
       if (untracked(this.correctedSelectedId)) { // Initial select
         this.foamTree().select({groups: untracked(this.correctedSelectedId), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
