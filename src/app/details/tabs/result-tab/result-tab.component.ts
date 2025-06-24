@@ -35,6 +35,7 @@ import {FoundTableComponent} from "./found-table/found-table.component";
 import {MatSliderModule} from "@angular/material/slider";
 import {getArrayStats} from "../../../services/utils";
 import {MatButtonToggleModule} from "@angular/material/button-toggle";
+import {MatDivider} from "@angular/material/divider";
 
 
 @Component({
@@ -60,7 +61,8 @@ import {MatButtonToggleModule} from "@angular/material/button-toggle";
     MatExpansionModule,
     FoundTableComponent,
     MatSliderModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatDivider
   ],
   templateUrl: './result-tab.component.html',
   styleUrl: './result-tab.component.scss'

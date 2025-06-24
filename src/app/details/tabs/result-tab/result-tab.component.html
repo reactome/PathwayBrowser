@@ -182,9 +182,25 @@
 </div>
 
 <mat-menu #filterMenu="matMenu">
-  <button mat-menu-item [matMenuTriggerFor]="filtersMode">
-    Filter modes
-  </button>
+  <mat-radio-group [(ngModel)]="filterViewMode">
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-radio-button [value]="'focus'" matTooltipPosition="after"
+                        matTooltip="Filters apply to both the table and the visualization. Only filtered pathways are shown in the ReacFoam view.">
+        <mat-icon fontSet="symbols">arrows_input</mat-icon>
+        Focus mode
+      </mat-radio-button>
+    </div>
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-radio-button [value]="'overview'" matTooltipPosition="after"
+                        matTooltip="Filters apply to the table only. The full pathway structure remains visible in the ReacFoam view, preserving the global context.">
+        <mat-icon fontSet="symbols">language</mat-icon>
+        Overview mode
+      </mat-radio-button>
+    </div>
+  </mat-radio-group>
+
+  <mat-divider></mat-divider>
+
   <button mat-menu-item (click)="onTogglableFilterClick($event, llp)" [class.filter-active]="includeGrouping()">
     <mat-checkbox [(ngModel)]="includeGrouping" #llp (click)="$event.stopPropagation()">
       <mat-icon fontSet="symbols">graph_2</mat-icon>
@@ -243,25 +259,6 @@
           [class.filter-active]="analysis.speciesFilterActive()">
     Species
   </button>
-</mat-menu>
-
-<mat-menu #filtersMode="matMenu">
-  <mat-radio-group [(ngModel)]="filterViewMode">
-    <div mat-menu-item (click)="$event.stopPropagation()">
-      <mat-radio-button [value]="'focus'" matTooltipPosition="after"
-                        matTooltip="Filters apply to both the table and the visualization. Only filtered pathways are shown in the ReacFoam view.">
-        <mat-icon fontSet="symbols">arrows_input</mat-icon>
-        Focus
-      </mat-radio-button>
-    </div>
-    <div mat-menu-item (click)="$event.stopPropagation()">
-      <mat-radio-button [value]="'overview'" matTooltipPosition="after"
-                        matTooltip="Filters apply to the table only. The full pathway structure remains visible in the ReacFoam view, preserving the global context.">
-        <mat-icon fontSet="symbols">language</mat-icon>
-        Overview
-      </mat-radio-button>
-    </div>
-  </mat-radio-group>
 </mat-menu>
 
 <mat-menu #resourcesMenu="matMenu">
