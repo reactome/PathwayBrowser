@@ -119,7 +119,7 @@ export class ResultTabComponent {
   filterMaxExpression = linkedSignal(() => this.state.maxExpressionFilter() !== undefined ? this.state.maxExpressionFilter()! : this.maxExpression())
   expressionFilterActive = computed(() => this.filterMinExpression() !== this.minExpression() || this.filterMaxExpression() !== this.maxExpression())
 
-  lockView = this.state.lockView
+  filterViewMode = linkedSignal(() => this.state.filterViewMode() || 'focus')
   includeGrouping =  linkedSignal(() => this.state.includeGrouping() !== false)
   includeDisease = linkedSignal(() => this.state.includeDisease() !== false)
 
@@ -229,6 +229,7 @@ export class ResultTabComponent {
     });
 
     // Update URL from value change
+    effect(() => this.state.filterViewMode.set(this.filterViewMode() === 'focus' ? undefined : this.filterViewMode()));
     effect(() => this.state.includeGrouping.set(this.includeGrouping() ? undefined : false));
     effect(() => this.state.includeDisease.set(this.includeDisease() ? undefined : false));
     effect(() => this.state.pathwayMinSizeFilter.set(this.filterMinSize() !== this.pathwaySizeStats().min ? this.filterMinSize() : undefined));

@@ -39,7 +39,7 @@ export class UrlStateService implements State {
     analysis: urlParam<string | null>(null, "string", ['ANALYSIS']),
     sample: urlParam<string | null>(null, "string"),
     palette: urlParam<PaletteName | null>(null, "string"),
-    lockView: urlParam<boolean>(false, "boolean"),
+    filterViewMode: urlParam<'focus' | 'overview' | undefined>(undefined, "string"),
     speciesFilter: urlParam<string[]>([], "string"),
     resourceFilter: urlParam<Analysis.Resource | null>(null, "string"),
     includeDisease: urlParam<boolean | undefined>(undefined, "boolean"),
@@ -60,7 +60,7 @@ export class UrlStateService implements State {
   public readonly analysis = this.values.analysis
   public readonly sample = this.values.sample
   public readonly palette = this.values.palette
-  public readonly lockView = this.values.lockView
+  public readonly filterViewMode = this.values.filterViewMode
   public readonly speciesFilter = this.values.speciesFilter
   public readonly resourceFilter = this.values.resourceFilter
   public readonly includeDisease = this.values.includeDisease

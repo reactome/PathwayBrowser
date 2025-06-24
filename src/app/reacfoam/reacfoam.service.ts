@@ -215,7 +215,7 @@ export class ReacfoamService {
   }))
 
   // Avoid triggering data update if lockView is enabled by firing same default object
-  filters = computed(() => this.state.lockView() ? {
+  filters = computed(() => this.state.filterViewMode() === 'overview' ? {
     excludeGrouping: undefined,
     excludeDiseases: undefined,
     minSize: undefined,
@@ -257,7 +257,7 @@ export class ReacfoamService {
     if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
 
     const children = event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])).flatMap(g => g) : [];
-    if (this.analysis.result() && !this.state.lockView()) { // Apply filters only if we have an analysis
+    if (this.analysis.result() && this.state.filterViewMode() !== 'overview') { // Apply filters only if we have an analysis
       if (this.filters().excludeDiseases && humanStId === 'R-HSA-1643685') return [];
       if (this.filters().excludeGrouping && !event.llp) return children;
       if (children.length === 0) { // if no children because of filters or simple leaf, then apply filters
