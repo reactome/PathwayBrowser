@@ -76,8 +76,8 @@ export class ReacfoamComponent implements OnDestroy {
 
     // Labels
     groupLabelFontFamily: 'Roboto',
-    groupLabelHorizontalPadding: 0,
-    groupLabelVerticalPadding: 0,
+    groupLabelHorizontalPadding: 0.8,
+    groupLabelVerticalPadding: 0.8,
     groupLabelMaxFontSize: 20,
     // Lower the minimum label font size a bit to show more labels
     groupLabelMinFontSize: 3,
