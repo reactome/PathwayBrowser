@@ -6,6 +6,10 @@
   height: 100%;
   background: var(--surface);
   font-family: 'Roboto Flex', sans-serif;
+
+  // Make the expression(gxa widget) tooltip visible when hovering
+  position: relative;
+  z-index: 0;
 }
 
 .custom-tab-group {
