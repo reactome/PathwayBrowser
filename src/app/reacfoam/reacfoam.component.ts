@@ -24,13 +24,14 @@ export class ReacfoamComponent implements OnDestroy {
     element: this.container().nativeElement,
     layout: "relaxed",
     stacking: "flattened",
-    relaxationInitializer: "fisheye", // Impactful on the sub-groups of TLPs
+    relaxationInitializer: "ordered", // Impactful on the sub-groups of TLPs
+    layoutByWeightOrder: false,
     relaxationVisible: true, // TODO evaluate if we wanna keep this
     pixelRatio: window.devicePixelRatio || 1,
     wireframePixelRatio: window.devicePixelRatio || 1,
     exposeDuration: 500,
     // Lower groupMinDiameter to fit as many groups as possible
-    groupMinDiameter: 0,
+    groupMinDiameter: 1,
     // Set a simple fading animation. Animated rollouts are very expensive for large hierarchies
     rolloutDuration: 0,
     pullbackDuration: 0,
@@ -61,9 +62,9 @@ export class ReacfoamComponent implements OnDestroy {
     // Make the description group (in flattened view) smaller to make more space for child groups
     descriptionGroupMaxHeight: 0.25,
     // Maximum duration of a complete high-quality redraw of the visualization
-    finalCompleteDrawMaxDuration: 40000,
-    finalIncrementalDrawMaxDuration: 40000,
-    wireframeDrawMaxDuration: 40_000, // Controls whether edges are rendered during wireframe
+    finalCompleteDrawMaxDuration: 4_000,
+    finalIncrementalDrawMaxDuration: 4_000,
+    wireframeDrawMaxDuration: 4_000, // Controls whether edges are rendered during wireframe
 
     resizeTransform: 'initialize',
 
@@ -71,7 +72,7 @@ export class ReacfoamComponent implements OnDestroy {
     fadeDuration: 0,
     wireframeToFinalFadeDuration: 0,
     groupLabelColorThreshold: 1 - 0.179,
-    relaxationMaxDuration: 2500,
+    relaxationMaxDuration: 4000,
     relaxationQualityThreshold: 0.5,
 
     // Labels
@@ -123,7 +124,7 @@ export class ReacfoamComponent implements OnDestroy {
     }
   } as FoamTree.InitialOptions<PathwayGroup>));
 
-  foamTree = computed(() => new CarrotSearchFoamTree<PathwayGroup>(this.options()));
+  foamTree = computed(() => new FoamTree<PathwayGroup>(this.options()));
   selectedId = computed(() => this.reacfoam.buildId(this.state.select(), this.state.path()));
   correctedSelectedId = computed(() => this.state.select() ?
     (
@@ -183,6 +184,14 @@ export class ReacfoamComponent implements OnDestroy {
         groupStrokePlainSaturationShift: 0,
         groupColorDecorator: (options, props, values) => {
           const depth = props.group.depth;
+          // If child groups of some group doesn't have enough space to
+          // render, draw the parent group in red.
+          if (props.hasChildren && props.browseable !== true) {
+            values.groupColor = "#E86365";
+            values.labelColor = "#000";
+            return
+          }
+
           if (this.analysis.result()) { // Analysis
             values.labelColor = 'auto'
             const pValue = props.group.pValue;
