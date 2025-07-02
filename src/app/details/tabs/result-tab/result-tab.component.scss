@@ -257,3 +257,15 @@ mat-expansion-panel {
   color: var(--primary);
   text-decoration: underline;
 }
+
+.not-found-section {
+  margin-bottom: 1em;
+  .badge {
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+    border-radius: 50px;
+    font: var(--mat-sys-label-medium);
+    padding: 2px 6px;
+    margin-left: 4px;
+  }
+}

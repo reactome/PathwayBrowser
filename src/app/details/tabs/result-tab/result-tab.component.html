@@ -173,7 +173,9 @@
     <div class="not-found-section">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title>Identifiers not found</mat-panel-title>
+          <mat-panel-title>
+            Identifiers not found <span class="badge">{{analysis.result()?.identifiersNotFound}}</span>
+          </mat-panel-title>
         </mat-expansion-panel-header>
         <cr-not-found-table/>
       </mat-expansion-panel>
