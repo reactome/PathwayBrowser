@@ -109,9 +109,12 @@ export class ResultTabComponent {
 
   currentSort = signal<Sort>({active: 'entities-pValue', direction: 'desc'})
 
-
+  pValues = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
   filterPValue = linkedSignal(() => this.state.pValueFilter() !== undefined ? this.state.pValueFilter()! : 1)
-  pValueFilterActive = computed(() => this.filterPValue() < 1)
+  pValueIndex = linkedSignal(() => this.pValues.indexOf(this.filterPValue()))
+  pValueLabel = (index: number) => '' + this.pValues[index]
+
+  pValueFilterActive = computed(() => this.pValueIndex() < this.pValues.length - 1)
 
   filterMinSize = linkedSignal(() => this.state.pathwayMinSizeFilter() !== undefined ? this.state.pathwayMinSizeFilter()! : this.pathwaySizeStats().min)
   filterMaxSize = linkedSignal(() => this.state.pathwayMaxSizeFilter() !== undefined ? this.state.pathwayMaxSizeFilter()! : this.pathwaySizeStats().max)
@@ -122,7 +125,7 @@ export class ResultTabComponent {
   expressionFilterActive = computed(() => this.filterMinExpression() !== this.minExpression() || this.filterMaxExpression() !== this.maxExpression())
 
   filterViewMode = linkedSignal(() => this.state.filterViewMode() || 'focus')
-  includeGrouping =  linkedSignal(() => this.state.includeGrouping() !== false)
+  includeGrouping = linkedSignal(() => this.state.includeGrouping() !== false)
   includeDisease = linkedSignal(() => this.state.includeDisease() !== false)
 
   filteredDataNoSize = computed(() => {
@@ -239,7 +242,7 @@ export class ResultTabComponent {
     effect(() => this.state.pathwayMaxSizeFilter.set(this.filterMaxSize() !== this.pathwaySizeStats().max ? this.filterMaxSize() : undefined));
     effect(() => this.state.minExpressionFilter.set(this.filterMinExpression() !== this.minExpression() ? this.filterMinExpression() : undefined));
     effect(() => this.state.maxExpressionFilter.set(this.filterMaxExpression() !== this.maxExpression() ? this.filterMaxExpression() : undefined));
-    effect(() => this.state.pValueFilter.set(this.filterPValue() !== 1 ? this.filterPValue() : undefined));
+    effect(() => this.state.pValueFilter.set(this.pValueFilterActive() ? this.pValues[this.pValueIndex()] : undefined));
   }
 
   selectPathway(pathway: Analysis.Pathway) {

@@ -216,8 +216,8 @@
   <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="pValueFilterActive()">
     <label (click)="$event.stopPropagation()">
       pValue
-      <mat-slider min="0.05" max="1" step="0.05" discrete>
-        <input matSliderThumb [(value)]="filterPValue">
+      <mat-slider min="0" [max]="pValues.length - 1" step="1" discrete showTickMarks [displayWith]="pValueLabel">
+        <input matSliderThumb [(value)]="pValueIndex">
       </mat-slider>
     </label>
   </div>
