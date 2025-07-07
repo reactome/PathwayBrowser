@@ -23,8 +23,7 @@ export class ExpressionTabComponent {
     effect(() => {
      // if (!this.obj()) return;
       const data = this.entity.refEntities();
-      const value = data();
-      this.gxaQueries = Array.isArray(value) ? value.map(entity => ({value: entity.identifier})) : null;
+      this.gxaQueries = Array.isArray(data) ? data.map(entity => ({value: entity.identifier})) : null;
 
       if (this.gxaQueries) {
         expressionAtlasHeatmapHighcharts.render({

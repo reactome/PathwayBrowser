@@ -25,7 +25,7 @@ export class EntityService {
     }
   });
 
-  refEntities = computed(() => this._refEntities.value);
+  refEntities = computed(() => this._refEntities.value());
 
   getOtherForms(stId: string): Observable<PhysicalEntity[]> {
     const url = `${environment.host}/ContentService/data/entity/${stId}/otherForms`;
