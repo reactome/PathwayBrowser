@@ -12,7 +12,7 @@ import {UrlStateService} from "./url-state.service";
 @Injectable({
   providedIn: 'root'
 })
-export class EntitiesService {
+export class EntityService {
 
   constructor(private http: HttpClient, private dataStateService: DataStateService, private state: UrlStateService) {
   }

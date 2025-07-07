@@ -1,5 +1,5 @@
 import {Component, effect} from '@angular/core';
-import {EntitiesService} from "../../../services/entities.service";
+import {EntityService} from "../../../services/entity.service";
 
 
 // Global variable avoid typescript errors
@@ -19,7 +19,7 @@ export class ExpressionTabComponent {
  // readonly obj = input.required<SelectableObject>();
   gxaQueries: GXAQuery[] | null = null;
 
-  constructor(private entity: EntitiesService) {
+  constructor(private entity: EntityService) {
     effect(() => {
      // if (!this.obj()) return;
       const data = this.entity.refEntities();

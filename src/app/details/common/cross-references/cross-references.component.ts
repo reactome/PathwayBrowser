@@ -1,5 +1,5 @@
 import {Component, computed, input} from '@angular/core';
-import {EntitiesService} from "../../../services/entities.service";
+import {EntityService} from "../../../services/entity.service";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 
 @Component({
@@ -15,10 +15,10 @@ export class CrossReferencesComponent {
 
     if (this._crossReferences().length == 0) return new Map<string, DatabaseIdentifier[]>();
     const crossRefs = [...this._crossReferences()];
-    return this.entitiesService.getGroupedData(crossRefs, ref => ref.databaseName);
+    return this.entity.getGroupedData(crossRefs, ref => ref.databaseName);
   });
 
-  constructor(private entitiesService: EntitiesService) {
+  constructor(private entity: EntityService) {
 
   }
 }

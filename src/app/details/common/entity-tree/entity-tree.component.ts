@@ -7,7 +7,7 @@ import {SelectableObject} from "../../../services/event.service";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {SchemaClasses} from "../../../constants/constants";
 import {IconService} from "../../../services/icon.service";
-import {EntitiesService} from "../../../services/entities.service";
+import {EntityService} from "../../../services/entity.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
@@ -59,7 +59,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   maxStringLength = 27; // Use Molluscum contagiosum virus's length
 
   constructor(private iconService: IconService,
-              private entitiesService: EntitiesService,
+              private entity: EntityService,
               private dataStateService: DataStateService,
               private urlState: UrlStateService,
   ) {
@@ -165,7 +165,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request).pipe(map(result => result as unknown as E));
       } else {
         // PE -> Complex and Set
-        return this.entitiesService.getEntityInDepth<E>(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
+        return this.entity.getEntityInDepth<E>(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
           .pipe(
             map(entityResult => {
               if (entityResult && entityResult.composedOf) {
@@ -245,7 +245,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       return of({...node, element: normalElement});
     }
 
-    return this.entitiesService.getEntityInDepth<E>(id, depth).pipe(
+    return this.entity.getEntityInDepth<E>(id, depth).pipe(
       map((entityResult) => {
         const composedOf = entityResult.composedOf || [];
         const nestedElement = {

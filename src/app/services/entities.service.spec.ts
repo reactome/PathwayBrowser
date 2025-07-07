@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { EntitiesService } from './entities.service';
+import { EntityService } from './entity.service';
 
 describe('EntitiesService', () => {
-  let service: EntitiesService;
+  let service: EntityService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(EntitiesService);
+    service = TestBed.inject(EntityService);
   });
 
   it('should be created', () => {
