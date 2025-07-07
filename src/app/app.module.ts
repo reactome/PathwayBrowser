@@ -76,7 +76,7 @@ import {CastPipe} from "./pipes/cast.pipe";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {CellMarkerComponent} from "./details/common/cell-marker/cell-marker.component";
 import {OntologyTermComponent} from "./details/common/ontology-term/ontology-term.component";
-import {ExpressionComponent} from "./details/tabs/expression/expression.component";
+import {ExpressionTabComponent} from "./details/tabs/expression-tab/expression-tab.component";
 
 @NgModule({
   declarations: [
@@ -105,7 +105,7 @@ import {ExpressionComponent} from "./details/tabs/expression/expression.componen
     ModificationComponent,
     MolecularProcessComponent,
     CellMarkerComponent,
-    ExpressionComponent
+    ExpressionTabComponent
   ],
   bootstrap: [AppComponent],
     imports: [

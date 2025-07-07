@@ -10,12 +10,12 @@ type GXAQuery = { value: string };
 
 
 @Component({
-  selector: 'cr-expression',
+  selector: 'cr-expression-tab',
   standalone: false,
-  templateUrl: './expression.component.html',
-  styleUrl: './expression.component.scss'
+  templateUrl: './expression-tab.component.html',
+  styleUrl: './expression-tab.component.scss'
 })
-export class ExpressionComponent {
+export class ExpressionTabComponent {
 
   readonly obj = input.required<SelectableObject>();
   gxaQueries: GXAQuery[] | null = null;

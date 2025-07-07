@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ExpressionComponent } from './expression.component';
+import { ExpressionTabComponent } from './expression-tab.component';
 
 describe('ExpressionComponent', () => {
-  let component: ExpressionComponent;
-  let fixture: ComponentFixture<ExpressionComponent>;
+  let component: ExpressionTabComponent;
+  let fixture: ComponentFixture<ExpressionTabComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ExpressionComponent]
+      imports: [ExpressionTabComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ExpressionComponent);
+    fixture = TestBed.createComponent(ExpressionTabComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
