@@ -1,5 +1,4 @@
-import {Component, effect, input} from '@angular/core';
-import {SelectableObject} from "../../../services/event.service";
+import {Component, effect} from '@angular/core';
 import {EntitiesService} from "../../../services/entities.service";
 
 
@@ -17,14 +16,12 @@ type GXAQuery = { value: string };
 })
 export class ExpressionTabComponent {
 
-  readonly obj = input.required<SelectableObject>();
+ // readonly obj = input.required<SelectableObject>();
   gxaQueries: GXAQuery[] | null = null;
 
   constructor(private entity: EntitiesService) {
     effect(() => {
-
-      const selectedEvent = this.obj().stId;
-      this.entity.loadRefEntities(selectedEvent);
+     // if (!this.obj()) return;
       const data = this.entity.refEntities();
       const value = data();
       this.gxaQueries = Array.isArray(value) ? value.map(entity => ({value: entity.identifier})) : null;

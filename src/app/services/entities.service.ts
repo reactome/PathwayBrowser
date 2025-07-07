@@ -1,4 +1,4 @@
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
@@ -7,21 +7,20 @@ import {DataStateService} from "./data-state.service";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {rxResource} from "@angular/core/rxjs-interop";
+import {UrlStateService} from "./url-state.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntitiesService {
 
-  constructor(private http: HttpClient, private dataStateService: DataStateService) {
+  constructor(private http: HttpClient, private dataStateService: DataStateService, private state: UrlStateService) {
   }
 
-  eventId = signal<string | undefined>(undefined);
-
   _refEntities = rxResource({
-    request: () => this.eventId(),
+    request: () => this.state.select() || this.state.pathwayId(),
     loader: () => {
-      const id = this.eventId();
+      const id = this.state.select() || this.state.pathwayId();
       return id ? this.getReferenceEntities(id) : of(null);
     }
   });
@@ -78,10 +77,5 @@ export class EntitiesService {
     const url = `${environment.host}/ContentService/data/participants/${stId}/referenceEntities`;
     return this.http.get<ReferenceEntity[]>(url);
   }
-
-  loadRefEntities(id: string) {
-    this.eventId.set(id);
-  }
-
 
 }
