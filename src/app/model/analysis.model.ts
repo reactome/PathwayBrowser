@@ -84,12 +84,20 @@ export namespace Analysis {
      * Default: false
      */
     importableOnly?: boolean;
+
+    /**
+     *  All non-human identifiers are converted to their human equivalents. (default = true)
+     */
+    disableProjectToHuman?: boolean;
   }
 
-  export interface Pathway  {
+  export interface Pathway {
     dbId: number,
     stId: string,
     name: string,
+    /**
+     * Lower Level Pathway
+     */
     llp: boolean,
     inDisease: boolean,
     entities: {
@@ -102,6 +110,8 @@ export namespace Analysis {
       exp: number[],
       curatedFound?: number,
       curatedTotal?: number,
+      interactorsFound?: number,
+      interactorsTotal?: number,
     }
     reactions: {
       resource: Resource,
@@ -172,16 +182,23 @@ export namespace Analysis {
 
     expNames: string[],
     resources: Resource[]
-    entities: {
-      id: string,
-      mapsTo: Identifiers[],
-      exp: number[]
-    }[],
+    entities: FoundEntity[],
     interactors?: {
       id: string,
-      interactsWith: Identifiers[],
+      interactsWith: Identifiers,
       mapsTo: string[],
       exp: number[]
     }[]
+  }
+
+  export interface FoundEntity {
+    id: string,
+    mapsTo: Identifiers[],
+    exp: number[]
+  }
+
+  export interface NotFoundIdentifier {
+    id: string,
+    exp: number[]
   }
 }

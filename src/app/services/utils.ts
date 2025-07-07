@@ -23,7 +23,10 @@ export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
 }
 
-export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, orderBy: (key1: K, key2: K) => number): {key: K, elements: E[]}[] {
+export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, orderBy: (key1: K, key2: K) => number): {
+  key: K,
+  elements: E[]
+}[] {
   const grouped = new Map<K, E[]>();
   elements.forEach(element => grouped.set(getKey(element), [...(grouped.get(getKey(element)) || []), element]))
   return [...grouped.keys()].sort(orderBy).map(key => ({key, elements: grouped.get(key)!}));
@@ -47,23 +50,23 @@ export function sortByYearDescending(refs: Publication[]) {
 
 // Type guards to narrow the type
 export function isEvent(obj: DatabaseObject): obj is Event {
-  return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj) || isRLE(obj);
+  return isExactlyPathway(obj) || isExactlyTLP(obj) || isExactlyCellLineagePath(obj) || isRLE(obj);
 }
 
-export function isPathway(obj: DatabaseObject): obj is Pathway {
+export function isExactlyPathway(obj: DatabaseObject): obj is Pathway {
   return obj.schemaClass === SchemaClasses.PATHWAY;
 }
 
-export function isTLP(obj: DatabaseObject): obj is TopLevelPathway {
+export function isExactlyTLP(obj: DatabaseObject): obj is TopLevelPathway {
   return obj.schemaClass === SchemaClasses.TLP;
 }
 
-export function isCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
+export function isExactlyCellLineagePath(obj: DatabaseObject): obj is CellLineagePath {
   return obj.schemaClass === SchemaClasses.CELL_LINEAGE_PATH;
 }
 
-export function isPathwayOrTLP(obj: DatabaseObject): obj is Pathway | TopLevelPathway | CellLineagePath {
-  return isPathway(obj) || isTLP(obj) || isCellLineagePath(obj);
+export function isPathway(obj: DatabaseObject): obj is Pathway | TopLevelPathway | CellLineagePath {
+  return isExactlyPathway(obj) || isExactlyTLP(obj) || isExactlyCellLineagePath(obj);
 }
 
 const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
@@ -77,14 +80,21 @@ export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequenc
   return obj.schemaClass === SchemaClasses.EWAS;
 }
 
-const reactionLikeEventClasses: Set<string> = new Set([SchemaClasses.REACTION, SchemaClasses.BLACK_BOX_EVENT, SchemaClasses.POLYMERISATION, SchemaClasses.DEPOLYMERISATION, SchemaClasses.FAILED_REACTION, SchemaClasses.CELL_DEVELOPMENT_STEP]);
+const reactionLikeEventClasses: Set<string> = new Set([
+  SchemaClasses.REACTION,
+  SchemaClasses.BLACK_BOX_EVENT,
+  SchemaClasses.POLYMERISATION,
+  SchemaClasses.DEPOLYMERISATION,
+  SchemaClasses.FAILED_REACTION,
+  SchemaClasses.CELL_DEVELOPMENT_STEP
+]);
 
 export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
   return reactionLikeEventClasses.has(obj.schemaClass);
 }
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
-  return isPathwayOrTLP(obj) && obj.hasDiagram;
+  return isPathway(obj) && obj.hasDiagram;
 }
 
 const regulationClasses: Set<string> = new Set([SchemaClasses.REGULATION, SchemaClasses.NEGATIVE_REGULATION, SchemaClasses.NEGATIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.POSITIVE_REGULATION, SchemaClasses.POSITIVE_GENE_EXPRESSION_REGULATION, SchemaClasses.REQUIREMENT]);
@@ -139,4 +149,34 @@ export function isRefOrBook(publication: Publication): publication is Literature
 
 export function getProperty<T extends DatabaseObject, K extends keyof T>(obj: T, key: K): T[K] | undefined {
   return key in obj ? obj[key] : undefined;
+}
+
+
+/**
+ * If any value among the representative sample has an exponent part above +3 or bellow -3, then it should be scientificFormat.
+ *
+ * @param representativeSample e.g. [firstValue, lastValue, min, max]
+ */
+export const shouldBeScientificFormat = (representativeSample: number[]) => representativeSample.some(shouldBeScientificFormatValue)
+
+/**
+ * if value has an exponent part above +3 or bellow -3, then it should be scientificFormat
+ * @param value a number
+ */
+const shouldBeScientificFormatValue = (value: number) => parseInt(value.toExponential(0).split(/e[+-]/)[1]) > 3;
+
+
+export type ArrayStats = { min: number, max: number, average: number, sum: number, multiValued?: boolean };
+
+export function getArrayStats(values: number[]): ArrayStats {
+  if (values === undefined || values.length === 0) return {min: 0, max: 0, average: 0, sum: 0, multiValued: false};
+  const summary: ArrayStats = values.reduce((acc: ArrayStats, value) => {
+    if (value < acc.min) acc.min = value;
+    if (value > acc.max) acc.max = value;
+    acc.sum += value;
+    return acc;
+  }, {min: Number.MAX_VALUE, max: Number.MIN_VALUE, sum: 0, average: 0});
+  summary.average = summary.sum / values.length
+  summary.multiValued = values.length > 1
+  return summary;
 }

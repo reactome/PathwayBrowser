@@ -1,7 +1,7 @@
 <div *ngIf="obj" id="details-container">
 
-  <mat-tab-group class="custom-tab-group" #tabGroup>
-    <mat-tab id="firstTab">
+  <mat-tab-group class="custom-tab-group" #tabGroup [(selectedIndex)]="selectedTabIndex">
+    <mat-tab id="firstTab" #detailTab [disabled]="!hasDetail()">
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="details-tab"></mat-icon>
@@ -10,12 +10,12 @@
       </ng-template>
       <ng-template matTabContent>
         @if (obj()) {
-          <cr-description [obj]="obj()!" [analysisResult]="analysisResult"></cr-description>
+          <cr-description-tab [obj]="obj()!" [analysisResult]="analysis.result()"></cr-description-tab>
         }
       </ng-template>
     </mat-tab>
 
-    <mat-tab>
+    <mat-tab #moleculeTab>
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="molecule-tab"></mat-icon>
@@ -27,7 +27,7 @@
       </ng-template>
     </mat-tab>
 
-    <mat-tab>
+    <mat-tab #resultsTab [disabled]="!hasResult()">
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="results-tab"></mat-icon>
@@ -35,11 +35,11 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-        Analysis Result Content
+        <cr-result-tab></cr-result-tab>
       </ng-template>
     </mat-tab>
 
-    <mat-tab>
+    <mat-tab #expressionTab>
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="expression-tab"></mat-icon>
@@ -51,7 +51,7 @@
       </ng-template>
     </mat-tab>
 
-    <mat-tab>
+    <mat-tab #infoTab>
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="info-tab"></mat-icon>
@@ -59,11 +59,11 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-        Info Content
+        <cr-info-tab></cr-info-tab>
       </ng-template>
     </mat-tab>
 
-    <mat-tab>
+    <mat-tab #downloadTab>
       <ng-template mat-tab-label>
         <div class="label-content">
         <mat-icon class="tab-icon" svgIcon="download-tab"></mat-icon>

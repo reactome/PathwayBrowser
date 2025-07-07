@@ -67,7 +67,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   @ViewChild('legend') legendContainer?: ElementRef<HTMLDivElement>;
   readonly thumbnailRef = viewChild.required<ElementRef<HTMLImageElement>>('thumbnail');
 
-
   readonly interactorsComponent = input<InteractorsComponent>(undefined, {alias: "interactor"});
   readonly pathwayId = model.required<string>();
 
@@ -110,6 +109,10 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       this._loadAnalysisFn &&
       this._loadAnalysisFn(this.analysis.sampleIndex())
     );
+    effect(() => { // Update style upon dark change
+      this.dark.isDark();
+      this.updateStyle();
+    })
   }
 
   zoomToCytoscapeTransform = (x: number) => this.minZoom() * Math.pow(this.maxZoom() / this.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
@@ -127,7 +130,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   minZoom = signal<number>(0.1);
   maxZoom = signal<number>(15);
 
-  thumbnailRxA = computed(() => (END_RX - INIT_RX) / (this.maxZoom() - this.minZoom()) );
+  thumbnailRxA = computed(() => (END_RX - INIT_RX) / (this.maxZoom() - this.minZoom()));
   thumbnailRxB = computed(() => INIT_RX - this.thumbnailRxA() * this.minZoom());
   thumbnailRx = computed(() => this.zoomLevel() * this.thumbnailRxA() + this.thumbnailRxB());
 
@@ -184,9 +187,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   selecting = false // Avoid zooming in diagram when selection came from in diagram
   flagging = false // Avoid flagging in diagram when flagging came from in diagram
 
-  ngAfterViewInit(): void {
-    this.dark.$dark.subscribe(this.updateStyle.bind(this))
 
+  ngAfterViewInit(): void {
     const container = this.cytoscapeContainer!.nativeElement;
     const compareContainer = this.compareContainer!.nativeElement;
     const legendContainer = this.legendContainer!.nativeElement;
@@ -339,7 +341,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         this.reactomeStyle.clearCache();
         this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
           queryParamsHandling: "preserve",
-          relativeTo: this.route
+          preserveFragment: true
         }))
 
         const shadowNodes = this.cy?.nodes('.Shadow');
@@ -699,41 +701,28 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
     forkJoin({
       entities: this.analysis.foundEntities(diagramId, token),
-      pathways: this.analysis.pathwaysResults(this.cy.nodes('.Pathway').map(p => p.data('reactomeId')), token),
-      result: this.analysis.result$.pipe(filter(isDefined), take(1))
-    }).subscribe(({entities, result, pathways}) => {
+      pathways: this.analysis.pathwaysResults(this.cy?.nodes('.Pathway').map(p => p.data('reactomeId')) || [], token),
+    }).subscribe(({entities, pathways}) => {
 
       this._loadAnalysisFn = (analysisIndex) => {
         console.log('loading index', analysisIndex)
         let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
           entity.mapsTo
             .flatMap(diagramEntity => diagramEntity.ids)
-            .map(id => [id, entity.exp[analysisIndex] || 1]))
+            .map(id => [id, entity.exp[analysisIndex] || 0]))
         )
-        console.log(analysisEntityMap)
 
         let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
-
-        console.log(analysisPathwayMap)
-
-        const normalize = (x: number, min: number, max: number) => (x - min) / (max - min)
 
         this.cys.forEach(cy => {
           cy.batch(() => {
             const style: Style = cy.data('reactome');
-            const min = style.properties.analysis.min = result.expression.min || 0;
-            const max = style.properties.analysis.max = result.expression.max || 1;
-
-            const hasExpression = result.summary.type !== 'OVERREPRESENTATION';
-
 
             cy.nodes('.PhysicalEntity').forEach(node => {
               const leaves: Graph.Node[] = node.data('graph.leaves');
               const exp = leaves
-                .map(leaf => analysisEntityMap.get(leaf.identifier))
-                .sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
-
-              // console.log(node.data('reactomeId'), leaves, exp)
+                ?.map(leaf => analysisEntityMap.get(leaf.identifier))
+                ?.sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
 
               // if (hasExpression) exp = exp.map(e => e !== undefined ? 1 - e : undefined);
               node.data('exp', exp);
@@ -744,9 +733,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               if (!pathwayData) {
                 node.data('exp', [undefined]);
               } else {
-                console.log(dbId, normalize(pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, min, max))
                 node.data('exp', [
-                  [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
+                  [pathwayData.exp[analysisIndex] || pathwayData.pValue, pathwayData.found],
                   [undefined, pathwayData.total - pathwayData.found]
                 ])
               }
@@ -962,10 +950,4 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   logProteins() {
     console.debug(new Set(this.cy.nodes(".Protein").map(node => node.data("acc") || node.data("iAcc"))))
   }
-
-  analyse(example: Examples) {
-    this.analysis.example(example).subscribe();
-  }
-
-
 }

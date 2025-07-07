@@ -3,7 +3,7 @@ import {map, Observable, of, switchMap} from "rxjs";
 import {SearchResult} from "../model/search-results.model";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {isCellLineagePath, isEWAS, isRLE} from "./utils";
+import {isExactlyCellLineagePath, isEWAS, isRLE} from "./utils";
 import {DatabaseObject} from "../model/graph/database-object.model";
 
 @Injectable({
@@ -226,7 +226,7 @@ export class IconService {
     }
 
     // Cell
-    if (isCellLineagePath(obj)) {
+    if (isExactlyCellLineagePath(obj)) {
       return this.reactomeSubjectIcons[obj.schemaClass];
     }
 

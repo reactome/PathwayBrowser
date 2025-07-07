@@ -1,4 +1,4 @@
-<div class="variables" [class.dark]="dark.isDark" #container
+<div class="variables" [class.dark]="dark.isDark()" #container
      (keydown.arrowUp)="move('up')"
      (keydown.arrowDown)="move('down')"
      (keydown.arrowLeft)="move('left')"
@@ -23,10 +23,10 @@
          (cdkDragMoved)="updateLegend()"
          [style.height.px]="container.clientHeight">
       <div class="legend-group-wrapper">
-        <div class="legend-group" [class.has-analysis]="analysis.resultSignal()"
+        <div class="legend-group" [class.has-analysis]="analysis.result()"
              [style.--handle-height.px]="handle.clientHeight">
           <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
-          @if (analysis.resultSignal() && analysis.resultSignal()?.expression?.min !== undefined) {
+          @if (analysis.result()) {
             <div class="analysis-legend">
               <cr-analysis-legend></cr-analysis-legend>
             </div>

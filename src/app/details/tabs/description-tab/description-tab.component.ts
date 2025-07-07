@@ -28,12 +28,12 @@ import {MarkerReference} from "../../../model/graph/control-reference/marker-ref
 
 
 @Component({
-  selector: 'cr-description',
-  templateUrl: './description.component.html',
-  styleUrl: './description.component.scss',
+  selector: 'cr-description-tab',
+  templateUrl: './description-tab.component.html',
+  styleUrl: './description-tab.component.scss',
   standalone: false
 })
-export class DescriptionComponent {
+export class DescriptionTabComponent {
 
   icon = rxResource({
     request: () => this.referenceEntity()?.identifier,
@@ -118,7 +118,7 @@ export class DescriptionComponent {
 
   repeatedUnits: Signal<PhysicalEntity[]> = computed(() => getProperty(this.obj(), DataKeys.REPEATED_UNIT))
 
-  overview$ = viewChild<HTMLDivElement>('#overview');
+  overview$ = viewChild<HTMLDivElement>('overview');
 
 
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
@@ -175,6 +175,7 @@ export class DescriptionComponent {
       isPresent: computed(() => this.proteinMarkers().length + this.rnaMarkers().length > 0)
     },
 
+    {key: DataKeys.EVENTS, label: Labels.EVENTS, hasDepthControl: true},
     {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, hasDepthControl: true},
     {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual: true, template: this.regulationTemplate$},

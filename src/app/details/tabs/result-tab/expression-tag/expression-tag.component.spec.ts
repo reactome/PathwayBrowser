@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DescriptionComponent } from './description.component';
+import { ExpressionTagComponent } from './expression-tag.component';
 
-describe('DetailsComponent', () => {
-  let component: DescriptionComponent;
-  let fixture: ComponentFixture<DescriptionComponent>;
+describe('ExpressionTagComponent', () => {
+  let component: ExpressionTagComponent;
+  let fixture: ComponentFixture<ExpressionTagComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DescriptionComponent]
+      imports: [ExpressionTagComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DescriptionComponent);
+    fixture = TestBed.createComponent(ExpressionTagComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

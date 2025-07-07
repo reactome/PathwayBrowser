@@ -38,7 +38,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "src/assets/reacfoam/foamtree-3.5.3-SNAPSHOT/carrotsearch.foamtree.js"
+            ],
             "stylePreprocessorOptions": {
               "includePaths": [
                 "node_modules/",

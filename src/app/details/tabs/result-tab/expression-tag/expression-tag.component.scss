@@ -1,0 +1,29 @@
+.value-tag {
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: var(--background);
+  display: inline-flex;
+  vertical-align: middle;
+  //font-family: Roboto Mono, monospace;
+
+  &.gsa {
+    padding: 4px;
+  }
+
+  &.scientific {
+    padding: 6px 8px 4px;
+    display: inherit;
+  }
+
+  .mat-icon {
+    margin: 0;
+    color: inherit;
+  }
+}
+
+
+::ng-deep.selected {
+  .value-tag {
+    box-shadow: 0 0 0 2px var(--on-primary);
+  }
+}

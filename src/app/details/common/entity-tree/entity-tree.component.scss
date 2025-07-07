@@ -5,13 +5,6 @@
 }
 
 .component-tree {
-
-  @include mat.tree-overrides((
-    node-text-weight: 400,
-    node-text-size:14px
-  ));
-
-
   --gap: 4px;
   --padding: 2px;
   --connector-width: 24px;
@@ -19,6 +12,11 @@
   --max-width: 150px;
 
   padding: var(--padding);
+
+  @include mat.tree-overrides((
+    node-text-weight: 400,
+    node-text-size:14px
+  ));
 }
 
 .component-tree-invisible {

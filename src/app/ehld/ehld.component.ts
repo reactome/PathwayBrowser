@@ -158,11 +158,9 @@ export class EhldComponent implements AfterViewInit {
 
     forkJoin({
       entities: this.analysisService.foundEntities(diagramId, token),
-      pathways: this.analysisService.pathwaysResults([...this.stIdToSVGGElement.keys()], token),
-      result: this.analysisService.result$.pipe(filter(isDefined), take(1))
-    }).subscribe(({entities, result, pathways}) => {
+      pathways: this.analysisService.pathwaysResults([...this.stIdToSVGGElement.keys()], token)
+    }).subscribe(({entities, pathways}) => {
 
-      console.log("result", entities, result, pathways);
 
       this.ehldService.clearExistingPatterns(this.stIdToSVGGElement, this.ehldContainer().nativeElement.querySelector('svg'))
       this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
@@ -191,7 +189,7 @@ export class EhldComponent implements AfterViewInit {
 
         const exps: [number | undefined, number][] = pathwayData
           ? [
-            [pathwayData.exp[analysisIndex] || 1 - pathwayData.pValue, pathwayData.found],
+            [pathwayData.exp?.[analysisIndex] || pathwayData.pValue, pathwayData.found],
             [undefined, pathwayData.total - pathwayData.found],
           ]
           : [[undefined, 1]];

@@ -31,7 +31,8 @@
     ],
     "typeRoots": [
       "node_modules/@types",
-      "node_modules/reactome-cytoscape-style/types"
+      "node_modules/reactome-cytoscape-style/types",
+      "src/types"
     ]
   },
   "angularCompilerOptions": {

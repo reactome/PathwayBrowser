@@ -4,16 +4,16 @@ import {
   Component,
   computed,
   effect,
-  model, viewChild,
-  ViewChild,
+  ElementRef,
+  model,
+  viewChild,
   WritableSignal
 } from '@angular/core';
 import {DiagramComponent} from "../diagram/diagram.component";
-import {ResourceAndType} from "../interactors/model/interactor.model";
 import {InteractorsComponent} from "../interactors/interactors.component";
 import {SpeciesService} from "../services/species.service";
 import {InteractorService} from "../interactors/services/interactor.service";
-import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DarkService} from "../services/dark.service";
 import {EventService} from "../services/event.service";
@@ -21,9 +21,11 @@ import {UrlStateService} from "../services/url-state.service";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GeneralService} from "../services/general.service";
 import {DataStateService} from "../services/data-state.service";
-import {isPathwayOrTLP} from "../services/utils";
+import {isPathway} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, style, transition, trigger} from "@angular/animations";
+
+const DETAIL_MIN_HEIGHT = 0;
 
 @Component({
   selector: 'cr-viewport',
@@ -50,30 +52,37 @@ export class ViewportComponent implements AfterViewInit {
 
   hasEHLD = computed(() => {
     const pathway = this.dataState.currentPathway();
-    return pathway && isPathwayOrTLP(pathway) && (pathway?.hasEHLD !== undefined) ? pathway.hasEHLD : true;
+    return pathway && isPathway(pathway) && (pathway?.hasEHLD !== undefined) ? pathway.hasEHLD : true;
   })
   title = computed(() => this.dataState.currentPathway()?.displayName)
 
   diseasePathways = computed(() => {
     const pathway = this.dataState.currentPathway();
-    if (pathway && isPathwayOrTLP(pathway)) {
+    if (pathway && isPathway(pathway)) {
       return pathway.diseasePathways || [];
     }
     return [] as Pathway[];
   })
   normalPathway = computed(() => {
     const pathway = this.dataState.currentPathway();
-    if (pathway && isPathwayOrTLP(pathway)) {
+    if (pathway && isPathway(pathway)) {
       return pathway.normalPathway
     }
     return undefined;
   })
 
+  contentHeight = computed(() => this.content().nativeElement.clientHeight)
+  // Use bellow when fixed layout solution found
+  // detailShare = computed(() => this.state.pathwayId() || this.state.select() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
+  detailShare = computed(() => 20)
+  viewShare = computed(() => 100 - this.detailShare())
+
   diagram = viewChild(DiagramComponent);
+  content = viewChild.required<ElementRef<HTMLDivElement>>('content');
   interactors = viewChild.required(InteractorsComponent);
   darkToggle = viewChild.required<MatSlideToggle>('darkToggle');
 
-  currentInteractorResource: ResourceAndType | undefined = {name: null, type: null};
+  currentInteractorResource = this.interactorService.currentResource;
 
 
   visibility = {
@@ -105,10 +114,6 @@ export class ViewportComponent implements AfterViewInit {
     //   // Updated the content after ngAfterContentChecked to avoid ExpressionChangedAfterItHasBeenCheckedError
     //   this.cdRef.detectChanges();
     // });
-
-    this.interactorService.currentInteractorResource$.pipe(untilDestroyed(this)).subscribe(resource => {
-      this.currentInteractorResource = resource;
-    });
 
 
     this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);

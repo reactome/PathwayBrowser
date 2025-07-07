@@ -13,7 +13,6 @@ import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
 
-
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
 @Component({
@@ -321,10 +320,11 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     const nonNestedClasses: Set<string> = new Set([
       SchemaClasses.EWAS,
       SchemaClasses.SIMPLE_ENTITY,
-      SchemaClasses.CHEMICAL_DRUG
+      SchemaClasses.CHEMICAL_DRUG,
+      SchemaClasses.REACTION
     ])
 
-    return !(nonNestedClasses.has(selectedNode.schemaClass) || isEvent(selectedNode));
+    return !(nonNestedClasses.has(selectedNode.schemaClass));
   }
 
   isEllipsisActive(e: HTMLElement): boolean {

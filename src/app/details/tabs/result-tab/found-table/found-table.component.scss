@@ -1,0 +1,44 @@
+@use '@angular/material' as mat;
+
+th {
+  top: calc(var(--header-row-height) + var(--row-height)) !important;
+  z-index: 98 !important;
+}
+
+td.mat-column-name {
+  text-wrap: balance;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.selected-expression {
+  text-decoration: underline;
+}
+
+
+.expand-button {
+  transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.curated {
+  font-weight: bold;
+}
+
+.interactor {
+  text-decoration: underline;
+}
+
+.mat-icon {
+  vertical-align: bottom;
+}
+
+.intact-icon {
+  color: var(--interactor-fill);
+}

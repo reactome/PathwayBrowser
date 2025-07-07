@@ -12,7 +12,7 @@ import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
 import {IconService} from "../services/icon.service";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isPathwayOrTLP} from "../services/utils";
+import {isPathway} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 import {toObservable} from "@angular/core/rxjs-interop";
 
@@ -42,7 +42,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
 
   childrenAccessor = (node: Event): Event[] => {
-    if (isPathwayOrTLP(node) && Array.isArray(node.events)) {
+    if (isPathway(node) && Array.isArray(node.events)) {
       return node.events.map(e => e.element);
     }
     return [];
@@ -56,7 +56,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   selectedIdFromUrl?: string;
   selectedTreeEvent?: Event;
   selectedObj?: DatabaseObject;
-  lastSpecieId?:string;
+  lastSpecieId?: string;
 
 
   constructor(protected eventService: EventService,
@@ -96,7 +96,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       )
     }),
     switchMap(({idToUse, enhancedEvent}) => {
-      const token = this.analysis.result?.summary.token;
+      const token = this.analysis.result()?.summary.token;
       if (!token) {
         return of({idToUse, enhancedEvent, hitReactions: []}); // Return empty hitReactions if there is no token
       }
@@ -123,10 +123,10 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       );
     })
   ).subscribe(({hitReactions}) => {
-    this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result);
+    this.eventService.addAnalysisTag(this.treeDataSource.data, this.analysis.result());
 
     // TODO add hit reactions on all opened pathways, not just current one + Make sure it gets updated upon selection / opening of a new pathway
-    if (this.selectedTreeEvent && isPathwayOrTLP(this.selectedTreeEvent)) {
+    if (this.selectedTreeEvent && isPathway(this.selectedTreeEvent)) {
       this.eventService.addHitReactions(this.selectedTreeEvent.events?.map(e => e.element), hitReactions);
     }
 
@@ -193,66 +193,50 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     )
 
     // Fetch EHLD and color data
-    const ehldAndSubpathwayColors$ = this.ehldService.hasEHLD$.pipe(
-      take(1),
-      switchMap(hasEHLD => hasEHLD
-        ? of({hasEHLD, colors: undefined}) // If EHLD exists, no colors needed
+    const ehldAndSubpathwayColors$ =
+      this.ehldService.hasEHLD()
+        ? of({hasEHLD: true, colors: undefined}) // If EHLD exists, no colors needed
         : this.eventService.subpathwayColors$.pipe(
           take(1),
-          map(colors => ({hasEHLD, colors}))
-        )
-      )
-    );
+          map(colors => ({hasEHLD: false, colors}))
+        );
 
     // Fetch analysis result
-    const analysisResult$ = this.analysis.result$.pipe(
-      take(1),
-      map(analysisResult => ({analysisResult}))
-    );
 
     // Fetch reactions based on token and pathway ID
-    const hitReactions$ = analysisResult$.pipe(
-      switchMap(({analysisResult}) => {
-        const token = analysisResult?.summary.token;
-        if (!token || !this.pathwayId()) return of({hitReactions: []}); // Return empty if no token
-        return this.analysis.getHitReactions(this.pathwayId()!, token).pipe(
+    const hitReactions$ =
+      !this.state.analysis() || !this.pathwayId() ?
+        of({hitReactions: []}) : // Return empty if no token
+        this.analysis.getHitReactions(this.pathwayId()!, this.state.analysis()!).pipe(
           map(hitReactions => ({hitReactions}))
         );
-      })
-    );
+    console.log(this.state.analysis(), this.pathwayId())
 
     // Combine all data and merged into one object
     initialData$.pipe(
-      tap(d => console.log('Initial data',d)),
+      tap(d => console.log('Initial data', d)),
       switchMap(initialData =>
         enhancedEventData$.pipe(
           combineLatestWith(
             ehldAndSubpathwayColors$,
-            analysisResult$,
             hitReactions$
           ),
-          map(([enhancedEvent, ehldAndColors, analysisResult, hitReactions]) => ({
+          map(([enhancedEvent, ehldAndColors, hitReactions]) => ({
             ...initialData,
             ...enhancedEvent,
             ...ehldAndColors,
-            ...analysisResult,
             ...hitReactions
           }))
         )
       ),
-      tap(d => console.log('Combined data',d)),
+      tap(d => console.log('Combined data', d)),
 
       // Build the tree with all data
       switchMap(({
                    enhancedEvent,
-                   initialTreeData,
-                   colors,
-                   hasEHLD,
-                   analysisResult,
                    hitReactions
                  }) => this.eventService.buildTree(enhancedEvent, this.pathwayId()!, this.tree, hitReactions)),
-    tap(d => console.log('Final data',d)),
-
+      tap(d => console.log('Final data', d)),
     ).subscribe({
       next: () => {
         // Give pathway id when idToUse is PEs
@@ -272,7 +256,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       return false;
     }
     const parent = event.parent;
-    if (isPathwayOrTLP(parent) && parent.events) {
+    if (isPathway(parent) && parent.events) {
       return parent.events.some(sibling => sibling.element !== event && this.eventService.eventHasChild(sibling.element));
     }
     return false;
@@ -287,7 +271,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   onTreeEventSelect(treeEvent: Event) {
     this.handleSelectionFromTree(treeEvent);
   }
-
 
 
   onBreadcrumbSelect(navEvent: Event) {
@@ -315,7 +298,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.clearAllSelectedEvents(this.treeDataSource.data);
     this.selectAllParents(treeEvent, this.treeDataSource.data);
 
-    if (isPathwayOrTLP(treeEvent)) {
+    if (isPathway(treeEvent)) {
       this.eventService.loadEventData(treeEvent);
     } else {
       this.dboService.fetchEnhancedEntry<Event>(treeEvent.parent.stId).pipe(untilDestroyed(this)).subscribe(result => {
@@ -328,7 +311,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   private selectAllParents(selectedEvent: Event, events: Event[]) {
     events.forEach(event => {
       event.isSelected = selectedEvent.ancestors?.some((parent: Event) => parent.stId === event.stId) || false;
-      if (isPathwayOrTLP(event) && event.events) {
+      if (isPathway(event) && event.events) {
         this.selectAllParents(selectedEvent, event.events?.map(e => e.element));
       }
     });
@@ -338,7 +321,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   private clearAllSelectedEvents(events: Event[]) {
     events.forEach(event => {
       event.isSelected = false;
-      if (isPathwayOrTLP(event) && event.events) {
+      if (isPathway(event) && event.events) {
         this.clearAllSelectedEvents(event.events?.map(e => e.element));
       }
     });
@@ -363,7 +346,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   private setDiagramId(event: Event): void {
     // Pathway
-    if (isPathwayOrTLP(event) && event.hasDiagram) {
+    if (isPathway(event) && event.hasDiagram) {
       this.pathwayId.set(event.stId);
     } else {
       // Subpathway and reaction
@@ -379,7 +362,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     const diagramId = this.pathwayId();
     this.eventService.setPath(diagramId, ancestors);
     // Determine if we should include the selectedEventId in the URL
-    const selectedEventId = isPathwayOrTLP(treeEvent) && treeEvent.hasDiagram ? '' : treeEvent.stId;
+    const selectedEventId = isPathway(treeEvent) && treeEvent.hasDiagram ? '' : treeEvent.stId;
     this._ignore = true;
     // this.speciesService.setIgnore(true);
     this.router.navigate([diagramId], {
@@ -442,7 +425,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
 
   onTagHover(event: Event) {
-    if (event.isSelected || (this.tree.isExpanded(event) && isPathwayOrTLP(event))) return;
+    if (event.isSelected || (this.tree.isExpanded(event) && isPathway(event))) return;
     event.isHovered = true
   }
 

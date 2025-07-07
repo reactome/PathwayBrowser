@@ -1,10 +1,11 @@
 import {Component, computed, input} from '@angular/core';
-import {AnalysisService, PaletteName, PaletteSummary} from "../../services/analysis.service";
+import {AnalysisService, PaletteName} from "../../services/analysis.service";
 import {UrlStateService} from "../../services/url-state.service";
 import {DecimalPipe, NgTemplateOutlet} from "@angular/common";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
+import {getArrayStats} from "../../services/utils";
 
 @Component({
   selector: 'cr-analysis-legend',
@@ -41,6 +42,12 @@ export class AnalysisLegendComponent {
     v -3
     H 0
     Z`)
+
+  floating = input(true);
+  //TODO support values representation
+  values = input<number[]>([]);
+  valuesStats = computed(() => getArrayStats(this.values()))
+  name = computed(() => this.state.sample() || "pValue")
 
   selectingPalette = false;
 
