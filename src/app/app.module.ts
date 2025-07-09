@@ -85,6 +85,7 @@ import {InfoTabComponent} from "./details/tabs/info-tab/info-tab.component";
 import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component";
 import {TypeSafeMatCellDef} from "./utils/type-safe-mat-cell-def.directive";
 import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
+import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
 
 @NgModule({
   declarations: [
@@ -113,7 +114,9 @@ import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
     ModificationComponent,
     MolecularProcessComponent,
     CellMarkerComponent,
-    ExpressionTabComponent
+    ExpressionTabComponent,
+    MoleculeTabComponent,
+
   ],
   bootstrap: [AppComponent],
   imports: [

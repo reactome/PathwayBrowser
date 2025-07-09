@@ -1,0 +1,45 @@
+<div class="container" #container [style.--width.px]="container.offsetWidth">
+  <div class="content">
+
+    @for (group of moleculeData() | sortByText: 'type'; track group.type; ) {
+      <mat-list [id]=sanitizeId(group.type)>
+        <div mat-subheader>{{ group.type }}
+
+          @let found = group.found;
+          @if (found !== undefined) {
+            {{ found }}/{{ group.data.length }}
+          } @else {
+            {{ group.data.length }}
+          }
+        </div>
+
+        @for (item of group.data; track item.entity.dbId) {
+          <mat-list-item>
+
+            {{item.stoichiometry}}
+            <cr-entity-tree [type]="group.type" [data]="[item.entity]" ></cr-entity-tree>
+
+
+<!--            <mat-icon class="symbol-icon"-->
+<!--                      [matTooltip]="getSymbol(item.entity.icon).tooltip"-->
+<!--                      [svgIcon]="getSymbol(item.entity.icon).name">-->
+<!--            </mat-icon>-->
+<!--            <span [class.highlight]="item.highlight">{{ item.entity.identifier }}-->
+<!--              &ndash;&gt; {{ item.entity.displayName }}({{ item.stoichiometry }}x)</span>-->
+
+          </mat-list-item>
+
+        }
+      </mat-list>
+    }
+
+  </div>
+  <div class="toc">
+    @for (group of moleculeData() | sortByText: 'type'; track group.type) {
+      <a (click)="scrollTo(group.type)">
+        {{ group.type }}
+      </a>
+    }
+  </div>
+
+</div>

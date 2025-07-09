@@ -1,5 +1,6 @@
-import {Component, effect} from '@angular/core';
+import {Component, effect, input} from '@angular/core';
 import {EntityService} from "../../../services/entity.service";
+import {SelectableObject} from "../../../services/event.service";
 
 
 // Global variable avoid typescript errors

@@ -23,7 +23,7 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-        Molecule Content
+        <cr-molecule-tab [obj]="obj()!"></cr-molecule-tab>
       </ng-template>
     </mat-tab>
 
@@ -47,7 +47,7 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-        <cr-expression-tab></cr-expression-tab>
+        <cr-expression-tab [obj]="obj()!"></cr-expression-tab>
       </ng-template>
     </mat-tab>
 
