@@ -16,13 +16,15 @@ type GXAQuery = { value: string };
 })
 export class ExpressionTabComponent {
 
- // readonly obj = input.required<SelectableObject>();
+  readonly obj = input.required<SelectableObject>();
   gxaQueries: GXAQuery[] | null = null;
 
   constructor(private entity: EntityService) {
     effect(() => {
-     // if (!this.obj()) return;
+      const selectedEvent = this.obj().stId;
+      this.entity.loadRefEntities(selectedEvent);
       const data = this.entity.refEntities();
+
       this.gxaQueries = Array.isArray(data) ? data.map(entity => ({value: entity.identifier})) : null;
 
       if (this.gxaQueries) {

@@ -7,21 +7,26 @@ import {DataStateService} from "./data-state.service";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {UrlStateService} from "./url-state.service";
+import {ParticipantService} from "./participant.service";
+import {DataKeys, Labels} from "../constants/constants";
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntityService {
 
-  constructor(private http: HttpClient, private dataStateService: DataStateService, private state: UrlStateService) {
+  eventId = signal<string | undefined>(undefined);
+
+  constructor(private http: HttpClient,
+              private dataStateService: DataStateService,
+              private participant: ParticipantService) {
   }
 
   _refEntities = rxResource({
-    request: () => this.state.select() || this.state.pathwayId(),
+    request: () => this.eventId(),
     loader: () => {
-      const id = this.state.select() || this.state.pathwayId();
-      return id ? this.getReferenceEntities(id) : of(null);
+      const id = this.eventId()
+      return id ? this.participant.getReferenceEntities(id) : of(null);
     }
   });
 
@@ -41,7 +46,7 @@ export class EntityService {
     if (!refEntity) return [];
     const externalRef = {...refEntity};
     const properties = [
-      {key: 'displayName', label: 'External Reference'},
+      {key: DataKeys.DISPLAY_NAME, label: Labels.EXTERNAL_REFERENCE},
       {key: 'geneName', label: 'Gene Names'},
       {key: 'chain', label: 'Chain'},
       {key: 'referenceGene', label: 'Reference Genes'},
@@ -73,9 +78,8 @@ export class EntityService {
     return grouped;
   }
 
-  getReferenceEntities(stId: string): Observable<ReferenceEntity[]> {
-    const url = `${environment.host}/ContentService/data/participants/${stId}/referenceEntities`;
-    return this.http.get<ReferenceEntity[]>(url);
+  loadRefEntities(id: string) {
+    this.eventId.set(id);
   }
 
 }

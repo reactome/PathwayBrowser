@@ -23,6 +23,7 @@ export const DataKeys = {
   SPECIES_NAME: 'speciesName',
   COMPARTMENT: 'hasCompartment',
   NAME: 'name',
+  DISPLAY_NAME: 'displayName',
   TISSUE: 'tissue',
   REVIEW_STATUS: 'reviewStatus',
   PUBLICATION: 'publication',
@@ -144,6 +145,11 @@ export enum SchemaClasses {
   MODIFIED_NUCLEOTIDE = 'ModifiedNucleotide',
 
   REFERENCE_RNA_SEQUENCE = 'ReferenceRNASequence',
+  REFERENCE_DNA_SEQUENCE = 'ReferenceDNASequence',
+  REFERENCE_GENE_PRODUCT = 'ReferenceGeneProduct',
+  REFERENCE_ISOFORM = 'ReferenceIsoform',
+
+  REFERENCE_THERAPEUTIC = 'ReferenceTherapeutic',
 
   LITERATURE_REFERENCE = 'LiteratureReference',
   BOOK = 'Book'
