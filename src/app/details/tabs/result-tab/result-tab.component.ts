@@ -107,14 +107,14 @@ export class ResultTabComponent {
     })
   });
 
-  currentSort = signal<Sort>({active: 'entities-pValue', direction: 'desc'})
+  currentSort = signal<Sort>({active: 'entities-fdr', direction: 'desc'})
 
-  pValues = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
-  filterPValue = linkedSignal(() => this.state.pValueFilter() !== undefined ? this.state.pValueFilter()! : 1)
-  pValueIndex = linkedSignal(() => this.pValues.indexOf(this.filterPValue()))
-  pValueLabel = (index: number) => '' + this.pValues[index]
+  fdrValues = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
+  filterFDR = linkedSignal(() => this.state.fdrFilter() !== undefined ? this.state.fdrFilter()! : 1)
+  fdrIndex = linkedSignal(() => this.fdrValues.indexOf(this.filterFDR()))
+  fdrLabel = (index: number) => '' + this.fdrValues[index]
 
-  pValueFilterActive = computed(() => this.pValueIndex() < this.pValues.length - 1)
+  fdrFilterActive = computed(() => this.fdrIndex() < this.fdrValues.length - 1)
 
   filterMinSize = linkedSignal(() => this.state.pathwayMinSizeFilter() !== undefined ? this.state.pathwayMinSizeFilter()! : this.pathwaySizeStats().min)
   filterMaxSize = linkedSignal(() => this.state.pathwayMaxSizeFilter() !== undefined ? this.state.pathwayMaxSizeFilter()! : this.pathwaySizeStats().max)
@@ -141,9 +141,9 @@ export class ResultTabComponent {
       console.log('Filter disease', size, '==>', data.length)
       size = data.length
     }
-    if (this.state.pValueFilter() !== undefined) {
-      data = data.filter(p => p.entities.pValue <= this.state.pValueFilter()!)
-      console.log('Filter pValue', size, '==>', data.length)
+    if (this.state.fdrFilter() !== undefined) {
+      data = data.filter(p => p.entities.fdr <= this.state.fdrFilter()!)
+      console.log('Filter fdr', size, '==>', data.length)
     }
     if (this.state.minExpressionFilter() !== undefined) {
       data = data.filter(p => p.entities.exp[this.analysis.sampleIndex()] >= this.state.minExpressionFilter()!)
@@ -242,7 +242,7 @@ export class ResultTabComponent {
     effect(() => this.state.pathwayMaxSizeFilter.set(this.filterMaxSize() !== this.pathwaySizeStats().max ? this.filterMaxSize() : undefined));
     effect(() => this.state.minExpressionFilter.set(this.filterMinExpression() !== this.minExpression() ? this.filterMinExpression() : undefined));
     effect(() => this.state.maxExpressionFilter.set(this.filterMaxExpression() !== this.maxExpression() ? this.filterMaxExpression() : undefined));
-    effect(() => this.state.pValueFilter.set(this.pValueFilterActive() ? this.pValues[this.pValueIndex()] : undefined));
+    effect(() => this.state.fdrFilter.set(this.fdrFilterActive() ? this.fdrValues[this.fdrIndex()] : undefined));
   }
 
   selectPathway(pathway: Analysis.Pathway) {

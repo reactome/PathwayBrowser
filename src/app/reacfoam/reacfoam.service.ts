@@ -199,7 +199,7 @@ export class ReacfoamService {
     maxSize: this.state.pathwayMaxSizeFilter(),
     minExpression: this.state.minExpressionFilter(),
     maxExpression: this.state.maxExpressionFilter(),
-    pValue: this.state.pValueFilter(),
+    fdr: this.state.fdrFilter(),
     gsa: new Set(this.state.gsaFilter()),
   }))
 
@@ -211,7 +211,7 @@ export class ReacfoamService {
     maxSize: undefined,
     minExpression: undefined,
     maxExpression: undefined,
-    pValue: undefined,
+    fdr: undefined,
     gsa: undefined,
   } : this.mergedFilters())
 
@@ -247,7 +247,7 @@ export class ReacfoamService {
       if (this.filters().excludeDiseases && isDisease) return [];
       if (this.filters().excludeGrouping && !event.llp) return children;
       if (children.length === 0) { // if no children because of filters or simple leaf, then apply filters
-        if (this.filters().pValue !== undefined && (event.entities?.pValue || 1) > this.mergedFilters().pValue!) return [];
+        if (this.filters().fdr !== undefined && (event.entities?.fdr || 1) > this.mergedFilters().fdr!) return [];
         if (this.filters().minSize !== undefined && (event.entities?.total || Number.MIN_VALUE) < this.mergedFilters().minSize!) return [];
         if (this.filters().maxSize !== undefined && (event.entities?.total || Number.MAX_VALUE) > this.mergedFilters().maxSize!) return [];
         if (this.filters().minExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MIN_VALUE) < this.mergedFilters().minExpression!) return [];

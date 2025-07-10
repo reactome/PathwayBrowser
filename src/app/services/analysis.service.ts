@@ -123,7 +123,7 @@ export class AnalysisService {
     ['primary', new PaletteSummary([extract(this.style.properties.global.primaryContainer), extract(this.style.properties.global.primary)])]
   ]);
 
-  pValueScale = computed(() => new PaletteSummary([
+  fdrScale = computed(() => new PaletteSummary([
     extract(this.style.properties.global.primaryContainer),
     extract(this.style.properties.global.primary)])
     .domain(0.05, 0)
@@ -302,7 +302,7 @@ export class AnalysisService {
   private clearFilters() {
     this.state.minExpressionFilter.set(undefined)
     this.state.maxExpressionFilter.set(undefined)
-    this.state.pValueFilter.set(undefined)
+    this.state.fdrFilter.set(undefined)
     this.state.gsaFilter.set([])
     this.state.pathwayMinSizeFilter.set(undefined)
     this.state.pathwayMaxSizeFilter.set(undefined)

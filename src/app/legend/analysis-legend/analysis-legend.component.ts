@@ -47,7 +47,7 @@ export class AnalysisLegendComponent {
   //TODO support values representation
   values = input<number[]>([]);
   valuesStats = computed(() => getArrayStats(this.values()))
-  name = computed(() => this.state.sample() || "pValue")
+  name = computed(() => this.state.sample() || "FDR")
 
   selectingPalette = false;
 

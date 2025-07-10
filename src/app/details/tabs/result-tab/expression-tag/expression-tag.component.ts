@@ -32,15 +32,15 @@ export class ExpressionTagComponent {
   value = input.required<number>()
   scientificFormat = input.required<boolean>()
 
-  pValue = input<number>(0)
-  isPValue = input<boolean>(false)
-  isSignificant = computed(() => ((this.isPValue() && this.value()) || this.pValue()) < 0.05)
+  fdr = input<number>(0)
+  isFDR = input<boolean>(false)
+  isSignificant = computed(() => ((this.isFDR() && this.value()) || this.fdr()) < 0.05)
 
   isGSA = input<boolean>(false)
 
   format = input<string | undefined>('1.3-3')
 
-  scale = computed(() => this.isPValue() ? this.analysis.pValueScale().scale : this.analysis.palette().scale)
+  scale = computed(() => this.isFDR() && this.analysis.type() !== 'OVERREPRESENTATION' ? this.analysis.fdrScale().scale : this.analysis.palette().scale)
   color = computed(() => this.scale()(this.value()))
   onColor = computed(() => this.color().get('oklch.l') > 0.70 ? 'black' : 'white')
   style = computed(() => this.isSignificant() ? {

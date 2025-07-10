@@ -48,7 +48,7 @@ export class UrlStateService implements State {
     pathwayMaxSizeFilter: urlParam<number | undefined>(undefined, "number"),
     minExpressionFilter: urlParam<number | undefined>(undefined, "number"),
     maxExpressionFilter: urlParam<number | undefined>(undefined, "number"),
-    pValueFilter: urlParam<number | undefined>(undefined, "number"),
+    fdrFilter: urlParam<number | undefined>(undefined, "number"),
     gsaFilter: urlParam<number[]>([], "number"),
   };
 
@@ -69,7 +69,7 @@ export class UrlStateService implements State {
   public readonly pathwayMaxSizeFilter = this.values.pathwayMaxSizeFilter
   public readonly minExpressionFilter = this.values.minExpressionFilter
   public readonly maxExpressionFilter = this.values.maxExpressionFilter
-  public readonly pValueFilter = this.values.pValueFilter
+  public readonly fdrFilter = this.values.fdrFilter
   public readonly gsaFilter = this.values.gsaFilter
 
   public readonly pathwayId = signal<string | undefined>(undefined);

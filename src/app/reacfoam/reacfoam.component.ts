@@ -194,13 +194,13 @@ export class ReacfoamComponent implements OnDestroy {
 
           if (this.analysis.result()) { // Analysis
             values.labelColor = 'auto'
-            const pValue = props.group.pValue;
+            const fdr = props.group.fdr;
 
             const notFoundColor = this.reacfoam.surfaceColor().hex();
 
-            if (!pValue || pValue > 0.05) values.groupColor = notFoundColor;
+            if (!fdr || fdr > 0.05) values.groupColor = notFoundColor;
             else {
-              if (this.analysis.type() === 'OVERREPRESENTATION') { // pValue ~ color
+              if (this.analysis.type() === 'OVERREPRESENTATION') { // FDR ~ color
                 values.groupColor = this.analysis.palette().scale(props.group.fdr).hex()
               } else { // expression ~ color
                 if (props.group.expressions) {
