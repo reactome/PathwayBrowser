@@ -86,7 +86,6 @@ export interface PathwayGroup extends FoamTree.DataObject {
   family: string,
   llp: boolean,
   familyColor: chroma.Color
-  depthColor: chroma.Color
   depth: number
   flag?: boolean
   expressions?: number[]
@@ -238,10 +237,6 @@ export class ReacfoamService {
     const family = parentFamily || layoutNode?.family || 'Unknown family'; // Unknown family with M. tuberculosis
     const familyColor = this.familyColorMap().get(family) || this.surfaceColor(); // Unknown family with M. tuberculosis
 
-    const depthColor = this.dark.isDark() ?
-      parentColor ? parentColor.brighten(0.2).saturate(0.2) : this.surfaceColor() :
-      parentColor ? parentColor.darken(0.2).saturate(0.2) : this.surfaceColor();
-
     const id = this.buildId(event.stId, path)!; // If no path or wrong path given, will use first occurrence of stId
     if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
 
@@ -258,7 +253,7 @@ export class ReacfoamService {
         if (this.filters().minExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MIN_VALUE) < this.mergedFilters().minExpression!) return [];
         if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.mergedFilters().maxExpression!) return [];
         if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.mergedFilters().maxExpression!) return [];
-        if (this.filters().gsa?.size !== 0  && !this.filters().gsa?.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
+        if (this.filters().gsa?.size !== 0 && !this.filters().gsa?.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
       }
     }
 
@@ -273,7 +268,6 @@ export class ReacfoamService {
       weight: event.totalEntity,
       initialPosition: layoutNode,
       familyColor: familyColor,
-      depthColor: depthColor,
       family,
       depth,
       path,
