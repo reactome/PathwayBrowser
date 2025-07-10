@@ -1,5 +1,5 @@
-import {Component, computed, linkedSignal, Signal, viewChild} from '@angular/core';
-import {MatTableModule} from "@angular/material/table";
+import {Component, computed, effect, linkedSignal, Signal, viewChild} from '@angular/core';
+import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {MatIconModule} from "@angular/material/icon";
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatTooltipModule} from "@angular/material/tooltip";
@@ -7,10 +7,10 @@ import {TypeSafeMatCellDef} from "../../../../utils/type-safe-mat-cell-def.direc
 import {TypeSafeMatRowDef} from "../../../../utils/type-safe-mat-row-def.directive";
 import {Analysis} from "../../../../model/analysis.model";
 import {AnalysisService} from "../../../../services/analysis.service";
-import chroma from "chroma-js";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {UrlStateService} from "../../../../services/url-state.service";
 import {ExpressionTagComponent} from "../expression-tag/expression-tag.component";
+import {MatSort, MatSortModule} from "@angular/material/sort";
 
 @Component({
   selector: 'cr-not-found-table',
@@ -22,6 +22,7 @@ import {ExpressionTagComponent} from "../expression-tag/expression-tag.component
     TypeSafeMatCellDef,
     TypeSafeMatRowDef,
     MatProgressSpinner,
+    MatSortModule,
     ExpressionTagComponent,
   ],
   templateUrl: './not-found-table.component.html',
@@ -33,7 +34,7 @@ export class NotFoundTableComponent {
 
   expressionColumnNames = computed(() => this.analysis.result()?.expression?.columnNames || []);
 
-  expressionColumnIds = computed(() => this.expressionColumnNames().map((_, i) => `entities-exp-${i}`));
+  expressionColumnIds = computed(() => this.expressionColumnNames().map((_, i) => `exp-${i}`));
 
   displayedColumns: Signal<string[]> = computed(() => [
     'id',
@@ -45,24 +46,19 @@ export class NotFoundTableComponent {
     computation: (source, previous?) => source || previous?.value || []
   })
 
+  dataSource = new MatTableDataSource<Analysis.NotFoundIdentifier>()
 
+  sort = viewChild.required(MatSort)
   headerRow = viewChild.required<HTMLTableRowElement>('headerRow')
   scrollOffset = computed(() => (this.headerRow().clientHeight || 56) + 'px')
 
 
   constructor(public analysis: AnalysisService, public state: UrlStateService) {
-  }
-
-  onColor(background: chroma.Color): string {
-    const oklch = background.get('oklch.l');
-    return oklch > 0.70 ? 'black' : 'white';
-  }
-
-  stylePathwayExpression(notFound: Analysis.NotFoundIdentifier, expressionIndex: number): any {
-    const color = this.analysis.palette().scale(notFound.exp[expressionIndex]);
-    return {
-      'background': color.hex(),
-      'color': this.onColor(color)
+    effect(() => this.dataSource.data = this.data())
+    effect(() => this.dataSource.sort = this.sort());
+    this.dataSource.sortingDataAccessor = (data, header) => {
+      const value = header.split('-').reduce((a: any, b) => a?.[b], data);
+      if (value) return value; // Expressions + identifier
     }
   }
 
