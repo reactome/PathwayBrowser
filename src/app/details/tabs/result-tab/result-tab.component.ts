@@ -36,6 +36,7 @@ import {MatSliderModule} from "@angular/material/slider";
 import {getArrayStats} from "../../../services/utils";
 import {MatButtonToggleModule} from "@angular/material/button-toggle";
 import {MatDivider} from "@angular/material/divider";
+import {MatFormField, MatOption, MatSelect} from "@angular/material/select";
 
 
 @Component({
@@ -62,12 +63,17 @@ import {MatDivider} from "@angular/material/divider";
     FoundTableComponent,
     MatSliderModule,
     MatButtonToggleModule,
-    MatDivider
+    MatDivider,
+    MatSelect,
+    MatOption,
+    MatFormField
   ],
   templateUrl: './result-tab.component.html',
   styleUrl: './result-tab.component.scss'
 })
 export class ResultTabComponent {
+
+  analysisType = computed(() => this.analysis.summary()?.gsaMethod?.toUpperCase() || titleCase(this.analysis.summary()?.type || ''));
 
   trackBy = (index: number, pathway: Analysis.Pathway) => pathway.stId + '-' + index;
 
@@ -325,4 +331,5 @@ const gsaValueToLabel = new Map([
   [-2, 'Sig. down regulated'],
 ])
 
+const titleCase = (s: string) => s.split(" ").map(ss => ss.charAt(0).toUpperCase() + ss.slice(1).toLowerCase()).join(' ')
 

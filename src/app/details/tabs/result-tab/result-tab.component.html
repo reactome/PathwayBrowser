@@ -1,5 +1,26 @@
 <!--ToDO investigate virtual scroll instead of pagination: https://material.angular.dev/cdk/scrolling/overview -->
 <div class="container" #container>
+  <div class="header" >
+    {{ analysisType() }}
+    analysis results
+    @if (analysis.summary()?.sampleName) {
+      of {{ analysis.summary()?.sampleName }}
+    }
+    @if (state.resourceFilter()) {
+      on {{ state.resourceFilter() }} entities
+    }
+    @if (analysis.samples().length > 1) {
+      using sample
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select [(value)]="state.sample">
+          @for (sample of analysis.samples(); track sample) {
+            <mat-option [value]="sample">{{ sample }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+    }
+  </div>
   <div class="found-section">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows [trackBy]="trackBy"
            matSort matSortActive="entities-fdr" matSortDirection="asc" matSortDisableClear
