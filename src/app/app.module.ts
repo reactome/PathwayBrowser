@@ -68,11 +68,8 @@ import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
 import {AnalysisLegendComponent} from "./legend/analysis-legend/analysis-legend.component";
 import {ExternalReferenceComponent} from "./details/common/external-reference/external-reference.component";
 import {CrossReferencesComponent} from "./details/common/cross-references/cross-references.component";
-import {CatalystActivityComponent} from "./details/common/catalyst-activity/catalyst-activity.component";
 import {ControllerTreeComponent} from "./details/common/controller-tree/controller-tree.component";
 import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
-import {RegulationComponent} from "./details/common/regulation/regulation.component";
-import {ModificationComponent} from "./details/common/modification/modification.component";
 import {MolecularProcessComponent} from "./details/common/molecular-process/molecular-process.component";
 import {FormatClassNamePipe} from "./pipes/format-class-name.pipe";
 import {CastPipe} from "./pipes/cast.pipe";
@@ -108,10 +105,7 @@ import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.com
     ControllerTreeComponent,
     ExternalReferenceComponent,
     CrossReferencesComponent,
-    CatalystActivityComponent,
     EntityTreeComponent,
-    RegulationComponent,
-    ModificationComponent,
     MolecularProcessComponent,
     CellMarkerComponent,
     ExpressionTabComponent,

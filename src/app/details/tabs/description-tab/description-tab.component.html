@@ -108,8 +108,6 @@
 <!-- Modifications-->
 <ng-template #modificationsTemplate>
   <div class="element-container">
-    <!--        <cr-modification [modifications]="modifications()"></cr-modification>-->
-
     <cr-molecular-process [entries]="modifications()" [catalystActivityReference]="catalystRef()"
                           [regulationRefs]="regulationRefs()"></cr-molecular-process>
   </div>
@@ -158,7 +156,6 @@
 <!-- Catalyst Activity-->
 <ng-template #catalystActivityTemplate>
   <div class="element-container">
-    <!--        <cr-catalyst-activity [catalystActivity]="catalystActivity()" [catalystActivityReference]="catalystRef()"></cr-catalyst-activity>-->
     <cr-molecular-process [entries]="catalystActivity()" [catalystActivityReference]="catalystRef()"
                           [regulationRefs]="regulationRefs()"></cr-molecular-process>
   </div>
@@ -167,7 +164,6 @@
 
 <ng-template #regulationTemplate>
   <div class="element-container">
-    <!--        <cr-regulation [regulations]="regulations()" [regulationRefs]="regulationRefs()"></cr-regulation>-->
     <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"
                           [regulationRefs]="regulationRefs()"></cr-molecular-process>
   </div>
