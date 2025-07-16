@@ -29,7 +29,7 @@
       <div class="left">
         <mat-icon class="symbol-icon"
                   [matTooltip]="getSymbol(element).tooltip"
-                  [svgIcon]="getSymbol(element).name">
+                  [svgIcon]="moleculeView()? getSymbol(element.icon).name: getSymbol(element).name">
         </mat-icon>
 
         <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">

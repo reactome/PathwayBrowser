@@ -62,6 +62,10 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   depthChangeSource = model<'controller' | 'tree' | undefined>(undefined);
   treeLength = model<number | undefined>(undefined);
 
+  moleculeView = input<boolean>(false);
+  stoichiometry = input<number>();
+  highlight = input<boolean>(false);
+
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
   fullTreeCache: R[] = [];
@@ -70,23 +74,29 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   @ViewChild(MatTree) tree!: MatTree<R>;
 
-  readonly type = input.required<string>()
-  readonly data = input.required<R[], (E | R)[]>({
-    transform: (data: (E | R)[]): R[] => {
-      if (!data || data.length === 0) return [];
-      if (data[0].stoichiometry) return data.map((r, index) => ({
-        ...r,
-        element: {...r.element, composedOf: r.element.composedOf || []},
-        index: index,
-      })) as R[];
-      return (data as E[]).map(e => ({
-        element: {...e, composedOf: e.composedOf || []},
-        order: 0,
-        stoichiometry: 1,
-        type: this.type(),
-        index: 0
-      }) as R); // Wrap in fake relationship to keep stoichiometry and global structure
-    }
+  readonly type = input.required<string>();
+  readonly data = input.required<(E | R)[]>();
+
+  treeData = computed<R[]>(() => {
+    const data = this.data();
+    const moleculeStoichiometry = this.stoichiometry();
+    const moleculeView = this.moleculeView();
+    const highlight = this.highlight();
+    if (!data || data.length === 0) return [];
+    if (data[0].stoichiometry) return data.map((r, index) => ({
+      ...r,
+      element: {...r.element, composedOf: r.element.composedOf || []},
+      index: index,
+    })) as R[];
+    return (data as E[]).map(e => ({
+      element: {...e, composedOf: e.composedOf || []},
+      order: 0,
+      stoichiometry: moleculeStoichiometry ?? 1,
+      type: this.type(),
+      index: 0,
+      highlight: highlight,
+      moleculeView: moleculeView,
+    }) as R); // Wrap in fake relationship to keep stoichiometry and global structure
   });
 
   dataSource = new MatTreeNestedDataSource<R>();
@@ -101,8 +111,8 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     // Initial tree data
     effect(() => {
       if (this.data().length > 0) {
-        this.initialData = cloneDeep(this.data());
-        this.dataSource.data = this.data();
+        this.initialData = cloneDeep(this.treeData());
+        this.dataSource.data = this.treeData();
       }
     });
 
@@ -111,7 +121,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       const result = this._selectedTreeNodeData.value();
       if (!result) return;
       this.updateMatTreeDataSource(result);
-
     });
 
     // Updating entire tree when user click depth controller
@@ -169,7 +178,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
 
       const depthInQuery = depth - 1; // Ignore the default depth 1
-      const results = [...this.data()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
+      const results = [...this.treeData()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
       return forkJoin(results).pipe();
     }
@@ -177,20 +186,20 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   // Get max level when first load
   _fullTreeSource = rxResource({
-    request: () => (this.data()),
+    request: () => (this.treeData()),
     loader: (params) => {
       if (this.hasDepthControl()) {
         const nodeResults = params.request.map((node) => this.fetchTreeAtDepth(node, -1));
         return forkJoin(nodeResults);
       }
 
-      return of(this.data());
+      return of(this.treeData());
     }
   })
 
 
   _selectedTreeNodeData = rxResource({
-    request: () => this.selectedTreeNode()?.stId,
+    request: () => this.selectedTreeNode()?.stId || this.selectedTreeNode()?.dbId,
     loader: (param) => {
       const selectedNode = this.selectedTreeNode();
       // Check the condition to determine which method to call
@@ -377,7 +386,14 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     const tree = [...existingTreeData];
     const flatTree = this.flattenTree(tree);
-    const targetTreeNode = flatTree.find(node => node.element.stId === result.stId);
+    const targetTreeNode = flatTree.find(node => {
+      if (result.stId != null) {
+        return node.element.stId === result.stId;
+      } else if (result.dbId != null) {
+        return node.element.dbId === result.dbId;
+      }
+      return false;
+    });
 
     if (targetTreeNode) {
       // Merge all properties from result directly into the element
