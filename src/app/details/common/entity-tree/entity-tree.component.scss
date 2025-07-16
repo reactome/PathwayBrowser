@@ -94,13 +94,22 @@
   max-width: var(--max-width);
 }
 
-.compartment {
+
+.shared-style {
   padding: 0 8px;
   background: var(--tertiary-container);
   border-radius: 10px;
   align-content: center;
   color: var(--on-tertiary-container);
+}
+
+.compartment {
+  @extend .shared-style;
   max-width: var(--max-width);
+}
+
+.molecule {
+  @extend .shared-style;
 }
 
 .goTo-container,
