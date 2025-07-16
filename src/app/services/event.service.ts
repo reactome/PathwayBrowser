@@ -10,7 +10,7 @@ import {AnalysisService} from "./analysis.service";
 import {EhldService} from "./ehld.service";
 import {TopLevelPathway} from "../model/graph/event/top-level-pathway.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isEntity, isEvent, isPathway, isPathwayWithDiagram, isRLE} from "./utils";
+import {isEvent, isPathway, isPathwayWithDiagram, isPhysicalEntity, isRLE} from "./utils";
 import {DatabaseObjectService} from "./database-object.service";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 import {Relationship} from "../model/graph/relationship.model";
