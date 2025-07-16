@@ -361,14 +361,29 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   isNestedView(selectedNode: E | undefined): boolean {
     if (!selectedNode) return true;
 
+    // participants for molecule tab
+    // If the node has an icon, treat it as non-nested
+    const isStructure = this.moleculeView();
+    if (isStructure) {
+      return false
+    }
+
     const nonNestedClasses: Set<string> = new Set([
       SchemaClasses.EWAS,
       SchemaClasses.SIMPLE_ENTITY,
       SchemaClasses.CHEMICAL_DRUG,
-      SchemaClasses.REACTION
+      // SchemaClasses.REACTION,
+      // SchemaClasses.PATHWAY,
+      // SchemaClasses.TLP,
+      // SchemaClasses.CELL_LINEAGE_PATH,
+      // SchemaClasses.BLACK_BOX_EVENT
     ])
 
-    return !(nonNestedClasses.has(selectedNode.schemaClass));
+    const notNested = nonNestedClasses.has(selectedNode.schemaClass) ||
+      isPathway(selectedNode) ||
+      isRLE(selectedNode);
+
+    return !notNested;
   }
 
   isEllipsisActive(e: HTMLElement): boolean {
