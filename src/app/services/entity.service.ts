@@ -38,7 +38,7 @@ export class EntityService {
   }
 
   getEntityInDepth<E extends DatabaseObject>(id: string | number, depth: number): Observable<E> {
-    const url = `${environment.host}/ContentService/data/entity/${id}/in-depth?maxDepth=${depth}&attributes=species%2Ccompartment&view=nested-aggregated&includeRef=true`;
+    const url = `${environment.host}/ContentService/data/entity/${id}/in-depth?maxDepth=${depth}&attributes=species%2Ccompartment%2CreferenceEntity&view=nested-aggregated&includeRef=true`;
     return this.http.get<E>(url).pipe(map(this.dataStateService.flattenReferences))
   }
 
