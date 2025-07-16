@@ -18,6 +18,8 @@ import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molecule.model";
 import {Publication} from "../model/graph/publication/publication.model";
 import {Book} from "../model/graph/publication/book.model";
+import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
+import {ParticipantRefEntity} from "./participant.service";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -76,6 +78,22 @@ export function isPhysicalEntity(obj: DatabaseObject): obj is PhysicalEntity {
   return physicalEntityClasses.has(obj.schemaClass);
 }
 
+const ReferenceEntityClasses: Set<string> = new Set([
+  SchemaClasses.REFERENCE_ENTITY,
+  SchemaClasses.REFERENCE_GROUP,
+  SchemaClasses.REFERENCE_MOLECULE,
+  SchemaClasses.REFERENCE_SEQUENCE,
+  SchemaClasses.REFERENCE_DNA_SEQUENCE,
+  SchemaClasses.REFERENCE_GENE_PRODUCT,
+  SchemaClasses.REFERENCE_ISOFORM,
+  SchemaClasses.REFERENCE_RNA_SEQUENCE,
+  SchemaClasses.REFERENCE_THERAPEUTIC
+]);
+
+export function isRefEntity(obj: DatabaseObject): obj is ReferenceEntity {
+  return ReferenceEntityClasses.has(obj.schemaClass);
+}
+
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
   return obj.schemaClass === SchemaClasses.EWAS;
 }
@@ -92,6 +110,24 @@ const reactionLikeEventClasses: Set<string> = new Set([
 export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
   return reactionLikeEventClasses.has(obj.schemaClass);
 }
+
+// todo: simplify ? introduce relationship?
+// All molecules at Molecules tab
+const moleculeClasses: Set<string> = new Set([
+  SchemaClasses.EWAS,
+  SchemaClasses.REFERENCE_GENE_PRODUCT,
+  SchemaClasses.REFERENCE_ISOFORM,
+  SchemaClasses.REFERENCE_RNA_SEQUENCE,
+  SchemaClasses.REFERENCE_DNA_SEQUENCE,
+  SchemaClasses.SIMPLE_ENTITY,
+  SchemaClasses.REFERENCE_MOLECULE,
+  SchemaClasses.REFERENCE_THERAPEUTIC
+])
+
+export function isMolecule(obj: DatabaseObject): obj is ParticipantRefEntity{
+  return  moleculeClasses.has(obj.schemaClass);
+}
+
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
   return isPathway(obj) && obj.hasDiagram;
@@ -138,6 +174,10 @@ export function isReferenceMolecule(obj: DatabaseObject): obj is ReferenceMolecu
 
 export function isRefOrBook(publication: Publication): publication is LiteratureReference | Book {
   return publication.schemaClass === SchemaClasses.LITERATURE_REFERENCE || publication.schemaClass === SchemaClasses.BOOK
+}
+
+export function isSelectableObject(obj: DatabaseObject): obj is Event | PhysicalEntity {
+  return isEvent(obj) || isPhysicalEntity(obj);
 }
 
 /** Generic function to dynamic access child property
