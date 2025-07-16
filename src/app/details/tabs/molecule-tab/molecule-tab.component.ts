@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, signal} from '@angular/core';
+import {Component, computed, effect, input} from '@angular/core';
 import {Participant, ParticipantRefEntity, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -8,6 +8,9 @@ import {DataStateService} from "../../../services/data-state.service";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {of} from "rxjs";
 import {IconService} from "../../../services/icon.service";
+import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
+import {MatDivider} from "@angular/material/divider";
+import {EntityTreeComponent} from "../../common/entity-tree/entity-tree.component";
 
 
 interface MoleculeData {
@@ -34,8 +37,12 @@ export enum PropertyType {
 @Component({
   selector: 'cr-molecule-tab',
   templateUrl: './molecule-tab.component.html',
-  styleUrl: './molecule-tab.component.scss',
-  standalone: false,
+  imports: [
+    SortByTextPipe,
+    MatDivider,
+    EntityTreeComponent
+  ],
+  styleUrl: './molecule-tab.component.scss'
 })
 export class MoleculeTabComponent {
 

@@ -1,6 +1,13 @@
 import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
-import {isEvent} from "../../../services/utils";
-import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
+import {isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
+import {
+  MatNestedTreeNode,
+  MatTree,
+  MatTreeNestedDataSource,
+  MatTreeNodeDef,
+  MatTreeNodeOutlet,
+  MatTreeNodeToggle
+} from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {forkJoin, map, of} from "rxjs";
 import {SelectableObject} from "../../../services/event.service";
@@ -12,13 +19,40 @@ import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
+import {NgClass, NgIf} from "@angular/common";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatIcon} from "@angular/material/icon";
+import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
+import {DescriptionOverviewComponent} from "../description-overview/description-overview.component";
+import {MatDivider} from "@angular/material/divider";
+import {ExternalReferenceComponent} from "../external-reference/external-reference.component";
+import {CrossReferencesComponent} from "../cross-references/cross-references.component";
+import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details/molecule-details.component";
+import {MatIconButton} from "@angular/material/button";
+import {Species} from "../../../model/graph/species.model";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
 @Component({
   selector: 'cr-entity-tree',
-  standalone: false,
   templateUrl: './entity-tree.component.html',
+  imports: [
+    MatTree,
+    MatNestedTreeNode,
+    NgClass,
+    MatTooltip,
+    MatIcon,
+    DescriptionOverviewComponent,
+    MatDivider,
+    ExternalReferenceComponent,
+    CrossReferencesComponent,
+    MoleculeDetailsComponent,
+    MatTreeNodeOutlet,
+    MatTreeNodeToggle,
+    MatIconButton,
+    MatTreeNodeDef,
+    NgIf
+  ],
   styleUrl: './entity-tree.component.scss'
 })
 export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {

@@ -1,12 +1,17 @@
 import {Component, computed, input} from '@angular/core';
 import {EntityService} from "../../../services/entity.service";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
+import {KeyValuePipe} from "@angular/common";
+import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 
 @Component({
   selector: 'cr-cross-references',
   templateUrl: './cross-references.component.html',
-  styleUrl: './cross-references.component.scss',
-  standalone: false
+  imports: [
+    KeyValuePipe,
+    SortByTextPipe
+  ],
+  styleUrl: './cross-references.component.scss'
 })
 export class CrossReferencesComponent {
   readonly _crossReferences = input.required<DatabaseIdentifier[]>({alias: 'crossRefs'});

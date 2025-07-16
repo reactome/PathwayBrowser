@@ -2,12 +2,16 @@ import {Component, computed, input} from '@angular/core';
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {EntityService} from "../../../services/entity.service";
 import {isArray, isString} from "lodash";
+import {NgClass, TitleCasePipe} from "@angular/common";
 
 @Component({
   selector: 'cr-external-reference',
   templateUrl: './external-reference.component.html',
   styleUrl: './external-reference.component.scss',
-  standalone: false
+  imports: [
+    TitleCasePipe,
+    NgClass
+  ]
 })
 export class ExternalReferenceComponent {
 
