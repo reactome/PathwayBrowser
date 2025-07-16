@@ -46,6 +46,20 @@
 
 
       <div class="right">
+
+        @if(moleculeView() && node.highlight){
+          <span class="highlight-tag">📌</span>
+        }
+
+        @if (moleculeView()) {
+          <span class="molecule name">
+             @if (node.stoichiometry > 1) {
+               <b>{{ node.stoichiometry }} ×</b>
+             }
+            {{ element.displayName }}
+          </span>
+        }
+
         <!--Compartment-->
         @for (comp of getCompartments(element); track comp) {
           <span class="compartment name"
@@ -66,12 +80,15 @@
           </span>
         }
 
-        <div class="select-container">
-          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-          <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
-            <mat-icon class="custom-icon" [svgIcon]="'select'"></mat-icon>
-          </button>
-        </div>
+        @if(!moleculeView()){
+          <div class="select-container">
+            <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+            <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
+              <mat-icon class="custom-icon" [svgIcon]="'select'"></mat-icon>
+            </button>
+          </div>
+        }
+
         <div class="goTo-container">
           <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()">
             <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
@@ -106,18 +123,28 @@
         </div>
 
         <div class="details-content-container">
-          <!-- Details content -->
-          <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
-          @if (element.referenceEntity) {
-            <mat-divider class="divider-color"></mat-divider>
-            <!-- External Reference -->
-            <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
+           <!--structure view is for the molecule on the molecule tab which contains a protein structure-->
+          @if(!moleculeView()){
+            <!-- Details content -->
+            <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
+            @if (element.referenceEntity) {
+              <mat-divider class="divider-color"></mat-divider>
+              <!-- External Reference -->
+              <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
+            }
+            <!-- Cross References -->
+            @if (element.referenceEntity && element.referenceEntity.crossReference) {
+              <mat-divider></mat-divider>
+              <cr-cross-references [crossRefs]=element.referenceEntity.crossReference></cr-cross-references>
+            }
+
+          } @else {
+
+            @if (_selectedTreeNodeData.hasValue()) {
+              <cr-molecule-details [obj]="element" [xRefs]="element.crossReference"></cr-molecule-details>
+            }
           }
-          <!-- Cross References -->
-          @if (element.referenceEntity && element.referenceEntity.crossReference) {
-            <mat-divider></mat-divider>
-            <cr-cross-references [crossRefs]=element.referenceEntity.crossReference></cr-cross-references>
-          }
+
         </div>
 
       </mat-nested-tree-node>
