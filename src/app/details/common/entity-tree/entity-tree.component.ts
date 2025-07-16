@@ -100,12 +100,13 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   });
 
   dataSource = new MatTreeNestedDataSource<R>();
-  maxStringLength = 27; // Use Molluscum contagiosum virus's length
+
 
   constructor(private iconService: IconService,
               private entity: EntityService,
               private dataStateService: DataStateService,
               private urlState: UrlStateService,
+              private extractCompartmentPipe: ExtractCompartmentPipe
   ) {
 
     // Initial tree data
@@ -412,7 +413,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     ]);
   }
 
-  getSymbol(obj: DatabaseObject) {
+  getSymbol(obj: DatabaseObject | string) {
     return this.iconService.getIconDetails(obj);
   }
 
@@ -559,4 +560,72 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     if (!node.stId) return;
     this.urlState.select.set(node.stId);
   }
+
+
+  getUrl(element: E): string {
+    if (isEWAS(element) && element.referenceEntity.url) {
+      return element.referenceEntity.url;
+    }
+    if (isMolecule(element)) {
+      return element.url
+    }
+    // Non proteins or molecule, linking to details page
+    return `/content/detail/${element.stId}`;
+  }
+
+  getDisplayName(node: R, element: E): string {
+
+    if (this.moleculeView() && isMolecule(element) && element.identifier) {
+      return `${element.identifier}`;
+    }
+
+    if (isSelectableObject(element)) {
+      const storichiometry = node.stoichiometry > 1 ? `${node.stoichiometry} × ` : '';
+      const displayName = this.extractCompartmentPipe.transform(element.displayName, true);
+      const finalName = element.name?.[0] || displayName;
+      return storichiometry + finalName
+    }
+    return element.displayName;
+  }
+
+  getCompartments(element:E): string[] {
+
+    if(this.moleculeView()) return [];
+    if (!this.isEvent(element)) {
+      const comp = this.extractCompartmentPipe.transform(element.displayName);
+      return comp ? [comp] : [];
+    } else {
+      return element.hasCompartment?.map(h => h.element.displayName) || [];
+    }
+  }
+
+
+  /**?
+   *
+   * @param element
+   *
+   *  element {
+   *    species: Species;
+   *    speciesName: string
+   *  }
+   *  Get short name from species name arr in Species Object for saving space.
+   *  For instance, H. sapiens instead of Human Sapiens
+   *
+   */
+
+  getSpeciesName(element: E): string | null {
+
+    const speciesName: string = isSelectableObject(element) ? element.speciesName : null;
+    const species: Species = isSelectableObject(element) ? element.species : null;
+
+    if (!speciesName) return null;
+
+    const maxStringLength = 30;  // Use Molluscum contagiosum virus's length
+    const speciesArr = Array.isArray(species) ? species : [species];
+    const firstSpeciesName = speciesArr?.[0]?.name;
+    const shouldShorten = speciesName.length >= maxStringLength && firstSpeciesName.length > 1;
+
+    return shouldShorten ? this.getShortest(firstSpeciesName) : speciesName;
+  }
+
 }
