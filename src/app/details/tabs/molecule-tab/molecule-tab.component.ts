@@ -7,7 +7,6 @@ import {rxResource} from "@angular/core/rxjs-interop";
 import {DataStateService} from "../../../services/data-state.service";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {of} from "rxjs";
-import {IconService} from "../../../services/icon.service";
 import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 import {MatDivider} from "@angular/material/divider";
 import {EntityTreeComponent} from "../../common/entity-tree/entity-tree.component";
@@ -26,7 +25,6 @@ export interface Molecule {
 }
 
 export enum PropertyType {
-
   PROTEINS = "Proteins",
   CHEMICAL_COMPOUNDS = "Chemical Compounds",
   SEQUENCES = "DNA/RNA",
@@ -52,10 +50,9 @@ export class MoleculeTabComponent {
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private dataState: DataStateService,
-              private iconService: IconService) {
+              private dataState: DataStateService) {
     effect(() => {
-      const stId = this.obj().stId;
+      const stId = this.obj()?.stId;
       const pathwayId = this.pathway()?.stId;
 
       if (stId && stId !== pathwayId) {
@@ -85,12 +82,10 @@ export class MoleculeTabComponent {
     let moleculeData: MoleculeData[] = [];
 
     const pathwayParticipants = this.pathwayParticipants();
-
     if (!pathwayParticipants) return [];
 
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
-
-    if (this.obj().stId === this.pathway()?.stId) {
+    if (this.obj()?.stId === this.pathway()?.stId) {
       moleculeData = pathwayResults;
     } else {
       const refEntities = this.entity.refEntities() || [];
@@ -146,7 +141,7 @@ export class MoleculeTabComponent {
 
       if (existingEntity) {
         existingEntity.stoichiometry++;
-      //  existingEntity.stoichiometry = (existingEntity.stoichiometry ?? 0) + 1;
+        // existingEntity.stoichiometry = (existingEntity.stoichiometry ?? 0) + 1;
       } else {
         dataMap.set(entity.dbId, {entity, stoichiometry: 1, highlight: true})
       }
@@ -204,4 +199,11 @@ export class MoleculeTabComponent {
       .replace(/[^a-z0-9-_]/g, '');   // Remove special characters
   }
 
+
+  getStatistics(graph: MoleculeData) {
+    const found = graph.found;
+    const total = graph.data.length;
+    return found ? `${found}/${total}` : `${total}`
+
+  }
 }

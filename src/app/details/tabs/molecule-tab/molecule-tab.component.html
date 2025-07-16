@@ -4,13 +4,7 @@
     @for (group of moleculeData() | sortByText: 'type'; track group.type; ) {
       <div class="list" [id]=sanitizeId(group.type)>
         <span class="header">
-          {{ group.type }}
-          @let found = group.found;
-          @if (found !== undefined) {
-            {{ found }}/{{ group.data.length }}
-          } @else {
-            {{ group.data.length }}
-          }
+          {{ group.type }} {{getStatistics(group)}}
         </span>
       </div>
 
