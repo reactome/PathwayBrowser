@@ -9,14 +9,16 @@
   padding-left: var(--gap);
   align-content: space-between;
 
-  --columns: 6;
-  --gap: 20px;
-  --half-gap: calc(var(--gap) / 2);
-  --padding: 20px;
-  --column-width: max(100px, calc((var(--width) - (var(--columns) + 1) * var(--gap)) / var(--columns)));
-  --icon-width: var(--column-width);
-  --icon-height: 84px;
-  --margin-right: 2px;
+  & {
+    --columns: 6;
+    --gap: 20px;
+    --half-gap: calc(var(--gap) / 2);
+    --padding: 20px;
+    --column-width: max(100px, calc((var(--width) - (var(--columns) + 1) * var(--gap)) / var(--columns)));
+    --icon-width: var(--column-width);
+    --icon-height: 84px;
+    --margin-right: 2px;
+  }
 
 }
 
@@ -32,6 +34,28 @@
   gap: var(--half-gap);
   width: calc((var(--columns) - 1) * var(--column-width) + (var(--columns) - 2) * var(--gap));
   height: 100%;
+
+  .list {
+    width: 100%;
+
+
+    .header {
+      padding: 0 2px;
+      font-weight: 500;
+      letter-spacing: 0.15px;
+      color: var(--outline);
+    }
+  }
+
+
+  .divider {
+    width: 100%;
+  }
+
+  .composition-container {
+    width: 100%;
+  }
+
 
 
 }

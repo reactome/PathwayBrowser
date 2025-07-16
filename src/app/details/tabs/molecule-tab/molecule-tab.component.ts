@@ -49,7 +49,6 @@ export class MoleculeTabComponent {
   readonly obj = input.required<SelectableObject>();
   pathway = computed(() => this.dataState.currentPathway());
 
-  selectedSection = signal<string | null>(null);
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
@@ -61,9 +60,7 @@ export class MoleculeTabComponent {
 
       if (stId && stId !== pathwayId) {
         this.entity.loadRefEntities(stId);
-        console.log("ji")
       }
-
     });
 
   }
@@ -90,6 +87,7 @@ export class MoleculeTabComponent {
     const pathwayParticipants = this.pathwayParticipants();
 
     if (!pathwayParticipants) return [];
+
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
 
     if (this.obj().stId === this.pathway()?.stId) {
@@ -158,10 +156,8 @@ export class MoleculeTabComponent {
     // todo remove finalResults
     const finalResults: MoleculeData[] = Array.from(groupedMap, ([type, dataMap]) => ({
       type,
-      //found: undefined,
       data: Array.from(dataMap.values())
     }));
- console.log('finalResults', finalResults);
     return finalResults;
   }
 
@@ -206,11 +202,6 @@ export class MoleculeTabComponent {
       .toLowerCase()
       .replace(/\s+/g, '-')           // Replace spaces with dashes
       .replace(/[^a-z0-9-_]/g, '');   // Remove special characters
-  }
-
-
-  getSymbol(obj: string) {
-    return this.iconService.getIconDetails(obj);
   }
 
 }
