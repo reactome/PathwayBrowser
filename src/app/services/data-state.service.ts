@@ -68,9 +68,9 @@ export class DataStateService {
     });
   }
 
-  fetchEnhancedData<T extends DatabaseObject>(stId: string | null): Observable<T | undefined> {
-    let url = `${environment.host}/ContentService/data/query/enhanced/${stId}?includeRef=true&view=nested-aggregated`;
-    if (stId === null) return of();
+  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null): Observable<T | undefined> {
+    let url = `${environment.host}/ContentService/data/query/enhanced/${id}?includeRef=true&view=nested-aggregated`;
+    if (id === null) return of();
     return this.http.get<T>(url).pipe(map(this.flattenReferences))
   }
 
