@@ -83,6 +83,8 @@ import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component
 import {TypeSafeMatCellDef} from "./utils/type-safe-mat-cell-def.directive";
 import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
 import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
+import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-viewer/structure-viewer.component";
+import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
 
 @NgModule({
   declarations: [
