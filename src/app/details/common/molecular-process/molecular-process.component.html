@@ -87,7 +87,7 @@
         <div class="composition-container">
           @if (isReferenceGroup(item.modification) || isReferenceMolecule(item.modification)) {
             <cr-ontology-term [term]="item.modification"></cr-ontology-term>
-          } @else if (isEntity(item.modification)) {
+          } @else if (isPhysicalEntity(item.modification)) {
             <cr-entity-tree [type]="'modification'" [data]="[item.modification]"></cr-entity-tree>
           }
         </div>

@@ -110,7 +110,7 @@ export class MolecularProcessComponent {
   }
 
   protected readonly isReferenceGroup = isReferenceGroup;
-  protected readonly isEntity = isEntity;
+  protected readonly isPhysicalEntity = isPhysicalEntity;
   protected readonly isReplacedResidue = isReplacedResidue;
   protected readonly isFragmentModification = isFragmentModification;
   protected readonly isReferenceMolecule = isReferenceMolecule;

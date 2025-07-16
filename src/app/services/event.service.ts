@@ -189,7 +189,7 @@ export class EventService {
   adjustTreeFromDiagramSelection(object: DatabaseObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     // All visible tree nodes
     const allVisibleTreeNodes = this.getAllVisibleTreeEvents(tree);
-    if (isEntity(object)) {
+    if (isPhysicalEntity(object)) {
       return this.handleEntitySelectionFromDiagram(object, diagramId, allVisibleTreeNodes, tree);
     } else if (isRLE(object)) {
       return this.handleReactionSelectionFromDiagram(object, diagramId, allVisibleTreeNodes, tree, hitReactions);
@@ -277,7 +277,7 @@ export class EventService {
   }
 
   buildTree(obj: SelectableObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
-    if (isEntity(obj)) {
+    if (isPhysicalEntity(obj)) {
       return this.buildTreeWithSelectedEntity(obj, diagramId, tree, hitReactions);
     } else {
       if (this.ehldService.hasEHLD()) {

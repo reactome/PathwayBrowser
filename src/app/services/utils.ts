@@ -72,7 +72,7 @@ export function isPathway(obj: DatabaseObject): obj is Pathway | TopLevelPathway
 const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
   SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY, SchemaClasses.CELL]);
 
-export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
+export function isPhysicalEntity(obj: DatabaseObject): obj is PhysicalEntity {
   return physicalEntityClasses.has(obj.schemaClass);
 }
 

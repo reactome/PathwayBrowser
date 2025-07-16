@@ -1,7 +1,7 @@
 import {Component, computed, effect, input, signal, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
-import {getProperty, groupAndSortBy, isEntity} from "../../../services/utils";
+import {getProperty, groupAndSortBy, isPhysicalEntity} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
@@ -41,12 +41,12 @@ export class DescriptionTabComponent {
   })
 
   _otherForms = rxResource({
-    request: () => isEntity(this.obj()) && this.obj().stId,
+    request: () => isPhysicalEntity(this.obj()) && this.obj().stId,
     loader: (param) => param.request ? this.entity.getOtherForms(param.request) : of(null)
   })
 
   _interactors = rxResource({
-    request: () => isEntity(this.obj()) && this.referenceEntity()?.identifier,
+    request: () => isPhysicalEntity(this.obj()) && this.referenceEntity()?.identifier,
     loader: (param) => param.request ? this.interactorService.getCustomInteractorsByAcc(param.request) : of(null)
   })
 

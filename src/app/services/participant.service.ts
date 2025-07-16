@@ -13,8 +13,6 @@ export interface ParticipantRefEntity {
   displayName: string;
   icon: string;
   url: string;
-
-
 }
 
 export interface Participant {
