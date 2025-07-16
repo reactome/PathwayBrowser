@@ -101,8 +101,9 @@
     <!-- Add this details-group and details-tree is for making the connector works in Firefox, to make the mat-nested-tree to take the full height of the parent -->
     <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group"
          [class.details-group]="!isNestedView(node.element) && tree.isExpanded(node) ? 'details-group' : ''">
+      <!--make sure getting full object content to render with _selectedTreeNodeData.hasValue()-->
       <ng-container
-        *ngIf="!isNestedView(node.element); then details; else entity">
+        *ngIf="!isNestedView(node.element) && _selectedTreeNodeData.hasValue(); then details; else entity">
       </ng-container>
     </div>
 
