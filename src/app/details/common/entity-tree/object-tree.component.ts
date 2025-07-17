@@ -37,13 +37,13 @@ import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
 import {PropertyType} from "../../tabs/molecule-tab/molecule-tab.component";
-import {EntityDetailsComponent} from "./entity-details/entity-details.component";
+import {ObjectTreeDetailsComponent} from "./entity-details/object-tree-details.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
 @Component({
-  selector: 'cr-entity-tree',
-  templateUrl: './entity-tree.component.html',
+  selector: 'cr-object-tree',
+  templateUrl: './object-tree.component.html',
   imports: [
     MatTree,
     MatNestedTreeNode,
@@ -56,11 +56,11 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     MatIconButton,
     MatTreeNodeDef,
     NgIf,
-    EntityDetailsComponent
+    ObjectTreeDetailsComponent
   ],
-  styleUrl: './entity-tree.component.scss'
+  styleUrl: './object-tree.component.scss'
 })
-export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
+export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
 
   hasDepthControl = input<boolean>(false);
   depthIndex = model<number | undefined>();

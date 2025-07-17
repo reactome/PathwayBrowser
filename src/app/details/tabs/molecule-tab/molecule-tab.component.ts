@@ -9,7 +9,7 @@ import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-e
 import {of} from "rxjs";
 import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 import {MatDivider} from "@angular/material/divider";
-import {EntityTreeComponent} from "../../common/entity-tree/entity-tree.component";
+import {ObjectTreeComponent} from "../../common/entity-tree/object-tree.component";
 
 
 interface MoleculeGroup {
@@ -38,7 +38,7 @@ export enum PropertyType {
   imports: [
     SortByTextPipe,
     MatDivider,
-    EntityTreeComponent
+    ObjectTreeComponent
   ],
   styleUrl: './molecule-tab.component.scss'
 })

@@ -10,7 +10,7 @@ import {ExternalReferenceComponent} from "../../external-reference/external-refe
 import {CrossReferencesComponent} from "../../cross-references/cross-references.component";
 
 @Component({
-  selector: 'cr-entity-details',
+  selector: 'cr-object-tree-details',
   imports: [
     StructureViewerComponent,
     MatDivider,
@@ -18,10 +18,10 @@ import {CrossReferencesComponent} from "../../cross-references/cross-references.
     ExternalReferenceComponent,
     CrossReferencesComponent
   ],
-  templateUrl: './entity-details.component.html',
-  styleUrl: './entity-details.component.scss'
+  templateUrl: './object-tree-details.component.html',
+  styleUrl: './object-tree-details.component.scss'
 })
-export class EntityDetailsComponent {
+export class ObjectTreeDetailsComponent {
 
   readonly obj = input.required<SelectableObject>();
 

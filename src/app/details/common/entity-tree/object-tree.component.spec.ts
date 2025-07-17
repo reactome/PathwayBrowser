@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EntityDetailsComponent } from './entity-details.component';
+import { ObjectTreeComponent } from './object-tree.component';
 
-describe('EntityDetailsComponent', () => {
-  let component: EntityDetailsComponent;
-  let fixture: ComponentFixture<EntityDetailsComponent>;
+describe('EntityTreeComponent', () => {
+  let component: ObjectTreeComponent;
+  let fixture: ComponentFixture<ObjectTreeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EntityDetailsComponent]
+      imports: [ObjectTreeComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EntityDetailsComponent);
+    fixture = TestBed.createComponent(ObjectTreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

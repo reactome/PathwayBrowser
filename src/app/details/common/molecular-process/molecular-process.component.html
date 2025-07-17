@@ -88,7 +88,7 @@
           @if (isReferenceGroup(item.modification) || isReferenceMolecule(item.modification)) {
             <cr-ontology-term [term]="item.modification"></cr-ontology-term>
           } @else if (isPhysicalEntity(item.modification)) {
-            <cr-entity-tree [type]="'modification'" [data]="[item.modification]"></cr-entity-tree>
+            <cr-object-tree [type]="'modification'" [data]="[item.modification]"></cr-object-tree>
           }
         </div>
       </div>
@@ -128,7 +128,7 @@
         <div class="label-container">Active Unit</div>
         <div class="composition-container tree-padding multiple">
           @for (unit of item.activeUnit; track unit.dbId) {
-            <cr-entity-tree [type]="'activeUnit'" [data]="[unit]"></cr-entity-tree>
+            <cr-object-tree [type]="'activeUnit'" [data]="[unit]"></cr-object-tree>
           }
 
         </div>
@@ -139,7 +139,7 @@
       <div class="row">
         <div class="label-container">Regulator</div>
         <div class="composition-container tree-padding">
-          <cr-entity-tree [type]="'regulator'" [data]="[item.regulator]"></cr-entity-tree>
+          <cr-object-tree [type]="'regulator'" [data]="[item.regulator]"></cr-object-tree>
         </div>
       </div>
     }
@@ -149,7 +149,7 @@
       <div class="row">
         <div class="label-container">Catalyst</div>
         <div class="composition-container tree-padding">
-          <cr-entity-tree [type]="'catalyst'" [data]="[item.catalyst]"></cr-entity-tree>
+          <cr-object-tree [type]="'catalyst'" [data]="[item.catalyst]"></cr-object-tree>
         </div>
       </div>
     }

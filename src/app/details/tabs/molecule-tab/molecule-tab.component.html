@@ -11,8 +11,8 @@
       <mat-divider class="divider"></mat-divider>
       <div class="composition-container">
         @for (item of group.data; track item.entity.dbId) {
-          <cr-entity-tree [type]="group.type" [data]="[item.entity]"
-                          [stoichiometry]=item.stoichiometry [highlight]="item.highlight" [moleculeView]="true"></cr-entity-tree>
+          <cr-object-tree [type]="group.type" [data]="[item.entity]"
+                          [stoichiometry]=item.stoichiometry [highlight]="item.highlight" [moleculeView]="true"></cr-object-tree>
         }
       </div>
     }
