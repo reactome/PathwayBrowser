@@ -1,5 +1,14 @@
 import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
-import {isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
+import {
+  extractFromSpace,
+  extractIdAfterColon, extractIdInBrackets,
+  isEvent,
+  isEWAS,
+  isMolecule,
+  isPathway,
+  isRLE,
+  isSelectableObject
+} from "../../../services/utils";
 import {
   MatNestedTreeNode,
   MatTree,
@@ -371,12 +380,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     const nonNestedClasses: Set<string> = new Set([
       SchemaClasses.EWAS,
       SchemaClasses.SIMPLE_ENTITY,
-      SchemaClasses.CHEMICAL_DRUG,
-      // SchemaClasses.REACTION,
-      // SchemaClasses.PATHWAY,
-      // SchemaClasses.TLP,
-      // SchemaClasses.CELL_LINEAGE_PATH,
-      // SchemaClasses.BLACK_BOX_EVENT
+      SchemaClasses.CHEMICAL_DRUG
     ])
 
     const notNested = nonNestedClasses.has(selectedNode.schemaClass) ||
@@ -589,16 +593,14 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
   getDisplayName(node: R, element: E): string {
-
     if (this.moleculeView() && isMolecule(element) && element.identifier) {
-      return `${element.identifier}`;
+      const displayName = this.getMoleculeName(node, element);
+      return `${displayName}`;
     }
 
     if (isSelectableObject(element)) {
-      const storichiometry = node.stoichiometry > 1 ? `${node.stoichiometry} × ` : '';
       const displayName = this.extractCompartmentPipe.transform(element.displayName, true);
-      const finalName = element.name?.[0] || displayName;
-      return storichiometry + finalName
+      return element.name?.[0] || displayName || element.displayName;
     }
     return element.displayName;
   }
@@ -641,6 +643,49 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     const shouldShorten = speciesName.length >= maxStringLength && firstSpeciesName.length > 1;
 
     return shouldShorten ? this.getShortest(firstSpeciesName) : speciesName;
+  }
+
+
+
+  getMoleculeName(node: R, element: E) {
+    let name = '';
+    const type = node.type;
+    switch (type) {
+      case PropertyType.PROTEINS:
+        name = extractFromSpace(element.displayName, false);
+        break;
+      case PropertyType.CHEMICAL_COMPOUNDS:
+        name = extractFromSpace(element.displayName, true);
+        break;
+      case PropertyType.SEQUENCES:
+        name = extractFromSpace(element.displayName, false);
+        break
+      case PropertyType.DRUG:
+        name = extractFromSpace(element.displayName, true);
+        break
+      case PropertyType.OTHERS:
+        name = element.displayName;
+    }
+    return name;
+  }
+
+
+  getMoleculeIdentifier(node: R,element:E) {
+    let identifier : string = '';
+    const type = node.type;
+    switch (type) {
+      case PropertyType.PROTEINS:
+      case PropertyType.SEQUENCES:
+        identifier = extractIdAfterColon(element.displayName);
+        break;
+      case PropertyType.CHEMICAL_COMPOUNDS:
+      case PropertyType.DRUG:
+        identifier = extractIdInBrackets(element.displayName);
+        break
+      case PropertyType.OTHERS:
+        identifier = element.displayName;
+    }
+    return identifier;
   }
 
 }

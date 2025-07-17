@@ -220,3 +220,55 @@ export function getArrayStats(values: number[]): ArrayStats {
   summary.multiValued = values.length > 1
   return summary;
 }
+
+
+/**
+ * J01866EMBL:J01866 5.8S rRNA ➡️ J01866
+ * ENSG00000001630ENSEMBL:ENSG00000001630 CYP51A1 ➡️ ENSG00000001630
+ * UniProt:A0A183 LCE6A ➡️ A0A183
+ * @param value
+ */
+export function extractIdAfterColon(value: string): string {
+  if (!value) return '';
+
+  const colonIndex = value.indexOf(':');
+  if (colonIndex === -1) return '';
+
+  const afterColon = value.substring(colonIndex + 1).trim();
+  const spaceIndex = afterColon.indexOf(' ');
+
+  return spaceIndex !== -1 ? afterColon.substring(0, spaceIndex) : afterColon;
+}
+
+
+/**
+ * ripasudil  [Guide to Pharmacology:10423] ➡️ 10423
+ * rosiglitazone [Guide to Pharmacology:1056] ➡️ 1056
+ * @param value
+ */
+export function extractIdInBrackets(value: string): string{
+  const match = value.match(/\[.*?:([^\]\s]+)\]/);
+  return match ? match[1] : '';
+}
+
+
+/**
+ * UniProt:P11142 HSPA8 ➡️ (default behavior) HSPA8
+ * UniProt:P11142 HSPA8 ➡️ True UniProt:P11142
+ * @param input
+ * @param getBeforeSpace
+ */
+export function  extractFromSpace(input: string, getBeforeSpace: boolean = false): string {
+  if (!input) return '';
+
+  const trimmed = input.trim();
+
+  if (getBeforeSpace) {
+    const index = trimmed.indexOf(' ');
+    return index !== -1 ? trimmed.substring(0, index) : trimmed;
+  } else {
+    const index = trimmed.lastIndexOf(' ');
+    return index !== -1 ? trimmed.substring(index + 1) : trimmed;
+  }
+}
+

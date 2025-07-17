@@ -40,6 +40,10 @@
         <span class="name" #name
               [matTooltip]="element.name?.[0]"
               [matTooltipDisabled]="!isEllipsisActive(name)">
+
+             @if (node.stoichiometry > 1) {
+               <b>{{ node.stoichiometry }} ×</b>
+             }
           {{ getDisplayName(node, element) }}
         </span>
       </div>
@@ -51,12 +55,9 @@
           <span class="highlight-tag">📌</span>
         }
 
-        @if (moleculeView()) {
+        @if(moleculeView()) {
           <span class="molecule name">
-             @if (node.stoichiometry > 1) {
-               <b>{{ node.stoichiometry }} ×</b>
-             }
-            {{ element.displayName }}
+            {{getMoleculeIdentifier(node, element)}}
           </span>
         }
 
