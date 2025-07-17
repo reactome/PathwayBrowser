@@ -80,10 +80,14 @@ export class StructureViewerComponent {
         }
       })
 
-    return [
+    const result = [
       {source: Source.ALPHA_FOLD, identifiers: [afId]},
-      {source: Source.PDB, identifiers: pdbIdentifiers}
-    ];
+    ]
+    if (pdbIdentifiers.length > 0) {
+      result.push({source: Source.PDB, identifiers: pdbIdentifiers})
+    }
+    return result;
+
   });
 
 
