@@ -127,6 +127,12 @@
         <div class="details-content-container">
            <!--structure view is for the molecule on the molecule tab which contains a protein structure-->
           @if(!moleculeView()){
+
+            @if (element.className === "Protein" && element.referenceEntity && element.referenceEntity.crossReference) {
+              <cr-structure-viewer [obj]=element.referenceEntity [xRefs]="element.referenceEntity.crossReference"></cr-structure-viewer>
+              <mat-divider class="divider-color"></mat-divider>
+            }
+
             <!-- Details content -->
             <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
             @if (element.referenceEntity) {

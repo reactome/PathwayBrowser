@@ -39,6 +39,8 @@ import {CrossReferencesComponent} from "../cross-references/cross-references.com
 import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details/molecule-details.component";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
+import {StructureViewerComponent} from "../../tabs/molecule-tab/structure-viewer/structure-viewer.component";
+import {PropertyType} from "../../tabs/molecule-tab/molecule-tab.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
@@ -60,7 +62,8 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     MatTreeNodeToggle,
     MatIconButton,
     MatTreeNodeDef,
-    NgIf
+    NgIf,
+    StructureViewerComponent
   ],
   styleUrl: './entity-tree.component.scss'
 })
