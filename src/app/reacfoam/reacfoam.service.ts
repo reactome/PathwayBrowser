@@ -23,6 +23,8 @@ export namespace EventsHierarchy {
     type: 'TopLevelPathway' | 'Pathway' | 'CellLineagePath'
     species: string,
     llp?: boolean,
+    totalEntity: number,
+    totalEntityAndInteractors: number,
     children: Data[]
     reactions?: Analysis.Pathway['reactions']
     entities?: Analysis.Pathway['entities']
@@ -84,7 +86,6 @@ export interface PathwayGroup extends FoamTree.DataObject {
   family: string,
   llp: boolean,
   familyColor: chroma.Color
-  depthColor: chroma.Color
   depth: number
   flag?: boolean
   expressions?: number[]
@@ -117,12 +118,6 @@ export class ReacfoamService {
     return this.http.get<EventsHierarchy.Data[]>(`${environment.host}/ContentService/data/eventsHierarchy/${species.taxId}`, {params})
   }
 
-  fetchFireworksNodeMap(species: string): Observable<Map<string, Fireworks.Node>> {
-    console.log('fetch fireworks node map')
-    return this.http.get<Fireworks.Data>(`${environment.host}/download/current/fireworks/${species}.json`).pipe(
-      map(data => new Map(data.nodes.map(node => [node.stId, node])))
-    )
-  }
 
   fetchTLPLayoutMap(): Observable<Map<string, Layout.Data>> {
     console.log('fetch tlp layout')
@@ -150,11 +145,6 @@ export class ReacfoamService {
     loader: () => this.fetchTLPLayoutMap()
   })
 
-  fireworksNodeMap = rxResource({
-    request: () => ({species: this.speciesName()}),
-    loader: ({request}) => this.fetchFireworksNodeMap(request.species)
-  })
-
   eventsHierarchyData = rxResource({
     request: () => ({
       species: this.species.currentSpecies(),
@@ -171,9 +161,8 @@ export class ReacfoamService {
 
   mergedData = computed(() => {
     console.log('signal mergedData')
-    return this.layoutMap.value() && this.fireworksNodeMap.value() && this.eventsHierarchyData.value() ? {
+    return this.layoutMap.value() && this.eventsHierarchyData.value() ? {
       layoutMap: this.layoutMap.value()!,
-      fireworksNodeMap: this.fireworksNodeMap.value()!,
       events: this.eventsHierarchyData.value()!,
     } : undefined
   })
@@ -230,10 +219,10 @@ export class ReacfoamService {
     this.dark.isDark();  // Compute on dark update
     this.filters(); // Compute on filters update
     if (!this.mergedData()) return;
-    const {layoutMap, fireworksNodeMap, events} = this.mergedData()!
+    const {layoutMap, events} = this.mergedData()!
     const stIdToFirstId = new Map<string, string>();
     return {
-      data: events.map(e => this.event2group(e, layoutMap, fireworksNodeMap, stIdToFirstId)).flatMap(g => g),
+      data: events.map(e => this.event2group(e, layoutMap, stIdToFirstId)).flatMap(g => g),
       idResolver: stIdToFirstId
     }
   })
@@ -241,24 +230,21 @@ export class ReacfoamService {
   data = computed(() => this.dataAndIdResolver()?.data)
   idToStId = computed(() => this.dataAndIdResolver()?.idResolver)
 
-  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, fireworksNodeMap: Map<string, Fireworks.Node>, stIdToFirstId: Map<string, string>, parentFamily?: string, parentColor?: chroma.Color, depth = 0, path: string[] = []): PathwayGroup[] {
+  event2group(event: EventsHierarchy.Data, layoutMap: Map<string, Layout.Data>, stIdToFirstId: Map<string, string>, parentFamily?: string, depth = 0, path: string[] = []): PathwayGroup[] {
     const humanStId = event.stId.replace(this.species.currentSpecies().abbreviation, 'HSA');
-    const fireworksNode = fireworksNodeMap.get(event.stId);
     const layoutNode = layoutMap.get(humanStId) || layoutMap.get(event.stId);
 
     const family = parentFamily || layoutNode?.family || 'Unknown family'; // Unknown family with M. tuberculosis
     const familyColor = this.familyColorMap().get(family) || this.surfaceColor(); // Unknown family with M. tuberculosis
 
-    const depthColor = this.dark.isDark() ?
-      parentColor ? parentColor.brighten(0.2).saturate(0.2) : this.surfaceColor() :
-      parentColor ? parentColor.darken(0.2).saturate(0.2) : this.surfaceColor();
-
     const id = this.buildId(event.stId, path)!; // If no path or wrong path given, will use first occurrence of stId
     if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
 
-    const children = event.children ? event.children.map(c => this.event2group(c, layoutMap, fireworksNodeMap, stIdToFirstId, family, depthColor, depth + 1, [...path, event.stId])).flatMap(g => g) : [];
+    const isDisease = [path[0], event.stId].includes('R-HSA-1643685');
+
+    const children = event.children ? event.children.map(c => this.event2group(c, layoutMap, stIdToFirstId, family, depth + 1, [...path, event.stId])).flatMap(g => g) : [];
     if (this.analysis.result() && this.state.filterViewMode() !== 'overview') { // Apply filters only if we have an analysis
-      if (this.filters().excludeDiseases && humanStId === 'R-HSA-1643685') return [];
+      if (this.filters().excludeDiseases && isDisease) return [];
       if (this.filters().excludeGrouping && !event.llp) return children;
       if (children.length === 0) { // if no children because of filters or simple leaf, then apply filters
         if (this.filters().pValue !== undefined && (event.entities?.pValue || 1) > this.mergedFilters().pValue!) return [];
@@ -267,7 +253,7 @@ export class ReacfoamService {
         if (this.filters().minExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MIN_VALUE) < this.mergedFilters().minExpression!) return [];
         if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.mergedFilters().maxExpression!) return [];
         if (this.filters().maxExpression !== undefined && (event.entities?.exp[this.analysis.sampleIndex()] || Number.MAX_VALUE) > this.mergedFilters().maxExpression!) return [];
-        if (this.filters().gsa?.size !== 0  && !this.filters().gsa?.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
+        if (this.filters().gsa?.size !== 0 && !this.filters().gsa?.has(event.entities?.exp[this.analysis.sampleIndex()] || 0)) return [];
       }
     }
 
@@ -278,11 +264,10 @@ export class ReacfoamService {
       stId: event.stId,
       label: event.name,
       diagram: event.diagram,
-      disease: fireworksNode?.disease || false,
-      weight: event.entities?.total || (fireworksNode && fireworksNode.ratio !== 0 ? fireworksNode.ratio * 1000 : 9),
+      disease: isDisease,
+      weight: event.totalEntity,
       initialPosition: layoutNode,
       familyColor: familyColor,
-      depthColor: depthColor,
       family,
       depth,
       path,
