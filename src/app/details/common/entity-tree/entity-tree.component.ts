@@ -1,7 +1,8 @@
 import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
 import {
   extractFromSpace,
-  extractIdAfterColon, extractIdInBrackets,
+  extractIdAfterColon,
+  extractIdInBrackets,
   isEvent,
   isEWAS,
   isMolecule,

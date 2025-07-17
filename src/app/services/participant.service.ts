@@ -6,7 +6,7 @@ import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 
 
-export interface ParticipantRefEntity {
+export interface Molecule {
   dbId: number;
   identifier: string;
   schemaClass: string;
@@ -19,7 +19,7 @@ export interface Participant {
   peDbId: number;
   displayName: string;
   schemaClass: string;
-  refEntities: ParticipantRefEntity[];
+  refEntities: Molecule[];
 }
 
 

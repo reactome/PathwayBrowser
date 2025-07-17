@@ -1,5 +1,5 @@
 import {Component, computed, effect, input} from '@angular/core';
-import {Participant, ParticipantRefEntity, ParticipantService} from "../../../services/participant.service";
+import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
 import {SchemaClasses} from "../../../constants/constants";
@@ -12,14 +12,14 @@ import {MatDivider} from "@angular/material/divider";
 import {EntityTreeComponent} from "../../common/entity-tree/entity-tree.component";
 
 
-interface MoleculeData {
+interface MoleculeGroup {
   type: string;
-  data: Molecule[];
+  data: MoleculeData[];
   found?: number;
 }
 
-export interface Molecule {
-  entity: ParticipantRefEntity;
+export interface MoleculeData {
+  entity: Molecule;
   stoichiometry: number;
   highlight: boolean;
 }
@@ -79,7 +79,7 @@ export class MoleculeTabComponent {
 
   moleculeData = computed(() => {
 
-    let moleculeData: MoleculeData[] = [];
+    let moleculeData: MoleculeGroup[] = [];
 
     const pathwayParticipants = this.pathwayParticipants();
     if (!pathwayParticipants) return [];
@@ -96,9 +96,9 @@ export class MoleculeTabComponent {
 
   })
 
-  getType(entity: ParticipantRefEntity) {
+  getType(molecule: Molecule) {
     let type = '';
-    const schemaClass = entity.schemaClass;
+    const schemaClass = molecule.schemaClass;
     switch (schemaClass) {
       case SchemaClasses.EWAS:
       case SchemaClasses.REFERENCE_GENE_PRODUCT:
@@ -126,7 +126,7 @@ export class MoleculeTabComponent {
 
   getPathwayParticipants(pathwayParticipants: Participant[]) {
 
-    const groupedMap = new Map<string, Map<number, Molecule>>();
+    const groupedMap = new Map<string, Map<number, MoleculeData>>();
     const allRefEntities = pathwayParticipants?.flatMap(participant => participant.refEntities) || [];
 
     for (const entity of allRefEntities) {
@@ -149,14 +149,14 @@ export class MoleculeTabComponent {
 
 
     // todo remove finalResults
-    const finalResults: MoleculeData[] = Array.from(groupedMap, ([type, dataMap]) => ({
+    const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([type, dataMap]) => ({
       type,
       data: Array.from(dataMap.values())
     }));
     return finalResults;
   }
 
-  getReactionParticipants(pathwayResults: MoleculeData[], refEntities: ReferenceEntity[]) {
+  getReactionParticipants(pathwayResults: MoleculeGroup[], refEntities: ReferenceEntity[]) {
 
     const dbIds = new Set(refEntities?.map(e => e.dbId));
 
@@ -200,7 +200,7 @@ export class MoleculeTabComponent {
   }
 
 
-  getStatistics(graph: MoleculeData) {
+  getStatistics(graph: MoleculeGroup) {
     const found = graph.found;
     const total = graph.data.length;
     return found ? `${found}/${total}` : `${total}`

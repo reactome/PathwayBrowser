@@ -19,7 +19,7 @@ import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molec
 import {Publication} from "../model/graph/publication/publication.model";
 import {Book} from "../model/graph/publication/book.model";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
-import {ParticipantRefEntity} from "./participant.service";
+import {Molecule} from "./participant.service";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -124,7 +124,7 @@ const moleculeClasses: Set<string> = new Set([
   SchemaClasses.REFERENCE_THERAPEUTIC
 ])
 
-export function isMolecule(obj: DatabaseObject): obj is ParticipantRefEntity{
+export function isMolecule(obj: DatabaseObject): obj is Molecule{
   return  moleculeClasses.has(obj.schemaClass);
 }
 
