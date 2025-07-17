@@ -96,31 +96,31 @@ export class MoleculeTabComponent {
 
   })
 
-  getLabel(entity: ParticipantRefEntity) {
-    let label = '';
+  getType(entity: ParticipantRefEntity) {
+    let type = '';
     const schemaClass = entity.schemaClass;
     switch (schemaClass) {
       case SchemaClasses.EWAS:
       case SchemaClasses.REFERENCE_GENE_PRODUCT:
       case SchemaClasses.REFERENCE_ISOFORM:
-        label = PropertyType.PROTEINS;
+        type = PropertyType.PROTEINS;
         break;
       case SchemaClasses.REFERENCE_RNA_SEQUENCE:
       case SchemaClasses.REFERENCE_DNA_SEQUENCE:
-        label = PropertyType.SEQUENCES;
+        type = PropertyType.SEQUENCES;
         break;
       case SchemaClasses.SIMPLE_ENTITY:
       case SchemaClasses.REFERENCE_MOLECULE:
-        label = PropertyType.CHEMICAL_COMPOUNDS;
+        type = PropertyType.CHEMICAL_COMPOUNDS;
         break;
       case SchemaClasses.REFERENCE_THERAPEUTIC:
-        label = PropertyType.DRUG
+        type = PropertyType.DRUG
         break;
       default:
-        label = PropertyType.OTHERS;
+        type = PropertyType.OTHERS;
     }
 
-    return label;
+    return type;
   }
 
 
@@ -130,13 +130,13 @@ export class MoleculeTabComponent {
     const allRefEntities = pathwayParticipants?.flatMap(participant => participant.refEntities) || [];
 
     for (const entity of allRefEntities) {
-      const label = this.getLabel(entity);
+      const type = this.getType(entity);
 
-      if (!groupedMap.has(label)) {
-        groupedMap.set(label, new Map());
+      if (!groupedMap.has(type)) {
+        groupedMap.set(type, new Map());
       }
 
-      const dataMap = groupedMap.get(label)!;
+      const dataMap = groupedMap.get(type)!;
       const existingEntity = dataMap.get(entity.dbId);
 
       if (existingEntity) {
