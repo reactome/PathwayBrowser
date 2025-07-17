@@ -1,3 +1,4 @@
+<div class="details-content-container">
 @if (moleculeType() === MoleculeType.PROTEIN) {
   <cr-structure-viewer [obj]=obj() [xRefs]="xRefs()"></cr-structure-viewer>
   <mat-divider></mat-divider>
@@ -8,5 +9,5 @@
 } @else {
   <p> placeholder => There is no more information available<p>
 }
-
+</div>
 

@@ -2,7 +2,7 @@ import {Component, computed, effect, input} from '@angular/core';
 import {
   MatNestedTreeNode,
   MatTree,
-  MatTreeNestedDataSource,
+  MatTreeNestedDataSource, MatTreeNodeDef,
   MatTreeNodeOutlet,
   MatTreeNodeToggle
 } from "@angular/material/tree";
@@ -26,7 +26,8 @@ type ReferenceHolder = { literatureReference: (LiteratureReference | Publication
     MatIcon,
     MatTreeNodeOutlet,
     MatButton,
-    MatTreeNodeToggle
+    MatTreeNodeToggle,
+    MatTreeNodeDef
   ],
   styleUrl: './refs-tree.scss'
 })

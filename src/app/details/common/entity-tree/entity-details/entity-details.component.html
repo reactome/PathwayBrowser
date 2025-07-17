@@ -1,0 +1,19 @@
+<div class="details-content-container">
+@if (className() === "Protein" && refEntity() && xRefs()) {
+  <cr-structure-viewer [obj]=refEntity() [xRefs]="xRefs()"></cr-structure-viewer>
+  <mat-divider class="divider-color"></mat-divider>
+}
+
+<!-- Details content -->
+<cr-description-overview [obj]="obj()" [showSpecies]="false"></cr-description-overview>
+@if (refEntity()) {
+  <mat-divider class="divider-color"></mat-divider>
+  <!-- External Reference -->
+  <cr-external-reference [referenceEntity]=refEntity()></cr-external-reference>
+}
+<!-- Cross References -->
+@if (refEntity() && xRefs()) {
+  <mat-divider></mat-divider>
+  <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
+}
+</div>

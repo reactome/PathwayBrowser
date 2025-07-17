@@ -32,15 +32,11 @@ import {NgClass, NgIf} from "@angular/common";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
-import {DescriptionOverviewComponent} from "../description-overview/description-overview.component";
-import {MatDivider} from "@angular/material/divider";
-import {ExternalReferenceComponent} from "../external-reference/external-reference.component";
-import {CrossReferencesComponent} from "../cross-references/cross-references.component";
 import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details/molecule-details.component";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
-import {StructureViewerComponent} from "../../tabs/molecule-tab/structure-viewer/structure-viewer.component";
 import {PropertyType} from "../../tabs/molecule-tab/molecule-tab.component";
+import {EntityDetailsComponent} from "./entity-details/entity-details.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
@@ -53,17 +49,13 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     NgClass,
     MatTooltip,
     MatIcon,
-    DescriptionOverviewComponent,
-    MatDivider,
-    ExternalReferenceComponent,
-    CrossReferencesComponent,
     MoleculeDetailsComponent,
     MatTreeNodeOutlet,
     MatTreeNodeToggle,
     MatIconButton,
     MatTreeNodeDef,
     NgIf,
-    StructureViewerComponent
+    EntityDetailsComponent
   ],
   styleUrl: './entity-tree.component.scss'
 })

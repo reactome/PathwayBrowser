@@ -124,36 +124,20 @@
           }
         </div>
 
-        <div class="details-content-container">
-           <!--structure view is for the molecule on the molecule tab which contains a protein structure-->
-          @if(!moleculeView()){
+        @if (!moleculeView()) {
+         <!--Point to entity details which contains more data and provide protein structure only-->
+          <cr-entity-details [obj]="element"
+                             [className]="element.className"
+                             [refEntity]="element.referenceEntity"
+                             [xRefs]="element.referenceEntity.crossReference">
+          </cr-entity-details>
 
-            @if (element.className === "Protein" && element.referenceEntity && element.referenceEntity.crossReference) {
-              <cr-structure-viewer [obj]=element.referenceEntity [xRefs]="element.referenceEntity.crossReference"></cr-structure-viewer>
-              <mat-divider class="divider-color"></mat-divider>
-            }
-
-            <!-- Details content -->
-            <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
-            @if (element.referenceEntity) {
-              <mat-divider class="divider-color"></mat-divider>
-              <!-- External Reference -->
-              <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
-            }
-            <!-- Cross References -->
-            @if (element.referenceEntity && element.referenceEntity.crossReference) {
-              <mat-divider></mat-divider>
-              <cr-cross-references [crossRefs]=element.referenceEntity.crossReference></cr-cross-references>
-            }
-
-          } @else {
-
-            @if (_selectedTreeNodeData.hasValue()) {
-              <cr-molecule-details [obj]="element" [xRefs]="element.crossReference"></cr-molecule-details>
-            }
+        } @else {
+          <!--Point to molecule details which provide structure and xRefs-->
+          @if (_selectedTreeNodeData.hasValue()) {
+            <cr-molecule-details [obj]="element" [xRefs]="element.crossReference"></cr-molecule-details>
           }
-
-        </div>
+        }
 
       </mat-nested-tree-node>
     </ng-template>

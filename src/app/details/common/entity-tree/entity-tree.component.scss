@@ -280,39 +280,15 @@
 
 
 /* Divider styles */
-.composition-container {
-  @include mat.divider-overrides((
-    color: var(--outline-variant),
-    width: 2px
-  ));
-}
-
-.mat-divider {
-  margin: 6px 6px;
-}
-
-.divider-color {
-  border-top-color: var(--primary);
-}
+//.composition-container {
+//  @include mat.divider-overrides((
+//    color: var(--outline-variant),
+//    width: 2px
+//  ));
+//}
 
 
-/* Content tree node styles*/
-.details-content-container {
-  border: 2px solid var(--primary);
-  border-radius: 10px;
-  display: flex;
-  gap: 6px;
-  flex-direction: column;
-}
 
-
-.details-content-container > :first-child {
-  padding-top: 6px;
-}
-
-.details-content-container > :last-child {
-  padding-bottom: 6px;
-}
 
 
 /* Take full height of the parent to ensure branch line(connector) is working in Firefox and Safari*/
