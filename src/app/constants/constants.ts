@@ -23,6 +23,7 @@ export const DataKeys = {
   SPECIES_NAME: 'speciesName',
   COMPARTMENT: 'hasCompartment',
   NAME: 'name',
+  DISPLAY_NAME: 'displayName',
   TISSUE: 'tissue',
   REVIEW_STATUS: 'reviewStatus',
   PUBLICATION: 'publication',
@@ -48,6 +49,7 @@ export const DataKeys = {
   CELL_TYPE: 'cellType',
   ORGAN:'organ',
   TISSUE_LAYER:'tissueLayer',
+  IDENTIFIER: 'identifier',
 
 
 } as const;
@@ -89,6 +91,7 @@ export const Labels = {
 export enum SchemaClasses {
   EWAS = 'EntityWithAccessionedSequence',
   PE = 'PhysicalEntity',
+  CELL = 'Cell',
   COMPLEX = 'Complex',
   DRUG = 'Drug',
   CHEMICAL_DRUG = 'ChemicalDrug',
@@ -101,7 +104,7 @@ export enum SchemaClasses {
   OTHER_ENTITY = 'OtherEntity',
   POLYMER = 'Polymer',
   SIMPLE_ENTITY = 'SimpleEntity',
-  REFERENCE_MOLECULE = 'ReferenceMolecule',
+
 
 
   PATHWAY = 'Pathway',
@@ -129,7 +132,6 @@ export enum SchemaClasses {
   ABSTRACT_MODIFIED_RESIDUE = 'AbstractModifiedResidue',
 
   MODIFIED_RESIDUE = 'ModifiedResidue',
-  REFERENCE_GROUP = 'ReferenceGroup',
   REPLACED_RESIDUE = 'ReplacedResidue',
   NONSENSE_MUTATION = 'NonsenseMutation',
   TRANSLATIONAL_MODIFICATION = 'TranslationalModification',
@@ -142,7 +144,15 @@ export enum SchemaClasses {
   TRANSCRIPTIONAL_MODIFICATION = 'TranscriptionalModification',
   MODIFIED_NUCLEOTIDE = 'ModifiedNucleotide',
 
+  REFERENCE_ENTITY = 'ReferenceEntity',
+  REFERENCE_GROUP = 'ReferenceGroup',
+  REFERENCE_MOLECULE='ReferenceMolecule',
+  REFERENCE_SEQUENCE = 'ReferenceSequence',
   REFERENCE_RNA_SEQUENCE = 'ReferenceRNASequence',
+  REFERENCE_DNA_SEQUENCE = 'ReferenceDNASequence',
+  REFERENCE_GENE_PRODUCT = 'ReferenceGeneProduct',
+  REFERENCE_ISOFORM = 'ReferenceIsoform',
+  REFERENCE_THERAPEUTIC = 'ReferenceTherapeutic',
 
   LITERATURE_REFERENCE = 'LiteratureReference',
   BOOK = 'Book'

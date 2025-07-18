@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModificationComponent } from './modification.component';
+import { MoleculeTabComponent } from './molecule-tab.component';
 
-describe('ModificationComponent', () => {
-  let component: ModificationComponent;
-  let fixture: ComponentFixture<ModificationComponent>;
+describe('MoleculeTabComponent', () => {
+  let component: MoleculeTabComponent;
+  let fixture: ComponentFixture<MoleculeTabComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModificationComponent]
+      imports: [MoleculeTabComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ModificationComponent);
+    fixture = TestBed.createComponent(MoleculeTabComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

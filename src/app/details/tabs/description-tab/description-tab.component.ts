@@ -1,7 +1,7 @@
 import {Component, computed, effect, input, signal, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
-import {getProperty, groupAndSortBy, isEntity} from "../../../services/utils";
+import {getProperty, groupAndSortBy, isPhysicalEntity} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
@@ -12,7 +12,7 @@ import {SelectableObject} from "../../../services/event.service";
 import {of} from "rxjs";
 import {PhysicalEntity} from "../../../model/graph/physical-entity/physical-entity.model";
 import {InteractorService} from "../../../interactors/services/interactor.service";
-import {EntitiesService} from "../../../services/entities.service";
+import {EntityService} from "../../../services/entity.service";
 import {DataKeys, Labels} from "../../../constants/constants";
 import {CatalystActivity} from "../../../model/graph/catalyst-activity.model";
 import {CatalystActivityReference} from "../../../model/graph/control-reference/catalyst-activity-reference.model";
@@ -41,12 +41,12 @@ export class DescriptionTabComponent {
   })
 
   _otherForms = rxResource({
-    request: () => isEntity(this.obj()) && this.obj().stId,
-    loader: (param) => param.request ? this.entitiesService.getOtherForms(param.request) : of(null)
+    request: () => isPhysicalEntity(this.obj()) && this.obj().stId,
+    loader: (param) => param.request ? this.entity.getOtherForms(param.request) : of(null)
   })
 
   _interactors = rxResource({
-    request: () => isEntity(this.obj()) && this.referenceEntity()?.identifier,
+    request: () => isPhysicalEntity(this.obj()) && this.referenceEntity()?.identifier,
     loader: (param) => param.request ? this.interactorService.getCustomInteractorsByAcc(param.request) : of(null)
   })
 
@@ -230,7 +230,7 @@ export class DescriptionTabComponent {
 
   constructor(private iconService: IconService,
               private route: ActivatedRoute,
-              private entitiesService: EntitiesService,
+              private entity: EntityService,
               private interactorService: InteractorService,
   ) {
     effect(() => {
@@ -250,12 +250,12 @@ export class DescriptionTabComponent {
 
   // Group by species name
   getGroupedInferences(inferences: PhysicalEntity[]) {
-    return this.entitiesService.getGroupedData(inferences, pe => pe.speciesName);
+    return this.entity.getGroupedData(inferences, pe => pe.speciesName);
   }
 
   // Group by compartment
   getGroupedOtherForms(otherForms: PhysicalEntity[]) {
-    return this.entitiesService.getGroupedData(otherForms, pe => {
+    return this.entity.getGroupedData(otherForms, pe => {
       // Extract compartment (group name) from displayName => HSPA8 [plasma membrane] => plasma membrane
       return pe.displayName.match(/\[(.*?)\]/)?.[1] || pe.displayName;
     });

@@ -1,12 +1,17 @@
 import {Component, computed, input} from '@angular/core';
-import {EntitiesService} from "../../../services/entities.service";
+import {EntityService} from "../../../services/entity.service";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
+import {KeyValuePipe} from "@angular/common";
+import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 
 @Component({
   selector: 'cr-cross-references',
   templateUrl: './cross-references.component.html',
-  styleUrl: './cross-references.component.scss',
-  standalone: false
+  imports: [
+    KeyValuePipe,
+    SortByTextPipe
+  ],
+  styleUrl: './cross-references.component.scss'
 })
 export class CrossReferencesComponent {
   readonly _crossReferences = input.required<DatabaseIdentifier[]>({alias: 'crossRefs'});
@@ -15,10 +20,10 @@ export class CrossReferencesComponent {
 
     if (this._crossReferences().length == 0) return new Map<string, DatabaseIdentifier[]>();
     const crossRefs = [...this._crossReferences()];
-    return this.entitiesService.getGroupedData(crossRefs, ref => ref.databaseName);
+    return this.entity.getGroupedData(crossRefs, ref => ref.databaseName);
   });
 
-  constructor(private entitiesService: EntitiesService) {
+  constructor(private entity: EntityService) {
 
   }
 }

@@ -11,6 +11,7 @@ export interface DatabaseObject {
   modified?: InstanceEdit;
   created?: InstanceEdit;
 
+  // tree
   composedOf?: Relationship.Has<DatabaseObject>[];
   isLoaded?: boolean;
 

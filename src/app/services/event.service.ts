@@ -10,7 +10,7 @@ import {AnalysisService} from "./analysis.service";
 import {EhldService} from "./ehld.service";
 import {TopLevelPathway} from "../model/graph/event/top-level-pathway.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isEntity, isEvent, isPathway, isPathwayWithDiagram, isRLE} from "./utils";
+import {isEvent, isPathway, isPathwayWithDiagram, isPhysicalEntity, isRLE} from "./utils";
 import {DatabaseObjectService} from "./database-object.service";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 import {Relationship} from "../model/graph/relationship.model";
@@ -189,7 +189,7 @@ export class EventService {
   adjustTreeFromDiagramSelection(object: DatabaseObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     // All visible tree nodes
     const allVisibleTreeNodes = this.getAllVisibleTreeEvents(tree);
-    if (isEntity(object)) {
+    if (isPhysicalEntity(object)) {
       return this.handleEntitySelectionFromDiagram(object, diagramId, allVisibleTreeNodes, tree);
     } else if (isRLE(object)) {
       return this.handleReactionSelectionFromDiagram(object, diagramId, allVisibleTreeNodes, tree, hitReactions);
@@ -277,7 +277,7 @@ export class EventService {
   }
 
   buildTree(obj: SelectableObject, diagramId: string, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
-    if (isEntity(obj)) {
+    if (isPhysicalEntity(obj)) {
       return this.buildTreeWithSelectedEntity(obj, diagramId, tree, hitReactions);
     } else {
       if (this.ehldService.hasEHLD()) {

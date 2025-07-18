@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RegulationComponent } from './regulation.component';
+import { ObjectTreeComponent } from './object-tree.component';
 
-describe('RegulationComponent', () => {
-  let component: RegulationComponent;
-  let fixture: ComponentFixture<RegulationComponent>;
+describe('EntityTreeComponent', () => {
+  let component: ObjectTreeComponent;
+  let fixture: ComponentFixture<ObjectTreeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RegulationComponent]
+      imports: [ObjectTreeComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RegulationComponent);
+    fixture = TestBed.createComponent(ObjectTreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

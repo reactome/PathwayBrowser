@@ -79,6 +79,27 @@ a {
 
 }
 
+// Shared with tree detail components, molecule tree and entity tree
+.details-content-container {
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  > :first-child {
+    padding-top: 6px;
+  }
+
+  > :last-child {
+    padding-bottom: 6px;
+  }
+
+  .mat-divider {
+    margin: 6px;
+  }
+}
+
 // Avoid first paragraph of summation being indented
 p:first-child {
   margin-top: 0;

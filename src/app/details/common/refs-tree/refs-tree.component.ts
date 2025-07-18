@@ -1,8 +1,17 @@
 import {Component, computed, effect, input} from '@angular/core';
-import {MatTreeNestedDataSource} from "@angular/material/tree";
+import {
+  MatNestedTreeNode,
+  MatTree,
+  MatTreeNestedDataSource, MatTreeNodeDef,
+  MatTreeNodeOutlet,
+  MatTreeNodeToggle
+} from "@angular/material/tree";
 import {sortByYearDescending} from "../../../services/utils";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {Publication} from "../../../model/graph/publication/publication.model";
+import {PublicationComponent} from "../publication/publication.component";
+import {MatIcon} from "@angular/material/icon";
+import {MatButton} from "@angular/material/button";
 
 
 type ReferenceHolder = { literatureReference: (LiteratureReference | Publication)[] };
@@ -10,8 +19,17 @@ type ReferenceHolder = { literatureReference: (LiteratureReference | Publication
 @Component({
   selector: 'cr-refs-tree',
   templateUrl: './refs-tree.html',
-  styleUrl: './refs-tree.scss',
-  standalone: false
+  imports: [
+    MatTree,
+    MatNestedTreeNode,
+    PublicationComponent,
+    MatIcon,
+    MatTreeNodeOutlet,
+    MatButton,
+    MatTreeNodeToggle,
+    MatTreeNodeDef
+  ],
+  styleUrl: './refs-tree.scss'
 })
 export class RefsTreeComponent {
 

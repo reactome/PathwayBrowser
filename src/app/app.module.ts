@@ -68,22 +68,23 @@ import {ExtractCompartmentPipe} from "./pipes/extract-compartment.pipe";
 import {AnalysisLegendComponent} from "./legend/analysis-legend/analysis-legend.component";
 import {ExternalReferenceComponent} from "./details/common/external-reference/external-reference.component";
 import {CrossReferencesComponent} from "./details/common/cross-references/cross-references.component";
-import {CatalystActivityComponent} from "./details/common/catalyst-activity/catalyst-activity.component";
 import {ControllerTreeComponent} from "./details/common/controller-tree/controller-tree.component";
-import {EntityTreeComponent} from "./details/common/entity-tree/entity-tree.component";
-import {RegulationComponent} from "./details/common/regulation/regulation.component";
-import {ModificationComponent} from "./details/common/modification/modification.component";
+import {ObjectTreeComponent} from "./details/common/entity-tree/object-tree.component";
 import {MolecularProcessComponent} from "./details/common/molecular-process/molecular-process.component";
 import {FormatClassNamePipe} from "./pipes/format-class-name.pipe";
 import {CastPipe} from "./pipes/cast.pipe";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {CellMarkerComponent} from "./details/common/cell-marker/cell-marker.component";
 import {OntologyTermComponent} from "./details/common/ontology-term/ontology-term.component";
+import {ExpressionTabComponent} from "./details/tabs/expression-tab/expression-tab.component";
 import {ReacfoamComponent} from "./reacfoam/reacfoam.component";
 import {InfoTabComponent} from "./details/tabs/info-tab/info-tab.component";
 import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component";
 import {TypeSafeMatCellDef} from "./utils/type-safe-mat-cell-def.directive";
 import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
+import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
+import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-viewer/structure-viewer.component";
+import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
 
 @NgModule({
   declarations: [
@@ -99,19 +100,12 @@ import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
     DiagramHomeComponent,
     DetailsComponent,
     DescriptionTabComponent,
-    DescriptionOverviewComponent,
-    RefsTreeComponent,
-    PublicationComponent,
     InteractorsTableComponent,
     ControllerTreeComponent,
-    ExternalReferenceComponent,
-    CrossReferencesComponent,
-    CatalystActivityComponent,
-    EntityTreeComponent,
-    RegulationComponent,
-    ModificationComponent,
     MolecularProcessComponent,
     CellMarkerComponent,
+    ExpressionTabComponent
+
   ],
   bootstrap: [AppComponent],
   imports: [
@@ -172,6 +166,15 @@ import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
     ReacfoamComponent,
     InfoTabComponent,
     ResultTabComponent,
+    MoleculeTabComponent,
+    StructureViewerComponent,
+    ObjectTreeComponent,
+    DescriptionOverviewComponent,
+    RefsTreeComponent,
+    PublicationComponent,
+    ExternalReferenceComponent,
+    CrossReferencesComponent,
+    MoleculeDetailsComponent,
 
   ],
   providers: [

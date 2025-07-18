@@ -1,0 +1,29 @@
+<div class="container" #container [style.--width.px]="container.offsetWidth">
+  <div class="content">
+
+    @for (group of moleculeData() | sortByText: 'type'; track group.type; ) {
+      <div class="list" [id]=sanitizeId(group.type)>
+        <span class="header">
+          {{ group.type }} {{getStatistics(group)}}
+        </span>
+      </div>
+
+      <mat-divider class="divider"></mat-divider>
+      <div class="composition-container">
+        @for (item of group.data; track item.entity.dbId) {
+          <cr-object-tree [type]="group.type" [data]="[item.entity]"
+                          [stoichiometry]=item.stoichiometry [highlight]="item.highlight" [moleculeView]="true"></cr-object-tree>
+        }
+      </div>
+    }
+
+  </div>
+  <div class="toc">
+    @for (group of moleculeData() | sortByText: 'type'; track group.type) {
+      <a (click)="scrollTo(group.type)">
+        {{ group.type }}
+      </a>
+    }
+  </div>
+
+</div>

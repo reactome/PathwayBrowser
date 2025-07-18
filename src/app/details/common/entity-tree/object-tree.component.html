@@ -29,7 +29,7 @@
       <div class="left">
         <mat-icon class="symbol-icon"
                   [matTooltip]="getSymbol(element).tooltip"
-                  [svgIcon]="getSymbol(element).name">
+                  [svgIcon]="moleculeView()? getSymbol(element.icon).name: getSymbol(element).name">
         </mat-icon>
 
         <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
@@ -37,54 +37,61 @@
                     [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
           </mat-icon>
         </div>
-        <span class="name" #name [matTooltip]="element.name?.[0]" [matTooltipDisabled]="!isEllipsisActive(name)">
-            @if (node.stoichiometry > 1) {
-              <b>{{ node.stoichiometry }} ×</b>
-            }
-          {{ element.name?.[0] || (element.displayName | extractCompartment: true) }}
+        <span class="name" #name
+              [matTooltip]="element.name?.[0]"
+              [matTooltipDisabled]="!isEllipsisActive(name)">
+
+             @if (node.stoichiometry > 1) {
+               <b>{{ node.stoichiometry }} ×</b>
+             }
+          {{ getDisplayName(node, element) }}
         </span>
       </div>
 
 
       <div class="right">
-        <!--Compartment-->
-        @if (!isEvent(element)) {
-          @if (element.displayName | extractCompartment) {
-            <span class="compartment name" #compartment [matTooltip]="element.displayName | extractCompartment"
-                  [matTooltipDisabled]="!isEllipsisActive(compartment)">{{ element.displayName | extractCompartment }}
+
+        @if(moleculeView() && node.highlight){
+          <span class="highlight-tag">📌</span>
+        }
+
+        @if(moleculeView()) {
+          <span class="molecule name">
+            {{getMoleculeIdentifier(node, element)}}
           </span>
-          }
-        } @else {
-          @for (has of element.hasCompartment; track has.element.dbId) {
-            <span class="compartment name" #compartment [matTooltip]="has.element.displayName"
-                  [matTooltipDisabled]="!isEllipsisActive(compartment)">{{ has.element.displayName }}
-            </span>
-          }
+        }
+
+        <!--Compartment-->
+        @for (comp of getCompartments(element); track comp) {
+          <span class="compartment name"
+                #compartment
+                [matTooltip]="comp"
+                [matTooltipDisabled]="!isEllipsisActive(compartment)">
+            {{ comp }}
+          </span>
         }
 
         <!--Species-->
-        @if (element.speciesName) {
-          <!--todo species could a single object or array of species-->
-          @let speciesArr = Array.isArray(element.species) ? element.species : [element.species];
-          <!--From Severe acute respiratory syndrome coronavirus 2 to SARS-CoV-2 -->
-          @if (element.speciesName.length >= maxStringLength && speciesArr?.length > 0 && speciesArr[0]?.name?.length > 1) {
-            @let shortName = getShortest(speciesArr[0].name);
-            <span class="species name" [matTooltip]="element.speciesName">{{ shortName }}</span>
-          } @else {
-            <span class="species name" #speciesName [matTooltip]="element.speciesName"
-                  [matTooltipDisabled]="!isEllipsisActive(speciesName)">{{ element.speciesName }}
-            </span>
-          }
+        @let finalSpeciesName = getSpeciesName(element);
+        @if (finalSpeciesName) {
+          <span class="species name" #speciesName
+                [matTooltip]="element.speciesName"
+                [matTooltipDisabled]="!isEllipsisActive(speciesName)">
+            {{ finalSpeciesName }}
+          </span>
         }
 
-        <div class="select-container">
-          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-          <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
-            <mat-icon class="custom-icon" [svgIcon]="'select'"></mat-icon>
-          </button>
-        </div>
+        @if(!moleculeView()){
+          <div class="select-container">
+            <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+            <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
+              <mat-icon class="custom-icon" [svgIcon]="'select'"></mat-icon>
+            </button>
+          </div>
+        }
+
         <div class="goTo-container">
-          <a [href]="'/content/detail/' + element.stId" target="_blank" (click)="$event.stopPropagation()">
+          <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()">
             <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
           </a>
         </div>
@@ -95,8 +102,9 @@
     <!-- Add this details-group and details-tree is for making the connector works in Firefox, to make the mat-nested-tree to take the full height of the parent -->
     <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group"
          [class.details-group]="!isNestedView(node.element) && tree.isExpanded(node) ? 'details-group' : ''">
+      <!--make sure getting full object content to render with _selectedTreeNodeData.hasValue()-->
       <ng-container
-        *ngIf="!isNestedView(node.element); then details; else entity">
+        *ngIf="!isNestedView(node.element) && _selectedTreeNodeData.hasValue(); then details; else entity">
       </ng-container>
     </div>
 
@@ -116,20 +124,20 @@
           }
         </div>
 
-        <div class="details-content-container">
-          <!-- Details content -->
-          <cr-description-overview [obj]="element" [showSpecies]="false"></cr-description-overview>
-          @if (element.referenceEntity) {
-            <mat-divider class="divider-color"></mat-divider>
-            <!-- External Reference -->
-            <cr-external-reference [referenceEntity]=element.referenceEntity></cr-external-reference>
+        @if (!moleculeView()) {
+         <!--Point to entity details which contains more data and provide protein structure only-->
+          <cr-object-tree-details [obj]="element"
+                             [className]="element.className"
+                             [refEntity]="element.referenceEntity"
+                             [xRefs]="element.referenceEntity.crossReference">
+          </cr-object-tree-details>
+
+        } @else {
+          <!--Point to molecule details which provide structure and xRefs-->
+          @if (_selectedTreeNodeData.hasValue()) {
+            <cr-molecule-details [obj]="element" [xRefs]="element.crossReference"></cr-molecule-details>
           }
-          <!-- Cross References -->
-          @if (element.referenceEntity && element.referenceEntity.crossReference) {
-            <mat-divider></mat-divider>
-            <cr-cross-references [crossRefs]=element.referenceEntity.crossReference></cr-cross-references>
-          }
-        </div>
+        }
 
       </mat-nested-tree-node>
     </ng-template>

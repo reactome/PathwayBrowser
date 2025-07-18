@@ -17,6 +17,9 @@ export namespace Relationship {
     order: number;
     element: O;
     index: number;
+    // Participants(Molecules) on Molecule tab
+    moleculeView?: boolean
+    highlight?:boolean;
   }
 
   export interface HasCandidate extends Has<PhysicalEntity, Type.CANDIDATE> {

@@ -1,32 +1,75 @@
 import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
-import {isEvent} from "../../../services/utils";
-import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
+import {
+  extractFromSpace,
+  extractIdAfterColon,
+  extractIdInBrackets,
+  isEvent,
+  isEWAS,
+  isMolecule,
+  isPathway,
+  isRLE,
+  isSelectableObject
+} from "../../../services/utils";
+import {
+  MatNestedTreeNode,
+  MatTree,
+  MatTreeNestedDataSource,
+  MatTreeNodeDef,
+  MatTreeNodeOutlet,
+  MatTreeNodeToggle
+} from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {forkJoin, map, of} from "rxjs";
 import {SelectableObject} from "../../../services/event.service";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {SchemaClasses} from "../../../constants/constants";
 import {IconService} from "../../../services/icon.service";
-import {EntitiesService} from "../../../services/entities.service";
+import {EntityService} from "../../../services/entity.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
+import {NgClass, NgIf} from "@angular/common";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatIcon} from "@angular/material/icon";
+import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
+import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details/molecule-details.component";
+import {MatIconButton} from "@angular/material/button";
+import {Species} from "../../../model/graph/species.model";
+import {PropertyType} from "../../tabs/molecule-tab/molecule-tab.component";
+import {ObjectTreeDetailsComponent} from "./entity-details/object-tree-details.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
 @Component({
-  selector: 'cr-entity-tree',
-  standalone: false,
-  templateUrl: './entity-tree.component.html',
-  styleUrl: './entity-tree.component.scss'
+  selector: 'cr-object-tree',
+  templateUrl: './object-tree.component.html',
+  imports: [
+    MatTree,
+    MatNestedTreeNode,
+    NgClass,
+    MatTooltip,
+    MatIcon,
+    MoleculeDetailsComponent,
+    MatTreeNodeOutlet,
+    MatTreeNodeToggle,
+    MatIconButton,
+    MatTreeNodeDef,
+    NgIf,
+    ObjectTreeDetailsComponent
+  ],
+  styleUrl: './object-tree.component.scss'
 })
-export class EntityTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
+export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
 
   hasDepthControl = input<boolean>(false);
   depthIndex = model<number | undefined>();
   depthChangeSource = model<'controller' | 'tree' | undefined>(undefined);
   treeLength = model<number | undefined>(undefined);
+
+  moleculeView = input<boolean>(false);
+  stoichiometry = input<number>();
+  highlight = input<boolean>(false);
 
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
@@ -36,39 +79,46 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   @ViewChild(MatTree) tree!: MatTree<R>;
 
-  readonly type = input.required<string>()
-  readonly data = input.required<R[], (E | R)[]>({
-    transform: (data: (E | R)[]): R[] => {
-      if (!data || data.length === 0) return [];
-      if (data[0].stoichiometry) return data.map((r, index) => ({
-        ...r,
-        element: {...r.element, composedOf: r.element.composedOf || []},
-        index: index,
-      })) as R[];
-      return (data as E[]).map(e => ({
-        element: {...e, composedOf: e.composedOf || []},
-        order: 0,
-        stoichiometry: 1,
-        type: this.type(),
-        index: 0
-      }) as R); // Wrap in fake relationship to keep stoichiometry and global structure
-    }
+  readonly type = input.required<string>();
+  readonly data = input.required<(E | R)[]>();
+
+  treeData = computed<R[]>(() => {
+    const data = this.data();
+    const moleculeStoichiometry = this.stoichiometry();
+    const moleculeView = this.moleculeView();
+    const highlight = this.highlight();
+    if (!data || data.length === 0) return [];
+    if (data[0].stoichiometry) return data.map((r, index) => ({
+      ...r,
+      element: {...r.element, composedOf: r.element.composedOf || []},
+      index: index,
+    })) as R[];
+    return (data as E[]).map(e => ({
+      element: {...e, composedOf: e.composedOf || []},
+      order: 0,
+      stoichiometry: moleculeStoichiometry ?? 1,
+      type: this.type(),
+      index: 0,
+      highlight: highlight,
+      moleculeView: moleculeView,
+    }) as R); // Wrap in fake relationship to keep stoichiometry and global structure
   });
 
   dataSource = new MatTreeNestedDataSource<R>();
-  maxStringLength = 27; // Use Molluscum contagiosum virus's length
+
 
   constructor(private iconService: IconService,
-              private entitiesService: EntitiesService,
+              private entity: EntityService,
               private dataStateService: DataStateService,
               private urlState: UrlStateService,
+              private extractCompartmentPipe: ExtractCompartmentPipe
   ) {
 
     // Initial tree data
     effect(() => {
       if (this.data().length > 0) {
-        this.initialData = cloneDeep(this.data());
-        this.dataSource.data = this.data();
+        this.initialData = cloneDeep(this.treeData());
+        this.dataSource.data = this.treeData();
       }
     });
 
@@ -77,7 +127,6 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       const result = this._selectedTreeNodeData.value();
       if (!result) return;
       this.updateMatTreeDataSource(result);
-
     });
 
     // Updating entire tree when user click depth controller
@@ -135,7 +184,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
 
       const depthInQuery = depth - 1; // Ignore the default depth 1
-      const results = [...this.data()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
+      const results = [...this.treeData()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
       return forkJoin(results).pipe();
     }
@@ -143,20 +192,20 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   // Get max level when first load
   _fullTreeSource = rxResource({
-    request: () => (this.data()),
+    request: () => (this.treeData()),
     loader: (params) => {
       if (this.hasDepthControl()) {
         const nodeResults = params.request.map((node) => this.fetchTreeAtDepth(node, -1));
         return forkJoin(nodeResults);
       }
 
-      return of(this.data());
+      return of(this.treeData());
     }
   })
 
 
   _selectedTreeNodeData = rxResource({
-    request: () => this.selectedTreeNode()?.stId,
+    request: () => this.selectedTreeNode()?.stId || this.selectedTreeNode()?.dbId,
     loader: (param) => {
       const selectedNode = this.selectedTreeNode();
       // Check the condition to determine which method to call
@@ -165,7 +214,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
         return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request).pipe(map(result => result as unknown as E));
       } else {
         // PE -> Complex and Set
-        return this.entitiesService.getEntityInDepth<E>(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
+        return this.entity.getEntityInDepth<E>(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
           .pipe(
             map(entityResult => {
               if (entityResult && entityResult.composedOf) {
@@ -219,15 +268,17 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     }
 
 
-    // Handle both expand and collapse with one timeout to get depthIndex
-    // Defer so the tree has time to update its expansion state
-    setTimeout(() => {
-      const depth = this.getTreeDepth(this.dataSource.data, 1, true);
-      if (this.depthIndex() !== depth) {
-        this.depthIndex.set(depth);
-        this.depthChangeSource.set('tree');
-      }
-    }, 500);
+    if (this.hasDepthControl()) {
+      // Handle both expand and collapse with one timeout to get depthIndex
+      // Defer so the tree has time to update its expansion state
+      setTimeout(() => {
+        const depth = this.getTreeDepth(this.dataSource.data, 1, true);
+        if (this.depthIndex() !== depth) {
+          this.depthIndex.set(depth);
+          this.depthChangeSource.set('tree');
+        }
+      }, 500);
+    }
   }
 
   fetchTreeAtDepth(node: R, depth: number) {
@@ -243,7 +294,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
       return of({...node, element: normalElement});
     }
 
-    return this.entitiesService.getEntityInDepth<E>(id, depth).pipe(
+    return this.entity.getEntityInDepth<E>(id, depth).pipe(
       map((entityResult) => {
         const composedOf = entityResult.composedOf || [];
         const nestedElement = {
@@ -315,14 +366,24 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
   isNestedView(selectedNode: E | undefined): boolean {
     if (!selectedNode) return true;
 
+    // participants for molecule tab
+    // If the node has an icon, treat it as non-nested
+    const isStructure = this.moleculeView();
+    if (isStructure) {
+      return false
+    }
+
     const nonNestedClasses: Set<string> = new Set([
       SchemaClasses.EWAS,
       SchemaClasses.SIMPLE_ENTITY,
-      SchemaClasses.CHEMICAL_DRUG,
-      SchemaClasses.REACTION
+      SchemaClasses.CHEMICAL_DRUG
     ])
 
-    return !(nonNestedClasses.has(selectedNode.schemaClass));
+    const notNested = nonNestedClasses.has(selectedNode.schemaClass) ||
+      isPathway(selectedNode) ||
+      isRLE(selectedNode);
+
+    return !notNested;
   }
 
   isEllipsisActive(e: HTMLElement): boolean {
@@ -341,7 +402,14 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     const tree = [...existingTreeData];
     const flatTree = this.flattenTree(tree);
-    const targetTreeNode = flatTree.find(node => node.element.stId === result.stId);
+    const targetTreeNode = flatTree.find(node => {
+      if (result.stId != null) {
+        return node.element.stId === result.stId;
+      } else if (result.dbId != null) {
+        return node.element.dbId === result.dbId;
+      }
+      return false;
+    });
 
     if (targetTreeNode) {
       // Merge all properties from result directly into the element
@@ -360,7 +428,7 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     ]);
   }
 
-  getSymbol(obj: DatabaseObject) {
+  getSymbol(obj: DatabaseObject | string) {
     return this.iconService.getIconDetails(obj);
   }
 
@@ -507,4 +575,113 @@ export class EntityTreeComponent<E extends DatabaseObject, R extends Relationshi
     if (!node.stId) return;
     this.urlState.select.set(node.stId);
   }
+
+
+  getUrl(element: E): string {
+    if (isEWAS(element) && element.referenceEntity.url) {
+      return element.referenceEntity.url;
+    }
+    if (isMolecule(element)) {
+      return element.url
+    }
+    // Non proteins or molecule, linking to details page
+    return `/content/detail/${element.stId}`;
+  }
+
+  getDisplayName(node: R, element: E): string {
+    if (this.moleculeView() && isMolecule(element) && element.identifier) {
+      const displayName = this.getMoleculeName(node, element);
+      return `${displayName}`;
+    }
+
+    if (isSelectableObject(element)) {
+      const displayName = this.extractCompartmentPipe.transform(element.displayName, true);
+      return element.name?.[0] || displayName || element.displayName;
+    }
+    return element.displayName;
+  }
+
+  getCompartments(element:E): string[] {
+
+    if(this.moleculeView()) return [];
+    if (!this.isEvent(element)) {
+      const comp = this.extractCompartmentPipe.transform(element.displayName);
+      return comp ? [comp] : [];
+    } else {
+      return element.hasCompartment?.map(h => h.element.displayName) || [];
+    }
+  }
+
+
+  /**?
+   *
+   * @param element
+   *
+   *  element {
+   *    species: Species;
+   *    speciesName: string
+   *  }
+   *  Get short name from species name arr in Species Object for saving space.
+   *  For instance, H. sapiens instead of Human Sapiens
+   *
+   */
+
+  getSpeciesName(element: E): string | null {
+
+    const speciesName: string = isSelectableObject(element) ? element.speciesName : null;
+    const species: Species = isSelectableObject(element) ? element.species : null;
+
+    if (!speciesName) return null;
+
+    const maxStringLength = 30;  // Use Molluscum contagiosum virus's length
+    const speciesArr = Array.isArray(species) ? species : [species];
+    const firstSpeciesName = speciesArr?.[0]?.name;
+    const shouldShorten = speciesName.length >= maxStringLength && firstSpeciesName.length > 1;
+
+    return shouldShorten ? this.getShortest(firstSpeciesName) : speciesName;
+  }
+
+
+
+  getMoleculeName(node: R, element: E) {
+    let name = '';
+    const type = node.type;
+    switch (type) {
+      case PropertyType.PROTEINS:
+        name = extractFromSpace(element.displayName, false);
+        break;
+      case PropertyType.CHEMICAL_COMPOUNDS:
+        name = extractFromSpace(element.displayName, true);
+        break;
+      case PropertyType.SEQUENCES:
+        name = extractFromSpace(element.displayName, false);
+        break
+      case PropertyType.DRUG:
+        name = extractFromSpace(element.displayName, true);
+        break
+      case PropertyType.OTHERS:
+        name = element.displayName;
+    }
+    return name;
+  }
+
+
+  getMoleculeIdentifier(node: R,element:E) {
+    let identifier : string = '';
+    const type = node.type;
+    switch (type) {
+      case PropertyType.PROTEINS:
+      case PropertyType.SEQUENCES:
+        identifier = extractIdAfterColon(element.displayName);
+        break;
+      case PropertyType.CHEMICAL_COMPOUNDS:
+      case PropertyType.DRUG:
+        identifier = extractIdInBrackets(element.displayName);
+        break
+      case PropertyType.OTHERS:
+        identifier = element.displayName;
+    }
+    return identifier;
+  }
+
 }

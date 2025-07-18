@@ -212,25 +212,27 @@ export class IconService {
     );
   }
 
-  getIconDetails(obj: DatabaseObject): { name: string; tooltip?: string; route?: string } {
+  getIconDetails(obj: DatabaseObject | string): { name: string; tooltip?: string; route?: string } {
+
     const defaultIcon = {name: 'pathway', tooltip: 'Unknown Event'};
-    // PE
-    if (isEWAS(obj)) {
-      return this.reactomeSubjectIcons[obj.referenceType];
-    }
-    // Reaction
-    if (isRLE(obj)) {
-      if (obj.category) {
-        return this.reactomeSubjectIcons[obj.category];
+
+    let key: string | undefined;
+
+    if (typeof obj === 'string') {
+      key = obj;
+    } else {
+      if (isEWAS(obj)) {
+        key = obj.referenceType;
+      } else if (isRLE(obj) && obj.category) {
+        key = obj.category;
+      } else if (isExactlyCellLineagePath(obj)) {
+        key = obj.schemaClass;
+      } else {
+        key = obj.schemaClass;
       }
     }
 
-    // Cell
-    if (isExactlyCellLineagePath(obj)) {
-      return this.reactomeSubjectIcons[obj.schemaClass];
-    }
-
-    return this.reactomeSubjectIcons[obj.schemaClass] || defaultIcon;
+    return this.reactomeSubjectIcons[key] || defaultIcon;
   }
 
 

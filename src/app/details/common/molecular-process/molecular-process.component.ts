@@ -1,4 +1,4 @@
-import {Component, computed, effect, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {CatalystActivityReference} from "../../../model/graph/control-reference/catalyst-activity-reference.model";
 import {CatalystActivity} from "../../../model/graph/catalyst-activity.model";
 import {Relationship} from "../../../model/graph/relationship.model";
@@ -9,10 +9,11 @@ import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {
   hasProperty,
   isCatalystActivity,
-  isEntity,
   isFragmentModification,
   isHasModifiedResidue,
-  isReferenceGroup, isReferenceMolecule,
+  isPhysicalEntity,
+  isReferenceGroup,
+  isReferenceMolecule,
   isRegulation,
   isReplacedResidue
 } from "../../../services/utils";
@@ -109,7 +110,7 @@ export class MolecularProcessComponent {
   }
 
   protected readonly isReferenceGroup = isReferenceGroup;
-  protected readonly isEntity = isEntity;
+  protected readonly isPhysicalEntity = isPhysicalEntity;
   protected readonly isReplacedResidue = isReplacedResidue;
   protected readonly isFragmentModification = isFragmentModification;
   protected readonly isReferenceMolecule = isReferenceMolecule;

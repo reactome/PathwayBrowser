@@ -18,6 +18,8 @@ import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molecule.model";
 import {Publication} from "../model/graph/publication/publication.model";
 import {Book} from "../model/graph/publication/book.model";
+import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
+import {Molecule} from "./participant.service";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -70,10 +72,26 @@ export function isPathway(obj: DatabaseObject): obj is Pathway | TopLevelPathway
 }
 
 const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
-  SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY]);
+  SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY, SchemaClasses.CELL]);
 
-export function isEntity(obj: DatabaseObject): obj is PhysicalEntity {
+export function isPhysicalEntity(obj: DatabaseObject): obj is PhysicalEntity {
   return physicalEntityClasses.has(obj.schemaClass);
+}
+
+const ReferenceEntityClasses: Set<string> = new Set([
+  SchemaClasses.REFERENCE_ENTITY,
+  SchemaClasses.REFERENCE_GROUP,
+  SchemaClasses.REFERENCE_MOLECULE,
+  SchemaClasses.REFERENCE_SEQUENCE,
+  SchemaClasses.REFERENCE_DNA_SEQUENCE,
+  SchemaClasses.REFERENCE_GENE_PRODUCT,
+  SchemaClasses.REFERENCE_ISOFORM,
+  SchemaClasses.REFERENCE_RNA_SEQUENCE,
+  SchemaClasses.REFERENCE_THERAPEUTIC
+]);
+
+export function isRefEntity(obj: DatabaseObject): obj is ReferenceEntity {
+  return ReferenceEntityClasses.has(obj.schemaClass);
 }
 
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
@@ -92,6 +110,24 @@ const reactionLikeEventClasses: Set<string> = new Set([
 export function isRLE(obj: DatabaseObject): obj is ReactionLikeEvent {
   return reactionLikeEventClasses.has(obj.schemaClass);
 }
+
+// todo: simplify ? introduce relationship?
+// All molecules at Molecules tab
+const moleculeClasses: Set<string> = new Set([
+  SchemaClasses.EWAS,
+  SchemaClasses.REFERENCE_GENE_PRODUCT,
+  SchemaClasses.REFERENCE_ISOFORM,
+  SchemaClasses.REFERENCE_RNA_SEQUENCE,
+  SchemaClasses.REFERENCE_DNA_SEQUENCE,
+  SchemaClasses.SIMPLE_ENTITY,
+  SchemaClasses.REFERENCE_MOLECULE,
+  SchemaClasses.REFERENCE_THERAPEUTIC
+])
+
+export function isMolecule(obj: DatabaseObject): obj is Molecule{
+  return  moleculeClasses.has(obj.schemaClass);
+}
+
 
 export function isPathwayWithDiagram(obj: DatabaseObject): obj is Pathway {
   return isPathway(obj) && obj.hasDiagram;
@@ -140,6 +176,10 @@ export function isRefOrBook(publication: Publication): publication is Literature
   return publication.schemaClass === SchemaClasses.LITERATURE_REFERENCE || publication.schemaClass === SchemaClasses.BOOK
 }
 
+export function isSelectableObject(obj: DatabaseObject): obj is Event | PhysicalEntity {
+  return isEvent(obj) || isPhysicalEntity(obj);
+}
+
 /** Generic function to dynamic access child property
  *  T represents the type of the obj parameter, which must extend DatabaseObject.
  *  K is constrained to the keys of T, ensuring only valid keys of the given object type can be accessed.
@@ -180,3 +220,55 @@ export function getArrayStats(values: number[]): ArrayStats {
   summary.multiValued = values.length > 1
   return summary;
 }
+
+
+/**
+ * J01866EMBL:J01866 5.8S rRNA ➡️ J01866
+ * ENSG00000001630ENSEMBL:ENSG00000001630 CYP51A1 ➡️ ENSG00000001630
+ * UniProt:A0A183 LCE6A ➡️ A0A183
+ * @param value
+ */
+export function extractIdAfterColon(value: string): string {
+  if (!value) return '';
+
+  const colonIndex = value.indexOf(':');
+  if (colonIndex === -1) return '';
+
+  const afterColon = value.substring(colonIndex + 1).trim();
+  const spaceIndex = afterColon.indexOf(' ');
+
+  return spaceIndex !== -1 ? afterColon.substring(0, spaceIndex) : afterColon;
+}
+
+
+/**
+ * ripasudil  [Guide to Pharmacology:10423] ➡️ 10423
+ * rosiglitazone [Guide to Pharmacology:1056] ➡️ 1056
+ * @param value
+ */
+export function extractIdInBrackets(value: string): string{
+  const match = value.match(/\[.*?:([^\]\s]+)\]/);
+  return match ? match[1] : '';
+}
+
+
+/**
+ * UniProt:P11142 HSPA8 ➡️ (default behavior) HSPA8
+ * UniProt:P11142 HSPA8 ➡️ True UniProt:P11142
+ * @param input
+ * @param getBeforeSpace
+ */
+export function  extractFromSpace(input: string, getBeforeSpace: boolean = false): string {
+  if (!input) return '';
+
+  const trimmed = input.trim();
+
+  if (getBeforeSpace) {
+    const index = trimmed.indexOf(' ');
+    return index !== -1 ? trimmed.substring(0, index) : trimmed;
+  } else {
+    const index = trimmed.lastIndexOf(' ');
+    return index !== -1 ? trimmed.substring(index + 1) : trimmed;
+  }
+}
+
