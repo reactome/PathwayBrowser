@@ -12,7 +12,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule} from "@angular/material/button";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {CdkDrag, CdkDragHandle} from "@angular/cdk/drag-drop";
-import {DiagramIteratorComponent} from './diagram-iterator/diagram-iterator.component';
 import {MatInputModule} from "@angular/material/input";
 import {MatSelectModule} from "@angular/material/select";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
@@ -38,7 +37,6 @@ import {MatTreeModule} from "@angular/material/tree";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {EhldComponent} from './ehld/ehld.component';
 import {MatMenuModule} from "@angular/material/menu";
-import {DiagramHomeComponent} from './diagram-home/diagram-home.component';
 import {MaterialFileInputModule} from "ngx-custom-material-file-input";
 import {CdkNestedTreeNode} from "@angular/cdk/tree";
 import {DetailsComponent} from "./details/details.component";
@@ -80,8 +78,6 @@ import {ExpressionTabComponent} from "./details/tabs/expression-tab/expression-t
 import {ReacfoamComponent} from "./reacfoam/reacfoam.component";
 import {InfoTabComponent} from "./details/tabs/info-tab/info-tab.component";
 import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component";
-import {TypeSafeMatCellDef} from "./utils/type-safe-mat-cell-def.directive";
-import {TypeSafeMatRowDef} from "./utils/type-safe-mat-row-def.directive";
 import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
 import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-viewer/structure-viewer.component";
 import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
@@ -90,14 +86,12 @@ import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-det
   declarations: [
     AppComponent,
     DiagramComponent,
-    DiagramIteratorComponent,
     CustomInteractorDialogComponent,
     InteractorsComponent,
     ViewportComponent,
     SpeciesComponent,
     EventHierarchyComponent,
     EhldComponent,
-    DiagramHomeComponent,
     DetailsComponent,
     DescriptionTabComponent,
     InteractorsTableComponent,
