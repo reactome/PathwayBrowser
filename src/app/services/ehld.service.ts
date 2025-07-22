@@ -1,12 +1,12 @@
-import {computed, ElementRef, Injectable, signal} from '@angular/core';
-import {BehaviorSubject, forkJoin, map, Observable} from "rxjs";
+import {computed, ElementRef, Injectable} from '@angular/core';
+import {Observable} from "rxjs";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Graph} from "../model/graph.model";
 import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
 import {DataStateService} from "./data-state.service";
+import {UrlStateService} from "./url-state.service";
 
 export interface LegendItem {
   name: string;
@@ -52,22 +52,11 @@ export class EhldService {
     }
   ];
 
-  constructor(private http: HttpClient, private analysis: AnalysisService, private data: DataStateService) {
+  constructor(private http: HttpClient, private analysis: AnalysisService, private data: DataStateService, private state: UrlStateService) {
   }
 
-
-
-  getSVGData(id: string): Observable<{ svg: string; graphData: Graph.Data }> {
-    const svgRequest = this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
-    const grapRequest = this.http.get<Graph.Data>(`${environment.host}/download/current/diagram/${id}.graph.json`)
-    return forkJoin({svg: svgRequest, graph: grapRequest}).pipe(
-      map(({svg, graph}) => {
-        return {
-          svg: svg,
-          graphData: graph
-        };
-      })
-    );
+  getSVGData(id: string): Observable<string> {
+    return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'})
   }
 
   // Hover an element
@@ -193,19 +182,37 @@ export class EhldService {
   }
 
 
-  createOverlay(stId: string, exps: [number | undefined, number][], regionElement: SVGGElement) {
+  createOverlay(stId: string, pathway: Analysis.Pathway | undefined, regionElement: SVGGElement) {
     const targetId = `${this.overlay}${stId}`;
     const overlayElement = regionElement.querySelector(`#${targetId}`);
+
+    for (let i = 0; i < regionElement.childElementCount; i++) {
+      const child = regionElement.children.item(i) as SVGElement | null;
+      if (child &&
+        !child.id.startsWith(this.overlay) &&
+        !child.id.startsWith(this.analysisInfoId)
+      ) child.style.filter = `saturate(${(pathway?.entities.fdr || 1) < this.state.significance() ? 1 : 0})`;
+    }
 
     if (overlayElement) {
       const rect = overlayElement.getElementsByTagName('rect')[0]
       if (!rect) return;
 
-      this.createPattern(stId, exps, regionElement);
+      const entities = pathway?.entities || {fdr: 1, found: 0, total: 1, exp: undefined};
+      const currentExp = entities.exp?.[this.analysis.sampleIndex()];
+      const exp = currentExp || entities.fdr;
 
-      rect.style.fill = `url(#${this.pattern}${stId})`;
-      rect.setAttribute('stroke', '#000000');
-      rect.setAttribute('stroke-width', '0.5');
+      const exps: [number | undefined, number][] = [
+        [exp, entities.found],
+        [undefined, entities.total - entities.found],
+      ]
+      this.createPattern(stId, exps, regionElement, 'exp');
+
+      this.addInnerStroke(rect, this.analysis.palette().scale(exp).hex(), 2);
+
+      rect.style.fill = `url(#${this.pattern}${stId}-exp)`;
+      rect.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
+      rect.style.backdropFilter = 'blur(5px)';
 
       const text = overlayElement.getElementsByTagName('text')[0];
       text?.classList.add('title-text');
@@ -213,14 +220,31 @@ export class EhldService {
   }
 
 
-  createPattern(stId: string, exps: [number | undefined, number] [], regionElement: SVGGElement) {
+  private addInnerStroke(rect: SVGRectElement, color: string, strokeWidth = 2) {
+    const hs = strokeWidth / 2;
+    const strokeRect = rect.cloneNode() as SVGRectElement;
+    strokeRect.classList.add('inner-stroke')
+    strokeRect.style.fill = 'none';
+    strokeRect.style.filter = 'none';
+    strokeRect.style.stroke = color;
+    strokeRect.style.strokeWidth = strokeWidth + '';
+    strokeRect.style.x = rect.x.baseVal.value + hs + '';
+    strokeRect.style.y = rect.y.baseVal.value + hs + '';
+    strokeRect.style.width = rect.width.baseVal.value - strokeWidth + '';
+    strokeRect.style.height = rect.height.baseVal.value - strokeWidth + '';
+    strokeRect.style.rx = rect.rx.baseVal.value - hs + '';
+    rect.after(strokeRect)
+  }
+
+  createPattern(stId: string, values: [number | undefined, number] [], regionElement: SVGGElement, type: 'fdr' | 'exp') {
     const svg = regionElement.closest('svg');
     const defs = svg!.querySelector('defs') || svg!.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
 
     const stops: { start: number, stop: number, color: string, exp: number | undefined, width: number }[] = [];
-    const size = exps.reduce((l: number, e) => e !== undefined && isArray(e) ? l + e[1] : l + 1, 0);
+    const size = values.reduce((l: number, e) => e !== undefined && isArray(e) ? l + e[1] : l + 1, 0);
     const delta = 1 / size;
-    exps.forEach((exp, i) => {
+    const palette = type === 'fdr' ? this.analysis.fdrPalette() : this.analysis.palette();
+    values.forEach((exp, i) => {
       const p = stops.length - 1;
       const realExp = isArray(exp) ? exp[0] : exp;
       if (stops.length !== 0 && stops[p].exp === realExp) {
@@ -231,13 +255,13 @@ export class EhldService {
           start: stops[p]?.stop || 0,
           stop: (stops[p]?.stop || 0) + delta * exp[1],
           width: delta * exp[1],
-          color: this.analysis.palette().scale(realExp).hex(),
+          color: palette.scale(realExp).hex(),
           exp: realExp
         })
       }
     })
 
-    const p = `<pattern id="${this.pattern}${stId}" patternUnits="objectBoundingBox" width="1" height="1" viewBox="0 0 1 1" preserveAspectRatio="none">` +
+    const p = `<pattern id="${this.pattern}${stId}-${type}" patternUnits="objectBoundingBox" width="1" height="1" viewBox="0 0 1 1" preserveAspectRatio="none">` +
       stops
         .map((stop, i) => `<rect fill="${stop.color}" x="${stop.start}" height="1" width="${stop.width + 0.01}"/>`)
         .join('') +
@@ -246,18 +270,32 @@ export class EhldService {
     defs.insertAdjacentHTML('beforeend', p);
   }
 
-  showAnalysisInfo(regionElement: SVGGElement, analysisPathway: Analysis.Pathway['entities']) {
-
+  showAnalysisInfo(regionElement: SVGGElement, analysisPathway: Analysis.Pathway | undefined) {
+    if (!analysisPathway)  return;
     const analysisInfoElement = regionElement.querySelector(`g[id^="${this.analysisInfoId}"]`) as SVGGElement;
 
     if (analysisInfoElement) {
       // Make it visible
       analysisInfoElement.classList.add(`${this.analysisInfoContainer}`);
 
+      const entities = analysisPathway.entities ;
+      this.createPattern(analysisPathway.stId, [
+        [entities.fdr, entities.found],
+        [undefined, entities.total - entities.found]
+      ], regionElement, "fdr")
+
+      const rect = analysisInfoElement.getElementsByTagName('rect')[0];
+
+      rect.classList.forEach(token => rect.classList.remove(token));
+
+      this.addInnerStroke(rect, this.analysis.fdrPalette().scale(entities.fdr).hex(), 2);
+
+      rect.style.fill = `url(#${this.pattern}${analysisPathway.stId}-fdr)`;
+      rect.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
+
       const textInfoElement = analysisInfoElement.getElementsByTagName('text')[0];
       // "1.23E4";
-      textInfoElement.innerHTML = `Hit: ${analysisPathway.found}/${analysisPathway.total} - FDR: ${analysisPathway.fdr.toExponential(2).replace('e', 'E')}`;
-
+      textInfoElement.innerHTML = `Hit: ${entities.found}/${entities.total} - FDR: ${entities.fdr.toExponential(2).replace('e', 'E')}`;
       textInfoElement.removeAttribute("transform");
       textInfoElement.classList.add('analysis-text');
 
@@ -273,24 +311,23 @@ export class EhldService {
 
   clearAllOverlay(regionElementsMap: Map<string, SVGGElement>) {
     regionElementsMap.forEach((element: SVGGElement, stId: string) => {
+      element.querySelectorAll('rect.inner-stroke').forEach(stroke => stroke.remove())
       const targetId = `${this.overlay}${stId}`;
       const overlayElement = element.querySelector(`#${targetId}`);
       if (overlayElement) {
         const rect = overlayElement.getElementsByTagName('rect')[0];
-        if (rect) rect.style.fill = "revert-layer";
+        if (rect) rect.removeAttribute("style")
       }
     })
   }
 
-  clearExistingPatterns(elementsMap: Map<string, SVGGElement>, svg: SVGElement | null) {
+  clearExistingPatterns( svg: SVGElement | null) {
     if (!svg) return;
     const defs = svg.querySelector('defs') || svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
-    elementsMap.forEach((element: SVGGElement, stId: string) => {
-      const patternId = `${this.pattern}${stId}`;
-      if (defs.querySelector(`#${patternId}`) !== null) {
-        defs.querySelector(`#${patternId}`)!.remove()
-      }
-    })
+
+    Array.from(defs.children)
+      .filter(child => child.id.startsWith(this.pattern))
+      .forEach(child => defs.removeChild(child));
   }
 
   clearAnalysisInfo(elementsMap: Map<string, SVGGElement>) {

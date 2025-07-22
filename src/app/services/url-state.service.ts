@@ -37,6 +37,7 @@ export class UrlStateService implements State {
     flagInteractors: urlParam<boolean>(false, "boolean", ['FLGINT']),
     overlay: urlParam<string | null>(null, "string"),
     analysis: urlParam<string | null>(null, "string", ['ANALYSIS']),
+    significance: urlParam<number>(0.05, "number"),
     sample: urlParam<string | null>(null, "string"),
     palette: urlParam<PaletteName | null>(null, "string"),
     filterViewMode: urlParam<'focus' | 'overview' | undefined>(undefined, "string"),
@@ -58,6 +59,7 @@ export class UrlStateService implements State {
   public readonly flagInteractors = this.values.flagInteractors
   public readonly overlay = this.values.overlay
   public readonly analysis = this.values.analysis
+  public readonly significance = this.values.significance
   public readonly sample = this.values.sample
   public readonly palette = this.values.palette
   public readonly filterViewMode = this.values.filterViewMode
@@ -101,24 +103,27 @@ export class UrlStateService implements State {
         const token = tokens.find(token => params.has(token));
         if (token) {
           const initialValue = param.initialValue;
-          let value = params.get(token)!;
-          if (isArray(initialValue)) {
-            let values: any[] = value.split(';');
-            if (param.type === 'id') {
-              const mixedValues = values.map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
-              values = await Promise.all(mixedValues.map(v => this.ensureStId(v)));
+          let value = params.get(token);
+          if (value === undefined || value === null) param.set(value);
+          else {
+            if (isArray(initialValue)) {
+              let values: any[] = value.split(';');
+              if (param.type === 'id') {
+                const mixedValues = values.map(v => v.charAt(0).match(/\d/) ? parseInt(v) : v);
+                values = await Promise.all(mixedValues.map(v => this.ensureStId(v)));
+              }
+              if (param.type === 'number') values = values.map(v => +v);
+              if (param.type === 'boolean') values = values.map(v => v === 'true');
+              param.set(values);
+            } else if (param.type === 'boolean') {
+              param.set(value === 'true');
+            } else if (param.type === 'id') {
+              param.set(!isNaN(+value) ? await this.dbIdToStId(+value) : value)
+            } else if (param.type === 'number') {
+              param.set(parseFloat(value))
+            } else {
+              param.set(value.replaceAll('__', ' '))
             }
-            if (param.type === 'number') values = values.map(v => +v);
-            if (param.type === 'boolean') values = values.map(v => v === 'true');
-            param.set(values);
-          } else if (param.type === 'boolean') {
-            param.set(value === 'true');
-          } else if (param.type === 'id') {
-            param.set(!isNaN(+value) ? await this.dbIdToStId(+value) : value)
-          } else if (param.type === 'number') {
-            param.set(parseFloat(value))
-          } else {
-            param.set(value.replaceAll('__', ' '))
           }
         } else {
           param.set(param.initialValue)
@@ -133,6 +138,7 @@ export class UrlStateService implements State {
         if (paramValue === undefined
           || paramValue === null
           || (isArray(paramValue) && paramValue.length === 0)
+          || paramValue === param.initialValue
         ) continue;
         if (typeof paramValue === 'string') paramValue = paramValue.replaceAll(' ', '__')
         queryParams[key] = isArray(paramValue) ? paramValue.join(';') : paramValue;

@@ -1,14 +1,21 @@
-import {AfterViewInit, Component, effect, ElementRef, model, viewChild} from '@angular/core';
-import {filter, forkJoin, take} from "rxjs";
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  linkedSignal,
+  model,
+  signal,
+  viewChild
+} from '@angular/core';
 import {EhldService, LegendGroup} from "../services/ehld.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {UrlStateService} from "../services/url-state.service";
 import SvgPanZoom from 'svg-pan-zoom';
 import {AnalysisService} from "../services/analysis.service";
 import {isDefined} from "../services/utils";
-import {Analysis} from "../model/analysis.model";
 import {Style} from "reactome-cytoscape-style";
-import {SpeciesService} from "../services/species.service";
 import {rxResource} from "@angular/core/rxjs-interop";
 
 
@@ -33,32 +40,27 @@ export class EhldComponent implements AfterViewInit {
   style!: Style;
   ratio = 0.384;
 
-  selectedElement?: SVGGElement;
-  selectedIdFromUrl?: string;
-  flaggedIdFromUrl?: string[];
-  flaggedElements: (SVGGElement | undefined)[] = [];
-  stIdToSVGGElement: Map<string, SVGGElement> = new Map<string, SVGGElement>();
+  stIdToSVGGElement = signal(new Map<string, SVGGElement>());
+  subpathwayStIds = computed(() => [...this.stIdToSVGGElement().keys()])
+  selectedElement = linkedSignal(() => this.state.select() ? this.stIdToSVGGElement().get(this.state.select()!) : undefined);
+  flaggedElements = computed(() => this.state.flag().map(stId => this.stIdToSVGGElement().get(stId)).filter(isDefined));
   panZoom?: SvgPanZoom.Instance;
   legendItems: LegendGroup[] = [...this.ehldService.legendItems];
 
   constructor(private ehldService: EhldService,
-              private analysisService: AnalysisService,
+              private analysis: AnalysisService,
               public state: UrlStateService,) {
-    effect(() => this.selectedIdFromUrl = this.state.select()!);
-    effect(() => this.flaggedIdFromUrl = this.state.flag());
-    effect(() => this.loadAnalysis(this.state.analysis()));
+    effect(() => this.selectedElement() && this.ehldService.applyOutline(this.selectedElement()!, this.flaggedElements()));
+    effect(() => this.flaggedElements().forEach(g => this.ehldService.applyFlagOutline(g)));
     effect(() => {
-      if (this.svgData.value()?.svg && this.ehldContainer()) {
-        this.ehldContainer().nativeElement.innerHTML = this.svgData.value()!.svg
-        this.stIdToSVGGElement = this.ehldService.setStIdToSVGGElementMap(this.ehldContainer());
-        this.setInitialSelection();
-        this.setInitialFlag();
+      if (this.svgData.value() && this.ehldContainer()) {
+        this.ehldContainer().nativeElement.innerHTML = this.svgData.value()!
+        this.stIdToSVGGElement.set(this.ehldService.setStIdToSVGGElementMap(this.ehldContainer()));
         this.addEventListenerToSvg();
-
         this.initializePanAndZoom();
-        this.loadAnalysis(this.state.analysis())
       }
     });
+    effect(() => this.loadAnalysis());
   }
 
   ngAfterViewInit(): void {
@@ -86,60 +88,39 @@ export class EhldComponent implements AfterViewInit {
     }
   }
 
-  private setInitialSelection() {
-    if (!this.selectedIdFromUrl) return;
-    this.selectedElement = this.stIdToSVGGElement.get(this.selectedIdFromUrl)
-    if (this.selectedElement) {
-      this.ehldService.applyOutline(this.selectedElement, this.flaggedElements);
-    }
-  }
-
-  private setInitialFlag() {
-    if (!this.flaggedIdFromUrl) return;
-    this.flaggedElements = this.flaggedIdFromUrl
-      .map(e => this.stIdToSVGGElement.get(e))
-      .filter(e => e !== undefined);
-
-    this.flaggedElements?.forEach(element => {
-      if (element) {
-        this.ehldService.applyFlagOutline(element)
-      }
-    });
-  }
-
   private addEventListenerToSvg(): void {
     const svgElement = this.ehldContainer().nativeElement.querySelectorAll('g[id^="REGION"]') as NodeListOf<SVGGElement>;
 
     svgElement.forEach((element: SVGGElement) => {
       element.addEventListener('mouseover', () => {
-        if (element !== this.selectedElement) {
-          this.ehldService.applyShadow(element, this.flaggedElements);
+        if (element !== this.selectedElement()) {
+          this.ehldService.applyShadow(element, this.flaggedElements());
         }
       })
 
       element.addEventListener('mouseout', () => {
-        if (element !== this.selectedElement) {
-          this.ehldService.removeShadow(element, this.flaggedElements);
+        if (element !== this.selectedElement()) {
+          this.ehldService.removeShadow(element, this.flaggedElements());
         }
       })
 
       element.addEventListener('click', () => {
-        if (this.selectedElement) {
-          this.ehldService.removeOutline(this.selectedElement, this.flaggedElements);
+        if (this.selectedElement()) {
+          this.ehldService.removeOutline(this.selectedElement()!, this.flaggedElements());
         }
-        this.selectedElement = element;
+        this.selectedElement.set(element);
 
-        const idAttr = this.selectedElement?.getAttribute('id');
+        const idAttr = this.selectedElement()?.getAttribute('id');
         if (idAttr) {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) this.state.select.set(stId);
         }
 
-        this.ehldService.applyOutline(element, this.flaggedElements);
+        this.ehldService.applyOutline(element, this.flaggedElements());
       });
 
       element.addEventListener('dblclick', () => {
-        const idAttr = this.selectedElement?.getAttribute('id');
+        const idAttr = this.selectedElement()?.getAttribute('id');
         if (idAttr) {
           const stId = this.ehldService.getStableId(idAttr);
           if (stId) {
@@ -152,56 +133,34 @@ export class EhldComponent implements AfterViewInit {
   }
 
 
-  private loadAnalysis(token: string | null) {
-    const diagramId = this.pathwayId();
-    if (!token || !diagramId) return;
+  private loadAnalysis() {
+    const elementsMap = this.stIdToSVGGElement();
+    const svg = this.ehldContainer().nativeElement.querySelector('svg')!;
+    if (!svg) return;
+    this.ehldService.clearExistingPatterns(svg)
+    this.ehldService.clearAllOverlay(elementsMap);
+    this.ehldService.clearAnalysisInfo(elementsMap);
 
-    forkJoin({
-      entities: this.analysisService.foundEntities(diagramId, token),
-      pathways: this.analysisService.pathwaysResults([...this.stIdToSVGGElement.keys()], token)
-    }).subscribe(({entities, pathways}) => {
+    const bg = svg.querySelector('#BG') as SVGGElement;
+    const fg = svg.querySelector('#FG') as SVGGElement;
 
+    const allPathwayStIds = this.subpathwayStIds();
+    if (!this.analysis.result()) {
+      bg?.removeAttribute('style');
+      fg?.removeAttribute('style');
+    } else {
+      if (bg) bg.style.filter = 'saturate(0)';
+      if (fg) fg.style.filter = 'saturate(0)';
 
-      this.ehldService.clearExistingPatterns(this.stIdToSVGGElement, this.ehldContainer().nativeElement.querySelector('svg'))
-      this.ehldService.clearAllOverlay(this.stIdToSVGGElement);
-      this.ehldService.clearAnalysisInfo(this.stIdToSVGGElement);
-
-      const analysisProfile = this.state.sample();
-      let analysisIndex = analysisProfile ? entities.expNames.indexOf(analysisProfile) : 0;
-      if (analysisIndex === -1) analysisIndex = 0;
-
-      // let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
-      //   entity.mapsTo
-      //     .flatMap(diagramEntity => diagramEntity.ids)
-      //     .map(id => [id, entity.exp[analysisIndex] || 1]))
-      // )
-      // console.log("analysisEntityMap ", analysisEntityMap);
-
-      // let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
-      let analysisPathwayMap = new Map<string, Analysis.Pathway['entities']>(pathways.map(p => [p.stId, p.entities]));
-
-      const allPathwayStIds = [...this.stIdToSVGGElement.keys()];
       allPathwayStIds.forEach((stId) => {
-        const regionElement = this.stIdToSVGGElement.get(stId);
-        const pathwayData = analysisPathwayMap.get(stId);
+        const regionElement = elementsMap.get(stId);
+        const pathwayData = this.analysis.pathwayStIdToData().get(stId);
 
         if (!regionElement) return;
 
-        const exps: [number | undefined, number][] = pathwayData
-          ? [
-            [pathwayData.exp?.[analysisIndex] || pathwayData.fdr, pathwayData.found],
-            [undefined, pathwayData.total - pathwayData.found],
-          ]
-          : [[undefined, 1]];
-
-        this.ehldService.createOverlay(stId, exps, regionElement);
-
-        // If pathway data exists, show additional analysis info box
-        if (pathwayData) {
-          this.ehldService.showAnalysisInfo(regionElement, pathwayData);
-        }
+        this.ehldService.createOverlay(stId, pathwayData, regionElement);
+        this.ehldService.showAnalysisInfo(regionElement, pathwayData);
       });
-    })
+    }
   }
-
 }
