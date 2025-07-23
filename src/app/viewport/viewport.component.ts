@@ -1,11 +1,11 @@
 import {
-  AfterViewInit,
+  AfterViewInit, ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   computed,
   effect,
-  ElementRef,
-  model,
+  ElementRef, linkedSignal,
+  model, signal,
   viewChild,
   WritableSignal
 } from '@angular/core';
@@ -24,13 +24,17 @@ import {DataStateService} from "../services/data-state.service";
 import {isPathway} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, style, transition, trigger} from "@angular/animations";
+import {drop} from "lodash";
 
-const DETAIL_MIN_HEIGHT = 0;
+const DETAIL_MIN_HEIGHT = 30;
+
+const DROPDOWN_DURATION = 500;
 
 @Component({
   selector: 'cr-viewport',
   templateUrl: './viewport.component.html',
   styleUrls: ['./viewport.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
   animations: [
     trigger('appear', [
@@ -42,6 +46,18 @@ const DETAIL_MIN_HEIGHT = 0;
         animate('1000ms ease-in-out', style({
           width: '0'
         })),
+      ])
+    ]),
+    trigger('dropdown', [
+      transition(':enter', [
+        style({bottom: '100%', borderBottom: '4px solid var(--primary)'}),
+        animate(`${DROPDOWN_DURATION}ms ease-in`, style({bottom: '0%'})),
+        style({borderBottom: '0px solid var(--primary)'}),
+      ]),
+      transition(':leave', [
+        style({borderBottom: '4px solid var(--primary)'}),
+        animate(`${DROPDOWN_DURATION}ms ease-out`, style({bottom: '100%'})),
+        style({bottom: '100%'}),
       ])
     ])
   ]
@@ -71,10 +87,17 @@ export class ViewportComponent implements AfterViewInit {
     return undefined;
   })
 
-  contentHeight = computed(() => this.content().nativeElement.clientHeight)
+  dropdownDuration = DROPDOWN_DURATION
+
+  dropdown = signal<'analysis' | 'compare' | null>(null)
+
+  contentHeight = linkedSignal(() => this.content().nativeElement.clientHeight)
+  sizeObserver = new ResizeObserver(() => {this.contentHeight.set(this.content().nativeElement.clientHeight)})
+
+  detailMinSize = computed(() => DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
   // Use bellow when fixed layout solution found
-  // detailShare = computed(() => this.state.pathwayId() || this.state.select() ? 20 : DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
-  detailShare = computed(() => 20)
+  detailShare = signal(20)
+  // detailShare = computed(() => 20)
   viewShare = computed(() => 100 - this.detailShare())
 
   diagram = viewChild(DiagramComponent);
@@ -96,7 +119,6 @@ export class ViewportComponent implements AfterViewInit {
 
   constructor(public speciesService: SpeciesService,
               private interactorService: InteractorService,
-              private cdRef: ChangeDetectorRef,
               public analysis: AnalysisService,
               public dark: DarkService,
               public eventService: EventService,
@@ -104,7 +126,13 @@ export class ViewportComponent implements AfterViewInit {
               public general: GeneralService,
               public dataState: DataStateService,
   ) {
+    effect(() => {
+      this.dropdown() === null ?
+        this.detailShare.set(20) :
+        setTimeout(() => this.detailShare.set(this.detailMinSize()), this.dropdownDuration);
+    });
     effect(() => this.dataState.currentPathway() && this.eventService.setDiagramEvent(this.dataState.currentPathway()!));
+    effect(() => this.sizeObserver.observe(this.content().nativeElement));
   }
 
   ngAfterViewInit(): void {
@@ -185,5 +213,6 @@ export class ViewportComponent implements AfterViewInit {
     else this.updateProfile(0)
   }
 
+  protected readonly drop = drop;
 }
 

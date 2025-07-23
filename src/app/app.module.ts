@@ -81,6 +81,8 @@ import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component
 import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
 import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-viewer/structure-viewer.component";
 import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
+import {AnalysisFormComponent} from "./viewport/analysis-form/analysis-form.component";
+import {CompareFormComponent} from "./viewport/compare-form/compare-form.component";
 
 @NgModule({
   declarations: [
@@ -169,6 +171,8 @@ import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-det
     ExternalReferenceComponent,
     CrossReferencesComponent,
     MoleculeDetailsComponent,
+    AnalysisFormComponent,
+    CompareFormComponent,
 
   ],
   providers: [

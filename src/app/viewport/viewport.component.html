@@ -52,7 +52,7 @@
           <div class="top-left">
 
             <div class="analysis-button-group">
-              <button [matMenuTriggerFor]="an" mat-ripple class="primary">
+              <button (click)="dropdown.set(dropdown() ? null : 'analysis')" mat-ripple class="primary">
                 <mat-icon>query_stats</mat-icon>
                 Analyze
               </button>
@@ -63,7 +63,7 @@
                   <div class="label" [style.max-width.px]="buttons.clientWidth">
                     {{ analysis.sampleIndex() + 1 }}/{{ analysis.samples().length }} : {{ state.sample() }}
                   </div>
-                  <div class="buttons" #buttons >
+                  <div class="buttons" #buttons>
                     <button mat-ripple class="primary" [@appear]
                             matTooltip="Previous sample"
                             (click)="previousProfile()"
@@ -109,9 +109,13 @@
 
             <mat-menu #an="matMenu">
               <button mat-menu-item (click)="analysis.example('uniprot').subscribe()">UniProt</button>
-              <button mat-menu-item (click)="analysis.example('extreme', {interactors: true}).subscribe()">Extreme</button>
+              <button mat-menu-item (click)="analysis.example('extreme', {interactors: true}).subscribe()">Extreme
+              </button>
               <button mat-menu-item (click)="analysis.example('microarray').subscribe()">Expression</button>
-              <button mat-menu-item (click)="analysis.example('cancer-gene-census', {disableProjectToHuman: true, interactors: true}).subscribe()">Gene Names (n Species)</button>
+              <button mat-menu-item
+                      (click)="analysis.example('cancer-gene-census', {disableProjectToHuman: true, interactors: true}).subscribe()">
+                Gene Names (n Species)
+              </button>
               <button mat-menu-item (click)="state.analysis.set('MjAyNTA2MjQxMDI3MTNfNzgx')">GSA</button>
             </mat-menu>
 
@@ -157,8 +161,7 @@
         </div>
         <div class="content" #content>
           <as-split direction="vertical" gutterSize="4" useTransition="true">
-            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
-            <as-split-area [size]="viewShare()" id="view" class="hide-overflow" >
+            <as-split-area [size]="viewShare()" id="view" class="hide-overflow">
               @if (pathwayId()) {
                 @if (hasEHLD()) {
                   <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
@@ -169,8 +172,22 @@
               } @else {
                 <cr-reacfoam/>
               }
+
+              <div class="dropdown" @dropdown *ngIf="dropdown()">
+                @switch (dropdown()) {
+                  @case ('analysis') {
+                    <cr-analysis-form (close)="dropdown.set(null)"/>
+                  }
+                  @case ('compare') {
+                    <cr-compare-form (close)="dropdown.set(null)"/>
+                  }
+                }
+              </div>
             </as-split-area>
-            <as-split-area [size]="detailShare()">
+
+            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
+
+            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()">
               <cr-details-panel></cr-details-panel>
             </as-split-area>
           </as-split>
