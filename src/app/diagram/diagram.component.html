@@ -22,9 +22,8 @@
     <div cdkDrag cdkDragLockAxis="x" cdkDragBoundary="#legend-boundary" id="legend-container"
          (cdkDragMoved)="updateLegend()"
          [style.height.px]="container.clientHeight">
-      <div class="legend-group-wrapper">
-        <div class="legend-group" [class.has-analysis]="analysis.result()"
-             [style.--handle-height.px]="handle.clientHeight">
+      <div class="legend-handlers-wrapper">
+        <div class="legend-handlers" [class.has-analysis]="analysis.result()" [style.--handle-height.px]="handle.clientHeight">
           <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
           @if (analysis.result()) {
             <div class="analysis-legend">

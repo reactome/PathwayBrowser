@@ -48,7 +48,7 @@ export class EhldComponent implements AfterViewInit {
   legendItems: LegendGroup[] = [...this.ehldService.legendItems];
 
   constructor(private ehldService: EhldService,
-              private analysis: AnalysisService,
+              public analysis: AnalysisService,
               public state: UrlStateService,) {
     effect(() => this.selectedElement() && this.ehldService.applyOutline(this.selectedElement()!, this.flaggedElements()));
     effect(() => this.flaggedElements().forEach(g => this.ehldService.applyFlagOutline(g)));
