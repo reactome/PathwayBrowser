@@ -1,9 +1,11 @@
 @use "@angular/material" as mat;
 @use "reactome-cytoscape-style";
 @use "ngx-reactome-style";
+@use "reactome-table";
 
 @include reactome-cytoscape-style.configure-diagrams();
 @include ngx-reactome-style.theme();
+@include reactome-table.configure-table();
 
 // Custom TABS
 .custom-tab-group {

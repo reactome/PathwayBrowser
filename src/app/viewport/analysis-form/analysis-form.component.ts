@@ -1,13 +1,24 @@
-import {Component, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, output} from '@angular/core';
+import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
+import {NgOptimizedImage} from "@angular/common";
+import {QualitativeAnalysisComponent} from "./qualitative-analysis/qualitative-analysis.component";
 
 @Component({
   selector: 'cr-analysis-form',
-  imports: [],
+  imports: [
+    MatTab,
+    MatTabGroup,
+    MatTabLabel,
+    NgOptimizedImage,
+    QualitativeAnalysisComponent,
+    QualitativeAnalysisComponent
+  ],
   templateUrl: './analysis-form.component.html',
-  styleUrl: './analysis-form.component.scss'
+  styleUrl: './analysis-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalysisFormComponent {
 
-  close = output<{status: 'finished' | 'premature'}>()
+  close = output<{ status: 'finished' | 'premature' }>()
 
 }

@@ -1,0 +1,87 @@
+<span class="title">Qualitative Entity Enrichment Analysis</span>
+
+<div class="description">
+  <section>
+    Enrichment analysis is a statistical test that determines whether certain Reactome pathways are over-represented
+    (enriched) in the submitted data. It answers the question ‘Does my list contain more proteins for pathway X than
+    would be expected by chance?’
+  </section>
+  <section>
+    You can provide a simple list of entities (genes, proteins, chemicals, ...) of interest to see which pathways are
+    enriched using this method, but you can also provide numerical data associated to those names so that the enriched
+    pathways are coloured according to their average value.
+  </section>
+</div>
+
+<mat-stepper linear class="stepper">
+  <mat-step>
+    <ng-template matStepLabel>Data</ng-template>
+
+    <div class="data-input">
+      <div class="data-table-column">
+        <div class="space-filler" #filler>
+          <!--   TODO find a better way to make the table fit within the viewport height       -->
+          <reactome-table #table [(table)]="data" [userSettings]="settings"
+                          [style.height.px]="filler.clientHeight - 10"></reactome-table>
+        </div>
+
+        <div class="table-controls">
+          <button mat-button>
+            <mat-icon>upload</mat-icon>
+            Import table
+          </button>
+          <button mat-button (click)="table.clear()">
+            <mat-icon>delete</mat-icon>
+            Clear
+          </button>
+          <button mat-button>
+            <mat-icon>download</mat-icon>
+            Export table
+          </button>
+        </div>
+      </div>
+      <div class="data-example-column">
+        <span class="title">Examples</span>
+        <div class="example-buttons">
+          <button mat-raised-button>UniProt Accession</button>
+          <button mat-raised-button>Gene Name</button>
+          <button mat-raised-button>Gene NCBI / Entrez</button>
+          <button mat-raised-button>Small Molecules (ChEBI)</button>
+          <button mat-raised-button>Small Molecules (KEGG)</button>
+          <button mat-raised-button>Microarray data</button>
+          <button mat-raised-button>Metabolomics data</button>
+          <button mat-raised-button>Cancer Gene Census (COSMIC)</button>
+          <button mat-raised-button>Tissue Specific Expression (HPA)</button>
+        </div>
+        <span class="space-holder"></span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button mat-stroked-button matStepperPrevious disabled>Previous</button>
+      <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+        <mat-icon class="red">close</mat-icon>
+        Close
+      </button>
+      <button mat-flat-button matStepperNext>Next</button>
+    </div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Options</ng-template>
+    <div class="controls">
+      <button mat-stroked-button matStepperPrevious>Previous</button>
+      <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+        <mat-icon class="red">close</mat-icon>
+        Close
+      </button>
+      <button mat-flat-button matStepperNext>Next</button>
+    </div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Analysis</ng-template>
+    <div class="controls">
+      <button mat-stroked-button matStepperPrevious>Previous</button>
+      <button mat-flat-button matStepperNext>See results</button>
+    </div>
+  </mat-step>
+</mat-stepper>

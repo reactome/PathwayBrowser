@@ -26,7 +26,7 @@ import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {drop} from "lodash";
 
-const DETAIL_MIN_HEIGHT = 30;
+const DETAIL_MIN_HEIGHT = 0;
 
 const DROPDOWN_DURATION = 500;
 
@@ -97,6 +97,7 @@ export class ViewportComponent implements AfterViewInit {
   detailMinSize = computed(() => DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
   // Use bellow when fixed layout solution found
   detailShare = signal(20)
+  detailVisible = signal(true )
   // detailShare = computed(() => 20)
   viewShare = computed(() => 100 - this.detailShare())
 
@@ -129,20 +130,17 @@ export class ViewportComponent implements AfterViewInit {
     effect(() => {
       this.dropdown() === null ?
         this.detailShare.set(20) :
-        setTimeout(() => this.detailShare.set(this.detailMinSize()), this.dropdownDuration);
+        setTimeout(() => {
+          this.detailShare.set(this.detailMinSize())
+          setTimeout(() => this.detailVisible.set(false), 245)
+        }, this.dropdownDuration);
     });
     effect(() => this.dataState.currentPathway() && this.eventService.setDiagramEvent(this.dataState.currentPathway()!));
     effect(() => this.sizeObserver.observe(this.content().nativeElement));
+    effect(() => this.dropdown() === null && this.detailVisible.set(true));
   }
 
   ngAfterViewInit(): void {
-
-    // this.speciesService.currentSpecies$.pipe(untilDestroyed(this)).subscribe(species => {
-    //   this.currentSpecies = species;
-    //   // Updated the content after ngAfterContentChecked to avoid ExpressionChangedAfterItHasBeenCheckedError
-    //   this.cdRef.detectChanges();
-    // });
-
 
     this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
     this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--off')?.querySelector('path')?.setAttribute('d', this.sun);

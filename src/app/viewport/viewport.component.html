@@ -185,9 +185,9 @@
               </div>
             </as-split-area>
 
-            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"></div>
+            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged" [class.hidden]="detailShare() === 0"></div>
 
-            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()">
+            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()">
               <cr-details-panel></cr-details-panel>
             </as-split-area>
           </as-split>
