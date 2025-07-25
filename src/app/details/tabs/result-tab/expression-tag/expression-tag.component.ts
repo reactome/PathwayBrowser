@@ -4,6 +4,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 import {DecimalPipe} from "@angular/common";
 import {ScientificNumberPipe} from "../../../../pipes/scientific-number.pipe";
+import {UrlStateService} from "../../../../services/url-state.service";
 
 type Label = { text: string, tooltip: string }
 
@@ -32,15 +33,15 @@ export class ExpressionTagComponent {
   value = input.required<number>()
   scientificFormat = input.required<boolean>()
 
-  pValue = input<number>(0)
-  isPValue = input<boolean>(false)
-  isSignificant = computed(() => ((this.isPValue() && this.value()) || this.pValue()) < 0.05)
+  fdr = input<number>(0)
+  isFDR = input<boolean>(false)
+  isSignificant = computed(() => ((this.isFDR() && this.value()) || this.fdr()) < this.state.significance())
 
   isGSA = input<boolean>(false)
 
   format = input<string | undefined>('1.3-3')
 
-  scale = computed(() => this.isPValue() ? this.analysis.pValueScale().scale : this.analysis.palette().scale)
+  scale = computed(() => this.isFDR() && this.analysis.type() !== 'OVERREPRESENTATION' ? this.analysis.fdrPalette().scale : this.analysis.palette().scale)
   color = computed(() => this.scale()(this.value()))
   onColor = computed(() => this.color().get('oklch.l') > 0.70 ? 'black' : 'white')
   style = computed(() => this.isSignificant() ? {
@@ -52,7 +53,7 @@ export class ExpressionTagComponent {
     'border': `2px solid ${this.color().hex()}`
   })
 
-  constructor(private analysis: AnalysisService) {
+  constructor(private analysis: AnalysisService, private state: UrlStateService) {
   }
 
   protected readonly gsaValueToLabel = gsaValueToLabel;

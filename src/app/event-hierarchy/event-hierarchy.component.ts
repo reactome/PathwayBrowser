@@ -362,7 +362,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     const diagramId = this.pathwayId();
     this.eventService.setPath(diagramId, ancestors);
     // Determine if we should include the selectedEventId in the URL
-    const selectedEventId = isPathway(treeEvent) && treeEvent.hasDiagram ? '' : treeEvent.stId;
+    const selectedEventId = isPathway(treeEvent) && treeEvent.hasDiagram ? null : treeEvent.stId;
     this._ignore = true;
     // this.speciesService.setIgnore(true);
     this.router.navigate([diagramId], {

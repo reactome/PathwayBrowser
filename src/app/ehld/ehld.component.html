@@ -4,7 +4,17 @@
   <div id="legend-boundary" [style.--legend-width.px]="ratio  * container.clientHeight">
     <div cdkDrag cdkDragLockAxis="x" cdkDragBoundary="#legend-boundary" id="legend-container"
          [style.height]="container.clientHeight + 'px'">
-      <button id="legend-handle" cdkDragHandle>LEGEND</button>
+      <div class="legend-handlers-wrapper">
+        <div class="legend-handlers" [class.has-analysis]="analysis.result()" [style.--handle-height.px]="handle.clientHeight">
+          <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
+          @if (analysis.result()) {
+            <div class="analysis-legend">
+              <cr-analysis-legend></cr-analysis-legend>
+            </div>
+          }
+        </div>
+      </div>
+
       <div id="legend">
         <div *ngFor="let group of legendItems" class="legend-group">
           <span>{{ group.type }}</span>

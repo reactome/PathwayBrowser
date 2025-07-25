@@ -115,19 +115,25 @@ export type Examples = 'uniprot' | 'microarray' | 'cancer-gene-census' | 'extrem
 export class AnalysisService {
   style: Style = new Style(document.body);
 
-  paletteOptions: Map<PaletteName, PaletteSummary> = new Map([
+  paletteOptions: Map<PaletteName, PaletteSummary> = new Map(([
     ...Object.keys(chroma.brewer)
       .filter(name => name.toLowerCase() !== name)
       .map(name => ([name, new PaletteSummary(name as StandardPalette)] as [StandardPalette, PaletteSummary])),
     ['ancient', new PaletteSummary(['#1532b3', extract(this.style.properties.global.surface), '#e5e61d'])],
     ['primary', new PaletteSummary([extract(this.style.properties.global.primaryContainer), extract(this.style.properties.global.primary)])]
-  ]);
+  ] as [PaletteName, PaletteSummary][]).map(([key, palette]) =>
+    [key, palette.noData(extract(this.style.properties.analysis.notFound))]
+  ));
 
-  pValueScale = computed(() => new PaletteSummary([
-    extract(this.style.properties.global.primaryContainer),
-    extract(this.style.properties.global.primary)])
-    .domain(0.05, 0)
-    .noData(extract(this.style.properties.analysis.notFound))
+  // Use primary palette if we have expression values, or the normal palette if we just represent FDR anyway
+  fdrPalette = computed(() =>
+    this.type() !== 'OVERREPRESENTATION' ?
+      new PaletteSummary([
+        extract(this.style.properties.global.primaryContainer),
+        extract(this.style.properties.global.primary)])
+        .domain(this.state.significance(), 0)
+        .noData(extract(this.style.properties.analysis.notFound)) :
+      this.palette()
   )
 
 
@@ -213,6 +219,8 @@ export class AnalysisService {
     }
   })
 
+  pathwayStIdToData = computed(() => new Map<string, Analysis.Pathway>(this.result()?.pathways?.map(p => [p.stId, p])))
+
   result$ = toObservable(this.result)
 
 
@@ -284,9 +292,8 @@ export class AnalysisService {
 
       for (let summary of this.paletteOptions.values()) {
         //@ts-ignore
-        summary.scale.nodata(extract(this.style.properties.analysis.notFound))
         summary.domain(
-          result.expression.min === undefined ? 0.05 : result.expression.min,
+          result.expression.min === undefined ? this.state.significance() : result.expression.min,
           result.expression.max === undefined ? 0 : result.expression.max
         );
         summary.classes(result.summary.type === 'GSA_REGULATION' ? 5 : -1); // ALWAYS put classes after domain otherwise create bugs https://github.com/gka/chroma.js/issues/371
@@ -302,7 +309,7 @@ export class AnalysisService {
   private clearFilters() {
     this.state.minExpressionFilter.set(undefined)
     this.state.maxExpressionFilter.set(undefined)
-    this.state.pValueFilter.set(undefined)
+    this.state.fdrFilter.set(undefined)
     this.state.gsaFilter.set([])
     this.state.pathwayMinSizeFilter.set(undefined)
     this.state.pathwayMaxSizeFilter.set(undefined)

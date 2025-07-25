@@ -1,0 +1,14 @@
+.flag-button {
+  background: var(--on-tertiary);
+  color: var(--tertiary);
+  border: 1px solid var(--tertiary);
+
+  .mat-icon {
+    //margin-left: -2px;
+  }
+
+  &.flagged {
+    background: var(--tertiary);
+    color: var(--on-tertiary);
+  }
+}

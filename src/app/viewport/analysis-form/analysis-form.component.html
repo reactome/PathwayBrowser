@@ -1,0 +1,63 @@
+<mat-tab-group>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="analysis-type-header">
+        <div class="analysis-type-icon">
+          <img ngSrc="assets/icons/analysis/Qualitative.svg" height="100" width="100" alt="Qualitative analysis icon">
+        </div>
+        <div class="analysis-type-label">
+          <u>Qualitative</u>
+          Pathway Enrichment Analysis
+        </div>
+      </div>
+    </ng-template>
+
+    <cr-qualitative-analysis (close)="close.emit($event)"/>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="analysis-type-header">
+        <div class="analysis-type-icon">
+          <img ngSrc="assets/icons/analysis/Quantitative.svg" height="100" width="100" alt="Quantitative analysis icon">
+        </div>
+        <div class="analysis-type-label">
+          <u>Quantitative</u>
+          Pathway Enrichment Analysis
+        </div>
+      </div>
+    </ng-template>
+
+    Quantitative
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="analysis-type-header">
+        <div class="analysis-type-icon">
+          <img ngSrc="assets/icons/analysis/SpeciesCompare.svg" height="100" width="100" alt="Species analysis icon">
+        </div>
+        <div class="analysis-type-label">
+          <u>Species</u>
+          Pathway Enrichment Analysis
+        </div>
+      </div>
+    </ng-template>
+
+    Species
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="analysis-type-header">
+        <div class="analysis-type-icon">
+          <img ngSrc="assets/icons/analysis/TissueCompare.svg" height="100" width="100" alt="Tissue analysis icon">
+        </div>
+        <div class="analysis-type-label">
+          <u>Tissue</u>
+          Pathway Enrichment Analysis
+        </div>
+      </div>
+    </ng-template>
+
+    Tissue
+  </mat-tab>
+</mat-tab-group>
+

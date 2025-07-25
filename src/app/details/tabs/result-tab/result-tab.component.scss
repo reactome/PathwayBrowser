@@ -269,3 +269,26 @@ mat-expansion-panel {
     margin-left: 4px;
   }
 }
+
+.header {
+  background: var(--primary-container);
+  padding: 8px 16px;
+  color: var(--on-primary-container);
+  border-radius: 24px 24px 0 0;
+  margin-top: 10px;
+  font: var(--mat-sys-body-medium);
+  box-shadow: var(--mat-sys-level1);
+  position: relative;
+  z-index: 101;
+
+
+  @include mat.form-field-overrides((
+    container-height: 20px,
+    container-vertical-padding: 5px,
+  ));
+
+  @include mat.select-overrides((
+    trigger-text-size: var(--mat-sys-body-medium-size)
+  ));
+}
+

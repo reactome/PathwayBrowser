@@ -734,7 +734,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
                 node.data('exp', [undefined]);
               } else {
                 node.data('exp', [
-                  [pathwayData.exp[analysisIndex] || pathwayData.pValue, pathwayData.found],
+                  [pathwayData.exp[analysisIndex] || pathwayData.fdr, pathwayData.found],
                   [undefined, pathwayData.total - pathwayData.found]
                 ])
               }

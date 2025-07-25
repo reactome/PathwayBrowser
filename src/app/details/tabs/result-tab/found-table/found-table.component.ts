@@ -11,6 +11,7 @@ import {UrlStateService} from "../../../../services/url-state.service";
 import {MatSort, MatSortModule} from "@angular/material/sort";
 import {TitleCasePipe} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
+import {FlagButtonComponent} from "../../../common/flag-button/flag-button.component";
 
 type ResourceMap = { [resource: string]: string[] };
 type FoundIdentifier = {
@@ -29,7 +30,8 @@ type FoundIdentifier = {
     TypeSafeMatRowDef,
     MatSortModule,
     TitleCasePipe,
-    MatIcon
+    MatIcon,
+    FlagButtonComponent
   ],
   templateUrl: './found-table.component.html',
   styleUrl: './found-table.component.scss'
@@ -105,6 +107,7 @@ export class FoundTableComponent {
 
   expandedColumns = computed(() => this.pathwayFoundEntities.value() ? [
     'id',
+    'flag',
     ...(this.analysis.hasInteractors() ? ['interactors'] : []),
     ...this.resourceColumnIds(),
     ...this.expressionColumnIds()

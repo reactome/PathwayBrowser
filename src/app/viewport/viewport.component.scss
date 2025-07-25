@@ -379,3 +379,16 @@
 .hide-overflow {
   overflow: hidden !important;
 }
+
+.content {
+  --as-transition-duration: 1500s;
+}
+.dropdown {
+  position: absolute;
+  inset: 0 0 0 0;
+  background: var(--surface);
+  z-index: 999;
+  overflow: hidden;
+}
+
+

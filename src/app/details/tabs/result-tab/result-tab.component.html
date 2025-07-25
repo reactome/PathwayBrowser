@@ -1,8 +1,29 @@
 <!--ToDO investigate virtual scroll instead of pagination: https://material.angular.dev/cdk/scrolling/overview -->
 <div class="container" #container>
+  <div class="header" >
+    {{ analysisType() }}
+    analysis results
+    @if (analysis.summary()?.sampleName) {
+      of {{ analysis.summary()?.sampleName }}
+    }
+    @if (state.resourceFilter()) {
+      on {{ state.resourceFilter() }} entities
+    }
+    @if (analysis.samples().length > 1) {
+      using sample
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select [(value)]="state.sample">
+          @for (sample of analysis.samples(); track sample) {
+            <mat-option [value]="sample">{{ sample }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+    }
+  </div>
   <div class="found-section">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows [trackBy]="trackBy"
-           matSort matSortActive="entities-pValue" matSortDirection="asc" matSortDisableClear
+           matSort matSortActive="entities-fdr" matSortDirection="asc" matSortDisableClear
            (matSortChange)="currentSort.set($event)"
            id="result-table">
       <ng-container matColumnDef="name">
@@ -82,18 +103,17 @@
       <ng-container matColumnDef="entities-pValue">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="no-wrap">Entities p-value</th>
         <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
-          <cr-expression-tag
-            [value]="pathway.entities.pValue"
-            [scientificFormat]="true"
-            [isPValue]="true"/>
+          <span [innerHTML]="pathway.entities.pValue | scientificNumber"></span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="entities-fdr">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities FDR</th>
         <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
-            <span class=""
-                  [innerHTML]="pathway.entities.fdr | scientificNumber"></span>
+          <cr-expression-tag
+            [value]="pathway.entities.fdr"
+            [scientificFormat]="true"
+            [isFDR]="true"/>
         </td>
       </ng-container>
 
@@ -128,7 +148,7 @@
           <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
             <cr-expression-tag
               [value]="pathway.entities.exp[i]"
-              [pValue]="pathway.entities.pValue"
+              [fdr]="pathway.entities.fdr"
               [scientificFormat]="analysis.expressionScientificFormat()"
               [isGSA]="analysis.isGSA()"/>
           </td>
@@ -174,7 +194,7 @@
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            Identifiers not found <span class="badge">{{analysis.result()?.identifiersNotFound}}</span>
+            Identifiers not found <span class="badge">{{ analysis.result()?.identifiersNotFound }}</span>
           </mat-panel-title>
         </mat-expansion-panel-header>
         <cr-not-found-table/>
@@ -215,11 +235,11 @@
       Diseases
     </mat-checkbox>
   </button>
-  <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="pValueFilterActive()">
+  <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="fdrFilterActive()">
     <label (click)="$event.stopPropagation()">
-      pValue
-      <mat-slider min="0" [max]="pValues.length - 1" step="1" discrete showTickMarks [displayWith]="pValueLabel">
-        <input matSliderThumb [(value)]="pValueIndex">
+      FDR
+      <mat-slider min="0" [max]="fdrValues.length - 1" step="1" discrete showTickMarks [displayWith]="fdrLabel">
+        <input matSliderThumb [(value)]="fdrIndex">
       </mat-slider>
     </label>
   </div>
