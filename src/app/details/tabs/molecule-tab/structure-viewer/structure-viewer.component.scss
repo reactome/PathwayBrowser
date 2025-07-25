@@ -15,16 +15,12 @@
   padding: 8px 10px;
   border-left: 2px solid var(--outline-variant);
   flex: 1;
-  //gap: 8px;
-
 
   .selector-container {
     width: 100%;
 
-
     .selector {
       width: 100%;
-
 
       @include mat.select-overrides((
         trigger-text-size: 14px,
@@ -35,22 +31,9 @@
     }
   }
 
-  //
-  //font-family: 'Roboto', sans-serif;
-  //font-style: normal;
-  //font-weight: 400;
-  //font-size: 14px;
-  //line-height: 20px;
-  //letter-spacing: 0.25px;
-
-
   .structure-container {
-
     width: 100%;
     position: relative;
     height: 220px;
   }
-
-
 }
-

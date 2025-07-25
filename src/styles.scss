@@ -116,6 +116,10 @@ p:first-child {
   margin-right: -2px;
 }
 
+.chebi-background rect {
+  fill: var(--surface) !important
+}
+
 body {
   --opacity: 0.08;
   --structure-opacity: [[130,0], [150,100]];

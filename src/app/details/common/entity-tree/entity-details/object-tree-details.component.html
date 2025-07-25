@@ -1,6 +1,6 @@
 <div class="details-content-container">
 @if (className() === MoleculeType.PROTEIN && refEntity() && xRefs()) {
-  <cr-structure-viewer [obj]=refEntity() [xRefs]="xRefs()"></cr-structure-viewer>
+  <cr-structure-viewer [obj]=refEntity() [xRefs]="xRefs()" [moleculeType]="MoleculeType.PROTEIN"></cr-structure-viewer>
   <mat-divider class="divider-color"></mat-divider>
 }
 
