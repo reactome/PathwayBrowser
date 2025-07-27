@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "run-p dev:* && wait-on dist/reactome-cytoscape-style/index.scss && sleep 2 && ng serve --proxy-config proxy-gxa.conf.json",
+    "start": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve --proxy-config proxy-gxa.conf.json",
     "dev:reactome-cytoscape-style": "ng build reactome-cytoscape-style --configuration development --watch &",
     "build:reactome-cytoscape-style": "ng build reactome-cytoscape-style",
     "test:reactome-cytoscape-style": "ng test reactome-cytoscape-style",
@@ -11,6 +11,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "page": "ng build --base-href=/PathwayBrowser/ --configuration development; ng deploy --no-build",
+    "deploy-dev": "ng build --configuration=production --base-href=/new-pwb/ && rsync --chown=www-data:reactome --chmod=775 -rpIgoDvhP dist/pathway-browser/browser/ dev:site/new-pwb --delete",
     "test": "ng test"
   },
   "private": true,

@@ -2,12 +2,11 @@
   <mat-tab>
     <ng-template mat-tab-label>
       <div class="analysis-type-header">
-        <div class="analysis-type-icon">
-          <img ngSrc="assets/icons/analysis/Qualitative.svg" height="100" width="100" alt="Qualitative analysis icon">
+        <div class="analysis-type-icon" [innerHTML]="qualitative | async | safe: 'html' : true">
         </div>
         <div class="analysis-type-label">
           <u>Qualitative</u>
-          Pathway Enrichment Analysis
+          Pathway Enrichment
         </div>
       </div>
     </ng-template>
@@ -17,12 +16,11 @@
   <mat-tab>
     <ng-template mat-tab-label>
       <div class="analysis-type-header">
-        <div class="analysis-type-icon">
-          <img ngSrc="assets/icons/analysis/Quantitative.svg" height="100" width="100" alt="Quantitative analysis icon">
+        <div class="analysis-type-icon" [innerHTML]="quantitative | async | safe: 'html' : true">
         </div>
         <div class="analysis-type-label">
           <u>Quantitative</u>
-          Pathway Enrichment Analysis
+          Pathway Enrichment
         </div>
       </div>
     </ng-template>
@@ -32,12 +30,11 @@
   <mat-tab>
     <ng-template mat-tab-label>
       <div class="analysis-type-header">
-        <div class="analysis-type-icon">
-          <img ngSrc="assets/icons/analysis/SpeciesCompare.svg" height="100" width="100" alt="Species analysis icon">
+        <div class="analysis-type-icon" [innerHTML]="species | async | safe: 'html' : true">
         </div>
         <div class="analysis-type-label">
           <u>Species</u>
-          Pathway Enrichment Analysis
+          Pathway Enrichment
         </div>
       </div>
     </ng-template>
@@ -47,12 +44,11 @@
   <mat-tab>
     <ng-template mat-tab-label>
       <div class="analysis-type-header">
-        <div class="analysis-type-icon">
-          <img ngSrc="assets/icons/analysis/TissueCompare.svg" height="100" width="100" alt="Tissue analysis icon">
+        <div class="analysis-type-icon" [innerHTML]="tissue | async | safe: 'html' : true">
         </div>
         <div class="analysis-type-label">
           <u>Tissue</u>
-          Pathway Enrichment Analysis
+          Pathway Enrichment
         </div>
       </div>
     </ng-template>

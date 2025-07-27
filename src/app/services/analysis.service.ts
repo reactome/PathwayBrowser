@@ -325,7 +325,7 @@ export class AnalysisService {
   }
 
   analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
-    return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/${params?.disableProjectToHuman ? '' : 'projection'}`, data, {params}).pipe(
+    return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/${params?.projectToHuman ? 'projection' : ''}`, data, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
       tap(result => this.clearFilters()),
@@ -360,12 +360,6 @@ export class AnalysisService {
       params: {resource}
     }).pipe(
       catchError(() => of([]))
-    )
-  }
-
-  example(name: Examples, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
-    return this.http.get(`assets/data/analysis-examples/${name}.tsv`, {responseType: 'text'}).pipe(
-      switchMap(example => this.analyse(example, params))
     )
   }
 

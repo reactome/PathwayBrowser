@@ -1,5 +1,5 @@
 @use "@angular/material" as mat;
-@use "reactome-cytoscape-style";
+@use "reactome-cytoscape-style/assets" as reactome-cytoscape-style;
 @use "ngx-reactome-style";
 @use "reactome-table";
 
@@ -205,4 +205,9 @@ body {
     --drug-contrast-3: #DA6E94;
     --drug-contrast-4: #c4527b;
   }
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
 }

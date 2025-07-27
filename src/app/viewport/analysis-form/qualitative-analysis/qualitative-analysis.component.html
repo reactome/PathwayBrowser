@@ -1,41 +1,44 @@
-<span class="title">Qualitative Entity Enrichment Analysis</span>
+<div class="header">
+  <span class="title">Qualitative Entity Enrichment Analysis</span>
 
-<div class="description">
-  <section>
-    Enrichment analysis is a statistical test that determines whether certain Reactome pathways are over-represented
-    (enriched) in the submitted data. It answers the question ‘Does my list contain more proteins for pathway X than
-    would be expected by chance?’
-  </section>
-  <section>
-    You can provide a simple list of entities (genes, proteins, chemicals, ...) of interest to see which pathways are
-    enriched using this method, but you can also provide numerical data associated to those names so that the enriched
-    pathways are coloured according to their average value.
-  </section>
+  <div class="description">
+    <div>
+      Enrichment analysis is a statistical test that determines whether certain Reactome pathways are over-represented
+      (enriched) in the submitted data. It answers the question ‘Does my list contain more proteins for pathway X than
+      would be expected by chance?’
+    </div>
+    <div>
+      You can provide a simple list of entities (genes, proteins, chemicals, ...) of interest to see which pathways are
+      enriched using this method, but you can also provide numerical data associated to those names so that the enriched
+      pathways are coloured according to their average value.
+    </div>
+  </div>
 </div>
 
 <mat-stepper linear class="stepper">
-  <mat-step>
+  <mat-step [stepControl]="dataStepForm">
     <ng-template matStepLabel>Data</ng-template>
-
     <div class="data-input">
       <div class="data-table-column">
-        <div class="space-filler" #filler>
-          <!--   TODO find a better way to make the table fit within the viewport height       -->
-          <reactome-table #table [(table)]="data" [userSettings]="settings"
-                          [style.height.px]="filler.clientHeight - 10"></reactome-table>
+        <div class="space-filler">
+          <reactome-table #table [numberOfRows]="1000" [numberOfColumns]="27"
+                          [userSettings]="settings" [minColWidth]="100"
+                          [name]="'reactome-analysis-data'"></reactome-table>
         </div>
 
         <div class="table-controls">
-          <button mat-button>
-            <mat-icon>upload</mat-icon>
+          <button mat-button (click)="fileUpload.click()">
+            <mat-icon>cloud_upload</mat-icon>
             Import table
+            <input #fileUpload (change)="uploadFile(fileUpload)" class="file-input" type="file">
           </button>
+
           <button mat-button (click)="table.clear()">
             <mat-icon>delete</mat-icon>
             Clear
           </button>
-          <button mat-button>
-            <mat-icon>download</mat-icon>
+          <button mat-button (click)="downloadFile()">
+            <mat-icon>cloud_download</mat-icon>
             Export table
           </button>
         </div>
@@ -43,15 +46,33 @@
       <div class="data-example-column">
         <span class="title">Examples</span>
         <div class="example-buttons">
-          <button mat-raised-button>UniProt Accession</button>
-          <button mat-raised-button>Gene Name</button>
-          <button mat-raised-button>Gene NCBI / Entrez</button>
-          <button mat-raised-button>Small Molecules (ChEBI)</button>
-          <button mat-raised-button>Small Molecules (KEGG)</button>
-          <button mat-raised-button>Microarray data</button>
-          <button mat-raised-button>Metabolomics data</button>
-          <button mat-raised-button>Cancer Gene Census (COSMIC)</button>
-          <button mat-raised-button>Tissue Specific Expression (HPA)</button>
+          <button mat-raised-button (click)="loadExample('uniprot')">
+            UniProt IDs
+          </button>
+          <button mat-raised-button (click)="loadExample('gene-name')">
+            Gene Name
+          </button>
+          <button mat-raised-button (click)="loadExample('gene-ncbi')">
+            Gene NCBI/Entrez
+          </button>
+          <button mat-raised-button (click)="loadExample('chebi')">
+            ChEBI IDs
+          </button>
+          <button mat-raised-button (click)="loadExample('kegg')">
+            KEGG IDs
+          </button>
+          <button mat-raised-button (click)="loadExample('microarray')">
+            Microarray
+          </button>
+          <button mat-raised-button (click)="loadExample('metabolomics')">
+            Metabolomics
+          </button>
+          <button mat-raised-button (click)="loadExample('cancer-gene-census')">
+            Cancer Gene Census
+          </button>
+          <button mat-raised-button (click)="loadExample('tissue')">
+            Tissue Expression
+          </button>
         </div>
         <span class="space-holder"></span>
       </div>
@@ -63,25 +84,99 @@
         <mat-icon class="red">close</mat-icon>
         Close
       </button>
-      <button mat-flat-button matStepperNext>Next</button>
+      <button mat-flat-button matStepperNext [disabled]="!(table.hasData$ | async)">Next</button>
     </div>
   </mat-step>
+
   <mat-step>
     <ng-template matStepLabel>Options</ng-template>
+    <div class="options-wrapper">
+      <div class="options-container">
+        <div class="card-checkbox flex-one" [class.checked]="projectToHuman()" (click)="toggle(projectToHuman)">
+          <div class="card-content">
+            <div class="header">
+              <p class="title">Project to Human</p>
+              <p class="description">All non-human identifiers are converted to their human equivalents</p>
+            </div>
+            <div class="illustration" [innerHTML]="projectToHumanIllustration | async | safe: 'html' : true"></div>
+            <div class="explanations">
+              <p class="title">Explanations</p>
+              <p>
+                Every species has its own set of identifiers (genes, proteins, chemicals, mRNA, etc...)
+              </p>
+              <p>
+                Reactome curates human pathways and <u>infers</u> their existence in other species using orthology
+                information
+                from the <u>PANTHER knowledge base</u>
+              </p>
+              <p>
+                When this option is selected, all non-human identifiers in your sample are mapped to their human equivalents
+                before the analysis is performed
+              </p>
+            </div>
+          </div>
+          <div class="selection-indicator" [class.checked]="projectToHuman()">
+            @if (projectToHuman()) {
+              <mat-icon>check</mat-icon>
+            }
+          </div>
+        </div>
+        <div class="card-checkbox flex-one" [class.checked]="includeInteractors()" (click)="toggle(includeInteractors)">
+          <div class="card-content">
+            <div class="header">
+              <p class="title">Include Interactors</p>
+              <p class="description">IntAct interactors are used to increase the analysis background</p>
+            </div>
+
+            <div class="illustration" [innerHTML]="includeInteractorsIllustration | async | safe: 'html' : true"></div>
+            <div class="explanations">
+              <p class="title">Explanations</p>
+              <p>
+                Selecting this option will take interactors into account when performing the analysis.
+              </p>
+              <p>
+                Only gene symbols, chemical names and Uniprot or ChEBI identifiers can be used to identify interactors.
+              </p>
+              <p>
+                Curated entities and interactors backgrounds may overlap (e.g. entities can interact with themselves
+                (dimers)
+                or with other entities in the diagram).
+              </p>
+              <p>
+                The analysis result uses the union of both backgrounds. Entities in the overlapping area are only counted
+                once.
+              </p>
+            </div>
+          </div>
+          <div class="selection-indicator" [class.checked]="includeInteractors()">
+            @if (includeInteractors()) {
+              <mat-icon>check</mat-icon>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
       <button mat-stroked-button (click)="close.emit({status: 'premature'})">
         <mat-icon class="red">close</mat-icon>
         Close
       </button>
-      <button mat-flat-button matStepperNext>Next</button>
+      <button mat-flat-button matStepperNext (click)="launchAnalysis()">Next</button>
     </div>
   </mat-step>
+
   <mat-step>
     <ng-template matStepLabel>Analysis</ng-template>
+
+    <div class="loader-container">
+      <img class="loader" src="assets/loader.gif"/>
+    </div>
     <div class="controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
-      <button mat-flat-button matStepperNext>See results</button>
+      <button mat-flat-button matStepperNext disabled>See results</button>
     </div>
+
   </mat-step>
 </mat-stepper>
