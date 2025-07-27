@@ -12,6 +12,22 @@ import {HttpClient} from "@angular/common/http";
 import {MoleculeType} from "../molecule-details/molecule-details.component";
 import {SafePipe} from "../../../../pipes/safe.pipe";
 
+export interface StructureEntry {
+  pdb_id: string;
+  chain_id: string;
+  experimental_method: string;
+  tax_id: number;
+  coverage: number;
+  resolution: number;
+  start: number;
+  end: number;
+  unp_start: number;
+  unp_end: number;
+}
+
+interface BestStructure {
+  [key: string]: StructureEntry[];
+}
 
 export enum Source {
   ALPHA_FOLD = "AlphaFold",
@@ -104,6 +120,21 @@ export class StructureViewerComponent {
     }
   })
 
+  bestPdbStructure = rxResource({
+    request: () => this.obj().identifier,
+    loader: () => {
+      if (!this.isProtein()) return EMPTY;
+      const id = this.obj().identifier;
+      return this.http.get<BestStructure>(`https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/${id}/`).pipe(
+        map(response => {
+          const value = response[id];
+          const ids = new Set(value.map(item => item.pdb_id.toUpperCase()));
+          return Array.from(ids)
+        })
+      )
+    }
+  })
+
 
   bgColor = computed(() => {
     this.dark.isDark(); // Compute on dark update
@@ -171,23 +202,40 @@ export class StructureViewerComponent {
   }
 
   getPDBIdentifiers(xRefs: DatabaseIdentifier[]) {
+    const bestStructure = new Map(this.bestPdbStructure.value()?.map((id, index)=>[id, index]));
+
     return xRefs
       .filter((ref: DatabaseIdentifier) => ref.databaseName === Source.PDB)
       .map(ref => ref.identifier)
       .sort((a, b) => {
-        //starts with digit
-        const aDigit = /^\d/.test(a);
-        const bDigit = /^\d/.test(b);
 
-        if (aDigit && bDigit) {
-          return a.localeCompare(b);
-        } else if (aDigit) {
-          return -1;// a comes before b
-        } else if (bDigit) {
-          return 1;// b comes before a
-        } else {
-          return a.localeCompare(b);// For non-digit,sort normally
+        if(bestStructure){
+          const aIndex = bestStructure.has(a) ? bestStructure.get(a)! : Number.MAX_SAFE_INTEGER;
+          const bIndex = bestStructure.has(b) ? bestStructure.get(b)! : Number.MAX_SAFE_INTEGER;
+
+          if (aIndex !== bIndex) {
+            return aIndex - bIndex;
+          }
         }
+        // fallback method when no best structure available
+       return  this.sortByAlphabeticalOrder(a,b);
       })
   }
+
+  sortByAlphabeticalOrder(a: string, b: string) {
+      //starts with digit
+      const aDigit = /^\d/.test(a);
+      const bDigit = /^\d/.test(b);
+
+      if (aDigit && bDigit) {
+        return a.localeCompare(b);
+      } else if (aDigit) {
+        return -1;// a comes before b
+      } else if (bDigit) {
+        return 1;// b comes before a
+      } else {
+        return a.localeCompare(b);// For non-digit,sort normally
+      }
+  }
+
 }
