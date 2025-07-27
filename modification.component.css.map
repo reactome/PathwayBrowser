@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/details/common/modification/modification.component.scss"],
-  "sourcesContent": ["\n:host {\n  width: 100%;\n}\n\n.modification-container {\n  display: flex;\n  flex-direction: column;\n\n  font-family: 'Roboto', sans-serif;\n  font-style: normal;\n  font-weight: 400;\n  font-size: 14px;\n  line-height: 20px;\n  letter-spacing: 0.25px;\n}\n\n// Adds 10px of padding to the top of the second .catalyst-activity-container, but only when it comes immediately after another .catalyst-activity-container.\n.modification-container + .modification-container {\n  padding-top: 10px;\n}\n\n\n.row {\n  display: flex;\n  flex-direction: row;\n  padding: 0;\n  gap: 10px;\n  width: 100%;\n}\n\n.composition-container {\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  align-items: center;\n  padding-left: 10px;\n  border-left: 2px solid var(--outline-variant);\n  flex: 1;\n  gap: 5px;\n}\n"],
-  "mappings": ";AACA;AACE,SAAA;;AAGF,CAAA;AACE,WAAA;AACA,kBAAA;AAEA,eAAA,QAAA,EAAA;AACA,cAAA;AACA,eAAA;AACA,aAAA;AACA,eAAA;AACA,kBAAA;;AAIF,CAbA,uBAaA,EAAA,CAbA;AAcE,eAAA;;AAIF,CAAA;AACE,WAAA;AACA,kBAAA;AACA,WAAA;AACA,OAAA;AACA,SAAA;;AAGF,CAAA;AACE,WAAA;AACA,kBAAA;AACA,aAAA;AACA,eAAA;AACA,gBAAA;AACA,eAAA,IAAA,MAAA,IAAA;AACA,QAAA;AACA,OAAA;;",
-  "names": []
-}

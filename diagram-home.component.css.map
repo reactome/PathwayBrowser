@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/diagram-home/diagram-home.component.scss"],
-  "sourcesContent": [".container {\n  display: flex;\n  flex-direction: column;\n  position: absolute;\n  inset: 0 0 0 0;\n  height: 100%;\n\n\n  .controls {\n    padding: .5em;\n    display: flex;\n    flex-direction: row;\n    gap: .5em;\n    align-items: baseline;\n\n    border-bottom: 1px solid var(--on-surface-variant);\n  }\n\n  .diagram-container {\n    flex: 1;\n\n  }\n}\n"],
-  "mappings": ";AAAA,CAAA;AACE,WAAA;AACA,kBAAA;AACA,YAAA;AACA,SAAA,EAAA,EAAA,EAAA;AACA,UAAA;;AAGA,CARF,UAQE,CAAA;AACE,WAAA;AACA,WAAA;AACA,kBAAA;AACA,OAAA;AACA,eAAA;AAEA,iBAAA,IAAA,MAAA,IAAA;;AAGF,CAlBF,UAkBE,CAAA;AACE,QAAA;;",
-  "names": []
-}

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/diagram-iterator/diagram-iterator.component.scss"],
-  "sourcesContent": [".diagram-container {\n  width: calc(100vw - 6px);\n  height: 75vh;\n  border: 1px solid black;\n}\n"],
-  "mappings": ";AAAA,CAAA;AACE,SAAA,KAAA,MAAA,EAAA;AACA,UAAA;AACA,UAAA,IAAA,MAAA;;",
-  "names": []
-}

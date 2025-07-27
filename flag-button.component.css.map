@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/details/common/flag-button/flag-button.component.scss"],
+  "sourcesContent": [".flag-button {\n  background: var(--on-tertiary);\n  color: var(--tertiary);\n  border: 1px solid var(--tertiary);\n\n  .mat-icon {\n    //margin-left: -2px;\n  }\n\n  &.flagged {\n    background: var(--tertiary);\n    color: var(--on-tertiary);\n  }\n}\n"],
+  "mappings": ";AAAA,CAAA;AACE,cAAA,IAAA;AACA,SAAA,IAAA;AACA,UAAA,IAAA,MAAA,IAAA;;AAMA,CATF,WASE,CAAA;AACE,cAAA,IAAA;AACA,SAAA,IAAA;;",
+  "names": []
+}

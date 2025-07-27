@@ -509,6 +509,87 @@ body {
   --icon-positive: #0C9509;
   --hover: rgba(0, 0, 0, 0.04);
 }
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("./media/RobotoMono.ttf") format("truetype");
+}
+.relative {
+  position: relative;
+}
+.no-event {
+  pointer-events: none;
+}
+.bold {
+  font-weight: 500;
+}
+.no-wrap {
+  white-space: nowrap;
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.italic {
+  font-style: italic;
+}
+.flex {
+  display: flex;
+}
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.flex-container.no-wrap {
+  flex-wrap: nowrap;
+  white-space: inherit;
+}
+.flex-one {
+  flex: 1;
+}
+.flex-shrink {
+  flex: 0 1 auto;
+}
+.flex-zero {
+  flex: 0 0 auto;
+}
+.gap-one {
+  gap: 1em;
+}
+.text-align-center {
+  text-align: center;
+}
+.align-center {
+  align-items: center;
+}
+.align-start {
+  align-items: start;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-evenly {
+  justify-content: space-evenly;
+}
+.horizontal {
+  flex-direction: row;
+}
+.vertical {
+  flex-direction: column;
+}
+.float-right {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+.no-radius {
+  border-radius: 0 !important;
+}
 .custom-tab-group {
   --mdc-secondary-navigation-tab-container-height: 30px;
 }
@@ -568,6 +649,22 @@ a:active {
   text-align: right;
   letter-spacing: 0.5px;
   color: var(--on-surface);
+}
+.details-content-container {
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.details-content-container > :first-child {
+  padding-top: 6px;
+}
+.details-content-container > :last-child {
+  padding-bottom: 6px;
+}
+.details-content-container .mat-divider {
+  margin: 6px;
 }
 p:first-child {
   margin-top: 0;
@@ -634,6 +731,10 @@ body.dark {
   --drug-contrast-2: #F988AE;
   --drug-contrast-3: #DA6E94;
   --drug-contrast-4: #c4527b;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
 }
 
 /* angular:styles/global:styles */
