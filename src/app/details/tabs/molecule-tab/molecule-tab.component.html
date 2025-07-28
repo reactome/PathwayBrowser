@@ -1,4 +1,4 @@
-@if (!state.pathwayId()) {
+@if (!pathwayId() && !obj()) {
   <div class="description-content">
     🗒️ When a pathway is displayed in the panel above, shows details of all the molecules involved.
     If an item is selected in the diagram, the corresponding molecules are highlighted.
@@ -6,7 +6,7 @@
     The molecule lists can be downloaded. Click the Download button,
     select the fields and molecule types you want and click Start Download.
   </div>
-} @else if (!moleculeData().length) {
+} @else if (moleculeData().length === 0) {
   <div class="spinner-container">
     <mat-spinner></mat-spinner>
     <p>Loading data for participating molecules, please wait...</p>

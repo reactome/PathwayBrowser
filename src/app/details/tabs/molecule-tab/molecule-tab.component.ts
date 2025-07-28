@@ -1,4 +1,4 @@
-import {Component, computed, effect, input} from '@angular/core';
+import {Component, computed, effect, input, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -11,6 +11,10 @@ import {MatDivider} from "@angular/material/divider";
 import {ObjectTreeComponent} from "../../common/object-tree/object-tree.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {SortByDatePipe} from "../../../pipes/sort-by-date.pipe";
+import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from "@angular/material/expansion";
+import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
+import {UrlStateService} from "../../../services/url-state.service";
+import {isPathway} from "../../../services/utils";
 
 
 export type MoleculeGroup = {
@@ -48,7 +52,7 @@ export enum PropertyType {
 export class MoleculeTabComponent {
 
   readonly obj = input.required<SelectableObject>();
-  pathway = computed(() => this.dataState.currentPathway());
+  pathwayId = this.state.pathwayId as WritableSignal<string>;
 
 
   constructor(private participant: ParticipantService,
@@ -57,20 +61,17 @@ export class MoleculeTabComponent {
               public state: UrlStateService) {
     effect(() => {
       const stId = this.obj()?.stId;
-      const pathwayId = this.pathway()?.stId;
-
+      const pathwayId = this.pathwayId();
       if (stId && stId !== pathwayId) {
         this.entity.loadRefEntities(stId);
       }
     });
-
   }
 
-
   _pathwayParticipants = rxResource({
-    request: () => this.dataState.currentPathway(),
+    request: () => this.dataState.currentPathway() || this.obj(),
     loader: () => {
-      const id = this.dataState.currentPathway()?.stId;
+      const id = this.dataState.currentPathway() ? this.dataState.currentPathway()!.stId : this.obj()?.stId;
       return id ? this.participant.getParticipants(id) : of(null);
     }
   });
@@ -89,15 +90,21 @@ export class MoleculeTabComponent {
     if (!pathwayParticipants) return [];
 
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
-    if (this.obj()?.stId === this.pathway()?.stId) {
-      moleculeData = pathwayResults;
+
+    if (this.pathwayId()) {
+      if (this.obj().stId === this.pathwayId()) {
+        moleculeData = pathwayResults;
+      } else {
+        const refEntities = this.entity.refEntities() || [];
+        moleculeData = this.getReactionParticipants(pathwayResults, refEntities);
+      }
     } else {
-      const refEntities = this.entity.refEntities() || [];
-      moleculeData = this.getReactionParticipants(pathwayResults, refEntities);
+      if (isPathway(this.obj())) {
+        moleculeData = pathwayResults;
+      }
     }
 
     return moleculeData
-
   })
 
 
