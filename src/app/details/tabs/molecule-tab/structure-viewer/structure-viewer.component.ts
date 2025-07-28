@@ -1,9 +1,9 @@
-import {Component, computed, effect, ElementRef, input, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, signal, viewChild, linkedSignal} from '@angular/core';
 import {DatabaseIdentifier} from "../../../../model/graph/database-identifier.model";
-import {FormControl, ReactiveFormsModule} from "@angular/forms";
+import {ReactiveFormsModule} from "@angular/forms";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOptgroup, MatOption, MatSelect} from "@angular/material/select";
-import {rxResource, toSignal} from "@angular/core/rxjs-interop";
+import {rxResource} from "@angular/core/rxjs-interop";
 import {extract, Style} from "reactome-cytoscape-style";
 import {DarkService} from "../../../../services/dark.service";
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
@@ -29,7 +29,6 @@ declare const PDBeMolstarPlugin: any;
     MatFormField,
     MatSelect,
     MatOptgroup,
-    ReactiveFormsModule,
     MatOption,
     SafePipe
   ],
@@ -47,7 +46,6 @@ export class StructureViewerComponent {
 
 
   reactomeStyle: Style = new Style(document.body);
-  structureControl = new FormControl('');
 
   alphaFoldEntryId = computed(() => {
     if (this.isProtein()) {
@@ -56,13 +54,8 @@ export class StructureViewerComponent {
     }
     return null;
   });
-
-  // selected value from form control
-  _selected = toSignal(this.structureControl.valueChanges);
-  selected = computed(() => {
-    return this._selected();
-  });
-
+  
+  selected = linkedSignal(() => this.alphaFoldEntryId())
 
   sourceLabel = computed(() => {
     return this.selected()?.startsWith("AF-") ? Source.ALPHA_FOLD : Source.PDB;
@@ -111,12 +104,6 @@ export class StructureViewerComponent {
   })
 
   constructor(private dark: DarkService, private http: HttpClient) {
-
-    effect(() => {
-      // set up default value
-      const id = this.alphaFoldEntryId();
-      this.structureControl.setValue(id);
-    });
 
     effect(() => {
       if (this.isProtein()) {
