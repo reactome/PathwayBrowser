@@ -54,7 +54,8 @@ export class MoleculeTabComponent {
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private dataState: DataStateService) {
+              private dataState: DataStateService,
+              public state: UrlStateService) {
     effect(() => {
       const stId = this.obj()?.stId;
       const pathwayId = this.pathway()?.stId;
