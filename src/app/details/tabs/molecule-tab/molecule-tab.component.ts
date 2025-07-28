@@ -45,7 +45,11 @@ export enum PropertyType {
     MatDivider,
     ObjectTreeComponent,
     MatProgressSpinner,
-    SortByDatePipe
+    SortByDatePipe,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MoleculeDownloadTableComponent
   ],
   styleUrl: './molecule-tab.component.scss'
 })

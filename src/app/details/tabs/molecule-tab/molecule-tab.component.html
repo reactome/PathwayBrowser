@@ -39,6 +39,24 @@
         {{ group.category }}
       </a>
     }
+    @if (moleculeData().length > 0) {
+      <!-- Add download link -->
+      <a (click)="scrollTo('download')">Download </a>
+    }
   </div>
 
+</div>
+
+
+<div id="download">
+  @if (moleculeData().length > 0) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span class="badge">Download</span>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <cr-molecule-download-table [moleculeData]="moleculeData()"></cr-molecule-download-table>
+    </mat-expansion-panel>
+  }
 </div>
