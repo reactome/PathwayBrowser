@@ -1,15 +1,5 @@
 import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
-import {
-  extractFromSpace,
-  extractIdAfterColon,
-  extractIdInBrackets,
-  isEvent,
-  isEWAS,
-  isMolecule,
-  isPathway,
-  isRLE,
-  isSelectableObject
-} from "../../../services/utils";
+import {isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
 import {
   MatNestedTreeNode,
   MatTree,
@@ -36,8 +26,7 @@ import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
 import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details/molecule-details.component";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
-import {PropertyType} from "../../tabs/molecule-tab/molecule-tab.component";
-import {ObjectTreeDetailsComponent} from "./entity-details/object-tree-details.component";
+import {ObjectTreeDetailsComponent} from "./object-details/object-tree-details.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
@@ -590,7 +579,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   getDisplayName(node: R, element: E): string {
     if (this.moleculeView() && isMolecule(element) && element.identifier) {
-      const displayName = this.getMoleculeName(node, element);
+      const displayName = element.formattedName;
       return `${displayName}`;
     }
 
@@ -639,49 +628,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     const shouldShorten = speciesName.length >= maxStringLength && firstSpeciesName.length > 1;
 
     return shouldShorten ? this.getShortest(firstSpeciesName) : speciesName;
-  }
-
-
-
-  getMoleculeName(node: R, element: E) {
-    let name = '';
-    const type = node.type;
-    switch (type) {
-      case PropertyType.PROTEINS:
-        name = extractFromSpace(element.displayName, false);
-        break;
-      case PropertyType.CHEMICAL_COMPOUNDS:
-        name = extractFromSpace(element.displayName, true);
-        break;
-      case PropertyType.SEQUENCES:
-        name = extractFromSpace(element.displayName, false);
-        break
-      case PropertyType.DRUG:
-        name = extractFromSpace(element.displayName, true);
-        break
-      case PropertyType.OTHERS:
-        name = element.displayName;
-    }
-    return name;
-  }
-
-
-  getMoleculeIdentifier(node: R,element:E) {
-    let identifier : string = '';
-    const type = node.type;
-    switch (type) {
-      case PropertyType.PROTEINS:
-      case PropertyType.SEQUENCES:
-        identifier = extractIdAfterColon(element.displayName);
-        break;
-      case PropertyType.CHEMICAL_COMPOUNDS:
-      case PropertyType.DRUG:
-        identifier = extractIdInBrackets(element.displayName);
-        break
-      case PropertyType.OTHERS:
-        identifier = element.displayName;
-    }
-    return identifier;
   }
 
 }

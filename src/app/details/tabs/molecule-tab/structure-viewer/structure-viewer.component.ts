@@ -1,6 +1,5 @@
-import {Component, computed, effect, ElementRef, input, signal, viewChild, linkedSignal} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, linkedSignal, signal, viewChild} from '@angular/core';
 import {DatabaseIdentifier} from "../../../../model/graph/database-identifier.model";
-import {ReactiveFormsModule} from "@angular/forms";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOptgroup, MatOption, MatSelect} from "@angular/material/select";
 import {rxResource} from "@angular/core/rxjs-interop";
@@ -70,7 +69,7 @@ export class StructureViewerComponent {
     }
     return null;
   });
-  
+
   selected = linkedSignal(() => this.alphaFoldEntryId())
 
   sourceLabel = computed(() => {
