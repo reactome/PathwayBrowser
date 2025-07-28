@@ -186,11 +186,11 @@ export class ReacfoamComponent implements OnDestroy {
           const depth = props.group.depth;
           // If child groups of some group doesn't have enough space to
           // render, draw the parent group in red.
-          if (props.hasChildren && props.browseable !== true) {
-            values.groupColor = "#E86365";
-            values.labelColor = "#000";
-            return
-          }
+          // if (props.hasChildren && props.browseable !== true) {
+          //   values.groupColor = "#E86365";
+          //   values.labelColor = "#000";
+          //   return
+          // }
 
           if (this.analysis.result()) { // Analysis
             values.labelColor = 'auto'
