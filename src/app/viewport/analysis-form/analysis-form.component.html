@@ -1,59 +1,55 @@
-<mat-tab-group>
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <div class="analysis-type-header">
-        <div class="analysis-type-icon" [innerHTML]="qualitative | async | safe: 'html' : true">
+<div class="container">
+  <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="qualitative | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Qualitative</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
         </div>
-        <div class="analysis-type-label">
-          <u>Qualitative</u>
-          Pathway Enrichment
+      </ng-template>
+      <cr-qualitative-analysis (close)="close.emit($event)"/>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="quantitative | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Quantitative</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
         </div>
-      </div>
-    </ng-template>
+      </ng-template>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="species | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Species</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="tissue | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Tissue</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
 
-    <cr-qualitative-analysis (close)="close.emit($event)"/>
-  </mat-tab>
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <div class="analysis-type-header">
-        <div class="analysis-type-icon" [innerHTML]="quantitative | async | safe: 'html' : true">
-        </div>
-        <div class="analysis-type-label">
-          <u>Quantitative</u>
-          Pathway Enrichment
-        </div>
-      </div>
-    </ng-template>
-
-    Quantitative
-  </mat-tab>
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <div class="analysis-type-header">
-        <div class="analysis-type-icon" [innerHTML]="species | async | safe: 'html' : true">
-        </div>
-        <div class="analysis-type-label">
-          <u>Species</u>
-          Pathway Enrichment
-        </div>
-      </div>
-    </ng-template>
-
-    Species
-  </mat-tab>
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <div class="analysis-type-header">
-        <div class="analysis-type-icon" [innerHTML]="tissue | async | safe: 'html' : true">
-        </div>
-        <div class="analysis-type-label">
-          <u>Tissue</u>
-          Pathway Enrichment
-        </div>
-      </div>
-    </ng-template>
-
-    Tissue
-  </mat-tab>
-</mat-tab-group>
 
