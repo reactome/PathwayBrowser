@@ -1,13 +1,13 @@
 <div class="details-content-container">
-@if (moleculeType() === MoleculeType.PROTEIN) {
-  <cr-structure-viewer [obj]=obj() [xRefs]="xRefs()"></cr-structure-viewer>
-  <mat-divider></mat-divider>
-}
+  @if (moleculeType() === MoleculeType.PROTEIN || moleculeType() === MoleculeType.CHEMICAL) {
+    <cr-structure-viewer [obj]=obj() [xRefs]="xRefs()" [moleculeType]="moleculeType()"></cr-structure-viewer>
+    <mat-divider></mat-divider>
+  }
 
-@if (xRefs()) {
-  <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
-} @else {
-  <p> placeholder => There is no more information available<p>
-}
+  @if (xRefs()) {
+    <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
+  } @else {
+    <p> placeholder => There is no more information available<p>
+      }
 </div>
 

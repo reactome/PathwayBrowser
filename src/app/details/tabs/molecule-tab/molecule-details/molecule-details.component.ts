@@ -1,11 +1,10 @@
 import {Component, computed, input} from '@angular/core';
-import {isRefEntity} from "../../../../services/utils";
 import {DatabaseIdentifier} from "../../../../model/graph/database-identifier.model";
 import {StructureViewerComponent} from "../structure-viewer/structure-viewer.component";
 import {MatDivider} from "@angular/material/divider";
 import {CrossReferencesComponent} from "../../../common/cross-references/cross-references.component";
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
-
+import {isRefEntity} from "../../../../services/utils";
 
 export enum MoleculeType {
 
@@ -26,10 +25,6 @@ export enum MoleculeType {
   styleUrl: './molecule-details.component.scss'
 })
 export class MoleculeDetailsComponent {
-
-
-  readonly MoleculeType = MoleculeType;
-
   readonly obj = input.required<ReferenceEntity>();
   readonly xRefs = input.required<DatabaseIdentifier[]>();
 
@@ -42,6 +37,5 @@ export class MoleculeDetailsComponent {
     return null;
   })
 
+  protected readonly MoleculeType = MoleculeType;
 }
-
-

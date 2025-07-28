@@ -10,6 +10,8 @@ import {of} from "rxjs";
 import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 import {MatDivider} from "@angular/material/divider";
 import {ObjectTreeComponent} from "../../common/entity-tree/object-tree.component";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {SortByDatePipe} from "../../../pipes/sort-by-date.pipe";
 
 
 interface MoleculeGroup {
@@ -38,7 +40,9 @@ export enum PropertyType {
   imports: [
     SortByTextPipe,
     MatDivider,
-    ObjectTreeComponent
+    ObjectTreeComponent,
+    MatProgressSpinner,
+    SortByDatePipe
   ],
   styleUrl: './molecule-tab.component.scss'
 })

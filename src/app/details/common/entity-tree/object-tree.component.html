@@ -129,7 +129,7 @@
           <cr-object-tree-details [obj]="element"
                              [className]="element.className"
                              [refEntity]="element.referenceEntity"
-                             [xRefs]="element.referenceEntity.crossReference">
+                             [xRefs]="element.referenceEntity?.crossReference ?? []">
           </cr-object-tree-details>
 
         } @else {
