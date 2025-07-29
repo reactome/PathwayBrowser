@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, output, signal, viewChild, WritableSignal} from '@angular/core';
+import {AfterViewInit, Component, effect, ElementRef, output, signal, viewChild, WritableSignal} from '@angular/core';
 import {MatStep, MatStepLabel, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/material/stepper";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
@@ -6,12 +6,15 @@ import {ReactomeTableModule, Settings, TableComponent} from "reactome-table";
 import {HttpClient} from "@angular/common/http";
 import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
-import {map, switchMap, take, tap} from "rxjs";
-import {AsyncPipe, NgOptimizedImage} from "@angular/common";
-import {rxResource} from "@angular/core/rxjs-interop";
+import {map, switchMap, take} from "rxjs";
+import {AsyncPipe} from "@angular/common";
 import {SafePipe} from "../../../pipes/safe.pipe";
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {AnalysisService} from "../../../services/analysis.service";
+import type {DotLottie} from "@lottiefiles/dotlottie-web";
+import {UrlStateService} from "../../../services/url-state.service";
+
+let lottieModule: any;
+
 
 @UntilDestroy()
 @Component({
@@ -60,10 +63,24 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
 
   dataStepForm: FormGroup;
 
-  constructor(private http: HttpClient, private fb: FormBuilder, public analysis: AnalysisService) {
+  constructor(private http: HttpClient, private fb: FormBuilder, public analysis: AnalysisService, private state: UrlStateService) {
     this.dataStepForm = this.fb.group({
       data: [''],
     })
+
+    effect(async () => {
+      if (!this.lottieCanvas()) return;
+      if (lottieModule === undefined) lottieModule = await import('@lottiefiles/dotlottie-web')
+      setTimeout(() => {
+        this.lottie = new lottieModule.DotLottie({
+          autoplay: true,
+          loop: true,
+          canvas: this.lottieCanvas()!.nativeElement,
+          renderer: 'canvas',
+          src: "assets/animations/loading-ripple.lottie"
+        })
+      }, 1000); // Wait for end of animation
+    });
   }
 
   ngAfterViewInit(): void {
@@ -90,6 +107,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
 
   readonly projectToHuman = signal(true)
   readonly includeInteractors = signal(false)
+
   toggle(booleanSignal: WritableSignal<boolean>) {
     booleanSignal.set(!booleanSignal());
   }
@@ -99,20 +117,32 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
 
   // STEP 3 Analysis
   analysisRunning = signal(false)
+  lottieCanvas = viewChild<ElementRef<HTMLDivElement>>('lottie')
+  lottie?: DotLottie;
+  token: string | null = null;
 
-  launchAnalysis() {
+  async launchAnalysis() {
+    this.lottie?.load({src: "assets/animations/loading-ripple.lottie", loop: true, autoplay: true})
     this.analysisRunning.set(true)
     this.table()!.cleanData$.pipe(
       take(1),
       switchMap(data => this.analysis.analyse(data.map(row => row.join('\t')).join('\n'), {
-        projectToHuman: this.projectToHuman(),
-        interactors: this.includeInteractors()
-      })
+          projectToHuman: this.projectToHuman(),
+          interactors: this.includeInteractors()
+        })
       )
     ).subscribe(() => {
+      this.lottie!.load({src: 'assets/animations/success-animation.json', loop: true, autoplay: true})
       this.analysisRunning.set(false)
+      this.token = this.state.analysis()!;
       this.close.emit({status: 'finished'})
     });
-
   }
+
+  displayAnalysis() {
+    this.state.analysis.set(this.token!)
+    this.close.emit({status: 'finished'})
+  }
+
+  protected readonly Math = Math;
 }

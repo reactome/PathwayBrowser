@@ -152,7 +152,7 @@
           </div>
         </div>
         <div class="content" #content>
-          <as-split direction="vertical" gutterSize="4" useTransition="true">
+          <as-split direction="vertical" gutterSize="4" useTransition="true" >
             <as-split-area [size]="viewShare()" id="view" class="hide-overflow">
               @if (pathwayId()) {
                 @if (hasEHLD()) {
@@ -165,21 +165,19 @@
                 <cr-reacfoam/>
               }
 
-              <div class="dropdown" @dropdown *ngIf="dropdown()">
-                @switch (dropdown()) {
-                  @case ('analysis') {
-                    <cr-analysis-form (close)="dropdown.set(null)"/>
-                  }
-                  @case ('compare') {
-                    <cr-compare-form (close)="dropdown.set(null)"/>
-                  }
-                }
+              <div class="dropdown" [@dropdown]="dropdown() === 'analysis' ? 'open' : 'closed'">
+                <cr-analysis-form (close)="dropdown.set(null)"/>
               </div>
+              <div class="dropdown" [@dropdown]="dropdown()  === 'compare' ? 'open' : 'closed'">
+                <cr-compare-form (close)="dropdown.set(null)"/>
+              </div>
+
             </as-split-area>
 
-            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged" [class.hidden]="detailShare() === 0"></div>
+            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"
+                 [class.hidden]="detailShare() === 0"></div>
 
-            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()">
+            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()" >
               <cr-details-panel></cr-details-panel>
             </as-split-area>
           </as-split>

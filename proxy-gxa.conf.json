@@ -1,8 +1,0 @@
-{
-  "/gxa": {
-    "target": "https://www.ebi.ac.uk",
-    "secure": true,
-    "logLevel": "debug",
-    "changeOrigin": true
-  }
-}

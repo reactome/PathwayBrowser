@@ -2,11 +2,33 @@
 @use "reactome-cytoscape-style/assets" as reactome-cytoscape-style;
 @use "ngx-reactome-style";
 @use "reactome-table";
+@use "reactome-gsa-form";
 
 @include reactome-cytoscape-style.configure-diagrams();
 @include ngx-reactome-style.theme();
 @include reactome-table.configure-table();
+@include reactome-gsa-form.configure-gsa-form-variables();
 
+@include reactome-gsa-form.configure-gsa-form();
+
+.material-symbols-outlined { // Overrides icon family to match current style
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+cr-quantitative-analysis {
+
+}
 // Custom TABS
 .custom-tab-group {
   @include mat.tabs-overrides((

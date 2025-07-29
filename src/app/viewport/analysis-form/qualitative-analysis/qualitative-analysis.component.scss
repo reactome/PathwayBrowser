@@ -19,6 +19,7 @@
 @container qualitative-analysis (height < 600px) {
   .header {
     display: none;
+
     .description {
     }
   }
@@ -321,12 +322,14 @@
 .loader-container {
   flex: 1;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   .loader {
-    inset: 0;
     position: absolute;
-    height: 100%;
-    margin: auto;
+    inset: auto;
   }
 }
 

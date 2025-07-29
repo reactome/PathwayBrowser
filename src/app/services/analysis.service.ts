@@ -13,6 +13,7 @@ import {Params} from "@angular/router";
 import {cleanObject} from "../reacfoam/reacfoam.service";
 import {isDefined, shouldBeScientificFormat} from "./utils";
 import NotFoundIdentifier = Analysis.NotFoundIdentifier;
+import {Report} from "reactome-gsa-form/lib/model/report-status.model";
 
 export interface Pagination extends Params {
   page: number,
@@ -228,6 +229,8 @@ export class AnalysisService {
   hasInteractors = computed(() => this.summary()?.interactors === true)
   type = computed(() => this.summary()?.type as Analysis.Type | undefined)
   isGSA = computed(() => this.type() === 'GSA_REGULATION');
+  gsaReportsRequired = signal(false);
+  gsaReports = signal<Report[] | undefined>(undefined);
 
   samples = computed(() => this.result()?.expression.columnNames || [])
   sampleIndex = linkedSignal({

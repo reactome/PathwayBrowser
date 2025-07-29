@@ -1,0 +1,17 @@
+{
+  "/gxa": {
+    "target": "https://www.ebi.ac.uk",
+    "secure": true,
+    "logLevel": "debug",
+    "changeOrigin": true
+  },
+  "/GSAServer": {
+    "target": "http://gsa.reactome.org",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/GSAServer": "/"
+    }
+  }
+}
