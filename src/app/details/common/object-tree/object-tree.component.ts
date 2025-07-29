@@ -63,7 +63,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
   fullTreeCache: R[] = [];
-  //todo: not used for now, delete it in future
   initialData: R[] = [];
 
   @ViewChild(MatTree) tree!: MatTree<R>;
