@@ -11,7 +11,8 @@ export class SafePipe implements PipeTransform {
   constructor(protected sanitizer: DomSanitizer) {
   }
 
-  transform(value: string, type: 'html' | 'style' | 'script' | 'url' | 'resource' = "html", bypass: boolean = false): string | SafeHtml | SafeUrl | SafeStyle | SafeScript | SafeResourceUrl {
+  transform(value: string | null, type: 'html' | 'style' | 'script' | 'url' | 'resource' = "html", bypass: boolean = false): string | SafeHtml | SafeUrl | SafeStyle | SafeScript | SafeResourceUrl {
+    if (value === null) value = '';
     let val: string | SafeHtml | SafeUrl | SafeStyle | SafeScript | SafeResourceUrl = value;
     if (bypass) {
       switch (type) {

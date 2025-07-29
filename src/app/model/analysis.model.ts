@@ -88,7 +88,7 @@ export namespace Analysis {
     /**
      *  All non-human identifiers are converted to their human equivalents. (default = true)
      */
-    disableProjectToHuman?: boolean;
+    projectToHuman?: boolean;
   }
 
   export interface Pathway {

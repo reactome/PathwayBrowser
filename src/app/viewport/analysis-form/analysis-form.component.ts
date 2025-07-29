@@ -1,7 +1,9 @@
 import {ChangeDetectionStrategy, Component, output} from '@angular/core';
 import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
-import {NgOptimizedImage} from "@angular/common";
+import {AsyncPipe} from "@angular/common";
 import {QualitativeAnalysisComponent} from "./qualitative-analysis/qualitative-analysis.component";
+import {HttpClient} from "@angular/common/http";
+import {SafePipe} from "../../pipes/safe.pipe";
 
 @Component({
   selector: 'cr-analysis-form',
@@ -9,9 +11,10 @@ import {QualitativeAnalysisComponent} from "./qualitative-analysis/qualitative-a
     MatTab,
     MatTabGroup,
     MatTabLabel,
-    NgOptimizedImage,
     QualitativeAnalysisComponent,
-    QualitativeAnalysisComponent
+    QualitativeAnalysisComponent,
+    SafePipe,
+    AsyncPipe
   ],
   templateUrl: './analysis-form.component.html',
   styleUrl: './analysis-form.component.scss',
@@ -19,6 +22,13 @@ import {QualitativeAnalysisComponent} from "./qualitative-analysis/qualitative-a
 })
 export class AnalysisFormComponent {
 
+  qualitative = this.http.get('assets/icons/analysis/Qualitative.svg', {responseType: 'text'})
+  quantitative = this.http.get('assets/icons/analysis/Quantitative.svg', {responseType: 'text'})
+  species = this.http.get('assets/icons/analysis/SpeciesCompare.svg', {responseType: 'text'})
+  tissue = this.http.get('assets/icons/analysis/TissueCompare.svg', {responseType: 'text'})
+
+
   close = output<{ status: 'finished' | 'premature' }>()
 
+  constructor(private http: HttpClient) { }
 }

@@ -566,7 +566,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
 
   getUrl(element: E): string {
-    if (isEWAS(element) && element.referenceEntity.url) {
+    if (isEWAS(element) && element.referenceEntity?.url) {
       return element.referenceEntity.url;
     }
     if (isMolecule(element)) {
