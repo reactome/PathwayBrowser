@@ -3,9 +3,7 @@ import {Molecule, Participant, ParticipantService} from "../../../services/parti
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {DataStateService} from "../../../services/data-state.service";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
-import {of} from "rxjs";
 import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 import {MatDivider} from "@angular/material/divider";
 import {ObjectTreeComponent} from "../../common/object-tree/object-tree.component";
@@ -55,29 +53,29 @@ export enum PropertyType {
 })
 export class MoleculeTabComponent {
 
-  readonly obj = input.required<SelectableObject>();
+  readonly selectableObject = input.required<SelectableObject>();
   pathwayId = this.state.pathwayId as WritableSignal<string>;
+
+  // Get selected pathway id on Reacfoam view
+  objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private dataState: DataStateService,
               public state: UrlStateService) {
     effect(() => {
-      const stId = this.obj()?.stId;
+      const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
-      if (stId && stId !== pathwayId) {
-        this.entity.loadRefEntities(stId);
+      if (selectableObjStId && selectableObjStId !== pathwayId) {
+        this.entity.loadRefEntities(selectableObjStId);
       }
     });
+
   }
 
   _pathwayParticipants = rxResource({
-    request: () => this.dataState.currentPathway() || this.obj(),
-    loader: () => {
-      const id = this.dataState.currentPathway() ? this.dataState.currentPathway()!.stId : this.obj()?.stId;
-      return id ? this.participant.getParticipants(id) : of(null);
-    }
+    request: () => this.objStId(),
+    loader: () => this.participant.getParticipants(this.objStId())
   });
 
 
@@ -96,14 +94,14 @@ export class MoleculeTabComponent {
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
 
     if (this.pathwayId()) {
-      if (this.obj().stId === this.pathwayId()) {
+      if (this.selectableObject()?.stId === this.pathwayId()) {
         moleculeData = pathwayResults;
       } else {
         const refEntities = this.entity.refEntities() || [];
         moleculeData = this.getReactionParticipants(pathwayResults, refEntities);
       }
     } else {
-      if (isPathway(this.obj())) {
+      if (isPathway(this.selectableObject())) {
         moleculeData = pathwayResults;
       }
     }

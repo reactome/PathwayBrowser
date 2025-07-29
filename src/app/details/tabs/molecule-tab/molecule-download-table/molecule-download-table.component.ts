@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, linkedSignal, signal, Signal} from '@angular/core';
+import {Component, computed, effect, input, linkedSignal, signal, Signal, viewChild} from '@angular/core';
 import {MoleculeGroup} from "../molecule-tab.component";
 import {
   MatCell,
@@ -17,9 +17,13 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {FormsModule} from "@angular/forms";
+import {MatSort, MatSortHeader} from "@angular/material/sort";
+import {MatIcon} from "@angular/material/icon";
+import {MatButton} from "@angular/material/button";
 
 
 type MoleculeRow = {
+  [key: string]: string;
   type: string;
   identifier: string;
   name: string
@@ -43,7 +47,11 @@ type MoleculeRow = {
     MatOption,
     MatLabel,
     MatCheckbox,
-    FormsModule
+    FormsModule,
+    MatSort,
+    MatSortHeader,
+    MatIcon,
+    MatButton
   ],
   templateUrl: './molecule-download-table.component.html',
   styleUrl: './molecule-download-table.component.scss'
@@ -51,6 +59,8 @@ type MoleculeRow = {
 export class MoleculeDownloadTableComponent {
 
   moleculeData = input.required<MoleculeGroup[]>();
+  sort = viewChild.required(MatSort);
+  objId = input.required<string>();
 
   tableData = computed(() => {
     return this.moleculeData().flatMap(group =>
@@ -92,20 +102,17 @@ export class MoleculeDownloadTableComponent {
     console.log("include identifier", this.includeIdentifier());
     console.log("include name", this.includeName());
 
-    data = data.filter(molecule => this.selectedCategory().includes(molecule.type));
+    data = data.filter(molecule => this.selectedCategory().includes(molecule.type))
+      .map(row => {
+        const {type, identifier, name, ...rest} = row;
+        const newRow = {...rest} as MoleculeRow;
 
-    data = data.map(row => {
-      const {type, identifier, name, ...rest} = row;
-      const newRow = {...rest} as MoleculeRow;
+        if (this.includeType()) newRow.type = type;
+        if (this.includeIdentifier()) newRow.identifier = identifier;
+        if (this.includeName()) newRow.name = name;
 
-      if (this.includeType()) newRow.type = type;
-      if (this.includeIdentifier()) newRow.identifier = identifier;
-      if (this.includeName()) newRow.name = name;
-
-      return newRow;
-    });
-
-    console.log("data", data)
+        return newRow;
+      });
     return data;
   })
 
@@ -117,10 +124,32 @@ export class MoleculeDownloadTableComponent {
       this.dataSource.data = this.tableData();
     });
 
-
     effect(() => {
       this.dataSource.data = this.filteredData();
     });
 
+    effect(() => {
+      this.dataSource.sort = this.sort();
+    });
+
+  }
+
+
+  exportToTSV(): void {
+    if (!this.tableData() || this.tableData().length === 0) return;
+
+    const keys = this.displayedColumns();
+    const tsvRows = [
+      keys.join('\t'),
+      ...this.tableData().map((row: MoleculeRow) => keys.map(key => row[key]).join('\t'))
+    ];
+
+    const tsvContent = tsvRows.join('\n');
+    const blob = new Blob([tsvContent], {type: 'text/tab-separated-values'});
+
+    const a = document.createElement('a');
+    a.href = window.URL.createObjectURL(blob);
+    a.download = `Participating Molecules [${this.objId()}].tsv`;
+    a.click();
   }
 }

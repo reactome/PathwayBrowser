@@ -1,4 +1,4 @@
-@if (!pathwayId() && !obj()) {
+@if (!objStId()) {
   <div class="description-content">
     🗒️ When a pathway is displayed in the panel above, shows details of all the molecules involved.
     If an item is selected in the diagram, the corresponding molecules are highlighted.
@@ -48,7 +48,7 @@
 </div>
 
 
-<div id="download">
+<div id="download" class="padding">
   @if (moleculeData().length > 0) {
     <mat-expansion-panel>
       <mat-expansion-panel-header>
@@ -56,7 +56,7 @@
           <span class="badge">Download</span>
         </mat-panel-title>
       </mat-expansion-panel-header>
-      <cr-molecule-download-table [moleculeData]="moleculeData()"></cr-molecule-download-table>
+      <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
     </mat-expansion-panel>
   }
 </div>
