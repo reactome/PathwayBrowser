@@ -47,7 +47,7 @@
   ::ng-deep {
     .mat-horizontal-stepper-wrapper,
     .mat-horizontal-content-container,
-    .mat-horizontal-stepper-content:not(.mat-horizontal-stepper-content-inactive) {
+    .mat-horizontal-stepper-content-current {
       height: 100%;
       color: var(--on-surface);
     }

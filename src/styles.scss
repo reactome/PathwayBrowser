@@ -8,7 +8,6 @@
 @include ngx-reactome-style.theme();
 @include reactome-table.configure-table();
 @include reactome-gsa-form.configure-gsa-form-variables();
-
 @include reactome-gsa-form.configure-gsa-form();
 
 .material-symbols-outlined { // Overrides icon family to match current style
