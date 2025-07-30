@@ -1,15 +1,17 @@
-@if (isReacfoamView() && selectableObject() && !isPathway(selectableObject())) {
-    <div class="description-content">
-      <p>🗒️ When a pathway is displayed in the panel above, it shows detailed information about all the molecules involved.
+@if (showDescription()) {
+  <div class="description-content">
+    <p>🗒️ When a pathway is displayed in the panel above, it shows detailed information about all the molecules
+      involved.
       If an item in the diagram is selected, the corresponding molecules are marked with a 📌 pin icon.
-        Molecules are categorized into subtypes: Protein, Chemical Compound, Sequences (DNA/RNA), and Other.</p>
+      Molecules are categorized into subtypes: Protein, Chemical Compound, Sequences (DNA/RNA), and Other.</p>
 
-      <p>To download molecule lists:
+    <p>To download molecule lists:
       Go to the Download menu on the right side of the Table of Contents (TOC). An expansion panel will appear.
-        Select the desired fields and molecule types, then click Download.</p>
-    </div>
+      Select the desired fields and molecule types, then click Download.</p>
+  </div>
+}
 
-} @else if (moleculeData().length === 0) {
+@if (isShowingSpinner()) {
   <div class="spinner-container">
     <mat-spinner></mat-spinner>
     <p>Loading data for participating molecules, please wait...</p>
@@ -35,7 +37,20 @@
       </div>
     }
 
+    <div id="download" class="download-container">
+      @if (moleculeData().length > 0) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h3 class="badge">Download Molecules Data</h3>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
+        </mat-expansion-panel>
+      }
+    </div>
   </div>
+
   <div class="toc">
     @for (group of moleculeData() | sortByText: 'category'; track group.category) {
       <a (click)="scrollTo(group.category)">
@@ -47,19 +62,4 @@
       <a (click)="scrollTo('download')">Download </a>
     }
   </div>
-
-</div>
-
-
-<div id="download" class="padding">
-  @if (moleculeData().length > 0) {
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <h3 class="badge">Download Molecules Data</h3>
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
-    </mat-expansion-panel>
-  }
 </div>

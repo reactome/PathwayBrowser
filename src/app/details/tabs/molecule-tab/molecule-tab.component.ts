@@ -61,6 +61,25 @@ export class MoleculeTabComponent {
 
   isReacfoamView = computed(() => this.pathwayId() == null);
 
+  //todo: simplify
+  isShowingSpinner = computed(() => {
+    const isReacfoam = this.isReacfoamView();
+    const hasSelectable = !!this.selectableObject();
+    const isPathwayObj = hasSelectable && isPathway(this.selectableObject());
+    const moleculesLoading = this.moleculeData().length === 0;
+
+    return (
+      (!isReacfoam && moleculesLoading) ||
+      (isReacfoam && hasSelectable && isPathwayObj && moleculesLoading)
+    );
+  });
+
+  showDescription = computed(() => {
+    return this.isReacfoamView() &&
+      (!this.selectableObject() || !isPathway(this.selectableObject()));
+  });
+
+
   constructor(private participant: ParticipantService,
               private entity: EntityService,
               public state: UrlStateService) {

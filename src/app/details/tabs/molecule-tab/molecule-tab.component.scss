@@ -41,7 +41,6 @@
   .list {
     width: 100%;
 
-
     .header {
       padding: 0 2px;
       font-weight: 500;
@@ -50,7 +49,6 @@
     }
   }
 
-
   .divider {
     width: 100%;
   }
@@ -58,8 +56,6 @@
   .composition-container {
     width: 100%;
   }
-
-
 
 }
 
@@ -82,7 +78,7 @@
   top: 0;
 }
 
-.spinner-container{
+.spinner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,17 +86,14 @@
   padding-top: 20px;
 }
 
-.description-content{
+.description-content {
   padding: 20px;
 }
 
 
-.padding{
-  padding: 5px 20px;
-}
+.download-container {
+  width: 100%;
 
-
-#download{
   @include mat.expansion-overrides((
     header-indicator-color: var(--primary),
   ));
