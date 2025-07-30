@@ -92,7 +92,7 @@
   grid-template-columns: repeat(20, 1fr);
   grid-template-rows: repeat(20, 1fr);
   flex: 1;
-  gap: 20px;
+  gap: min(20px, 2cqh, 2cqw);
   justify-items: stretch;
   align-items: stretch;
   aspect-ratio: 1 / 1;
