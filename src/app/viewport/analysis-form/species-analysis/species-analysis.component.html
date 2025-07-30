@@ -28,7 +28,7 @@
               </div>
             </div>
             @if (selectedSpecies(); as species) {
-              <span>to</span>
+              <span>with</span>
               <div class="comparison" (click)="toggle(species)">
                 <div [matTooltip]="species.displayName" class="flex-column">
                   <mat-icon class="custom-icon" [svgIcon]="species.taxId"></mat-icon>
