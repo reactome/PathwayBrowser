@@ -200,7 +200,7 @@ export class ReacfoamComponent implements OnDestroy {
 
             if (!fdr || fdr > this.state.significance()) values.groupColor = notFoundColor;
             else {
-              if (this.analysis.type() === 'OVERREPRESENTATION') { // FDR ~ color
+              if (this.analysis.type() === 'OVERREPRESENTATION' || this.analysis.type() === 'SPECIES_COMPARISON') { // FDR ~ color
                 values.groupColor = this.analysis.palette().scale(props.group.fdr).hex()
               } else { // expression ~ color
                 if (props.group.expressions) {

@@ -151,14 +151,12 @@ export class TissueAnalysisComponent {
 
     effect(async () => {
       if (!this.lottieCanvas()) return;
-      setTimeout(async () => {
-        this.lottie = await this.lottieService.buildLottie({
-          autoplay: true,
-          loop: true,
-          canvas: this.lottieCanvas()!.nativeElement,
-          src: "assets/animations/loading-ripple.lottie"
-        })
-      }, 1000); // Wait for end of animation
+      this.lottie = await this.lottieService.buildLottie({
+        autoplay: true,
+        loop: true,
+        canvas: this.lottieCanvas()!.nativeElement,
+        src: "assets/animations/loading-ripple.lottie"
+      })
     });
   }
 
@@ -262,7 +260,6 @@ export class TissueAnalysisComponent {
 
 
   protected readonly Math = Math;
-
 
 
 }

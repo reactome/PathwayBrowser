@@ -207,9 +207,15 @@
 
 .stepper-controls {
   display: grid;
-  column-gap: 40px;
-  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 20px;
+  grid-template-columns: 1fr 2fr 1fr;
   margin-top: 20px;
+  width: 100%;
+  justify-items: center;
+  button:first-child,
+  button:last-child {
+    width: 100%;
+  }
 }
 
 // Step 2 Loading

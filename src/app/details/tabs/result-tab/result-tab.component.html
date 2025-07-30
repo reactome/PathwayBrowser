@@ -6,6 +6,9 @@
     @if (analysis.summary()?.sampleName) {
       of {{ analysis.summary()?.sampleName }}
     }
+    @if (analysis.species()) {
+      of {{ analysis.species()!.displayName }}
+    }
     @if (state.resourceFilter()) {
       on {{ state.resourceFilter() }} entities
     }

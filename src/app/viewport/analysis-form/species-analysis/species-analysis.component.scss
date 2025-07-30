@@ -40,3 +40,164 @@
   }
 
 }
+
+.stepper {
+  flex: 1 1 auto;
+
+  ::ng-deep {
+    .mat-horizontal-stepper-wrapper,
+    .mat-horizontal-content-container,
+    .mat-horizontal-stepper-content-current {
+      height: 100%;
+      color: var(--on-surface);
+    }
+
+    .mat-horizontal-stepper-content-current {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+    }
+
+  }
+}
+
+.wrapper {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  container: species-container / size;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.stepper-controls {
+  display: grid;
+  column-gap: 20px;
+  grid-template-columns: 1fr 2fr 1fr;
+  margin-top: 20px;
+  width: 100%;
+  justify-items: center;
+
+  button:first-child,
+  button:last-child {
+    width: 100%;
+  }
+}
+
+.species-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  flex: 1;
+  gap: 20px;
+  justify-items: stretch;
+  align-items: stretch;
+  aspect-ratio: 1 / 1;
+  width: calc(min(100cqw, 100cqh));
+
+  .species-button {
+    border-radius: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    grid-column: span 4;
+    grid-row: span 4;
+
+    border: 1px solid var(--primary);
+    background: var(--surface);
+    color: var(--primary);
+    transition: all 400ms ease-in-out;
+    cursor: pointer;
+    container-type: size;
+
+    &.selected {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .species-name {
+      width: 75%;
+      overflow: clip;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-top: 5px;
+    }
+
+    .mat-icon {
+      aspect-ratio: 1 / 1;
+      width: min(50cqw, 50cqh);
+      height: unset;
+    }
+
+    &:nth-last-child(-n + 4) {
+      grid-column: span 5;
+      grid-row: span 5;
+    }
+  }
+
+  .center-grid {
+    grid-column: 5 / span 12;
+    grid-row: 5 / span 12;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    cursor: unset;
+    border-radius: 33%;
+
+    .title {
+      font: var(--mat-sys-title-medium);
+      margin: 20px;
+    }
+
+
+    .comparison-container {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+      width: 100%;
+      align-items: center;
+
+      .flex-column {
+        width: 100%;
+      }
+
+      .comparison {
+        container-type: size;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        align-items: center;
+
+        .flex-column {
+          align-items: center;
+        }
+
+        &:nth-child(3) .mat-icon {
+          transform: scale(-1, 1);
+        }
+      }
+    }
+  }
+}
+
+// Step 2 Loading
+.loader-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  .loader {
+    position: absolute;
+    inset: auto;
+  }
+}

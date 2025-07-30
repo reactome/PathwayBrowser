@@ -173,17 +173,19 @@
     <ng-template matStepLabel>Analysis</ng-template>
 
     <div class="loader-container" #container>
-      @let scale = Math.max(Math.min(container.clientWidth, container.clientHeight) / 1000, 0.5);
-      <div class="loader">
-        <canvas #lottie style="width: 1000px; height: 1000px" [style.transform]="'scale(' + scale + ')'">
-        </canvas>
-      </div>
+      @if (analysisLaunched) {
+        @let scale = Math.max(Math.min(container.clientWidth, container.clientHeight) / 1000, 0.5);
+        <div class="loader">
+          <canvas #lottie style="width: 1000px; height: 1000px" [style.transform]="'scale(' + scale + ')'">
+          </canvas>
+        </div>
+      }
     </div>
 
 
     <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
-      <button mat-flat-button matStepperNext [disabled]="analysisRunning()" (click)="displayAnalysis()">See results</button>
+      <button mat-flat-button matStepperNext [disabled]="token === null" (click)="displayAnalysis()">See results</button>
     </div>
 
   </mat-step>

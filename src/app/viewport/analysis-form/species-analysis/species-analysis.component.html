@@ -14,3 +14,73 @@
   </div>
 </div>
 
+<mat-stepper class="stepper">
+  <mat-step label="Data">
+    <div class="wrapper">
+      <div class="species-selector-grid">
+        <div class="center-grid species-button">
+          <span class="title">Comparing</span>
+          <div class="comparison-container">
+            <div class="comparison">
+              <div matTooltip="Homo sapiens" class="flex-column">
+                <mat-icon class="custom-icon" svgIcon="9606"></mat-icon>
+                <span class="species-name">H. sapiens</span>
+              </div>
+            </div>
+            @if (selectedSpecies(); as species) {
+              <span>to</span>
+              <div class="comparison" (click)="toggle(species)">
+                <div [matTooltip]="species.displayName" class="flex-column">
+                  <mat-icon class="custom-icon" [svgIcon]="species.taxId"></mat-icon>
+                  <span class="species-name">{{ species.shortName }}</span>
+                </div>
+              </div>
+            }
+          </div>
+          <span class="title"> </span>
+
+
+        </div>
+        @for (species of comparableSpecies(); track species.dbId) {
+          <div class="species-button" matRipple (click)="toggle(species)"
+               [matTooltip]="species.displayName"
+               [class.selected]="selectedSpecies() === species">
+            <mat-icon class="custom-icon" [svgIcon]="species.taxId"></mat-icon>
+            <span class="species-name">{{ species.shortName }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+
+    <div class="stepper-controls">
+      <button mat-stroked-button matStepperPrevious disabled>Previous</button>
+      <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+        <mat-icon class="red">close</mat-icon>
+        Close
+      </button>
+      <button mat-flat-button matStepperNext [disabled]="selectedSpecies() === null" (click)="analyse()">Next
+      </button>
+    </div>
+
+  </mat-step>
+  <mat-step label="Analysis">
+    @if (analysisLaunched) {
+      <div class="loader-container" #container>
+        @let scale = Math.max(Math.min(container.clientWidth, container.clientHeight) / 1000, 0.5);
+        <div class="loader">
+          <canvas #lottie style="width: 1000px; height: 1000px" [style.transform]="'scale(' + scale + ')'">
+          </canvas>
+        </div>
+      </div>
+      <div class="stepper-controls">
+        <button mat-stroked-button matStepperPrevious>Previous</button>
+        <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+          <mat-icon class="red">close</mat-icon>
+          Close
+        </button>
+        <button mat-flat-button (click)="loadAnalysis()" [disabled]="token === undefined">See results</button>
+      </div>
+    }
+  </mat-step>
+</mat-stepper>

@@ -4,7 +4,7 @@ import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {ReactomeTableModule, Settings, TableComponent} from "reactome-table";
 import {HttpClient} from "@angular/common/http";
-import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {map, switchMap, take} from "rxjs";
 import {AsyncPipe} from "@angular/common";
@@ -60,40 +60,32 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
       })
   }
 
-  dataStepForm: FormGroup;
+  dataStepForm = new FormControl(null);
 
   constructor(
     private http: HttpClient,
-    private fb: FormBuilder,
     public analysis: AnalysisService,
     private state: UrlStateService,
     private lottieService: LottieService
-  ) {`z`
-    this.dataStepForm = this.fb.group({
-      data: [''],
-    })
+  ) {
 
     effect(async () => {
       if (!this.lottieCanvas()) return;
-      setTimeout(async () => {
-        this.lottie = await this.lottieService.buildLottie({
-          autoplay: true,
-          loop: true,
-          canvas: this.lottieCanvas()!.nativeElement,
-          src: "assets/animations/loading-ripple.lottie"
-        })
-      }, 1000); // Wait for end of animation
+      this.lottie = await this.lottieService.buildLottie({
+        autoplay: true,
+        loop: true,
+        canvas: this.lottieCanvas()!.nativeElement,
+        src: "assets/animations/loading-ripple.lottie"
+      })
     });
   }
 
   ngAfterViewInit(): void {
-    const control = this.dataStepForm.get('data')!;
-    control.setAsyncValidators(ctrl => this.table()!.hasData$.pipe(
+    this.dataStepForm.setAsyncValidators(control => this.table()!.hasData$.pipe(
       map(hasData => hasData ? null : {invalid: true}),
       untilDestroyed(this)
     ))
-    control.updateValueAndValidity()
-
+    this.dataStepForm.updateValueAndValidity()
   }
 
   uploadFile(input: HTMLInputElement) {
@@ -119,14 +111,14 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
   includeInteractorsIllustration = this.http.get('assets/animations/interactors-animation.svg', {responseType: 'text'})
 
   // STEP 3 Analysis
-  analysisRunning = signal(false)
+  analysisLaunched = false
   lottieCanvas = viewChild<ElementRef<HTMLCanvasElement>>('lottie')
   lottie?: DotLottie;
   token: string | null = null;
 
   async launchAnalysis() {
     this.lottie?.load({src: "assets/animations/loading-ripple.lottie", loop: true, autoplay: true})
-    this.analysisRunning.set(true)
+    this.analysisLaunched = true
     this.table()!.cleanData$.pipe(
       take(1),
       switchMap(data => this.analysis.analyse(data.map(row => row.join('\t')).join('\n'), {
@@ -136,7 +128,6 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
       )
     ).subscribe((result) => {
       this.lottie!.load({src: 'assets/animations/success-animation.json', loop: true, autoplay: true})
-      this.analysisRunning.set(false)
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     });
