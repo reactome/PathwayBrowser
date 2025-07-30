@@ -7,11 +7,21 @@
   gap: 10px;
   box-sizing: border-box;
   height: 100%;
+  container: qualitative-analysis / size;
 
   --mat-stepper-header-height: 48px;
 
   ::ng-deep .mat-horizontal-content-container {
     padding: 0 !important;
+  }
+}
+
+@container qualitative-analysis (height < 600px) {
+  .header {
+    display: none;
+
+    .description {
+    }
   }
 }
 
@@ -28,6 +38,7 @@
     color: var(--on-surface);
     font: var(--mat-sys-body-medium);
   }
+
 }
 
 .stepper {
@@ -36,7 +47,7 @@
   ::ng-deep {
     .mat-horizontal-stepper-wrapper,
     .mat-horizontal-content-container,
-    .mat-horizontal-stepper-content:not(.mat-horizontal-stepper-content-inactive) {
+    .mat-horizontal-stepper-content-current {
       height: 100%;
       color: var(--on-surface);
     }
@@ -137,7 +148,8 @@
     align-items: center;
     align-self: stretch;
     box-sizing: border-box;
-    container-type: size;
+    container-type: size; // important for @container size reaction
+    container-name: data-example-column;
     background: var(--surface1);
     border-radius: 0 20px 20px 0px;
 
@@ -146,9 +158,14 @@
       flex-direction: column;
       grid-template-columns: 1fr;
       gap: 15px;
+      width: 100%;
 
       button {
         width: 100%;
+
+        &:last-child {
+          margin-bottom: 4px;
+        }
 
         ::ng-deep .mdc-button__label {
           width: 100%;
@@ -159,14 +176,20 @@
       }
     }
 
-    @container (max-height: 600px) {
+    @container data-example-column (max-height: 600px) {
       .example-buttons {
         grid-template-columns: 1fr 1fr;
         font: var(--mat-sys-label-medium);
+        overflow: auto;
+        align-items: center;
 
         > :nth-last-child(1):nth-child(odd) {
           grid-column: span 2;
         }
+      }
+
+      .space-holder {
+        height: 0 !important;
       }
     }
 
@@ -176,7 +199,7 @@
   }
 }
 
-.controls {
+.stepper-controls {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
@@ -206,6 +229,7 @@
     gap: 20px;
     position: absolute;
     inset: 0;
+    cursor: pointer;
 
     .card-checkbox {
       border-radius: 20px;
@@ -298,11 +322,14 @@
 .loader-container {
   flex: 1;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   .loader {
-    inset: 0;
     position: absolute;
-    height: 100%;
-    margin: auto;
+    inset: auto;
   }
 }
 

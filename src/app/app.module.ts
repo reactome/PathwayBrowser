@@ -83,6 +83,11 @@ import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-vi
 import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
 import {AnalysisFormComponent} from "./viewport/analysis-form/analysis-form.component";
 import {CompareFormComponent} from "./viewport/compare-form/compare-form.component";
+import {GsaFormModule} from "reactome-gsa-form"
+import {environment} from "../environments/environment";
+import {StoreModule} from "@ngrx/store";
+import {routerReducer, StoreRouterConnectingModule} from "@ngrx/router-store";
+import {EffectsModule} from "@ngrx/effects";
 
 @NgModule({
   declarations: [
@@ -173,7 +178,14 @@ import {CompareFormComponent} from "./viewport/compare-form/compare-form.compone
     MoleculeDetailsComponent,
     AnalysisFormComponent,
     CompareFormComponent,
-
+    StoreModule.forRoot({
+      router: routerReducer
+    }, {}),
+    GsaFormModule.forRoot({
+      server: environment.production ? "production" : "dev",
+    }),
+    EffectsModule.forRoot([]),
+    StoreRouterConnectingModule.forRoot(),
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

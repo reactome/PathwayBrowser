@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious disabled>Previous</button>
       <button mat-stroked-button (click)="close.emit({status: 'premature'})">
         <mat-icon class="red">close</mat-icon>
@@ -110,7 +110,8 @@
                 from the <u>PANTHER knowledge base</u>
               </p>
               <p>
-                When this option is selected, all non-human identifiers in your sample are mapped to their human equivalents
+                When this option is selected, all non-human identifiers in your sample are mapped to their human
+                equivalents
                 before the analysis is performed
               </p>
             </div>
@@ -143,7 +144,8 @@
                 or with other entities in the diagram).
               </p>
               <p>
-                The analysis result uses the union of both backgrounds. Entities in the overlapping area are only counted
+                The analysis result uses the union of both backgrounds. Entities in the overlapping area are only
+                counted
                 once.
               </p>
             </div>
@@ -157,7 +159,7 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
       <button mat-stroked-button (click)="close.emit({status: 'premature'})">
         <mat-icon class="red">close</mat-icon>
@@ -170,12 +172,20 @@
   <mat-step>
     <ng-template matStepLabel>Analysis</ng-template>
 
-    <div class="loader-container">
-      <img class="loader" src="assets/loader.gif"/>
+    <div class="loader-container" #container>
+      @if (analysisLaunched) {
+        @let scale = Math.max(Math.min(container.clientWidth, container.clientHeight) / 1000, 0.5);
+        <div class="loader">
+          <canvas #lottie style="width: 1000px; height: 1000px" [style.transform]="'scale(' + scale + ')'">
+          </canvas>
+        </div>
+      }
     </div>
-    <div class="controls">
+
+
+    <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
-      <button mat-flat-button matStepperNext disabled>See results</button>
+      <button mat-flat-button matStepperNext [disabled]="token === null" (click)="displayAnalysis()">See results</button>
     </div>
 
   </mat-step>

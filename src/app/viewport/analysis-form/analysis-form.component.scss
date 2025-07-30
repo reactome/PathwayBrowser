@@ -16,10 +16,43 @@
 
 
 :host {
+  container: analysis-form / size;
+}
+
+:host,
+.container {
   display: flex;
   flex-direction: column;
   overflow: hidden;
   height: 100%;
+}
+
+@container analysis-form (height < 580px) {
+  .container {
+    .analysis-type-header {
+      gap: 0;
+    }
+  }
+}
+
+@container analysis-form (height < 525px) {
+  .container {
+    .analysis-type-header {
+
+      .analysis-type-icon {
+        display: none;
+      }
+
+      .analysis-type-label {
+        display: flex;
+        flex-direction: column;
+
+        .normal {
+          display: none;
+        }
+      }
+    }
+  }
 }
 
 :host ::ng-deep {
@@ -36,6 +69,7 @@
 
   .mat-mdc-tab {
     padding: 24px 8px;
+
     &.mdc-tab--active {
       background: var(--surface1);
 
@@ -65,6 +99,7 @@
       }
     }
   }
+
   .mat-mdc-tab-body-wrapper {
     flex: 1 1 auto;
   }
@@ -93,13 +128,6 @@ mat-tab-body {
   display: none;
 }
 
-/* Styles for the active tab label */
-:host ::ng-deep.mat-tab-label.mat-tab-label-active {
-  background-color: transparent;
-  color: red;
-  background-color: yellow;
-  border-right: 2px solid red;
-}
 
 /* Styles for the active tab label */
 :host ::ng-deep.mat-tab-label {

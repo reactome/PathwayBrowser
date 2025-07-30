@@ -73,7 +73,7 @@ import {MatFormField, MatOption, MatSelect} from "@angular/material/select";
 })
 export class ResultTabComponent {
 
-  analysisType = computed(() => this.analysis.summary()?.gsaMethod?.toUpperCase() || titleCase(this.analysis.summary()?.type || ''));
+  analysisType = computed(() => this.analysis.summary()?.gsaMethod?.toUpperCase() || titleCase(this.analysis.summary()?.type || '').replace("_", ' '));
 
   trackBy = (index: number, pathway: Analysis.Pathway) => pathway.stId + '-' + index;
 

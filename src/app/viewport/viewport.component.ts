@@ -1,11 +1,13 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy,
-  ChangeDetectorRef,
+  AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
-  ElementRef, linkedSignal,
-  model, signal,
+  ElementRef,
+  linkedSignal,
+  model,
+  signal,
   viewChild,
   WritableSignal
 } from '@angular/core';
@@ -23,7 +25,7 @@ import {GeneralService} from "../services/general.service";
 import {DataStateService} from "../services/data-state.service";
 import {isPathway} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
-import {animate, style, transition, trigger} from "@angular/animations";
+import {animate, state, style, transition, trigger} from "@angular/animations";
 import {drop} from "lodash";
 
 const DETAIL_MIN_HEIGHT = 0;
@@ -49,15 +51,21 @@ const DROPDOWN_DURATION = 500;
       ])
     ]),
     trigger('dropdown', [
-      transition(':enter', [
-        style({bottom: '100%', borderBottom: '4px solid var(--primary)'}),
-        animate(`${DROPDOWN_DURATION}ms ease-in`, style({bottom: '0%'})),
-        style({borderBottom: '0px solid var(--primary)'}),
-      ]),
-      transition(':leave', [
+      state('closed', style({
+        bottom: '100%',
+        borderBottom: '0px solid var(--primary)',
+      })),
+      state('open', style({
+        bottom: '0%',
+        borderBottom: '0px solid var(--primary)',
+      })),
+      transition('closed => open', [
         style({borderBottom: '4px solid var(--primary)'}),
-        animate(`${DROPDOWN_DURATION}ms ease-out`, style({bottom: '100%'})),
-        style({bottom: '100%'}),
+        animate(`${DROPDOWN_DURATION}ms ease-in`),
+      ]),
+      transition('open => closed', [
+        style({borderBottom: '4px solid var(--primary)'}),
+        animate(`${DROPDOWN_DURATION}ms ease-out`),
       ])
     ])
   ]
@@ -92,12 +100,14 @@ export class ViewportComponent implements AfterViewInit {
   dropdown = signal<'analysis' | 'compare' | null>(null)
 
   contentHeight = linkedSignal(() => this.content().nativeElement.clientHeight)
-  sizeObserver = new ResizeObserver(() => {this.contentHeight.set(this.content().nativeElement.clientHeight)})
+  sizeObserver = new ResizeObserver(() => {
+    this.contentHeight.set(this.content().nativeElement.clientHeight)
+  })
 
   detailMinSize = computed(() => DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
   // Use bellow when fixed layout solution found
   detailShare = signal(20)
-  detailVisible = signal(true )
+  detailVisible = signal(true)
   // detailShare = computed(() => 20)
   viewShare = computed(() => 100 - this.detailShare())
 
@@ -128,16 +138,21 @@ export class ViewportComponent implements AfterViewInit {
               public dataState: DataStateService,
   ) {
     effect(() => {
-      this.dropdown() === null ?
-        this.detailShare.set(20) :
+      if (this.dropdown() === null) {
+        this.detailShare.set(20);
+        this.detailVisible.set(true);
+      } else {
         setTimeout(() => {
           this.detailShare.set(this.detailMinSize())
-          setTimeout(() => this.detailVisible.set(false), 245)
+          setTimeout(() => {
+            this.detailVisible.set(false)
+          }, 245)
         }, this.dropdownDuration);
+      }
     });
     effect(() => this.dataState.currentPathway() && this.eventService.setDiagramEvent(this.dataState.currentPathway()!));
     effect(() => this.sizeObserver.observe(this.content().nativeElement));
-    effect(() => this.dropdown() === null && this.detailVisible.set(true));
+    // effect(() => this.dropdown() === null && this.detailVisible.set(true));
   }
 
   ngAfterViewInit(): void {
@@ -212,5 +227,6 @@ export class ViewportComponent implements AfterViewInit {
   }
 
   protected readonly drop = drop;
+  protected readonly document = document;
 }
 

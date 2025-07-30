@@ -13,6 +13,9 @@ import {Params} from "@angular/router";
 import {cleanObject} from "../reacfoam/reacfoam.service";
 import {isDefined, shouldBeScientificFormat} from "./utils";
 import NotFoundIdentifier = Analysis.NotFoundIdentifier;
+import {Report} from "reactome-gsa-form/lib/model/report-status.model";
+import {Species} from "../model/graph/species.model";
+import {SpeciesService} from "./species.service";
 
 export interface Pagination extends Params {
   page: number,
@@ -127,7 +130,7 @@ export class AnalysisService {
 
   // Use primary palette if we have expression values, or the normal palette if we just represent FDR anyway
   fdrPalette = computed(() =>
-    this.type() !== 'OVERREPRESENTATION' ?
+    this.type() !== "OVERREPRESENTATION" && this.type() !== "SPECIES_COMPARISON" ?
       new PaletteSummary([
         extract(this.style.properties.global.primaryContainer),
         extract(this.style.properties.global.primary)])
@@ -141,6 +144,7 @@ export class AnalysisService {
     ['GSA_REGULATION', 'ancient'],
     ['EXPRESSION', 'Viridis'],
     ['OVERREPRESENTATION', 'primary'],
+    ['SPECIES_COMPARISON', 'primary'],
   ]);
 
   palette: WritableSignal<PaletteSummary> = linkedSignal({
@@ -227,7 +231,10 @@ export class AnalysisService {
   summary = computed(() => this.result()?.summary)
   hasInteractors = computed(() => this.summary()?.interactors === true)
   type = computed(() => this.summary()?.type as Analysis.Type | undefined)
+  species =computed(() => this.speciesService.allShortenSpecies()?.find(species => species.dbId === this.result()?.summary?.species))
   isGSA = computed(() => this.type() === 'GSA_REGULATION');
+  gsaReportsRequired = signal(false);
+  gsaReports = signal<Report[] | undefined>(undefined);
 
   samples = computed(() => this.result()?.expression.columnNames || [])
   sampleIndex = linkedSignal({
@@ -260,10 +267,13 @@ export class AnalysisService {
   speciesFilterActive = computed(() => this.state.speciesFilter().length !== 0)
 
 
-  constructor(private http: HttpClient,
-              private state: UrlStateService,
-              private data: DataStateService,
-              private darkS: DarkService) {
+  constructor(
+    private http: HttpClient,
+    private state: UrlStateService,
+    private data: DataStateService,
+    private darkS: DarkService,
+    private speciesService: SpeciesService,
+  ) {
     effect(() => {
       [...this.paletteOptions.values()].forEach(summary => summary.dark = this.darkS.isDark())
     });
@@ -281,7 +291,10 @@ export class AnalysisService {
         validGroups.add('continuous')
       } else if (result.summary.type === 'OVERREPRESENTATION') {
         validGroups.add('sequential')
+      } else if (result.summary.type === 'SPECIES_COMPARISON') {
+        validGroups.add('sequential')
       }
+
       if (this.state.palette()) {
         const isValidPalette = [...validGroups.values()].some(validGroup =>
           this.paletteGroups.find(group => group.name === validGroup)
@@ -331,6 +344,24 @@ export class AnalysisService {
       tap(result => this.clearFilters()),
       tap(result => this.state.analysis.set(result.summary.token)),
     )
+  }
+
+  analyseSpecies(species: Species, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+    return this.http.get<Analysis.Result>(`${environment.host}/AnalysisService/species/homoSapiens/${species.dbId}`, {params}).pipe(
+      tap(result => this.result.set(result)),
+      tap(result => this.resultResource.set(result)),
+      tap(result => this.clearFilters()),
+      tap(result => this.state.analysis.set(result.summary.token)),
+    )
+  }
+
+  analyseFromUrl(url: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+    return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/url${params?.projectToHuman ? '/projection' : ''}`, url, {params}).pipe(
+      tap(result => this.result.set(result)),
+      tap(result => this.resultResource.set(result)),
+      tap(result => this.clearFilters()),
+      tap(result => this.state.analysis.set(result.summary.token)),
+    );
   }
 
   loadAnalysis(token?: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {

@@ -126,7 +126,7 @@ export namespace Analysis {
     }
   }
 
-  export type Type = 'OVERREPRESENTATION' | 'EXPRESSION' | 'GSA_REGULATION';
+  export type Type = 'OVERREPRESENTATION' | 'EXPRESSION' | 'GSA_REGULATION' | 'SPECIES_COMPARISON';
 
   export interface Result {
     expression: {
