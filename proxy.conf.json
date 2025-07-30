@@ -5,6 +5,15 @@
     "logLevel": "debug",
     "changeOrigin": true
   },
+  "/ExperimentDigester" : {
+    "target": "https://dev.reactome.org/ExperimentDigester",
+    "secure": true,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/ExperimentDigester": "/"
+    }
+  },
   "/GSAServer": {
     "target": "http://gsa.reactome.org",
     "secure": false,

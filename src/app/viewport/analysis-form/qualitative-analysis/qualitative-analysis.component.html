@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious disabled>Previous</button>
       <button mat-stroked-button (click)="close.emit({status: 'premature'})">
         <mat-icon class="red">close</mat-icon>
@@ -159,7 +159,7 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
       <button mat-stroked-button (click)="close.emit({status: 'premature'})">
         <mat-icon class="red">close</mat-icon>
@@ -181,7 +181,7 @@
     </div>
 
 
-    <div class="controls">
+    <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
       <button mat-flat-button matStepperNext [disabled]="analysisRunning()" (click)="displayAnalysis()">See results</button>
     </div>

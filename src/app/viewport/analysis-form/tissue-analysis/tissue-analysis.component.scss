@@ -1,0 +1,228 @@
+@use '@angular/material' as mat;
+
+:host {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 100%;
+  container: qualitative-analysis / size;
+
+  --mat-stepper-header-height: 48px;
+
+  ::ng-deep .mat-horizontal-content-container {
+    padding: 0 !important;
+  }
+}
+
+@container qualitative-analysis (height < 600px) {
+  .header {
+    display: none;
+
+    .description {
+    }
+  }
+}
+
+.header {
+  .title {
+    font: var(--mat-sys-title-medium);
+    color: var(--primary);
+  }
+
+  .description {
+    column-count: 2;
+    column-gap: 20px;
+    text-align: justify;
+    color: var(--on-surface);
+    font: var(--mat-sys-body-medium);
+  }
+
+}
+
+.stepper {
+  flex: 1 1 auto;
+
+  ::ng-deep {
+    .mat-horizontal-stepper-wrapper,
+    .mat-horizontal-content-container,
+    .mat-horizontal-stepper-content-current {
+      height: 100%;
+      color: var(--on-surface);
+    }
+
+    .mat-horizontal-stepper-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+  }
+}
+
+.experiment {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  --corner-radius: 20px;
+
+  &.one-experiment {
+    //--corner-radius:8px;
+
+    .experiment-selector-wrapper {
+      display: none;
+    }
+    .headers {
+      border-radius: 20px 20px 0 0;
+      border: 1px solid var(--outline);
+    }
+  }
+
+  .experiment-selector-wrapper {
+    @include mat.form-field-overrides((
+      filled-container-shape: var(--corner-radius),
+    ));
+
+    .experiment-selector {
+      width: calc(100% - 2px);
+      background: border-box;
+      border: 1px solid var(--outline);
+      border-radius: 20px 20px 0 0;
+      border-bottom: 0;
+    }
+  }
+
+  .headers {
+    display: grid;
+    column-gap: 20px;
+    grid-template-columns: 1fr 0.1fr 1fr;
+    background: var(--primary-container);
+
+    border-bottom: 0!important;
+    overflow: clip;
+
+    .header {
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: 20px;
+
+      &:first-child {
+        text-align: right;
+      }
+      &:last-child {
+        text-align: left;
+      }
+    }
+  }
+
+  .tissue-selector-wrapper {
+    position: relative;
+    flex: 1;
+
+    .tissue-columns {
+      display: grid;
+      position: absolute;
+      inset: 0;
+      column-gap: 20px;
+      grid-template-columns: 1fr 0.1fr 1fr;
+      border-radius: 20px;
+      background: var(--primary-container);
+      border-bottom: 1px solid var(--outline);
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: center;
+        align-content: space-evenly;
+        justify-items: center;
+
+        .mdc-icon-button:not([disabled]) {
+          color: var(--primary);
+        }
+      }
+
+      .tissue-list {
+        border: 1px solid var(--outline);
+        border-top: none;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: var(--surface);
+        padding: 0 10px;
+
+        &:first-child {
+          border-bottom-left-radius: var(--corner-radius);
+          .tissue-box {
+            justify-content: right;
+          }
+        }
+
+        &:last-child {
+          border-bottom-right-radius: var(--corner-radius);
+          .tissue-box {
+            justify-content: left;
+          }
+        }
+      }
+
+    }
+
+  }
+}
+
+.tissue-box {
+  padding: 20px;
+  border-bottom: solid 1px var(--outline-variant);
+  color: var(--on-surface);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: move;
+  background: var(--surface);
+  font: var(--mat-sys-body-medium);
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: solid 1px var(--outline-variant);
+  overflow: hidden;
+  box-shadow: var(--mat-sys-level2);
+}
+
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+
+.tissue-list.cdk-drop-list-dragging .tissue-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.stepper-controls {
+  display: grid;
+  column-gap: 40px;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-top: 20px;
+}
+
+// Step 2 Loading
+.loader-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .loader {
+    position: absolute;
+    inset: auto;
+  }
+}

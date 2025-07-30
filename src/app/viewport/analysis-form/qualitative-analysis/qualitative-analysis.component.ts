@@ -12,8 +12,7 @@ import {SafePipe} from "../../../pipes/safe.pipe";
 import {AnalysisService} from "../../../services/analysis.service";
 import type {DotLottie} from "@lottiefiles/dotlottie-web";
 import {UrlStateService} from "../../../services/url-state.service";
-
-let lottieModule: any;
+import {LottieService} from "../../../services/lottie.service";
 
 
 @UntilDestroy()
@@ -63,20 +62,24 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
 
   dataStepForm: FormGroup;
 
-  constructor(private http: HttpClient, private fb: FormBuilder, public analysis: AnalysisService, private state: UrlStateService) {
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder,
+    public analysis: AnalysisService,
+    private state: UrlStateService,
+    private lottieService: LottieService
+  ) {`z`
     this.dataStepForm = this.fb.group({
       data: [''],
     })
 
     effect(async () => {
       if (!this.lottieCanvas()) return;
-      if (lottieModule === undefined) lottieModule = await import('@lottiefiles/dotlottie-web')
-      setTimeout(() => {
-        this.lottie = new lottieModule.DotLottie({
+      setTimeout(async () => {
+        this.lottie = await this.lottieService.buildLottie({
           autoplay: true,
           loop: true,
           canvas: this.lottieCanvas()!.nativeElement,
-          renderer: 'canvas',
           src: "assets/animations/loading-ripple.lottie"
         })
       }, 1000); // Wait for end of animation
@@ -117,7 +120,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
 
   // STEP 3 Analysis
   analysisRunning = signal(false)
-  lottieCanvas = viewChild<ElementRef<HTMLDivElement>>('lottie')
+  lottieCanvas = viewChild<ElementRef<HTMLCanvasElement>>('lottie')
   lottie?: DotLottie;
   token: string | null = null;
 
@@ -131,10 +134,10 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
           interactors: this.includeInteractors()
         })
       )
-    ).subscribe(() => {
+    ).subscribe((result) => {
       this.lottie!.load({src: 'assets/animations/success-animation.json', loop: true, autoplay: true})
       this.analysisRunning.set(false)
-      this.token = this.state.analysis()!;
+      this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     });
   }

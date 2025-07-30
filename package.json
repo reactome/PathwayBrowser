@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve --proxy-config proxy.conf.json",
+    "start": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve",
     "dev:reactome-cytoscape-style": "ng build reactome-cytoscape-style --configuration development --watch &",
     "build:reactome-cytoscape-style": "ng build reactome-cytoscape-style",
     "test:reactome-cytoscape-style": "ng test reactome-cytoscape-style",

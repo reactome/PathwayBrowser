@@ -336,6 +336,15 @@ export class AnalysisService {
     )
   }
 
+  analyseFromUrl(url: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+    return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/url${params?.projectToHuman ? '/projection' : ''}`, url, {params}).pipe(
+      tap(result => this.result.set(result)),
+      tap(result => this.resultResource.set(result)),
+      tap(result => this.clearFilters()),
+      tap(result => this.state.analysis.set(result.summary.token)),
+    );
+  }
+
   loadAnalysis(token?: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
     cleanObject(params || {})
     return this.http.get<Analysis.Result>(`${environment.host}/AnalysisService/token/${token || this.state.analysis()}`, {params})

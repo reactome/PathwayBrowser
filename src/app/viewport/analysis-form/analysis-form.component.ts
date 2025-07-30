@@ -18,6 +18,8 @@ import {UrlStateService} from "../../services/url-state.service";
 import {Report} from "reactome-gsa-form/lib/model/report-status.model";
 import {AnalysisResult} from "reactome-gsa-form/lib/model/analysis-result.model";
 import {QuantitativeAnalysisComponent} from "./quantitative-analysis/quantitative-analysis.component";
+import {TissueAnalysisComponent} from "./tissue-analysis/tissue-analysis.component";
+import {SpeciesAnalysisComponent} from "./species-analysis/species-analysis.component";
 
 @Component({
   selector: 'cr-analysis-form',
@@ -30,7 +32,9 @@ import {QuantitativeAnalysisComponent} from "./quantitative-analysis/quantitativ
     SafePipe,
     AsyncPipe,
     GsaFormModule,
-    QuantitativeAnalysisComponent
+    QuantitativeAnalysisComponent,
+    TissueAnalysisComponent,
+    SpeciesAnalysisComponent
   ],
   templateUrl: './analysis-form.component.html',
   styleUrl: './analysis-form.component.scss',
