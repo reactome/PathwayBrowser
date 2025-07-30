@@ -167,10 +167,22 @@ export class TissueAnalysisComponent {
 
   addOne() {
     const availableTissues = this.availableTissues();
-    const shift = availableTissues.pop();
+    const shift = availableTissues.shift();
     if (shift) {
       this.availableTissues.set([...availableTissues]);
-      this.selectedTissues.set([shift, ...this.selectedTissues()]);
+      this.selectedTissues.set([...this.selectedTissues(), shift]);
+    } else if (this.interval) {
+      clearInterval(this.interval());
+      this.interval.set(undefined);
+    }
+  }
+
+  removeOne() {
+    const selectedTissues = this.selectedTissues();
+    const shift = selectedTissues.shift();
+    if (shift) {
+      this.selectedTissues.set([...selectedTissues]);
+      this.availableTissues.set([...this.availableTissues(), shift]);
     } else if (this.interval) {
       clearInterval(this.interval());
       this.interval.set(undefined);
@@ -179,18 +191,6 @@ export class TissueAnalysisComponent {
 
   addAll() {
     this.interval.set(setInterval(() => this.addOne(), 20)) // stagger
-  }
-
-  removeOne() {
-    const selectedTissues = this.selectedTissues();
-    const shift = selectedTissues.pop();
-    if (shift) {
-      this.selectedTissues.set([...selectedTissues]);
-      this.availableTissues.set([shift, ...this.availableTissues()]);
-    } else if (this.interval) {
-      clearInterval(this.interval());
-      this.interval.set(undefined);
-    }
   }
 
   removeAll() {
