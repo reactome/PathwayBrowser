@@ -1,4 +1,12 @@
-@if (!moleculeData().length) {
+@if (!objStId()) {
+  <div class="description-content">
+    🗒️ When a pathway is displayed in the panel above, shows details of all the molecules involved.
+    If an item is selected in the diagram, the corresponding molecules are highlighted.
+    Molecules are grouped into the subtypes Protein, Chemical Compound, Sequences (for DNA/RNA) and Other.
+    The molecule lists can be downloaded. Click the Download button,
+    select the fields and molecule types you want and click Start Download.
+  </div>
+} @else if (moleculeData().length === 0) {
   <div class="spinner-container">
     <mat-spinner></mat-spinner>
     <p>Loading data for participating molecules, please wait...</p>
@@ -7,17 +15,17 @@
 
 <div class="container" #container [style.--width.px]="container.offsetWidth">
   <div class="content">
-    @for (group of moleculeData() | sortByText: 'type'; track group.type; ) {
-      <div class="list" [id]=sanitizeId(group.type)>
+    @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
+      <div class="list" [id]=sanitizeId(group.category)>
         <span class="header">
-          {{ group.type }} {{ getStatistics(group) }}
+          {{ group.category }} {{ getStatistics(group) }}
         </span>
       </div>
 
       <mat-divider class="divider"></mat-divider>
       <div class="composition-container">
-        @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId ) {
-          <cr-object-tree [type]="group.type" [data]="[item.entity]"
+        @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId) {
+          <cr-object-tree [type]="group.category" [data]="[item.entity]"
                           [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
                           [moleculeView]="true"></cr-object-tree>
         }
@@ -26,11 +34,29 @@
 
   </div>
   <div class="toc">
-    @for (group of moleculeData() | sortByText: 'type'; track group.type) {
-      <a (click)="scrollTo(group.type)">
-        {{ group.type }}
+    @for (group of moleculeData() | sortByText: 'category'; track group.category) {
+      <a (click)="scrollTo(group.category)">
+        {{ group.category }}
       </a>
+    }
+    @if (moleculeData().length > 0) {
+      <!-- Add download link -->
+      <a (click)="scrollTo('download')">Download </a>
     }
   </div>
 
+</div>
+
+
+<div id="download" class="padding">
+  @if (moleculeData().length > 0) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span class="badge">Download</span>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
+    </mat-expansion-panel>
+  }
 </div>

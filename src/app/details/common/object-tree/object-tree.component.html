@@ -28,7 +28,7 @@
     <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
       <div class="left">
         <mat-icon class="symbol-icon"
-                  [matTooltip]="getSymbol(element).tooltip"
+                  [matTooltip]="moleculeView()? getSymbol(element.icon).tooltip: getSymbol(element).tooltip"
                   [svgIcon]="moleculeView()? getSymbol(element.icon).name: getSymbol(element).name">
         </mat-icon>
 
@@ -57,7 +57,7 @@
 
         @if(moleculeView()) {
           <span class="molecule name">
-            {{getMoleculeIdentifier(node, element)}}
+            {{element.identifier}}
           </span>
         }
 

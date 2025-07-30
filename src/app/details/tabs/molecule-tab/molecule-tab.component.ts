@@ -1,26 +1,27 @@
-import {Component, computed, effect, input} from '@angular/core';
+import {Component, computed, effect, input, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
-import {SchemaClasses} from "../../../constants/constants";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {DataStateService} from "../../../services/data-state.service";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
-import {of} from "rxjs";
 import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
 import {MatDivider} from "@angular/material/divider";
-import {ObjectTreeComponent} from "../../common/entity-tree/object-tree.component";
+import {ObjectTreeComponent} from "../../common/object-tree/object-tree.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {SortByDatePipe} from "../../../pipes/sort-by-date.pipe";
+import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from "@angular/material/expansion";
+import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
+import {UrlStateService} from "../../../services/url-state.service";
+import {isPathway} from "../../../services/utils";
 
 
-interface MoleculeGroup {
-  type: string;
+export type MoleculeGroup = {
+  category: string;
   data: MoleculeData[];
   found?: number;
 }
 
-export interface MoleculeData {
+export type MoleculeData = {
   entity: Molecule;
   stoichiometry: number;
   highlight: boolean;
@@ -42,37 +43,39 @@ export enum PropertyType {
     MatDivider,
     ObjectTreeComponent,
     MatProgressSpinner,
-    SortByDatePipe
+    SortByDatePipe,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MoleculeDownloadTableComponent
   ],
   styleUrl: './molecule-tab.component.scss'
 })
 export class MoleculeTabComponent {
 
-  readonly obj = input.required<SelectableObject>();
-  pathway = computed(() => this.dataState.currentPathway());
+  readonly selectableObject = input.required<SelectableObject>();
+  pathwayId = this.state.pathwayId as WritableSignal<string>;
+
+  // Get selected pathway id on Reacfoam view
+  objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private dataState: DataStateService) {
+              public state: UrlStateService) {
     effect(() => {
-      const stId = this.obj()?.stId;
-      const pathwayId = this.pathway()?.stId;
-
-      if (stId && stId !== pathwayId) {
-        this.entity.loadRefEntities(stId);
+      const selectableObjStId = this.selectableObject()?.stId;
+      const pathwayId = this.pathwayId();
+      if (selectableObjStId && selectableObjStId !== pathwayId) {
+        this.entity.loadRefEntities(selectableObjStId);
       }
     });
 
   }
 
-
   _pathwayParticipants = rxResource({
-    request: () => this.dataState.currentPathway(),
-    loader: () => {
-      const id = this.dataState.currentPathway()?.stId;
-      return id ? this.participant.getParticipants(id) : of(null);
-    }
+    request: () => this.objStId(),
+    loader: () => this.participant.getParticipants(this.objStId())
   });
 
 
@@ -89,43 +92,22 @@ export class MoleculeTabComponent {
     if (!pathwayParticipants) return [];
 
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
-    if (this.obj()?.stId === this.pathway()?.stId) {
-      moleculeData = pathwayResults;
+
+    if (this.pathwayId()) {
+      if (this.selectableObject()?.stId === this.pathwayId()) {
+        moleculeData = pathwayResults;
+      } else {
+        const refEntities = this.entity.refEntities() || [];
+        moleculeData = this.getReactionParticipants(pathwayResults, refEntities);
+      }
     } else {
-      const refEntities = this.entity.refEntities() || [];
-      moleculeData = this.getReactionParticipants(pathwayResults, refEntities);
+      if (isPathway(this.selectableObject())) {
+        moleculeData = pathwayResults;
+      }
     }
 
     return moleculeData
-
   })
-
-  getType(molecule: Molecule) {
-    let type = '';
-    const schemaClass = molecule.schemaClass;
-    switch (schemaClass) {
-      case SchemaClasses.EWAS:
-      case SchemaClasses.REFERENCE_GENE_PRODUCT:
-      case SchemaClasses.REFERENCE_ISOFORM:
-        type = PropertyType.PROTEINS;
-        break;
-      case SchemaClasses.REFERENCE_RNA_SEQUENCE:
-      case SchemaClasses.REFERENCE_DNA_SEQUENCE:
-        type = PropertyType.SEQUENCES;
-        break;
-      case SchemaClasses.SIMPLE_ENTITY:
-      case SchemaClasses.REFERENCE_MOLECULE:
-        type = PropertyType.CHEMICAL_COMPOUNDS;
-        break;
-      case SchemaClasses.REFERENCE_THERAPEUTIC:
-        type = PropertyType.DRUG
-        break;
-      default:
-        type = PropertyType.OTHERS;
-    }
-
-    return type;
-  }
 
 
   getPathwayParticipants(pathwayParticipants: Participant[]) {
@@ -134,7 +116,7 @@ export class MoleculeTabComponent {
     const allRefEntities = pathwayParticipants?.flatMap(participant => participant.refEntities) || [];
 
     for (const entity of allRefEntities) {
-      const type = this.getType(entity);
+      const type = entity.type;
 
       if (!groupedMap.has(type)) {
         groupedMap.set(type, new Map());
@@ -153,8 +135,8 @@ export class MoleculeTabComponent {
 
 
     // todo remove finalResults
-    const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([type, dataMap]) => ({
-      type,
+    const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([category, dataMap]) => ({
+      category,
       data: Array.from(dataMap.values())
     }));
     return finalResults;

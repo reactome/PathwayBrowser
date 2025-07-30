@@ -67,7 +67,7 @@ import {AnalysisLegendComponent} from "./legend/analysis-legend/analysis-legend.
 import {ExternalReferenceComponent} from "./details/common/external-reference/external-reference.component";
 import {CrossReferencesComponent} from "./details/common/cross-references/cross-references.component";
 import {ControllerTreeComponent} from "./details/common/controller-tree/controller-tree.component";
-import {ObjectTreeComponent} from "./details/common/entity-tree/object-tree.component";
+import {ObjectTreeComponent} from "./details/common/object-tree/object-tree.component";
 import {MolecularProcessComponent} from "./details/common/molecular-process/molecular-process.component";
 import {FormatClassNamePipe} from "./pipes/format-class-name.pipe";
 import {CastPipe} from "./pipes/cast.pipe";
