@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .container {
   display: flex;
   align-items: flex-start;
@@ -8,6 +10,7 @@
   gap: var(--gap);
   padding-left: var(--gap);
   align-content: space-between;
+  padding-top: var(--half-gap);
 
   & {
     --columns: 6;
@@ -94,4 +97,11 @@
 
 .padding{
   padding: 5px 20px;
+}
+
+
+#download{
+  @include mat.expansion-overrides((
+    header-indicator-color: var(--primary),
+  ));
 }

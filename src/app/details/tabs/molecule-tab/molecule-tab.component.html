@@ -1,11 +1,14 @@
-@if (!objStId()) {
-  <div class="description-content">
-    🗒️ When a pathway is displayed in the panel above, shows details of all the molecules involved.
-    If an item is selected in the diagram, the corresponding molecules are highlighted.
-    Molecules are grouped into the subtypes Protein, Chemical Compound, Sequences (for DNA/RNA) and Other.
-    The molecule lists can be downloaded. Click the Download button,
-    select the fields and molecule types you want and click Start Download.
-  </div>
+@if (isReacfoamView() && selectableObject() && !isPathway(selectableObject())) {
+    <div class="description-content">
+      <p>🗒️ When a pathway is displayed in the panel above, it shows detailed information about all the molecules involved.
+      If an item in the diagram is selected, the corresponding molecules are marked with a 📌 pin icon.
+        Molecules are categorized into subtypes: Protein, Chemical Compound, Sequences (DNA/RNA), and Other.</p>
+
+      <p>To download molecule lists:
+      Go to the Download menu on the right side of the Table of Contents (TOC). An expansion panel will appear.
+        Select the desired fields and molecule types, then click Download.</p>
+    </div>
+
 } @else if (moleculeData().length === 0) {
   <div class="spinner-container">
     <mat-spinner></mat-spinner>
@@ -53,7 +56,7 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          <span class="badge">Download</span>
+          <h3 class="badge">Download Molecules Data</h3>
         </mat-panel-title>
       </mat-expansion-panel-header>
       <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
