@@ -12,7 +12,7 @@ import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
 import {IconService} from "../services/icon.service";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isPathway} from "../services/utils";
+import {isDefined, isPathway} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 import {toObservable} from "@angular/core/rxjs-interop";
 
@@ -183,13 +183,12 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     // Conditionally fetch or reuse enhanced event data
     const enhancedEventData$: Observable<{
       enhancedEvent: SelectableObject | undefined
-    }> = this.eventService.diagramEvent$.pipe(
-      // filter( event => event !== null),
+    }> = this.eventService.diagramPathway$.pipe(
       take(1),
-      switchMap(diagramEvent => {
+      switchMap(diagramPathway => {
         if (!idToUse) return of({enhancedEvent: undefined});
-        if (diagramEvent && diagramEvent.stId === idToUse) {
-          return of({enhancedEvent: diagramEvent});
+        if (diagramPathway && diagramPathway.stId === idToUse) {
+          return of({enhancedEvent: diagramPathway});
         } else {
           return this.dboService.fetchEnhancedEntry<SelectableObject>(idToUse).pipe(
             map(enhancedEvent => ({enhancedEvent}))

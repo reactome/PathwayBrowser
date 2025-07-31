@@ -45,6 +45,7 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 
 import {DarkService} from "../services/dark.service";
+import {Pathway} from "../model/graph/event/pathway.model";
 
 
 const INIT_RX = 2;
@@ -301,8 +302,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   }
 
   private loadDiagram(): void {
-    this.event.diagramEvent$.pipe(
-      filter((event): event is EventModel => event !== undefined),
+    this.event.diagramPathway$.pipe(
+      filter(isDefined),
       take(1),
       switchMap((event) => {
         // If the diagramId is a subpathway without diagram, and it is a first load then load parent diagram

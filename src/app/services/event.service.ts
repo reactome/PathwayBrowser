@@ -30,6 +30,7 @@ import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.mod
 import {Relationship} from "../model/graph/relationship.model";
 import {toObservable} from "@angular/core/rxjs-interop";
 import HasEvent = Relationship.HasEvent;
+import {Pathway} from "../model/graph/event/pathway.model";
 
 
 export type SelectableObject = Event | PhysicalEntity;
@@ -55,9 +56,10 @@ export class EventService {
   subpathwayColors$ = this._subpathwayColors.asObservable();
   subpathwayColors?: Map<number, string>;
 
-  private _diagramEvent = new BehaviorSubject<SelectableObject | undefined>(undefined);
-  diagramEvent$ = this._diagramEvent.asObservable();
-  diagramEvent?: Event;
+  // Todo replace with dataState.currentPathway()
+  private _diagramPathway = new BehaviorSubject<Pathway | undefined>(undefined);
+  diagramPathway$ = this._diagramPathway.asObservable();
+  diagramPathway?: Pathway;
 
   constructor(private http: HttpClient,
               private state: UrlStateService,
@@ -89,9 +91,9 @@ export class EventService {
     this._subpathwayColors.next(colorMap);
   }
 
-  setDiagramEvent(event: Event) {
-    this.diagramEvent = event;
-    this._diagramEvent.next(event);
+  setDiagramPathway(pathway: Pathway) {
+    this.diagramPathway = pathway;
+    this._diagramPathway.next(pathway);
   }
 
   fetchTlpsBySpecies(taxId: string): Observable<TopLevelPathway[]> {
@@ -410,8 +412,8 @@ export class EventService {
         if (!targetTreeEvent) return EMPTY;
 
         // Use existing diagramEvent data if stId matches
-        if (this.diagramEvent?.stId === ancestor.stId) {
-          this.processHasEventData(this.diagramEvent, targetTreeEvent, selectedIdFromUrl, diagramId, this.subpathwayColors, matTree, index, ancestors.length);
+        if (this.diagramPathway?.stId === ancestor.stId) {
+          this.processHasEventData(this.diagramPathway, targetTreeEvent, selectedIdFromUrl, diagramId, this.subpathwayColors, matTree, index, ancestors.length);
           return of(null); // Skip the API call and continue to the next ancestor
         }
 

@@ -148,7 +148,7 @@ export class ViewportComponent implements AfterViewInit {
         }, this.dropdownDuration);
       }
     });
-    effect(() => this.dataState.currentPathway() && this.eventService.setDiagramEvent(this.dataState.currentPathway()!));
+    effect(() => this.dataState.currentPathway() && this.eventService.setDiagramPathway(this.dataState.currentPathway()!));
     effect(() => this.sizeObserver.observe(this.content().nativeElement));
     // effect(() => this.dropdown() === null && this.detailVisible.set(true));
   }
