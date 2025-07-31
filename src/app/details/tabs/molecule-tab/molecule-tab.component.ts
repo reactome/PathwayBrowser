@@ -59,7 +59,7 @@ export class MoleculeTabComponent {
   // Get selected pathway id on Reacfoam view
   objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
-  isReacfoamView = computed(() => this.pathwayId() == null);
+  isReacfoamView = computed(() => this.pathwayId() === undefined);
 
   //todo: simplify
   isShowingSpinner = computed(() => {
@@ -74,15 +74,10 @@ export class MoleculeTabComponent {
     );
   });
 
-  showDescription = computed(() => {
-    return this.isReacfoamView() &&
-      (!this.selectableObject() || !isPathway(this.selectableObject()));
-  });
-
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              public state: UrlStateService) {
+              private state: UrlStateService) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
