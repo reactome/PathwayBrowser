@@ -277,6 +277,7 @@ export class AnalysisService {
     effect(() => {
       [...this.paletteOptions.values()].forEach(summary => summary.dark = this.darkS.isDark())
     });
+    effect(() => this.resultResource.error() && this.state.analysis.set(null)) // remove token if it is wrong
 
     effect(() => {
       const result = this.result();
