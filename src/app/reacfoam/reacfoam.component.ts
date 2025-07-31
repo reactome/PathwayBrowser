@@ -98,7 +98,7 @@ export class ReacfoamComponent implements OnDestroy {
         this.state.path.set(event.group.path)
       } else {
         const exposed = this.foamTree().get('exposure').groups.at(0);
-        const parent = this.foamTree().get('hierarchy', exposed).parent;
+        const parent = this.foamTree().get('hierarchy', exposed)?.parent;
         this.state.select.set(parent?.stId || null)
         this.state.path.set(parent?.path || [])
       }
