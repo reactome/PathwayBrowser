@@ -397,8 +397,7 @@ export class AnalysisService {
 
   getHitReactions(pathwayId: string, token: string, params?: Partial<Analysis.Parameters>) {
     if (!pathwayId || !token) return of([]);
-    return this.http.get<number[]>(`${environment.host}/AnalysisService/token/${token}/reactions/${pathwayId}`, {params}).pipe(
-    )
+    return this.http.get<number[]>(`${environment.host}/AnalysisService/token/${token}/reactions/${pathwayId}`, {params})
   }
 
   // Not Found
