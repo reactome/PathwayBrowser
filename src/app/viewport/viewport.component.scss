@@ -171,6 +171,19 @@
   max-height: calc(100% - var(--top-bar-height));
 }
 
+.spinner-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container: spinner / size;
+  .mdc-circular-progress {
+    --diameter: min(33cqw, 33cqh);
+    width: var(--diameter)!important;
+    height: var(--diameter)!important;
+  }
+}
 
 .custom-gutter {
   background: var(--primary);

@@ -153,13 +153,18 @@
         </div>
         <div class="content" #content>
           <as-split direction="vertical" gutterSize="4" useTransition="true">
-            <as-split-area [size]="viewShare()" id="view" class="hide-overflow">
+            <as-split-area [size]="viewShare()" id="view" class="hide-overflow" #view>
               @if (pathwayId()) {
-                @if (hasEHLD()) {
-                  <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
+                @if (loadingPathwayData()) {
+                  <div class="spinner-container">
+                    <mat-progress-spinner mode="indeterminate" />
+                  </div>
                 } @else {
-                  <cr-diagram [(pathwayId)]="pathwayId" #diagram
-                              [interactor]="interactors"></cr-diagram>
+                  @if (hasEHLD()) {
+                    <cr-ehld [(pathwayId)]="pathwayId"/>
+                  } @else {
+                    <cr-diagram [(pathwayId)]="pathwayId" #diagram [interactor]="interactors"/>
+                  }
                 }
               } @else {
                 <cr-reacfoam/>
