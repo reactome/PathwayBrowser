@@ -177,12 +177,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  container: spinner / size;
   .mdc-circular-progress {
     --diameter: min(33cqw, 33cqh);
     width: var(--diameter)!important;
     height: var(--diameter)!important;
   }
+}
+
+#view {
+  container: view / size;
+}
+#bottom-panel {
+  container: bottom-panel / size;
 }
 
 .custom-gutter {
