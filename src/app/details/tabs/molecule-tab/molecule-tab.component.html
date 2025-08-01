@@ -4,7 +4,7 @@
     <p>Loading data for participating molecules, please wait...</p>
   </div>
 } @else {
-  <div class="container" #container [style.--width.px]="container.offsetWidth">
+  <div class="container">
     <div class="content">
       @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
         <div class="list" [id]=sanitizeId(group.category)>
