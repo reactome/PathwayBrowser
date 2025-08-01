@@ -126,14 +126,7 @@ export class DownloadTabComponent {
       title: 'Compressed Pathway Analysis Results in JSON Format',
       url: `${environment.host}/AnalysisService/download/${this.token()}/result.json.gz`,
       icon: this.sbml,
-      isShown: computed(() => this.analysis.isGSA())
-    },
-
-    {
-      title: 'Identifier Mapping in CSV format',
-      url: `${environment.host}/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource}/mapping.csv`,
-      icon: this.sbml,
-      isShown: computed(() => this.analysis.isGSA())
+      isShown: signal(true)
     },
 
     {
@@ -144,47 +137,18 @@ export class DownloadTabComponent {
     },
 
     {
+      title: 'Identifier Mapping in CSV format',
+      url: `${environment.host}/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource}/mapping.csv`,
+      icon: this.sbml,
+      isShown: signal(true)
+    },
+
+    {
       title: 'Not Found Identifiers in CSV Format',
       url: `${environment.host}/AnalysisService/dowmload/${this.token()}/entities/notfound/not_found.csv`,
       icon: this.sbml,
-      isShown: computed(() => this.analysis.isGSA())
+      isShown: signal(true)
     }]
-
-  // analysisItems = computed(() => [
-  //   {
-  //   title: 'Pathway Analysis Results in CSV format',
-  //   url: `${environment.host}/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`,
-  //   icon: this.sbml,
-  //   isShown: computed(() => !this.analysis.isGSA())
-  //   },
-  //
-  //   {
-  //     title: 'Compressed Pathway Analysis Results in JSON Format',
-  //     url: `${environment.host}/AnalysisService/download/${this.token()}/result.json.gz`,
-  //     icon: this.sbml,
-  //     isShown: computed(() => this.analysis.isGSA())
-  //   },
-  //
-  //   {
-  //     title: 'Identifier Mapping in CSV format',
-  //     url: `${environment.host}/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource}/mapping.csv`,
-  //     icon: this.sbml,
-  //     isShown: computed(() => this.analysis.isGSA())
-  //   },
-  //
-  //   {
-  //     title: 'Analysis Results in PDF Format',
-  //     url: `${environment.host}/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies}/report.pdf`,
-  //     icon: this.sbml,
-  //     isShown: computed(() => !this.analysis.isGSA())
-  //   },
-  //
-  //   {
-  //     title: 'Not Found Identifiers in CSV Format',
-  //     url: `${environment.host}/AnalysisService/dowmload/${this.token()}/entities/notfound/not_found.csv`,
-  //     icon: this.sbml,
-  //     isShown: computed(() => this.analysis.isGSA())
-  //   }])
 
   constructor(private state: UrlStateService,
               private http: HttpClient,
@@ -205,4 +169,23 @@ export class DownloadTabComponent {
   }
 
   protected readonly environment = environment;
+
+  getGsaIcon(name: string) {
+    switch (name) {
+      case 'MS Excel Report (xlsx)':
+        return 'table_view';
+      case 'PDF Report':
+        return 'picture_as_pdf';
+      case 'R Script':
+        return 'code_blocks';
+      default:
+        return '';
+    }
+  }
+
+  getGsaLabel(name: string) {
+    if (name === 'MS Excel Report (xlsx)') return 'Excel Report';
+    return name
+  }
+
 }
