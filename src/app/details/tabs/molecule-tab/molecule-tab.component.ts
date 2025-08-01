@@ -59,10 +59,25 @@ export class MoleculeTabComponent {
   // Get selected pathway id on Reacfoam view
   objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
+  isReacfoamView = computed(() => this.pathwayId() === undefined);
+
+  //todo: simplify
+  isShowingSpinner = computed(() => {
+    const isReacfoam = this.isReacfoamView();
+    const hasSelectable = !!this.selectableObject();
+    const isPathwayObj = hasSelectable && isPathway(this.selectableObject());
+    const moleculesLoading = this.moleculeData().length === 0;
+
+    return (
+      (!isReacfoam && moleculesLoading) ||
+      (isReacfoam && hasSelectable && isPathwayObj && moleculesLoading)
+    );
+  });
+
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              public state: UrlStateService) {
+              private state: UrlStateService) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
@@ -70,7 +85,6 @@ export class MoleculeTabComponent {
         this.entity.loadRefEntities(selectableObjStId);
       }
     });
-
   }
 
   _pathwayParticipants = rxResource({
@@ -93,7 +107,7 @@ export class MoleculeTabComponent {
 
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
 
-    if (this.pathwayId()) {
+    if (!this.isReacfoamView()) {
       if (this.selectableObject()?.stId === this.pathwayId()) {
         moleculeData = pathwayResults;
       } else {
@@ -105,7 +119,6 @@ export class MoleculeTabComponent {
         moleculeData = pathwayResults;
       }
     }
-
     return moleculeData
   })
 
@@ -192,4 +205,6 @@ export class MoleculeTabComponent {
     return found ? `${found}/${total}` : `${total}`
 
   }
+
+  protected readonly isPathway = isPathway;
 }

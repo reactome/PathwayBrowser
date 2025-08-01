@@ -1,12 +1,4 @@
-@if (!objStId()) {
-  <div class="description-content">
-    🗒️ When a pathway is displayed in the panel above, shows details of all the molecules involved.
-    If an item is selected in the diagram, the corresponding molecules are highlighted.
-    Molecules are grouped into the subtypes Protein, Chemical Compound, Sequences (for DNA/RNA) and Other.
-    The molecule lists can be downloaded. Click the Download button,
-    select the fields and molecule types you want and click Start Download.
-  </div>
-} @else if (moleculeData().length === 0) {
+@if (isShowingSpinner()) {
   <div class="spinner-container">
     <mat-spinner></mat-spinner>
     <p>Loading data for participating molecules, please wait...</p>
@@ -32,7 +24,20 @@
       </div>
     }
 
+    <div id="download" class="download-container">
+      @if (moleculeData().length > 0) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h3 class="badge">Download Molecules Data</h3>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
+        </mat-expansion-panel>
+      }
+    </div>
   </div>
+
   <div class="toc">
     @for (group of moleculeData() | sortByText: 'category'; track group.category) {
       <a (click)="scrollTo(group.category)">
@@ -44,19 +49,4 @@
       <a (click)="scrollTo('download')">Download </a>
     }
   </div>
-
-</div>
-
-
-<div id="download" class="padding">
-  @if (moleculeData().length > 0) {
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <span class="badge">Download</span>
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
-    </mat-expansion-panel>
-  }
 </div>

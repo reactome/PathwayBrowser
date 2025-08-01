@@ -13,13 +13,12 @@ import {
   MatTable,
   MatTableDataSource
 } from "@angular/material/table";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatSort, MatSortHeader} from "@angular/material/sort";
 import {MatIcon} from "@angular/material/icon";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 
 type MoleculeRow = {
@@ -42,16 +41,17 @@ type MoleculeRow = {
     MatCellDef,
     MatHeaderRowDef,
     MatRowDef,
-    MatFormField,
-    MatSelect,
-    MatOption,
-    MatLabel,
     MatCheckbox,
-    FormsModule,
     MatSort,
     MatSortHeader,
     MatIcon,
-    MatButton
+    MatButton,
+    ReactiveFormsModule,
+    FormsModule,
+    MatIconButton,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem
   ],
   templateUrl: './molecule-download-table.component.html',
   styleUrl: './molecule-download-table.component.scss'
@@ -83,37 +83,22 @@ export class MoleculeDownloadTableComponent {
   includeIdentifier = signal(true);
   includeName = signal(true);
 
-  displayedColumns: Signal<string[]> = computed(() => {
-      const columns = [];
-      if (this.includeType()) columns.push('type')
-      if (this.includeIdentifier()) columns.push('identifier')
-      if (this.includeName()) columns.push('name')
-      return columns;
-    }
+  displayedColumns: Signal<string[]> = computed(() =>
+    ['type', 'identifier', 'name']
   );
 
+  exportedColumns: Signal<string[]> = computed(() => {
+    const fields = [];
+    if (this.includeType()) fields.push('type');
+    if (this.includeIdentifier()) fields.push('identifier');
+    if (this.includeName()) fields.push('name');
+    return fields;
+  })
 
   filteredData = computed(() => {
-
-    let data = this.tableData();
-
-    console.log("selectedType", this.selectedCategory())
-    console.log("include Type", this.includeType());
-    console.log("include identifier", this.includeIdentifier());
-    console.log("include name", this.includeName());
-
-    data = data.filter(molecule => this.selectedCategory().includes(molecule.type))
-      .map(row => {
-        const {type, identifier, name, ...rest} = row;
-        const newRow = {...rest} as MoleculeRow;
-
-        if (this.includeType()) newRow.type = type;
-        if (this.includeIdentifier()) newRow.identifier = identifier;
-        if (this.includeName()) newRow.name = name;
-
-        return newRow;
-      });
-    return data;
+    return this.tableData().filter(molecule =>
+      this.selectedCategory().includes(molecule.type)
+    );
   })
 
   dataSource = new MatTableDataSource<MoleculeRow>([]);
@@ -134,14 +119,29 @@ export class MoleculeDownloadTableComponent {
 
   }
 
+  getExportData() {
+    return this.tableData()
+      .filter(molecule => this.selectedCategory().includes(molecule.type))
+      .map(row => {
+        const newRow = {} as MoleculeRow;
+        if (this.includeType()) newRow.type = row.type;
+        if (this.includeIdentifier()) newRow.identifier = row.identifier;
+        if (this.includeName()) newRow.name = row.name;
+        return newRow;
+      })
+      .filter(row => Object.keys(row).length > 0);
+  }
+
 
   exportToTSV(): void {
     if (!this.tableData() || this.tableData().length === 0) return;
 
-    const keys = this.displayedColumns();
+    const exportData = this.getExportData();
+
+    const keys = this.exportedColumns();
     const tsvRows = [
       keys.join('\t'),
-      ...this.tableData().map((row: MoleculeRow) => keys.map(key => row[key]).join('\t'))
+      ...exportData.map((row: MoleculeRow) => keys.map(key => row[key]).join('\t'))
     ];
 
     const tsvContent = tsvRows.join('\n');
@@ -151,5 +151,14 @@ export class MoleculeDownloadTableComponent {
     a.href = window.URL.createObjectURL(blob);
     a.download = `Participating Molecules [${this.objId()}].tsv`;
     a.click();
+  }
+
+  onCategoryToggle(category: string) {
+    const currentValue = this.selectedCategory();
+    if (!currentValue.includes(category)) {
+      this.selectedCategory.set([...currentValue, category]);
+    } else {
+      this.selectedCategory.set(currentValue.filter(c => c !== category));
+    }
   }
 }

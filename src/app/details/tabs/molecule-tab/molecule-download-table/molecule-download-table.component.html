@@ -1,45 +1,72 @@
 <div class="controls">
-  <mat-form-field>
-    <mat-label>Molecule Types</mat-label>
-    <mat-select [disabled]="!includeType()" [(value)]="selectedCategory" multiple>
-      @for (category of category(); track category) {
-        <mat-option [value]="category">{{ category }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+  <!--  <button mat-flat-button [disabled]="exportedColumns().length === 0" (click)="exportToTSV()">-->
+  <!--    <mat-icon>download</mat-icon>-->
+  <!--    Download-->
+  <!--  </button>-->
 
-  <mat-checkbox [(ngModel)]="includeType">Type</mat-checkbox>
-  <mat-checkbox [(ngModel)]="includeIdentifier">Identifier</mat-checkbox>
-  <mat-checkbox [(ngModel)]="includeName">Name</mat-checkbox>
-
-  <button mat-flat-button (click)="exportToTSV()">
+  <button class="button" mat-flat-button [class.disabled]="exportedColumns().length === 0" (click)="exportToTSV()">
     <mat-icon>download</mat-icon>
     Download
   </button>
 
 </div>
 
-
 <table mat-table [dataSource]="dataSource" matSort matSortActive="type"
        matSortDirection="asc">
   <!-- Type Column -->
   <ng-container matColumnDef="type">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef> Molecule Type</th>
-    <td mat-cell *matCellDef="let element"> {{ element.type }}</td>
+    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+      Molecule Type
+      <mat-checkbox [(ngModel)]="includeType"></mat-checkbox>
+      <button [disabled]="!includeType()" mat-icon-button (click)="$event.stopPropagation()"
+              [matMenuTriggerFor]="categoryMenu">
+        <mat-icon fontSet="symbols">filter_alt</mat-icon>
+      </button>
+    </th>
+    <td mat-cell *matCellDef="let element">
+      @if (includeType()) {
+        {{ element.type }}
+      }
+    </td>
   </ng-container>
 
   <!-- Identifier Column -->
   <ng-container matColumnDef="identifier">
-    <th mat-header-cell *matHeaderCellDef> Identifier</th>
-    <td mat-cell *matCellDef="let element"> {{ element.identifier }}</td>
+    <th mat-header-cell *matHeaderCellDef>
+      Identifier
+      <mat-checkbox [(ngModel)]="includeIdentifier"></mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let element">
+      @if (includeIdentifier()) {
+        {{ element.identifier }}
+      }
+    </td>
   </ng-container>
 
   <!-- Name Column -->
   <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef> Molecule Name</th>
-    <td mat-cell *matCellDef="let element"> {{ element.name }}</td>
+    <th mat-header-cell *matHeaderCellDef>
+      Molecule Name
+      <mat-checkbox [(ngModel)]="includeName"></mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let element">
+      @if (includeName()) {
+        {{ element.name }}
+      }</td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns();"></tr>
 </table>
+
+<mat-menu #categoryMenu="matMenu">
+  @for (category of category(); track category) {
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-checkbox [checked]="category"
+                    (change)="onCategoryToggle(category)"
+                    (click)="$event.stopPropagation()">
+        {{ category }}
+      </mat-checkbox>
+    </div>
+  }
+</mat-menu>

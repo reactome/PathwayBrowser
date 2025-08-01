@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .container {
   display: flex;
   align-items: flex-start;
@@ -8,6 +10,7 @@
   gap: var(--gap);
   padding-left: var(--gap);
   align-content: space-between;
+  padding-top: var(--half-gap);
 
   & {
     --columns: 6;
@@ -38,25 +41,28 @@
   .list {
     width: 100%;
 
-
     .header {
       padding: 0 2px;
       font-weight: 500;
       letter-spacing: 0.15px;
       color: var(--outline);
+      font-size: 16px;
+      line-height: 24px;
     }
   }
 
-
   .divider {
     width: 100%;
+
+    @include mat.divider-overrides((
+      width: 2px,
+    ));
+
   }
 
   .composition-container {
     width: 100%;
   }
-
-
 
 }
 
@@ -79,7 +85,7 @@
   top: 0;
 }
 
-.spinner-container{
+.spinner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,11 +93,10 @@
   padding-top: 20px;
 }
 
-.description-content{
-  padding: 20px;
-}
+.download-container {
+  width: 100%;
 
-
-.padding{
-  padding: 5px 20px;
+  @include mat.expansion-overrides((
+    header-indicator-color: var(--primary),
+  ));
 }

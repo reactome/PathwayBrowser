@@ -3,6 +3,7 @@ import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {DataStateService} from "../services/data-state.service";
 import {UrlStateService} from "../services/url-state.service";
+import {isPathway} from "../services/utils";
 
 
 @Component({
@@ -16,8 +17,24 @@ export class DetailsComponent {
 
   obj = this.dataState.selectedElement;
 
+  isReacfoamView = computed(() => this.state.pathwayId() === undefined);
+
   hasResult = computed(() => !!(this.analysis.result()))
   hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()))
+  hasMolecules = computed(() => {
+    const isReacfoamView = this.isReacfoamView();
+    const selectedElement = this.obj();
+    const hasDetail = this.hasDetail();
+    const pathway = this.dataState.currentPathway();
+    if (!isReacfoamView) return true;
+    if (!hasDetail) return false;
+    if (pathway) return true;
+    if (selectedElement && isPathway(selectedElement)) return true;
+    return false;
+  });
+
+  hasDownload = computed(() => this.hasMolecules());
+  hasExpressionMap = computed(() => this.isReacfoamView());
 
   selectedTabIndex = linkedSignal<number>(
     () => this.hasResult() ? 2 : // Has results => results tab

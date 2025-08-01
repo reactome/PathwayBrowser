@@ -1,14 +1,26 @@
 <div *ngIf="obj" id="details-container">
 
   <mat-tab-group class="custom-tab-group" #tabGroup [(selectedIndex)]="selectedTabIndex">
-    <mat-tab id="firstTab" #detailTab [disabled]="!hasDetail()">
+    <mat-tab id="firstTab" #detailTab>
       <ng-template mat-tab-label>
         <div class="label-content">
-        <mat-icon class="tab-icon" svgIcon="details-tab"></mat-icon>
-        <span class="label-text">Details</span>
+          <mat-icon class="tab-icon" svgIcon="details-tab"></mat-icon>
+          <span class="label-text">Details</span>
         </div>
       </ng-template>
       <ng-template matTabContent>
+
+        @if (!hasDetail()) {
+          <div class="tab-description-container">
+            <h3> 📋 Reactome Knowledgebase Details </h3>
+            <p>Displays detailed information when you select an item in the Pathway Browser.</p>
+
+            <p>For example, selecting a reaction shows details such as the <b>input</b> and <b>output</b> molecules — each of which is clickable to explore further in a tree structure.
+            Additional information includes a <b>summary</b>, supporting references, and <b>authorship</b> details.
+              When applicable, it also displays information about <b>catalysts</b>, <b>regulators</b>, and <b>preceding</b> or <b>following</b> events.</p>
+          </div>
+        }
+
         @if (obj()) {
           <cr-description-tab [obj]="obj()!" [analysisResult]="analysis.result()"></cr-description-tab>
         }
@@ -18,35 +30,73 @@
     <mat-tab #moleculeTab>
       <ng-template mat-tab-label>
         <div class="label-content">
-        <mat-icon class="tab-icon" svgIcon="molecule-tab"></mat-icon>
-        <span class="label-text">Molecule</span>
+          <mat-icon class="tab-icon" svgIcon="molecule-tab"></mat-icon>
+          <span class="label-text">Molecule</span>
         </div>
       </ng-template>
       <ng-template matTabContent>
+
+        @if (!hasMolecules()) {
+          <div class="tab-description-container">
+            <h3>🗺️ Exploring Molecules in the Pathway</h3>
+            <p>When a pathway is displayed in the panel above, it shows detailed information about all the molecules
+              involved.
+              If an item in the diagram is selected, the corresponding molecules are marked with a 📌 pin icon.
+              Molecules are categorized into subtypes: <b>Protein</b>, <b>Chemical Compound</b>, <b>Sequences (DNA/RNA)</b>, and <b>Other</b>.</p>
+            <p>To download molecule lists:
+              Go to the <b>Download</b> menu on the right side of the Table of Contents (TOC). An expansion panel will appear.
+              Select the desired fields and molecule types, then click Download.</p>
+          </div>
+        }
+
+
         <cr-molecule-tab [selectableObject]="obj()!"></cr-molecule-tab>
       </ng-template>
     </mat-tab>
 
-    <mat-tab #resultsTab [disabled]="!hasResult()">
+    <mat-tab #resultsTab>
       <ng-template mat-tab-label>
         <div class="label-content">
-        <mat-icon class="tab-icon" svgIcon="results-tab"></mat-icon>
-        <span class="label-text">Results</span>
+          <mat-icon class="tab-icon" svgIcon="results-tab"></mat-icon>
+          <span class="label-text">Results</span>
         </div>
       </ng-template>
       <ng-template matTabContent>
-        <cr-result-tab></cr-result-tab>
+
+        @if (!hasResult()) {
+          <div class="tab-description-container">
+            <h3>📈 Analysis Results</h3>
+            <p>To start an analysis, click the <b>"Analyse"</b> button in the top bar.</p>
+            <p>Once the analysis is complete, a <b>results table</b> will be displayed.
+              You can sort the data by different fields and filter the results to explore specific outcomes</p>
+          </div>
+        } @else {
+          <cr-result-tab></cr-result-tab>
+        }
+
       </ng-template>
     </mat-tab>
 
     <mat-tab #expressionTab>
       <ng-template mat-tab-label>
         <div class="label-content">
-        <mat-icon class="tab-icon" svgIcon="expression-tab"></mat-icon>
-        <span class="label-text">Expression</span>
+          <mat-icon class="tab-icon" svgIcon="expression-tab"></mat-icon>
+          <span class="label-text">Expression</span>
         </div>
       </ng-template>
       <ng-template matTabContent>
+
+        @if (hasExpressionMap()) {
+          <div class="tab-description-container">
+            <h3>📍 Gene Expression Map</h3>
+            <p>Details are shown when an item is selected in the pathway diagram above.</p>
+
+            <p>This panel displays <b>gene expression</b> information for genes associated with the selected item across a
+            standard set of tissues and organs.
+              Expression data is sourced from the Gene Expression Atlas.</p>
+          </div>
+        }
+
         <cr-expression-tab [obj]="obj()!"></cr-expression-tab>
       </ng-template>
     </mat-tab>
@@ -54,8 +104,8 @@
     <mat-tab #infoTab>
       <ng-template mat-tab-label>
         <div class="label-content">
-        <mat-icon class="tab-icon" svgIcon="info-tab"></mat-icon>
-        <span class="label-text">Info</span>
+          <mat-icon class="tab-icon" svgIcon="info-tab"></mat-icon>
+          <span class="label-text">Info</span>
         </div>
       </ng-template>
       <ng-template matTabContent>
@@ -66,12 +116,26 @@
     <mat-tab #downloadTab>
       <ng-template mat-tab-label>
         <div class="label-content">
-        <mat-icon class="tab-icon" svgIcon="download-tab"></mat-icon>
-        <span class="label-text">Download</span>
+          <mat-icon class="tab-icon" svgIcon="download-tab"></mat-icon>
+          <span class="label-text">Download</span>
         </div>
       </ng-template>
       <ng-template matTabContent>
-       Download Content
+
+        @if (!hasDownload()) {
+          <div class="tab-description-container">
+            <h3> 📥 Download</h3>
+            <p>When a pathway is displayed in the panel above,
+              download buttons are available for exporting the diagram in various formats for reuse or reference.
+              Supported formats include <b>PDF</b>, <b>SBML</b>, <b>SBGN</b>, <b>BioPAX 2</b>, <b>BioPAX 3</b>.
+              A link to the <b>Newt Editor</b> is also provided, allowing you to edit the pathway diagram interactively.
+            </p>
+            <p>After performing an analysis, you can also download a corresponding <b>analysis report</b>.</p>
+          </div>
+        } @else {
+          <cr-download-tab></cr-download-tab>
+        }
+
       </ng-template>
     </mat-tab>
 

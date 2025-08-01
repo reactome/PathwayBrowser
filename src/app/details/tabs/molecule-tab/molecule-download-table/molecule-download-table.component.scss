@@ -1,4 +1,36 @@
 .controls{
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  align-items: center;
+
+  flex-direction: column;
+
+
+  //background: var(--primary-container);
+  //padding: 0 16px 8px 16px;
+ // color: var(--on-primary-container);
+  //border-radius: 15px 15px 0 0;
+  //margin-top: 10px;
+  //font: var(--mat-sys-body-medium);
+  //box-shadow: var(--mat-sys-level1);
+  //position: relative;
+ // z-index: 101;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.button{
+  background: var(--primary-container);
+  padding:8px 16px;
+   color: var(--on-primary-container);
+  border-radius: 15px 15px 0 0;
+  //margin-top: 10px;
+  font: var(--mat-sys-body-medium);
+  box-shadow: var(--mat-sys-level1);
+  position: relative;
+   z-index: 101;
+  width: 100%;
+}
+
+.disabled{
+ opacity: 0.5;
 }
