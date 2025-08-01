@@ -3,8 +3,7 @@
 .container {
   display: flex;
   align-items: flex-start;
-  overflow-y: auto;
-  height: 100%;
+
   background: var(--surface);
   font-family: 'Roboto', sans-serif;
   gap: var(--gap);
@@ -82,15 +81,25 @@
 
   // Sticky
   position: sticky;
-  top: 0;
+  top: 10px;
 }
 
 .spinner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding-top: 20px;
+  width: 100cqw;
+  height: calc(100cqh - 31px); // remove tabs header height
+  container: spinner / size;
+  justify-content: center;
+
+  mat-spinner {
+    --size: min(50cqh, 50cqw);
+    width: var(--size)!important;
+    height: var(--size)!important;
+  }
+
+
 }
 
 .download-container {
@@ -99,4 +108,7 @@
   @include mat.expansion-overrides((
     header-indicator-color: var(--primary),
   ));
+  mat-expansion-panel {
+    margin-bottom: 8px; // make shadow visible
+  }
 }
