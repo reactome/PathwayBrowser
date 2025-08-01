@@ -88,6 +88,7 @@ import {environment} from "../environments/environment";
 import {StoreModule} from "@ngrx/store";
 import {routerReducer, StoreRouterConnectingModule} from "@ngrx/router-store";
 import {EffectsModule} from "@ngrx/effects";
+import {DownloadTabComponent} from "./details/tabs/download-tab/download-tab.component";
 
 @NgModule({
   declarations: [
@@ -176,6 +177,7 @@ import {EffectsModule} from "@ngrx/effects";
     ExternalReferenceComponent,
     CrossReferencesComponent,
     MoleculeDetailsComponent,
+    DownloadTabComponent,
     AnalysisFormComponent,
     CompareFormComponent,
     StoreModule.forRoot({

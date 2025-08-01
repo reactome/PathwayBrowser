@@ -1,0 +1,69 @@
+@use '@angular/material' as mat;
+
+
+.download-container {
+  padding: 20px;
+
+  .header {
+    padding: 0 2px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--outline);
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
+
+.divider {
+  width: 100%;
+
+  @include mat.divider-overrides((
+    width: 2px,
+  ));
+
+}
+
+
+.pathway-download {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 10px;
+
+}
+
+.analysis-download {
+  //display: grid;
+  //gap: 20px;
+  //grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: column;
+  gap:10px
+}
+
+.button {
+
+  text-decoration: none;
+  display: flex;
+  justify-content: flex-start;
+
+  //border: 1px solid var(--primary);
+  //padding: 20px 30px;
+  // background: var(--primary);
+
+
+  .icon {
+    fill: var(--primary);
+  }
+
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    //width: 100%;
+    //text-wrap: nowrap;
+    //text-overflow: ellipsis;
+    //overflow: hidden;
+  }
+
+}
