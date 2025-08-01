@@ -233,6 +233,14 @@ export class ReacfoamComponent implements OnDestroy {
     this.sizeObserver.disconnect();
   }
 
+  export(params : FoamTree.ImageFormat) {
+    const a = document.createElement('a');
+    a.href = this.foamTree().get('imageData', params)
+    a.download = `reacfoam.${params.format.split('/')[1]}`;
+    a.click();
+    a.remove();
+  }
+
 }
 
 function throttle<Args extends any[]>(func: (...args: Args) => void, delay: number): (...args: Args) => void {
