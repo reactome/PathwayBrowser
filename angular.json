@@ -144,9 +144,12 @@
             },
             "development": {
               "buildTarget": "pathway-browser:build:development"
+            },
+            "local": {
+              "buildTarget": "pathway-browser:build:local"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
