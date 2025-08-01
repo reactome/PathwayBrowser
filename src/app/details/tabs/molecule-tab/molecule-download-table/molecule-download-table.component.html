@@ -4,7 +4,7 @@
   <!--    Download-->
   <!--  </button>-->
 
-  <button class="button" mat-flat-button [class.disabled]="exportedColumns().length === 0" (click)="exportToTSV()">
+  <button class="button" mat-flat-button [matTooltip]="'Download the data shown in the Molecules tab as a TSV'" [class.disabled]="exportedColumns().length === 0" (click)="exportToTSV()">
     <mat-icon>download</mat-icon>
     Download
   </button>

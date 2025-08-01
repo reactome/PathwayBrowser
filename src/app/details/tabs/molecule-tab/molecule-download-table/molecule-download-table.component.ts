@@ -19,6 +19,7 @@ import {MatSort, MatSortHeader} from "@angular/material/sort";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {MatTooltip} from "@angular/material/tooltip";
 
 
 type MoleculeRow = {
@@ -51,7 +52,8 @@ type MoleculeRow = {
     MatIconButton,
     MatMenuTrigger,
     MatMenu,
-    MatMenuItem
+    MatMenuItem,
+    MatTooltip
   ],
   templateUrl: './molecule-download-table.component.html',
   styleUrl: './molecule-download-table.component.scss'
