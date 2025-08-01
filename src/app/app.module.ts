@@ -182,7 +182,7 @@ import {EffectsModule} from "@ngrx/effects";
       router: routerReducer
     }, {}),
     GsaFormModule.forRoot({
-      server: environment.production ? "production" : "dev",
+      server: environment.gsaServer as 'production' | 'dev',
     }),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),
