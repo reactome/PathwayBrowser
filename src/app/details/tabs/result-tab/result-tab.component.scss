@@ -97,8 +97,7 @@ td.mat-column-name {
   }
 }
 
-
-.stepper-controls {
+.controls {
   position: sticky;
   bottom: 2px;
   width: fit-content;
@@ -115,6 +114,12 @@ td.mat-column-name {
   flex-direction: row;
   align-items: center;
   gap: 5px;
+
+  @container bottom-panel (height < 200px) {
+    // When the bottom panel is too small, remove sticky
+    position: relative !important;
+
+  }
 
 
   *:first-child {
@@ -136,6 +141,7 @@ td.mat-column-name {
     label-text-size: var(--mat-sys-body-small-size)
   ));
 }
+
 
 mat-expansion-panel {
   overflow: clip !important; // Avoid sticky not working inside
@@ -186,9 +192,11 @@ mat-expansion-panel {
       .mdc-slider__track--inactive {
         background: var(--gradient);
       }
+
       .mdc-slider__track--active {
         background: var(--gradient);
         position: relative;
+
         &::before {
           content: '';
           position: absolute;
@@ -196,6 +204,7 @@ mat-expansion-panel {
           background: color-mix(in srgb, var(--surface) 70%, transparent);
           mask-image: var(--gradient-mask);
         }
+
         .mdc-slider__track--active_fill {
           opacity: 0;
         }
@@ -212,6 +221,7 @@ mat-expansion-panel {
         ));
 
       }
+
       mat-slider-visual-thumb:last-of-type {
         --expression-color: var(--expression-color-stop);
         --faded-color: color-mix(in srgb, var(--expression-color) 80%, transparent);
@@ -260,6 +270,7 @@ mat-expansion-panel {
 
 .not-found-section {
   margin-bottom: 1em;
+
   .badge {
     background-color: var(--primary-container);
     color: var(--on-primary-container);
