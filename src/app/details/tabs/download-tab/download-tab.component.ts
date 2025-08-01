@@ -10,7 +10,6 @@ import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
 import {environment} from "../../../../environments/environment";
 import {toSignal} from "@angular/core/rxjs-interop";
-import {NgSwitch, NgSwitchCase} from "@angular/common";
 
 
 type PathwayItem = {
@@ -35,9 +34,7 @@ type AnaLysisItem = {
     MatDivider,
     MatAnchor,
     SafePipe,
-    MatIcon,
-    NgSwitch,
-    NgSwitchCase
+    MatIcon
   ],
   templateUrl: './download-tab.component.html',
   styleUrl: './download-tab.component.scss'
