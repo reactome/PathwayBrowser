@@ -166,7 +166,8 @@ export class StructureViewerComponent {
     const viewerInstance = new PDBeMolstarPlugin();
     const options = {
       bgColor: this.bgColor(),
-      hideControls: true
+      hideControls: true,
+      landscape: true,
     };
 
     const pdbOptions = {

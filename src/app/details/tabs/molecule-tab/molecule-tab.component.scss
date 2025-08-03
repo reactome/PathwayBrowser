@@ -1,28 +1,19 @@
 @use '@angular/material' as mat;
 
 .container {
-  display: flex;
-  align-items: flex-start;
-  overflow-y: auto;
-  height: 100%;
+  --gap: 20px;
+  --half-gap: calc(var(--gap) / 2);
+
   background: var(--surface);
   font-family: 'Roboto', sans-serif;
   gap: var(--gap);
   padding-left: var(--gap);
   align-content: space-between;
   padding-top: var(--half-gap);
-
-  & {
-    --columns: 6;
-    --gap: 20px;
-    --half-gap: calc(var(--gap) / 2);
-    --padding: 20px;
-    --column-width: max(100px, calc((var(--width) - (var(--columns) + 1) * var(--gap)) / var(--columns)));
-    --icon-width: var(--column-width);
-    --icon-height: 84px;
-    --margin-right: 2px;
-  }
-
+  display: grid;
+  align-items: start;
+  grid-template-columns: repeat(6, 1fr);
+  padding-right: 6px;
 }
 
 .highlight {
@@ -35,8 +26,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--half-gap);
-  width: calc((var(--columns) - 1) * var(--column-width) + (var(--columns) - 2) * var(--gap));
-  height: 100%;
+  grid-column: span 5;
 
   .list {
     width: 100%;
@@ -73,8 +63,7 @@
   align-items: flex-end;
   padding: 5px 0 5px 0;
   gap: 8px;
-  width: var(--column-width);
-  height: calc(100% - 10px);
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height) - 20px);
   overflow-y: auto;
   font-size: 16px;
   font-weight: 600;
@@ -82,15 +71,25 @@
 
   // Sticky
   position: sticky;
-  top: 0;
+  top: 10px;
 }
 
 .spinner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding-top: 20px;
+  width: 100cqw;
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height));
+  container: spinner / size;
+  justify-content: center;
+
+  mat-spinner {
+    --size: min(50cqh, 50cqw);
+    width: var(--size) !important;
+    height: var(--size) !important;
+  }
+
+
 }
 
 .download-container {
@@ -99,4 +98,8 @@
   @include mat.expansion-overrides((
     header-indicator-color: var(--primary),
   ));
+
+  mat-expansion-panel {
+    margin-bottom: 8px; // make shadow visible
+  }
 }

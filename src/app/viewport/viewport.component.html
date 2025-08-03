@@ -112,7 +112,7 @@
             </mat-menu>
 
             @if (normalPathway()) {
-              <button mat-stroked-button [routerLink]="['/PathwayBrowser', normalPathway()?.stId]"
+              <button mat-stroked-button [routerLink]="['/', normalPathway()?.stId]"
                       queryParamsHandling="preserve">
                 <mat-icon>compare</mat-icon>
                 <span>Compare</span>
@@ -125,7 +125,7 @@
               </button>
               <mat-menu #compare="matMenu">
                 @for (comparablePathway of diseasePathways(); track comparablePathway.stId) {
-                  <a mat-menu-item [routerLink]="['/PathwayBrowser', comparablePathway.stId]"
+                  <a mat-menu-item [routerLink]="['/', comparablePathway.stId]"
                      queryParamsHandling="preserve">{{ comparablePathway.displayName }}</a>
                 }
               </mat-menu>
@@ -152,14 +152,19 @@
           </div>
         </div>
         <div class="content" #content>
-          <as-split direction="vertical" gutterSize="4" useTransition="true" >
-            <as-split-area [size]="viewShare()" id="view" class="hide-overflow">
+          <as-split direction="vertical" gutterSize="4" useTransition="true">
+            <as-split-area [size]="viewShare()" id="view" class="hide-overflow" #view>
               @if (pathwayId()) {
-                @if (hasEHLD()) {
-                  <cr-ehld [(pathwayId)]="pathwayId"></cr-ehld>
+                @if (loadingPathwayData()) {
+                  <div class="spinner-container">
+                    <mat-progress-spinner mode="indeterminate" />
+                  </div>
                 } @else {
-                  <cr-diagram [(pathwayId)]="pathwayId" #diagram
-                              [interactor]="interactors"></cr-diagram>
+                  @if (hasEHLD()) {
+                    <cr-ehld [(pathwayId)]="pathwayId"/>
+                  } @else {
+                    <cr-diagram [(pathwayId)]="pathwayId" #diagram [interactor]="interactors"/>
+                  }
                 }
               } @else {
                 <cr-reacfoam/>
@@ -177,7 +182,7 @@
             <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"
                  [class.hidden]="detailShare() === 0"></div>
 
-            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()" >
+            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()" id="bottom-panel">
               <cr-details-panel></cr-details-panel>
             </as-split-area>
           </as-split>

@@ -41,7 +41,7 @@ export class DescriptionTabComponent {
   })
 
   _otherForms = rxResource({
-    request: () => isPhysicalEntity(this.obj()) && this.obj().stId,
+    request: () => isPhysicalEntity(this.obj()) && this.referenceEntity() && this.obj().stId,
     loader: (param) => param.request ? this.entity.getOtherForms(param.request) : of(null)
   })
 

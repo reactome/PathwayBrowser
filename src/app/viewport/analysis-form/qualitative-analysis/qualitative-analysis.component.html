@@ -102,17 +102,15 @@
             <div class="explanations">
               <p class="title">Explanations</p>
               <p>
-                Every species has its own set of identifiers (genes, proteins, chemicals, mRNA, etc...)
+                Every species has its own set of identifiers (genes, proteins, chemicals, mRNA, etc...).
               </p>
               <p>
                 Reactome curates human pathways and <u>infers</u> their existence in other species using orthology
-                information
-                from the <u>PANTHER knowledge base</u>
+                information from the <u>PANTHER knowledge base</u>.
               </p>
               <p>
                 When this option is selected, all non-human identifiers in your sample are mapped to their human
-                equivalents
-                before the analysis is performed
+                equivalents before the analysis is performed.
               </p>
             </div>
           </div>
@@ -172,13 +170,9 @@
   <mat-step>
     <ng-template matStepLabel>Analysis</ng-template>
 
-    <div class="loader-container" #container>
+    <div class="loader-container" >
       @if (analysisLaunched) {
-        @let scale = Math.max(Math.min(container.clientWidth, container.clientHeight) / 1000, 0.5);
-        <div class="loader">
-          <canvas #lottie style="width: 1000px; height: 1000px" [style.transform]="'scale(' + scale + ')'">
-          </canvas>
-        </div>
+          <canvas #lottie class="loader"></canvas>
       }
     </div>
 

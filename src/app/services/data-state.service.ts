@@ -20,7 +20,7 @@ type SelectionData = {
   providedIn: 'root'
 })
 export class DataStateService {
-  private _currentPathway = rxResource({
+  _currentPathway = rxResource({
     request: () => this.state.pathwayId(),
     loader: (params) => this.fetchEnhancedData<Pathway>(params.request)
   })

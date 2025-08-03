@@ -2,7 +2,7 @@ import {AfterViewInit, Component, effect, ElementRef, input, model, OnDestroy, V
 import {Event} from "../model/graph/event/event.model";
 import {EventService, SelectableObject} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatestWith, filter, fromEvent, map, of, switchMap, take, tap} from "rxjs";
+import {combineLatestWith, filter, fromEvent, map, Observable, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {UrlStateService} from "../services/url-state.service";
 import {SplitComponent} from "angular-split";
@@ -12,7 +12,7 @@ import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
 import {IconService} from "../services/icon.service";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isPathway} from "../services/utils";
+import {isDefined, isPathway} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 import {toObservable} from "@angular/core/rxjs-interop";
 
@@ -26,7 +26,7 @@ import {toObservable} from "@angular/core/rxjs-interop";
 @UntilDestroy()
 export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
-  readonly pathwayId = model.required<string>();
+  readonly pathwayId = model<string>();
   readonly split = input.required<SplitComponent>({alias: "eventSplit"});
   @ViewChild('treeControlButton', {read: ElementRef}) treeControlButton!: ElementRef;
   @ViewChild('eventIcon', {read: ElementRef}) eventIcon!: ElementRef;
@@ -90,10 +90,13 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     ),// Ignore the changes from Tree itself , first load and species changes
     // debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
     switchMap(id => {
-      const idToUse = id ? id : this.pathwayId()!;
-      return this.dboService.fetchEnhancedEntry(idToUse).pipe(
-        map(enhancedEvent => ({idToUse, enhancedEvent}))
-      )
+      const idToUse = id ? id : this.pathwayId();
+      return idToUse
+        ? this.dboService.fetchEnhancedEntry<SelectableObject>(idToUse).pipe(map(enhancedEvent => ({
+          idToUse,
+          enhancedEvent
+        })))
+        : of({idToUse, enhancedEvent: undefined});
     }),
     switchMap(({idToUse, enhancedEvent}) => {
       const token = this.analysis.result()?.summary.token;
@@ -106,10 +109,10 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       );
     }),
     switchMap(({idToUse, enhancedEvent, hitReactions}) => {
-      return this.eventService.adjustTreeFromDiagramSelection(enhancedEvent, this.pathwayId()!, this.tree, hitReactions);
+      return this.eventService.adjustTreeFromUrlSelectUpdate(enhancedEvent, this.pathwayId(), this.tree, hitReactions);
     }),
     untilDestroyed(this),
-  ).subscribe((e) => {
+  ).subscribe(() => {
     document.querySelector(`[st-id='${this.selectedIdFromUrl}']`)?.scrollIntoView({behavior: 'smooth'});
   });
 
@@ -170,7 +173,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   }
 
   buildInitialTreeWithTlps(taxId: string): void {
-    const idToUse = this.selectedIdFromUrl ? this.selectedIdFromUrl : this.pathwayId()!;
+    const idToUse = this.selectedIdFromUrl ? this.selectedIdFromUrl : this.pathwayId();
     // Fetch and prepare initial data
     const initialData$ = this.eventService.fetchTlpsBySpecies(taxId).pipe(
       tap(allTLPs => this.eventService.setTreeData(allTLPs)), // Set initial tree data
@@ -178,12 +181,14 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     );
 
     // Conditionally fetch or reuse enhanced event data
-    const enhancedEventData$ = this.eventService.diagramEvent$.pipe(
-      // filter( event => event !== null),
+    const enhancedEventData$: Observable<{
+      enhancedEvent: SelectableObject | undefined
+    }> = this.eventService.diagramPathway$.pipe(
       take(1),
-      switchMap(diagramEvent => {
-        if (diagramEvent && diagramEvent.stId === idToUse) {
-          return of({enhancedEvent: diagramEvent});
+      switchMap(diagramPathway => {
+        if (!idToUse) return of({enhancedEvent: undefined});
+        if (diagramPathway && diagramPathway.stId === idToUse) {
+          return of({enhancedEvent: diagramPathway});
         } else {
           return this.dboService.fetchEnhancedEntry<SelectableObject>(idToUse).pipe(
             map(enhancedEvent => ({enhancedEvent}))
@@ -210,7 +215,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         this.analysis.getHitReactions(this.pathwayId()!, this.state.analysis()!).pipe(
           map(hitReactions => ({hitReactions}))
         );
-    console.log(this.state.analysis(), this.pathwayId())
 
     // Combine all data and merged into one object
     initialData$.pipe(
@@ -235,7 +239,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
       switchMap(({
                    enhancedEvent,
                    hitReactions
-                 }) => this.eventService.buildTree(enhancedEvent, this.pathwayId()!, this.tree, hitReactions)),
+                 }) => this.eventService.buildTree(enhancedEvent, this.pathwayId(), this.tree, hitReactions)),
       tap(d => console.log('Final data', d)),
     ).subscribe({
       next: () => {
@@ -244,7 +248,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         element?.scrollIntoView({behavior: 'smooth'});
       },
       error: (err: Error) => {
-        console.error(err.stack)
+        console.error(err, err.stack)
         throw err;
       }
     });

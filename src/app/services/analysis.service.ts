@@ -277,6 +277,7 @@ export class AnalysisService {
     effect(() => {
       [...this.paletteOptions.values()].forEach(summary => summary.dark = this.darkS.isDark())
     });
+    effect(() => this.resultResource.error() && this.state.analysis.set(null)) // remove token if it is wrong
 
     effect(() => {
       const result = this.result();
@@ -396,8 +397,7 @@ export class AnalysisService {
 
   getHitReactions(pathwayId: string, token: string, params?: Partial<Analysis.Parameters>) {
     if (!pathwayId || !token) return of([]);
-    return this.http.get<number[]>(`${environment.host}/AnalysisService/token/${token}/reactions/${pathwayId}`, {params}).pipe(
-    )
+    return this.http.get<number[]>(`${environment.host}/AnalysisService/token/${token}/reactions/${pathwayId}`, {params})
   }
 
   // Not Found

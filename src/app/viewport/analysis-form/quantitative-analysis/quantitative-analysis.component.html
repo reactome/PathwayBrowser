@@ -1,23 +1,22 @@
-<!--TODO make GSA adjust to container height instead of absolute viewport height, in order to be able to add description at the top-->
-<!--<div class="header">-->
-<!--  <span class="title">Quantitative Entity Enrichment Analysis (Reactome GSA)</span>-->
+<div class="header">
+  <span class="title">Quantitative Entity Enrichment Analysis (Reactome GSA)</span>
 
-<!--  <div class="description">-->
-<!--    <div>-->
-<!--      Quantitative enrichment analysis (ReactomeGSA) identifies pathways whose overall activity changes significantly-->
-<!--      between experimental conditions or sample groups. Unlike standard enrichment analysis, which focuses on whether-->
-<!--      specific pathways are over-represented in a list, this method takes into account quantitative expression data for-->
-<!--      all pathway members.-->
-<!--    </div>-->
-<!--    <div>-->
-<!--      You can provide full datasets from transcriptomics, proteomics, or single-cell experiments. The analysis will-->
-<!--      reveal which pathways are up- or down-regulated between conditions, highlighting coordinated biological changes-->
-<!--      across the entire dataset.-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
+  <div class="description">
+    <div>
+      Quantitative enrichment analysis (ReactomeGSA) identifies pathways whose overall activity changes significantly
+      between experimental conditions or sample groups. Unlike standard enrichment analysis, which focuses on whether
+      specific pathways are over-represented in a list, this method takes into account quantitative expression data for
+      all pathway members.
+    </div>
+    <div>
+      You can provide full datasets from transcriptomics, proteomics, or single-cell experiments. The analysis will
+      reveal which pathways are up- or down-regulated between conditions, highlighting coordinated biological changes
+      across the entire dataset.
+    </div>
+  </div>
+</div>
 
-<div class="form-wrapper" #wrapper>
+<div class="form-wrapper fill-height" #wrapper>
   <gsa-form (analysisId)="gsaId.set($event)"
             (reportsRequired)="analysis.gsaReportsRequired.set($event)"
             (analysisReports)="analysis.gsaReports.set($event)"

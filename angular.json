@@ -68,6 +68,12 @@
                   "maximumError": "8kb"
                 }
               ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                }
+              ],
               "outputHashing": "all"
             },
             "release": {
@@ -92,6 +98,15 @@
               ]
             },
             "development": {
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
+            },
+            "local": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
@@ -99,7 +114,19 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.development.ts"
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
+            },
+            "github": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.github.ts"
                 }
               ]
             }
@@ -117,9 +144,12 @@
             },
             "development": {
               "buildTarget": "pathway-browser:build:development"
+            },
+            "local": {
+              "buildTarget": "pathway-browser:build:local"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",

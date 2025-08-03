@@ -1,52 +1,53 @@
-@if (isShowingSpinner()) {
+@if (_pathwayParticipants.isLoading()) {
   <div class="spinner-container">
-    <mat-spinner></mat-spinner>
+    <mat-spinner/>
     <p>Loading data for participating molecules, please wait...</p>
   </div>
-}
-
-<div class="container" #container [style.--width.px]="container.offsetWidth">
-  <div class="content">
-    @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
-      <div class="list" [id]=sanitizeId(group.category)>
+} @else {
+  <div class="container">
+    <div class="content">
+      @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
+        <div class="list" [id]=sanitizeId(group.category)>
         <span class="header">
           {{ group.category }} {{ getStatistics(group) }}
         </span>
-      </div>
+        </div>
 
-      <mat-divider class="divider"></mat-divider>
-      <div class="composition-container">
-        @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId) {
-          <cr-object-tree [type]="group.category" [data]="[item.entity]"
-                          [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
-                          [moleculeView]="true"></cr-object-tree>
+        <mat-divider class="divider"></mat-divider>
+        <div class="composition-container">
+          @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId) {
+            <cr-object-tree [type]="group.category" [data]="[item.entity]"
+                            [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
+                            [moleculeView]="true"></cr-object-tree>
+          }
+        </div>
+      }
+
+      <div id="download" class="download-container">
+        @if (moleculeData().length > 0) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <h3 class="badge">Download Molecules Data</h3>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
+          </mat-expansion-panel>
         }
       </div>
-    }
+    </div>
 
-    <div id="download" class="download-container">
+    <div class="toc">
+      @for (group of moleculeData() | sortByText: 'category'; track group.category) {
+        <a (click)="scrollTo(group.category)">
+          {{ group.category }}
+        </a>
+      }
       @if (moleculeData().length > 0) {
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <h3 class="badge">Download Molecules Data</h3>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
-        </mat-expansion-panel>
+        <!-- Add download link -->
+        <a (click)="scrollTo('download')">Download </a>
       }
     </div>
   </div>
 
-  <div class="toc">
-    @for (group of moleculeData() | sortByText: 'category'; track group.category) {
-      <a (click)="scrollTo(group.category)">
-        {{ group.category }}
-      </a>
-    }
-    @if (moleculeData().length > 0) {
-      <!-- Add download link -->
-      <a (click)="scrollTo('download')">Download </a>
-    }
-  </div>
-</div>
+}

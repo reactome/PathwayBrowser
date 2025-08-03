@@ -1,36 +1,54 @@
-.controls{
+@use "@angular/material" as mat;
+.controls {
   display: flex;
   justify-content: space-around;
   align-items: center;
-
   flex-direction: column;
-
-
-  //background: var(--primary-container);
-  //padding: 0 16px 8px 16px;
- // color: var(--on-primary-container);
-  //border-radius: 15px 15px 0 0;
-  //margin-top: 10px;
-  //font: var(--mat-sys-body-medium);
-  //box-shadow: var(--mat-sys-level1);
-  //position: relative;
- // z-index: 101;
   border-bottom: 1px solid var(--outline-variant);
 }
 
-.button{
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  padding:0 5px;
+}
+
+mat-checkbox {
+  @include mat.checkbox-overrides((
+    state-layer-size: 18px
+  ));
+}
+
+.button {
   background: var(--primary-container);
-  padding:8px 16px;
-   color: var(--on-primary-container);
+  padding: 8px 16px;
+  color: var(--on-primary-container);
   border-radius: 15px 15px 0 0;
   //margin-top: 10px;
   font: var(--mat-sys-body-medium);
   box-shadow: var(--mat-sys-level1);
   position: relative;
-   z-index: 101;
+  z-index: 101;
   width: 100%;
+  transition: all 200ms ease-in-out;
 }
 
-.disabled{
- opacity: 0.5;
+.disabled {
+  opacity: 0.5;
+}
+
+th {
+  padding-left: 0;
+}
+
+td {
+  padding-left: 28px;
+  color: var(--outline-variant);
+  transition: color 200ms ease-in-out;
+
+  &.included {
+    color: var(--on-surface);
+  }
 }

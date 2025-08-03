@@ -221,14 +221,17 @@
 // Step 2 Loading
 .loader-container {
   flex: 1;
-  position: relative;
-  overflow: hidden;
+
   display: flex;
   justify-content: center;
   align-items: center;
+  container: lottie / size;
+  width: 100%;
+
 
   .loader {
-    position: absolute;
-    inset: auto;
+    --size: min(100cqh, 100cqw);
+    width: var(--size);
+    height: var(--size);
   }
 }

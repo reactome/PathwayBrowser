@@ -90,14 +90,13 @@
     }
   </mat-step>
   <mat-step label="Analysis">
-    @if (analysisLaunched) {
-      <div class="loader-container" #container>
-        @let scale = Math.max(Math.min(container.clientWidth, container.clientHeight) / 1000, 0.5);
-        <div class="loader">
-          <canvas #lottie style="width: 1000px; height: 1000px" [style.transform]="'scale(' + scale + ')'">
-          </canvas>
-        </div>
+
+      <div class="loader-container" >
+        @if (analysisLaunched) {
+          <canvas #lottie class="loader"></canvas>
+        }
       </div>
+
       <div class="stepper-controls">
         <button mat-stroked-button matStepperPrevious>Previous</button>
         <button mat-stroked-button (click)="close.emit({status: 'premature'})">
@@ -106,7 +105,7 @@
         </button>
         <button mat-flat-button (click)="loadAnalysis()" [disabled]="token === undefined">See results</button>
       </div>
-    }
+
   </mat-step>
 </mat-stepper>
 

@@ -98,7 +98,7 @@ export class ReacfoamComponent implements OnDestroy {
         this.state.path.set(event.group.path)
       } else {
         const exposed = this.foamTree().get('exposure').groups.at(0);
-        const parent = this.foamTree().get('hierarchy', exposed).parent;
+        const parent = this.foamTree().get('hierarchy', exposed)?.parent;
         this.state.select.set(parent?.stId || null)
         this.state.path.set(parent?.path || [])
       }
@@ -111,7 +111,6 @@ export class ReacfoamComponent implements OnDestroy {
         this.relaxing.set(false)
         if (this.correctedSelectedId()) {
           setTimeout(() => {
-            console.log('Relaxation complete ==> Put back exposure');
             this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})
           })
         }
@@ -138,7 +137,6 @@ export class ReacfoamComponent implements OnDestroy {
   relaxing = signal(false)
 
   sizeObserver = new ResizeObserver(() => {
-    console.log('Resize ==> Reset layout')
     setTimeout(() => { // Avoid white flickering
       this.foamTree().set('exposeDuration', 0) // Make removal of exposure instant
       this.foamTree().expose({
@@ -159,7 +157,6 @@ export class ReacfoamComponent implements OnDestroy {
     private router: Router) {
     effect(() => { // Initialise
       this.reacfoam.data(); // Set data whenever it is updated
-      console.log("Setting data object", this.reacfoam.data())
       // if (!untracked(this.relaxing)) // Avoid errors happening when setting data while relaxing
       this.foamTree().set('dataObject', {groups: this.reacfoam.data()!})
 
@@ -234,6 +231,14 @@ export class ReacfoamComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.sizeObserver.disconnect();
+  }
+
+  export(params : FoamTree.ImageFormat) {
+    const a = document.createElement('a');
+    a.href = this.foamTree().get('imageData', params)
+    a.download = `reacfoam.${params.format.split('/')[1]}`;
+    a.click();
+    a.remove();
   }
 
 }

@@ -74,10 +74,8 @@ const DROPDOWN_DURATION = 500;
 export class ViewportComponent implements AfterViewInit {
   readonly pathwayId = this.state.pathwayId as WritableSignal<string>;
 
-  hasEHLD = computed(() => {
-    const pathway = this.dataState.currentPathway();
-    return pathway && isPathway(pathway) && (pathway?.hasEHLD !== undefined) ? pathway.hasEHLD : true;
-  })
+  loadingPathwayData = this.dataState._currentPathway.isLoading;
+  hasEHLD = computed(() => this.dataState.currentPathway()?.hasEHLD === true);
   title = computed(() => this.dataState.currentPathway()?.displayName)
 
   diseasePathways = computed(() => {
@@ -150,7 +148,7 @@ export class ViewportComponent implements AfterViewInit {
         }, this.dropdownDuration);
       }
     });
-    effect(() => this.dataState.currentPathway() && this.eventService.setDiagramEvent(this.dataState.currentPathway()!));
+    effect(() => this.dataState.currentPathway() && this.eventService.setDiagramPathway(this.dataState.currentPathway()!));
     effect(() => this.sizeObserver.observe(this.content().nativeElement));
     // effect(() => this.dropdown() === null && this.detailVisible.set(true));
   }
@@ -228,5 +226,6 @@ export class ViewportComponent implements AfterViewInit {
 
   protected readonly drop = drop;
   protected readonly document = document;
+  protected readonly Math = Math;
 }
 

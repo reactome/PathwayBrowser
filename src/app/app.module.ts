@@ -184,7 +184,7 @@ import {DownloadTabComponent} from "./details/tabs/download-tab/download-tab.com
       router: routerReducer
     }, {}),
     GsaFormModule.forRoot({
-      server: environment.production ? "production" : "dev",
+      server: environment.gsaServer as 'production' | 'dev',
     }),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),

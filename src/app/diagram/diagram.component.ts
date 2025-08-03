@@ -45,6 +45,7 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 
 import {DarkService} from "../services/dark.service";
+import {Pathway} from "../model/graph/event/pathway.model";
 
 
 const INIT_RX = 2;
@@ -301,8 +302,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   }
 
   private loadDiagram(): void {
-    this.event.diagramEvent$.pipe(
-      filter((event): event is EventModel => event !== undefined),
+    this.event.diagramPathway$.pipe(
+      filter(isDefined),
+      take(1),
       switchMap((event) => {
         // If the diagramId is a subpathway without diagram, and it is a first load then load parent diagram
         // For instance: ../PathwayBrowser/R-HSA-69541
@@ -388,11 +390,11 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
           const diagramId = this.pathwayId();
           if (newDiagramId !== diagramId) {
             this.pathwayId.set(newDiagramId);
-            this.router.navigate([diagramId], {
-              queryParamsHandling: "preserve"
-            }).then(() => {
+            // this.router.navigate([diagramId], {
+            //   queryParamsHandling: "preserve"
+            // }).then(() => {
               this.state.select.set(event.stId);
-            });
+            // });
 
             return this.loadElvDiagram();
           }
