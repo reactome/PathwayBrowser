@@ -50,6 +50,7 @@ export class IconService {
 
   reactomeSubjectIcons: { [key: string]: { name: string; tooltip?: string; route: string } } = {
     Pathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
+    TopLevelPathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
     BlackBoxEvent: {name: 'omitted', tooltip: 'Black Box Event', route: 'omitted'},
     EntityWithAccessionedSequence: this.protein,
     Complex: {
@@ -242,6 +243,7 @@ export class IconService {
       }
     }
 
+    if (!key || !this.reactomeSubjectIcons[key]) console.warn("Failed to retrieve icon for", obj)
     return this.reactomeSubjectIcons[key] || defaultIcon;
   }
 
