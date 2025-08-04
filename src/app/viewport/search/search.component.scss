@@ -204,6 +204,7 @@
   width: 100%;
   box-sizing: border-box;
   gap: 4px;
+  align-items: center;
 
   > mat-icon {
     flex: 0 0 auto
@@ -221,6 +222,23 @@
     flex: 0 0 auto;
     display: flex;
     gap: 4px;
+
+    button {
+      @include mat.icon-button-overrides((
+        state-layer-size: 20px,
+        touch-target-display: none,
+        icon-size: 16px
+      ));
+      background: var(--primary);
+      color: var(--on-primary);
+
+      mat-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+        line-height: 16px;
+      }
+    }
   }
 }
 
