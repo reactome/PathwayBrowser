@@ -1,12 +1,14 @@
 import {RouterModule, Routes} from "@angular/router";
 import {NgModule} from "@angular/core";
-import {legacyGuard} from "./guard/legacy.guard";
 import {ViewportComponent} from "./viewport/viewport.component";
 
 export const routes: Routes = [
-  {path: ':pathwayId', component: ViewportComponent},
-  {path: '', component: ViewportComponent},
-  {path: '**', component: ViewportComponent, canActivate: [legacyGuard], runGuardsAndResolvers: 'always'}
+  {
+    matcher: (segments) => segments.length === 0
+      ? {consumed: segments}
+      : {consumed: segments, posParams: {pathwayId: segments[0]}},
+    component: ViewportComponent,
+  },
 ]
 
 
@@ -14,4 +16,5 @@ export const routes: Routes = [
   imports: [RouterModule.forRoot(routes, {bindToComponentInputs: false})],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}
