@@ -15,6 +15,7 @@ export interface Molecule {
   schemaClass: string;
   displayName: string;
   icon: string;
+  displayIcon:string;
   url: string;
   formattedName: string;
   type: string;
@@ -46,15 +47,16 @@ export class ParticipantService {
           ...participant,
           refEntities: participant.refEntities.map(molecule => ({
             ...molecule,
-            formattedName: this.getType(molecule).name, // UniProt:P78396 CCNA1 ➡️ CCNA1
-            type: this.getType(molecule).type
+            formattedName: this.getNameAndType(molecule).name, // UniProt:P78396 CCNA1 ➡️ CCNA1
+            type: this.getNameAndType(molecule).type,
+            displayIcon: this.getDisplayIcon(molecule),// Correct DNA/RNA icon
           }))
         })))
     );
   }
 
 
-  getType(molecule: Molecule): { type: string; name: string } {
+  getNameAndType(molecule: Molecule): { type: string; name: string } {
     let type = '';
     let name = '';
 
@@ -93,6 +95,16 @@ export class ParticipantService {
     return {type, name};
   }
 
+  getDisplayIcon(molecule: Molecule) {
+    const schemaClass = molecule.schemaClass;
+    if (schemaClass === SchemaClasses.REFERENCE_DNA_SEQUENCE) {
+      return schemaClass;
+    }
+    if (schemaClass === SchemaClasses.REFERENCE_RNA_SEQUENCE) {
+      return schemaClass;
+    }
+    return molecule.icon
+  }
 
   getReferenceEntities(stId: string): Observable<ReferenceEntity[]> {
     const url = `${environment.host}/ContentService/data/participants/${stId}/referenceEntities`;
