@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, input, linkedSignal, Signal, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, linkedSignal, signal, viewChild} from '@angular/core';
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
@@ -171,13 +171,15 @@ export class SearchComponent {
 
   scopes: Record<Scope, SearchDataSource> = {
     local: new SearchDataSource(this.searchParams$,
-      (page, pageSize, params) => this.http.get<Search.Result>(`${environment.host}/ContentService/search/diagram/${params.diagram}`, {
-        params: {
-          ...params,
-          start: page * pageSize,
-          rows: pageSize,
-        } as Search.Paginated<Search.Params>
-      })
+      (page, pageSize, params) => params.diagram ?
+        this.http.get<Search.Result>(`${environment.host}/ContentService/search/diagram/${params.diagram}`, {
+          params: {
+            ...params,
+            start: page * pageSize,
+            rows: pageSize,
+          } as Search.Paginated<Search.Params>
+        })
+        : of(Search.EMPTY_RESULTS)
     ),
     global: new SearchDataSource(this.searchParams$,
       (page, pageSize, params) => this.http.get<Search.Result>(`${environment.host}/ContentService/search/fireworks/`, {
@@ -272,12 +274,8 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
     // Use `setTimeout` to simulate fetching data from server.
     this.param$.pipe(
       take(1),
-      switchMap(param => param ? this.fetcher(page, this.pageSize, param) : of({
-        found: 0,
-        facets: [],
-        entries: []
-      } as Search.Result)),
-      catchError(err => of({found: 0, facets: [], entries: []} as Search.Result))
+      switchMap(param => param ? this.fetcher(page, this.pageSize, param) : of(Search.EMPTY_RESULTS)),
+      catchError(err => of(Search.EMPTY_RESULTS))
     ).subscribe(result => {
       this._result.set(result);
       if (this.cachedEntries.length !== result.found) this.cachedEntries.length = result.found;
@@ -289,6 +287,8 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
 
 
 namespace Search {
+  export const EMPTY_RESULTS = {found: 0, facets: [], entries: []} as Search.Result;
+
   export interface Params extends Record<string, any> {
     query: string
     species?: string
