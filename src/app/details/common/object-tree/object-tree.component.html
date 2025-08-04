@@ -28,8 +28,8 @@
     <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
       <div class="left">
         <mat-icon class="symbol-icon"
-                  [matTooltip]="moleculeView()? getSymbol(element.icon).tooltip: getSymbol(element).tooltip"
-                  [svgIcon]="moleculeView()? getSymbol(element.icon).name: getSymbol(element).name">
+                  [matTooltip]="moleculeView() ? getSymbol(element.icon).tooltip : getSymbol(element).tooltip"
+                  [svgIcon]="moleculeView() ? getSymbol(element.icon).name : getSymbol(element).name">
         </mat-icon>
 
         <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
@@ -51,13 +51,13 @@
 
       <div class="right">
 
-        @if(moleculeView() && node.highlight){
+        @if (moleculeView() && node.highlight) {
           <span class="highlight-tag">📌</span>
         }
 
-        @if(moleculeView()) {
+        @if (moleculeView()) {
           <span class="molecule name">
-            {{element.identifier}}
+            {{ element.identifier }}
           </span>
         }
 
@@ -81,7 +81,7 @@
           </span>
         }
 
-        @if(!moleculeView()){
+        @if (!moleculeView()) {
           <div class="select-container">
             <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
             <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
@@ -125,11 +125,11 @@
         </div>
 
         @if (!moleculeView()) {
-         <!--Point to entity details which contains more data and provide protein structure only-->
+          <!--Point to entity details which contains more data and provide protein structure only-->
           <cr-object-tree-details [obj]="element"
-                             [className]="element.className"
-                             [refEntity]="element.referenceEntity"
-                             [xRefs]="element.referenceEntity?.crossReference ?? []">
+                                  [className]="element.className"
+                                  [refEntity]="element.referenceEntity"
+                                  [xRefs]="element.referenceEntity?.crossReference ?? []">
           </cr-object-tree-details>
 
         } @else {
