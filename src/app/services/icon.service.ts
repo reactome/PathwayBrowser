@@ -58,6 +58,7 @@ export class IconService {
       route: 'complex'
     },
     SimpleEntity: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
+    ReferenceMolecule: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
     Cell: {name: 'cell', tooltip: 'Cell Type', route: 'cell'},
     DefinedSet: {name: 'defined-set', tooltip: 'Defined Set', route: 'defined-set'},
     OtherEntity: {name: 'other-entity', tooltip: 'Other Entity', route: 'other-entity'},
@@ -66,6 +67,7 @@ export class IconService {
     ReferenceDNASequence: {name: 'gene', tooltip: 'DNA Sequence', route: 'gene'},
     ReferenceRNASequence: {name: 'RNA', tooltip: 'RNA Sequence', route: 'RNA'},
     ReferenceGeneProduct: this.protein,
+    ReferenceTherapeutic: {name: 'drug', tooltip: 'Drug', route: 'chemical-drug'},
     ReferenceIsoform: this.protein,
     Interactor: {name: 'interactor', tooltip: 'Interactor', route: 'interactor'},
     GenomeEncodedEntity: {

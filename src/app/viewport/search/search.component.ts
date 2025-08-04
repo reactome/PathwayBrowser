@@ -106,6 +106,14 @@ export class SearchComponent {
     private species: SpeciesService,
     public state: UrlStateService,
     public icons: IconService) {
+    effect(() => this.typeFilter() && this.searchParams.update(params => (params ? {
+      ...params,
+      types: this.typeFilter()
+    } : undefined)));
+    effect(() => this.diagram() && this.searchParams.update(params => (params ? {
+      ...params,
+      diagram: this.diagram()
+    } : undefined)));
     effect(() => this.resultHeight() && this.resultsScroll() && setTimeout(() => this.resultsScroll()?.checkViewportSize()));
     effect(() => {
       if (this.scopes.local.found() === 0 && this.scopes.global.found() !== 0) this.currentScope.set('global')
@@ -130,6 +138,7 @@ export class SearchComponent {
     if (event) event.preventDefault();
     this.collapsed.set('opened')
     console.log('searching', searchText);
+    this.typeFilter.set([])
     this.searchParams.set({
       query: searchText,
       diagram: this.state.pathwayId() || '',
@@ -153,6 +162,8 @@ export class SearchComponent {
     if (!this.inputBox().nativeElement.contains($event.relatedTarget as Node)) this.hasFocus.set(false);
   }
 
+  typeFilter = signal<string[]>([])
+  diagram = this.state.pathwayId
   searchParams = signal<Search.Params | undefined>(undefined)
   searchParams$ = toObservable(this.searchParams)
 
@@ -186,6 +197,11 @@ export class SearchComponent {
 
   entryHeight = input(24)
   trackEntry = (index: number, value: Search.Entry | undefined) => value?.dbId || index
+
+
+  toggleTypeFacet(name: string) {
+    this.typeFilter.update(filter => filter.includes(name) ? filter.filter(f => f !== name) : [...filter, name])
+  }
 
   collapsed = signal<'collapsed' | 'opened'>('opened')
 
