@@ -3,6 +3,8 @@
 .container {
   --gap: 20px;
   --half-gap: calc(var(--gap) / 2);
+  --columns: 6;
+  --column-width: calc((100cqw - var(--gap) * (var(--columns) + 1)) / var(--columns)) ;
 
   background: var(--surface);
   font-family: 'Roboto', sans-serif;
@@ -12,7 +14,7 @@
   padding-top: var(--half-gap);
   display: grid;
   align-items: start;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(var(--columns), 1fr);
   padding-right: 6px;
 }
 
