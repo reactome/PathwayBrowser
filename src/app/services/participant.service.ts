@@ -15,6 +15,7 @@ export interface Molecule {
   schemaClass: string;
   displayName: string;
   icon: string;
+  displayIcon:string;
   url: string;
   formattedName: string;
   type: string;
@@ -46,8 +47,9 @@ export class ParticipantService {
           ...participant,
           refEntities: participant.refEntities.map(molecule => ({
             ...molecule,
-            formattedName: this.getType(molecule).name, // UniProt:P78396 CCNA1 ➡️ CCNA1
-            type: this.getType(molecule).type
+            formattedName: this.getNameAndType(molecule).name, // UniProt:P78396 CCNA1 ➡️ CCNA1
+            type: this.getNameAndType(molecule).type,
+            displayIcon: this.getDisplayIcon(molecule),// Correct DNA/RNA icon
           }))
         })))
     );

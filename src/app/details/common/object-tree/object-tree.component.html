@@ -28,8 +28,8 @@
     <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
       <div class="left">
         <mat-icon class="symbol-icon"
-                  [matTooltip]="moleculeView()? getSymbol(element.icon).tooltip: getSymbol(element).tooltip"
-                  [svgIcon]="moleculeView()? getSymbol(element.icon).name: getSymbol(element).name">
+                  [matTooltip]="moleculeView()? getSymbol(element.displayIcon).tooltip: getSymbol(element).tooltip"
+                  [svgIcon]="moleculeView()? getSymbol(element.displayIcon).name: getSymbol(element).name">
         </mat-icon>
 
         <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
