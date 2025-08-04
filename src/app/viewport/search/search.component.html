@@ -14,7 +14,7 @@
     <input type="text" placeholder="Search protein, gene, pathway, reaction" [(ngModel)]="searchText" #query
            (keydown)="hasFocus.set(true)">
   </div>
-  @if (scopes[currentScope()].found()) {
+  @if (scopes[currentScopeName()].found()) {
     <button mat-icon-button (click)="clear($event)">
       <mat-icon fontSet="symbols">close</mat-icon>
     </button>
@@ -38,20 +38,20 @@
     <div class="collapsable" [@collapsable]="collapsed()">
       <div class="scope-container">
         @if (state.pathwayId() && scopes.local.found()) {
-          <div class="scope" [class.selected]="currentScope() === 'local'" (click)="currentScope.set('local')">
+          <div class="scope" [class.selected]="currentScopeName() === 'local'" (click)="currentScopeName.set('local')">
             <mat-icon svgIcon="local-scope"/>
             <span>Current pathway</span>
-            <span class="count" [class.active]="currentScope() === 'local'">{{ scopes.local.found() }}</span>
+            <span class="count" [class.active]="currentScopeName() === 'local'">{{ scopes.local.found() }}</span>
           </div>
         }
-        <div class="scope" [class.selected]="currentScope() === 'global'" (click)="currentScope.set('global')">
+        <div class="scope" [class.selected]="currentScopeName() === 'global'" (click)="currentScopeName.set('global')">
           <mat-icon svgIcon="global-scope"/>
           <span>All pathways</span>
-          <span class="count" [class.active]="currentScope() === 'global'">{{ scopes.global.found() }}</span>
+          <span class="count" [class.active]="currentScopeName() === 'global'">{{ scopes.global.found() }}</span>
         </div>
       </div>
       <div class="facets">
-        @for (facet of scopes[currentScope()].facets(); track facet.name) {
+        @for (facet of currentScope().facets(); track facet.name) {
           <div class="facet" [class.active]="check.checked" (click)="check.toggle()">
             <mat-checkbox [value]="facet.name" #check (click)="$event.stopPropagation()"
                           [checked]="typeFilter().includes(facet.name)"
@@ -61,9 +61,9 @@
           </div>
         }
       </div>
-      <cdk-virtual-scroll-viewport itemSize="20" [style.height.px]="resultHeight()" #resultScroll
+      <cdk-virtual-scroll-viewport itemSize="24" [style.height.px]="resultHeight()" #resultScroll
                                    maxBufferPx="240" minBufferPx="120" class="scroller">
-        <div *cdkVirtualFor="let entry of scopes[currentScope()]; trackBy trackEntry; let i = index"
+        <div *cdkVirtualFor="let entry of currentScope(); trackBy trackEntry; let i = index"
              [style.height.px]="entryHeight()" (click)="state.select.set(entry?.stId || entry?.dbId || null)"
              class="result-row">
           @if (entry) {

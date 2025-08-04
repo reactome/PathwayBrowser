@@ -114,10 +114,23 @@ export class SearchComponent {
       ...params,
       diagram: this.diagram()
     } : undefined)));
-    effect(() => this.resultHeight() && this.resultsScroll() && setTimeout(() => this.resultsScroll()?.checkViewportSize()));
     effect(() => {
-      if (this.scopes.local.found() === 0 && this.scopes.global.found() !== 0) this.currentScope.set('global')
+      const subs = [this.resultHeight(), this.resultsScroll()];
+      setTimeout(() => this.resultsScroll()?.checkViewportSize(), 500); // After opening animation
     });
+    effect(() => {
+      if (!this.state.pathwayId()) this.currentScopeName.set('global');
+    });
+    effect(() => {
+      if (this.scopes.local.found() === 0 && this.scopes.global.found() !== 0) this.currentScopeName.set('global')
+    });
+    effect(() => {
+      const [active, inactive] = this.currentScopeName() === 'global'
+        ? [this.scopes.global, this.scopes.local]
+        : [this.scopes.local, this.scopes.global];
+      active.active = true;
+      inactive.active = false;
+    })
   }
 
   nextSuggest(event?: Event) {
@@ -167,7 +180,7 @@ export class SearchComponent {
   searchParams = signal<Search.Params | undefined>(undefined)
   searchParams$ = toObservable(this.searchParams)
 
-  currentScope = signal<Scope>('local')
+  currentScopeName = signal<Scope>('local')
 
   scopes: Record<Scope, SearchDataSource> = {
     local: new SearchDataSource(this.searchParams$,
@@ -192,8 +205,10 @@ export class SearchComponent {
     )
   }
 
+  currentScope = computed(() => this.scopes[this.currentScopeName()])
+
   resultHeight = computed(() => {
-    const [scope, ...sources] = [this.currentScope(), this.scopes.local.found(), this.scopes.global.found()]
+    const [scope, ...sources] = [this.currentScopeName(), this.scopes.local.found(), this.scopes.global.found()]
     return Math.min(this.scopes[scope].found(), 10) * this.entryHeight()
   })
 
@@ -228,6 +243,7 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
   private dataStream = new BehaviorSubject<(Search.Entry | undefined)[]>(this.cachedEntries);
   private subscription = new Subscription();
   private viewerToSubscription = new Map<CollectionViewer, Subscription>();
+  active = false;
 
   constructor(
     private param$: Observable<Search.Params | undefined>,
@@ -245,6 +261,7 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
 
   override connect(collectionViewer: CollectionViewer): Observable<(Search.Entry | undefined)[]> {
     const subscribe = collectionViewer.viewChange.subscribe(range => {
+      if (!this.active) return;
       const startPage = this.getPageForIndex(range.start);
       const endPage = this.getPageForIndex(range.end - 1);
       for (let i = startPage; i <= endPage; i++) {
