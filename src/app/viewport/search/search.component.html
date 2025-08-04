@@ -14,9 +14,11 @@
     <input type="text" placeholder="Search protein, gene, pathway, reaction" [(ngModel)]="searchText" #query
            (keydown)="hasFocus.set(true)">
   </div>
-  <button mat-icon-button (click)="clear($event)">
-    <mat-icon fontSet="symbols">close</mat-icon>
-  </button>
+  @if (scopes[currentScope()].found()) {
+    <button mat-icon-button (click)="clear($event)">
+      <mat-icon fontSet="symbols">close</mat-icon>
+    </button>
+  }
 
   @if (hasFocus() && suggestionResults().length >= 1) {
     <div class="suggestions" @suggest>
@@ -71,7 +73,9 @@
             <span>{{ entry.name }}</span>
 
             <div class="right">
-              <button mat-icon-button><mat-icon svgIcon="select"/></button>
+              <button mat-icon-button>
+                <mat-icon svgIcon="select"/>
+              </button>
             </div>
           } @else {
             <mat-progress-spinner [diameter]="entryHeight()" mode="indeterminate">Loading ...</mat-progress-spinner>
