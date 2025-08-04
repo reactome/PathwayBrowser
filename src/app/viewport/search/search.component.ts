@@ -6,7 +6,7 @@ import {rxResource, toObservable} from "@angular/core/rxjs-interop";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {BehaviorSubject, catchError, Observable, of, Subscription, switchMap, take} from "rxjs";
-import {animate, state, style, transition, trigger} from "@angular/animations";
+import {animate, sequence, state, style, transition, trigger} from "@angular/animations";
 import {SpeciesService} from "../../services/species.service";
 import {UrlStateService} from "../../services/url-state.service";
 import {CollectionViewer, DataSource} from "@angular/cdk/collections";
@@ -56,10 +56,17 @@ type Scope = 'local' | 'global';
       ])
     ]),
     trigger('collapsable', [
-      state('collapsed', style({height: '0', padding: '0 0', marginTop: '-4px'})),
-      state('opened', style({height: '*', padding: '4px 0', marginTop: '0'})),
-      transition('* <=> *', [animate('500ms ease-in-out')]),
-      transition(':leave', style({height: '0', padding: '0 0', marginTop: '-4px'})) // Todo Make cleaning when collapsed not cancel its state
+      transition(':enter', [
+        style({height: '0'}),
+        animate('500ms ease-in-out', style({height: '*'})),
+      ]),
+      transition(':leave', [
+        style({height: '*'}),
+        sequence([
+          animate('500ms ease-in', style({height: '0'})),
+          animate('10ms linear', style({padding: '0 0', marginTop: '-4px'})),
+        ])
+      ])
     ]),
     trigger('collapse-button', [
       state('collapsed', style({
