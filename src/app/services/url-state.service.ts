@@ -19,7 +19,7 @@ export type UrlParam<T> = WritableSignal<T> & {
 };
 
 export function urlParam<T>(initialValue: T, type: UrlParam<T>['type'], otherTokens?: string[]): UrlParam<T> {
-  const writableSignal = signal<T>(initialValue) as UrlParam<T>;
+  const writableSignal = signal<T>(initialValue, {equal: (a, b) => JSON.stringify(a) === JSON.stringify(b)}) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
   writableSignal.initialValue = initialValue;
   writableSignal.type = type;

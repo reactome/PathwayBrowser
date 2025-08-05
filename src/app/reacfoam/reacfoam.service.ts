@@ -160,7 +160,6 @@ export class ReacfoamService {
   })
 
   mergedData = computed(() => {
-    console.log('signal mergedData')
     return this.layoutMap.value() && this.eventsHierarchyData.value() ? {
       layoutMap: this.layoutMap.value()!,
       events: this.eventsHierarchyData.value()!,
@@ -186,10 +185,19 @@ export class ReacfoamService {
     return familyColorMap
   })
 
+  flagColor = computed(() => {
+    this.dark.isDark(); // Compute on dark update
+    return chroma(extract(this.style.properties.global.flag))
+  })
+
   surfaceColor = computed(() => {
-    console.log('signal surfaceColor')
     this.dark.isDark(); // Compute on dark update
     return chroma(extract(this.style.properties.global.surface))
+  })
+
+  onSurfaceColor = computed(() => {
+    this.dark.isDark(); // Compute on dark update
+    return chroma(extract(this.style.properties.global.onSurface))
   })
 
   mergedFilters = computed(() => ({

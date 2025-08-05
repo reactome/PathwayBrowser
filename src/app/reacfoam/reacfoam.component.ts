@@ -6,6 +6,7 @@ import {DarkService} from "../services/dark.service";
 import {UrlStateService} from "../services/url-state.service";
 import {AnalysisService} from "../services/analysis.service";
 import {AnalysisLegendComponent} from "../legend/analysis-legend/analysis-legend.component";
+import {DataStateService} from "../services/data-state.service";
 
 
 @Component({
@@ -149,9 +150,20 @@ export class ReacfoamComponent implements OnDestroy {
     })
   });
 
+  cleanFlagIdentifiers = computed(() => new Set(this.data.flagIdentifiers().filter(id => id.startsWith('R-'))))
+  flagging = computed(() => this.cleanFlagIdentifiers().size !== 0)
+
+  setFlag(groups: PathwayGroup[]) {
+    groups?.forEach((group: PathwayGroup) => {
+      group.flag = this.flagging() ? this.cleanFlagIdentifiers().has(group.stId) : false
+      group.groups && this.setFlag(group.groups)
+    })
+  }
+
   constructor(
     private reacfoam: ReacfoamService,
     private state: UrlStateService,
+    private data: DataStateService,
     public analysis: AnalysisService,
     private dark: DarkService,
     private router: Router) {
@@ -163,6 +175,11 @@ export class ReacfoamComponent implements OnDestroy {
       if (untracked(this.correctedSelectedId)) { // Initial select
         this.foamTree().select({groups: untracked(this.correctedSelectedId), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
       }
+    });
+    effect(() => {
+      this.cleanFlagIdentifiers() && this.reacfoam.data();
+      this.setFlag(this.foamTree().get('dataObject').groups)
+      this.foamTree().redraw()
     });
     effect(() => this.container()?.nativeElement && this.sizeObserver.observe(this.container().nativeElement));
     effect(() => { // Update colors upon analysis column switching
@@ -190,7 +207,7 @@ export class ReacfoamComponent implements OnDestroy {
           // }
 
           if (this.analysis.result()) { // Analysis
-            values.labelColor = 'auto'
+            values.labelColor = this.flagging() && props.group.flag ? this.reacfoam.flagColor().hex() : 'auto';
             const fdr = props.group.fdr;
 
             const notFoundColor = this.reacfoam.surfaceColor().hex();
@@ -217,6 +234,10 @@ export class ReacfoamComponent implements OnDestroy {
               values.labelColor = props.group.familyColor.darken(4).saturate(5).hex();
             }
 
+            if (this.flagging()) {
+              values.groupColor = props.group.flag ? this.reacfoam.flagColor().hex() :this.reacfoam.surfaceColor().hex();
+              values.labelColor = props.group.flag ? this.reacfoam.surfaceColor().hex() :this.reacfoam.onSurfaceColor().hex();
+            }
             // values.groupColor =  props.group.depthColor.hex();
             // values.labelColor = 'auto'
           }
@@ -233,7 +254,7 @@ export class ReacfoamComponent implements OnDestroy {
     this.sizeObserver.disconnect();
   }
 
-  export(params : FoamTree.ImageFormat) {
+  export(params: FoamTree.ImageFormat) {
     const a = document.createElement('a');
     a.href = this.foamTree().get('imageData', params)
     a.download = `reacfoam.${params.format.split('/')[1]}`;
