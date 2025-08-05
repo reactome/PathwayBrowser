@@ -278,9 +278,11 @@ export class DiagramService {
         }
 
         idToGraphNodes.forEach(node => {
-          let leaves = new Set<Graph.Node>();
-          getLeaves(node, leaves);
-          node.leaves = [...leaves];
+          if (node.children.length > 0) {
+            let leaves = new Set<Graph.Node>();
+            getLeaves(node, leaves);
+            node.leaves = [...leaves];
+          }
         })
 
         const dbIdToGraphEdge = new Map<number, Graph.Edge>(graph.edges.map(edge => ([edge.dbId, edge])))
