@@ -831,7 +831,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   private stateToDiagram() {
     for (let cy of this.cys) {
-      this.flag(this.state.flag(), cy);
+      this.flag(this.data.flagIdentifiers(), cy);
       this.select(this.state.select()!, cy);
     }
 
