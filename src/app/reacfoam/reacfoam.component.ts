@@ -177,7 +177,7 @@ export class ReacfoamComponent implements OnDestroy {
       }
     });
     effect(() => {
-      this.cleanFlagIdentifiers() ;
+      this.cleanFlagIdentifiers();
       if (this.reacfoam.data()) {
         this.setFlag(this.reacfoam.data()!)
         this.foamTree().redraw()
@@ -209,13 +209,17 @@ export class ReacfoamComponent implements OnDestroy {
           // }
 
           if (this.analysis.result()) { // Analysis
-            values.labelColor = this.flagging() && props.group.flag ? this.reacfoam.flagColor().hex() : 'auto';
+            values.labelColor = 'auto';
             const fdr = props.group.fdr;
 
             const notFoundColor = this.reacfoam.surfaceColor().hex();
 
-            if (!fdr || fdr > this.state.significance()) values.groupColor = notFoundColor;
-            else {
+            if (this.flagging() && props.group.flag) {
+              values.groupColor = this.reacfoam.flagColor().hex()
+              values.labelColor = this.reacfoam.surfaceColor().hex()
+            } else if (!fdr || fdr > this.state.significance()) {
+              values.groupColor = notFoundColor;
+            } else {
               if (this.analysis.type() === 'OVERREPRESENTATION' || this.analysis.type() === 'SPECIES_COMPARISON') { // FDR ~ color
                 values.groupColor = this.analysis.palette().scale(props.group.fdr).hex()
               } else { // expression ~ color
@@ -235,13 +239,13 @@ export class ReacfoamComponent implements OnDestroy {
               values.groupColor = props.group.familyColor.darken(depth * 0.15).saturate(depth * 0.3).hex();
               values.labelColor = props.group.familyColor.darken(4).saturate(5).hex();
             }
-
-            if (this.flagging()) {
-              values.groupColor = props.group.flag ? this.reacfoam.flagColor().hex() :this.reacfoam.surfaceColor().hex();
-              values.labelColor = props.group.flag ? this.reacfoam.surfaceColor().hex() :this.reacfoam.onSurfaceColor().hex();
-            }
             // values.groupColor =  props.group.depthColor.hex();
             // values.labelColor = 'auto'
+
+            if (this.flagging()) {
+              values.groupColor = props.group.flag ? this.reacfoam.flagColor().hex() : this.reacfoam.surfaceColor().hex();
+              values.labelColor = props.group.flag ? this.reacfoam.surfaceColor().hex() : this.reacfoam.onSurfaceColor().hex();
+            }
           }
 
 
