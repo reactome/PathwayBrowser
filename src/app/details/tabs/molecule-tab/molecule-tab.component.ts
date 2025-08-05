@@ -59,7 +59,7 @@ export class MoleculeTabComponent {
   // Get selected pathway id on Reacfoam view
   objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
-  isReacfoamView = computed(() => this.pathwayId() === undefined);
+  isReacfoamView = computed(() => !(this.state.select() || this.state.pathwayId()));
 
 
   constructor(private participant: ParticipantService,
@@ -132,7 +132,7 @@ export class MoleculeTabComponent {
     }
 
 
-    // todo remove finalResults
+
     const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([category, dataMap]) => ({
       category,
       data: Array.from(dataMap.values())
