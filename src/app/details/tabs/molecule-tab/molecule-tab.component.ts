@@ -15,6 +15,8 @@ import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
 
 
+// TODO: Find a way to not crash when too many data, e.g. selecting a top level pathway. (using virtual scrolls probably, but wit a way to expand rows)
+
 export type MoleculeGroup = {
   category: string;
   data: MoleculeData[];
