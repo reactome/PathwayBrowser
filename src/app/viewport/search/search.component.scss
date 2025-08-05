@@ -125,6 +125,7 @@
     background: var(--surface-variant);
     color: var(--outline);
     padding: 8px;
+    cursor: pointer;
 
     &.selected {
       background: var(--primary-container);
@@ -162,6 +163,7 @@
     padding: 0 8px;
     box-sizing: border-box;
     color: var(--outline);
+    cursor: pointer;
 
 
     &.active {

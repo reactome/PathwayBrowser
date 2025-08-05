@@ -39,13 +39,15 @@
       <div class="collapsable" @collapsable>
         <div class="scope-container">
           @if (state.pathwayId() && scopes.local.found()) {
-            <div class="scope" [class.selected]="currentScopeName() === 'local'" (click)="currentScopeName.set('local')">
+            <div class="scope" [class.selected]="currentScopeName() === 'local'"
+                 (click)="currentScopeName.set('local')">
               <mat-icon svgIcon="local-scope"/>
               <span>Current pathway</span>
               <span class="count" [class.active]="currentScopeName() === 'local'">{{ scopes.local.found() }}</span>
             </div>
           }
-          <div class="scope" [class.selected]="currentScopeName() === 'global'" (click)="currentScopeName.set('global')">
+          <div class="scope" [class.selected]="currentScopeName() === 'global'"
+               (click)="currentScopeName.set('global')">
             <mat-icon svgIcon="global-scope"/>
             <span>All pathways</span>
             <span class="count" [class.active]="currentScopeName() === 'global'">{{ scopes.global.found() }}</span>
@@ -62,8 +64,10 @@
             </div>
           }
         </div>
-        <cdk-virtual-scroll-viewport itemSize="24" [style.height.px]="resultHeight()" #resultScroll
-                                     maxBufferPx="240" minBufferPx="120" class="scroller">
+        <cdk-virtual-scroll-viewport [style.height.px]="resultHeight()" #resultScroll class="scroller"
+                                     [itemSize]="entryHeight()"
+                                     [maxBufferPx]="entryHeight() * 10"
+                                     [minBufferPx]="entryHeight() * 5">
           <div *cdkVirtualFor="let entry of currentScope(); trackBy trackEntry; let i = index"
                [style.height.px]="entryHeight()" (click)="state.select.set(entry?.stId || entry?.dbId || null)"
                class="result-row">

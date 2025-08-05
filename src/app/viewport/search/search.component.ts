@@ -88,6 +88,7 @@ export class SearchComponent {
   open = signal(false);
 
   inputBox = viewChild.required<ElementRef<HTMLDivElement>>('inputBox');
+  query = viewChild.required<ElementRef<HTMLInputElement>>('query');
 
   suggestions = rxResource({
     request: this.searchText,
@@ -153,7 +154,7 @@ export class SearchComponent {
 
   search(searchText?: string, event?: Event) {
     searchText = searchText || this.searchText();
-    this.hasFocus.set(false)
+    this.query().nativeElement.blur();
     this.searchText.set(searchText);
     if (event) event.preventDefault();
     this.collapsed.set('opened')
@@ -191,7 +192,7 @@ export class SearchComponent {
 
   scopes: Record<Scope, SearchDataSource> = {
     local: new SearchDataSource(this.searchParams$,
-      (page, pageSize, params) => params.diagram ?
+      (page, pageSize, params) => params.diagram && params.query.length > 0 ?
         this.http.get<Search.Result>(`${environment.host}/ContentService/search/diagram/${params.diagram}`, {
           params: {
             ...params,
@@ -202,13 +203,15 @@ export class SearchComponent {
         : of(Search.EMPTY_RESULTS)
     ),
     global: new SearchDataSource(this.searchParams$,
-      (page, pageSize, params) => this.http.get<Search.Result>(`${environment.host}/ContentService/search/fireworks/`, {
-        params: {
-          ...params,
-          start: page * pageSize,
-          rows: pageSize,
-        } as Search.Paginated<Search.Params>
-      })
+      (page, pageSize, params) => params.query.length > 0 ?
+        this.http.get<Search.Result>(`${environment.host}/ContentService/search/fireworks/`, {
+          params: {
+            ...params,
+            start: page * pageSize,
+            rows: pageSize,
+          } as Search.Paginated<Search.Params>
+        })
+        : of(Search.EMPTY_RESULTS)
     )
   }
 
