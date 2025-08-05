@@ -177,9 +177,11 @@ export class ReacfoamComponent implements OnDestroy {
       }
     });
     effect(() => {
-      this.cleanFlagIdentifiers() && this.reacfoam.data();
-      this.setFlag(this.foamTree().get('dataObject').groups)
-      this.foamTree().redraw()
+      this.cleanFlagIdentifiers() ;
+      if (this.reacfoam.data()) {
+        this.setFlag(this.reacfoam.data()!)
+        this.foamTree().redraw()
+      }
     });
     effect(() => this.container()?.nativeElement && this.sizeObserver.observe(this.container().nativeElement));
     effect(() => { // Update colors upon analysis column switching
