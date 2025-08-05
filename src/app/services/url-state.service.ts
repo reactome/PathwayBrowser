@@ -101,7 +101,7 @@ export class UrlStateService implements State {
     });
 
     route.fragment.pipe(untilDestroyed(this)).subscribe((fragment) => {
-      if (fragment) { // Convert fragments to
+      if (fragment) { // Convert fragments to params
         let params: Params = {};
         let id = undefined; // Default routing
 
@@ -122,6 +122,7 @@ export class UrlStateService implements State {
 
         this.router.navigate(id ? [id] : [], {
           queryParamsHandling: 'merge',
+          fragment: fragment.replace(FRAGMENT_PATTERN, ''),
           preserveFragment: false,
           queryParams: params
         });
