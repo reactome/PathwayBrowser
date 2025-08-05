@@ -126,21 +126,7 @@
         </div>
       </ng-template>
       <ng-template matTabContent>
-
-        @if (!hasDownload()) {
-          <div class="tab-description-container">
-            <h3> 📥 Download</h3>
-            <p>When a pathway is displayed in the panel above,
-              download buttons are available for exporting the diagram in various formats for reuse or reference.
-              Supported formats include <b>PDF</b>, <b>SBML</b>, <b>SBGN</b>, <b>BioPAX 2</b>, <b>BioPAX 3</b>.
-              A link to the <b>Newt Editor</b> is also provided, allowing you to edit the pathway diagram interactively.
-            </p>
-            <p>After performing an analysis, you can also download a corresponding <b>analysis report</b>.</p>
-          </div>
-        } @else {
-          <cr-download-tab></cr-download-tab>
-        }
-
+        <cr-download-tab></cr-download-tab>
       </ng-template>
     </mat-tab>
 

@@ -1,29 +1,28 @@
-import {Component, computed, effect, signal, Signal, WritableSignal} from '@angular/core';
-import {MatDivider} from "@angular/material/divider";
+import {Component, computed, signal, Signal, WritableSignal} from '@angular/core';
 import {MatAnchor} from "@angular/material/button";
 import {UrlStateService} from "../../../services/url-state.service";
 import {HttpClient} from "@angular/common/http";
-import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatIcon} from "@angular/material/icon";
 import {DataStateService} from "../../../services/data-state.service";
 import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
 import {environment} from "../../../../environments/environment";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {SafePipe} from "../../../pipes/safe.pipe";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 
 type PathwayItem = {
-  type: string;
+  name: string;
   url: string;
-  icon: Signal<string>;
-  isSVGIcon: boolean;
 }
 
 type AnaLysisItem = {
   title: string;
   description?: string;
   url: string;
-  icon: Signal<string>;
+  icon: string;
   isShown: Signal<boolean>;
 }
 
@@ -31,26 +30,25 @@ type AnaLysisItem = {
 @Component({
   selector: 'cr-download-tab',
   imports: [
-    MatDivider,
     MatAnchor,
+    MatIcon,
     SafePipe,
-    MatIcon
+    MatTooltip,
+    MatProgressSpinner,
+
   ],
   templateUrl: './download-tab.component.html',
   styleUrl: './download-tab.component.scss'
 })
 export class DownloadTabComponent {
 
-
-  sbml = toSignal(this.http.get('assets/icons/species/homo-sapiens.svg', {responseType: 'text'}), {initialValue: ''});
-  sbgn = toSignal(this.http.get('assets/icons/species/homo-sapiens.svg', {responseType: 'text'}), {initialValue: ''});
-  bioPax2 = toSignal(this.http.get('assets/icons/species/homo-sapiens.svg', {responseType: 'text'}), {initialValue: ''});
-  bioPax3 = toSignal(this.http.get('assets/icons/species/homo-sapiens.svg', {responseType: 'text'}), {initialValue: ''});
-  newt = toSignal(this.http.get('assets/icons/species/homo-sapiens.svg', {responseType: 'text'}), {initialValue: ''});
+  newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
+  newtUrl = computed(()=> `https://web.newteditor.org/?URL=${environment.host}/ContentService/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
 
   pathwayId = this.state.pathwayId as WritableSignal<string>;
-  selectedElement = this.data.selectedElement;
-  finalPathwayId = computed(() => {
+  selectedElement = this.dataState.selectedElement;
+
+  finalEventId = computed(() => {
     const pathwayId = this.pathwayId();
     const selected = this.selectedElement();
     if (pathwayId) return pathwayId;
@@ -58,8 +56,23 @@ export class DownloadTabComponent {
     return undefined;
   })
 
+  finalPathwayName = computed(() => {
+    const pathway = this.dataState.currentPathway();
+    const selected = this.selectedElement();
+    if (pathway) return pathway.displayName
+    if (selected && isPathway(selected)) return selected.displayName;
+    return undefined
+  });
 
   hasResult = computed(() => !!(this.analysis.result()) || this.analysis.gsaReportsRequired());
+  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
+
+  hasDownload = computed(() => {
+    if(this.hasResult()) return true;
+    return this.hasDetail();
+  });
+
+
   token = computed(() => this.analysis.result()?.summary.token);
   currentAnalysisResource = computed(() => {
     return this.analysis.resourceFilterActive() ? this.analysis.resourceFilter() : 'TOTAL';
@@ -74,95 +87,72 @@ export class DownloadTabComponent {
 
   pathwayItems: PathwayItem[] = [
     {
-      type: 'sbml',
-      url: `${environment.host}/ContentService/exporter/event/${this.finalPathwayId()}.sbml`,
-      icon: this.sbml,
-      isSVGIcon: true
+      name: 'SBML',
+      url: `${environment.host}/ContentService/exporter/event/${this.finalEventId()}.sbml`,
     },
     {
-      type: 'sbgn',
-      url: `${environment.host}/ContentService/exporter/event/${this.finalPathwayId()}.sbgn`,
-      icon: this.sbgn,
-      isSVGIcon: true
+      name: 'SBGN',
+      url: `${environment.host}/ContentService/exporter/event/${this.finalEventId()}.sbgn`,
     },
     {
-      type: 'bioPax2',
-      url: `${environment.host}/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level2/${this.finalPathwayId()}`,
-      icon: this.bioPax2,
-      isSVGIcon: true
+      name: 'BioPAX2',
+      url: `${environment.host}/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level2/${this.finalEventId()}`,
     },
     {
-      type: 'bioPax3',
-      url: `${environment.host}/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level3/${this.finalPathwayId()}`,
-      icon: this.bioPax3,
-      isSVGIcon: true
+      name: 'BioPAX3',
+      url: `${environment.host}/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level3/${this.finalEventId()}`,
     },
     {
-      type: '',
-      url: `${environment.host}/ContentService/exporter/event/${this.finalPathwayId()}.pdf`,
-      icon: signal('picture_as_pdf'),
-      isSVGIcon: false
-    },
-    {
-      type: 'newt',
-      url: `https://web.newteditor.org/?URL=${environment.host}/ContentService/exporter/event/${this.finalPathwayId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`,
-      icon: this.newt,
-      isSVGIcon: true
-    },
+      name: 'PDF',
+      url: `${environment.host}/ContentService/exporter/event/${this.finalEventId()}.pdf`,
+    }
   ]
 
   analysisItems: AnaLysisItem[] = [
     {
-      title: 'Pathway Analysis Results in CSV format',
+      title: 'Results CSV',
+      description:'Download the pathway analysis results in CSV format for selected resource',
       url: `${environment.host}/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`,
-      icon: this.sbml,
+      icon: 'table',
       isShown: computed(() => !this.analysis.isGSA())
     },
 
     {
-      title: 'Compressed Pathway Analysis Results in JSON Format',
+      title: 'Results JSON',
+      description:'Download a compressed file containing the complete analysis results in JSON format fot all resources',
       url: `${environment.host}/AnalysisService/download/${this.token()}/result.json.gz`,
-      icon: this.sbml,
+      icon: 'data_object',
       isShown: signal(true)
     },
 
     {
-      title: 'Analysis Results in PDF Format',
-      url: `${environment.host}/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies}/report.pdf`,
-      icon: this.sbml,
+      title: 'Result PDF',
+      description:'Download a detailed report with the most significant pathway analysis results in PDF format',
+      url: `${environment.host}/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`,
+      icon: 'docs',
       isShown: computed(() => !this.analysis.isGSA())
     },
 
     {
-      title: 'Identifier Mapping in CSV format',
-      url: `${environment.host}/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource}/mapping.csv`,
-      icon: this.sbml,
+      title: 'Identifier Mapping CSV',
+      description:'Download the identifier mappings between the submitted data and the selected resource in CSV format',
+      url: `${environment.host}/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`,
+      icon: 'table',
       isShown: signal(true)
     },
 
     {
-      title: 'Not Found Identifiers in CSV Format',
+      title: 'Not Found Identifiers CSV',
+      description:'Download a CSV file containing those identifiers from the submitted sample that we were not mapped',
       url: `${environment.host}/AnalysisService/dowmload/${this.token()}/entities/notfound/not_found.csv`,
-      icon: this.sbml,
+      icon: 'table',
       isShown: signal(true)
     }]
 
   constructor(private state: UrlStateService,
               private http: HttpClient,
-              private data: DataStateService,
+              private dataState: DataStateService,
               private analysis: AnalysisService) {
-    effect(() => {
-      console.log("pathwayId", this.finalPathwayId());
-      console.log("hasResult", this.analysis.result());
-      console.log("isGSA", this.analysis.isGSA());
-      console.log("hasGSAReports", this.hasGSAReports());
-      console.log("GSAReports", this.gsaReports());
-      console.log("hasAnalysisResult", this.analysis.result());
-      // console.log("analysisResourceFilter", this.analysis.resourceFilter());
-      // console.log("analysisResourceOptions", this.analysis.resourceOptions());
-      // console.log("analysisResourceFilterActive", this.analysis.resourceFilterActive());
-      console.log("analysis result", this.analysisItems);
-    });
   }
 
   protected readonly environment = environment;
@@ -170,9 +160,9 @@ export class DownloadTabComponent {
   getGsaIcon(name: string) {
     switch (name) {
       case 'MS Excel Report (xlsx)':
-        return 'table_view';
+        return 'table';
       case 'PDF Report':
-        return 'picture_as_pdf';
+        return 'docs';
       case 'R Script':
         return 'code_blocks';
       default:
