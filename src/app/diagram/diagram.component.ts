@@ -740,7 +740,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
             const style: Style = cy.data('reactome');
 
             cy.nodes('.PhysicalEntity').forEach(node => {
-              const leaves: Graph.Node[] = node.data('graph.leaves');
+              const leaves: Graph.Node[] = node.data('graph.leaves') || [node.data('graph')];
               const exp = leaves
                 ?.map(leaf => analysisEntityMap.get(leaf.identifier))
                 ?.sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
