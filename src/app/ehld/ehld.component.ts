@@ -17,6 +17,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {isDefined} from "../services/utils";
 import {Style} from "reactome-cytoscape-style";
 import {rxResource} from "@angular/core/rxjs-interop";
+import {DataStateService} from "../services/data-state.service";
 
 
 @Component({
@@ -43,13 +44,14 @@ export class EhldComponent implements AfterViewInit {
   stIdToSVGGElement = signal(new Map<string, SVGGElement>());
   subpathwayStIds = computed(() => [...this.stIdToSVGGElement().keys()])
   selectedElement = linkedSignal(() => this.state.select() ? this.stIdToSVGGElement().get(this.state.select()!) : undefined);
-  flaggedElements = computed(() => this.state.flag().map(stId => this.stIdToSVGGElement().get(stId)).filter(isDefined));
+  flaggedElements = computed(() => this.data.flagIdentifiers().map(stId => this.stIdToSVGGElement().get(stId)).filter(isDefined));
   panZoom?: SvgPanZoom.Instance;
   legendItems: LegendGroup[] = [...this.ehldService.legendItems];
 
   constructor(private ehldService: EhldService,
               public analysis: AnalysisService,
-              public state: UrlStateService,) {
+              public state: UrlStateService,
+              private data: DataStateService) {
     effect(() => this.selectedElement() && this.ehldService.applyOutline(this.selectedElement()!, this.flaggedElements()));
     effect(() => this.flaggedElements().forEach(g => this.ehldService.applyFlagOutline(g)));
     effect(() => {
