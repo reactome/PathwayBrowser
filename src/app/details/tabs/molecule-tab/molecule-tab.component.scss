@@ -64,6 +64,7 @@
   flex-direction: column;
   align-items: flex-end;
   padding: 5px 0 5px 0;
+  margin-right: 13px;
   gap: 8px;
   height: calc(100cqh - var(--bottom-panel-tabs-header-height) - 20px);
   overflow-y: auto;
