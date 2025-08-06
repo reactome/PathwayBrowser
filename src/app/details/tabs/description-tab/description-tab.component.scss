@@ -8,7 +8,6 @@
   gap: var(--gap);
   padding-left: var(--gap);
   align-content: space-between;
-  padding-top: var(--half-gap);
   display: grid;
   align-items: start;
   grid-template-columns: repeat(var(--columns), 1fr);
@@ -163,6 +162,7 @@
 .icon-container {
   box-sizing: border-box;
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   align-items: center;
   padding: 8px;

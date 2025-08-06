@@ -21,9 +21,11 @@
 
 
 .composition-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  column-gap: 20px;
+  display: grid;
+  //grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
   align-items: center;
   padding-left: 10px;
   border-left: 2px solid var(--outline-variant);
@@ -39,21 +41,11 @@
   letter-spacing: 0.25px;
 }
 
-// A grid layout
-.columns-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: start;
-  align-items: center;
-}
 
 .column-item {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  flex: 1 1 25%; // Each item takes exactly 25% of the container width
-  max-width: 25%; // Ensures all items have the same width
 }
 
 .item {
