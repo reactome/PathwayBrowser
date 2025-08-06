@@ -43,7 +43,7 @@ import {DetailsComponent} from "./details/details.component";
 import {DescriptionTabComponent} from "./details/tabs/description-tab/description-tab.component";
 import {RefsTreeComponent} from "./details/common/refs-tree/refs-tree.component";
 import {PublicationComponent} from "./details/common/publication/publication.component";
-import {DescriptionOverviewComponent} from "./details/common/description-overview/description-overview.component";
+import {DescriptionOverviewComponent} from "./details/tabs/description-tab/description-overview/description-overview.component";
 import {IncludeRefPipe} from "./pipes/include-ref.pipe";
 import {AuthorshipDateFormatPipe} from "./pipes/authorship-date-format.pipe";
 import {SortByDatePipe} from "./pipes/sort-by-date.pipe";
