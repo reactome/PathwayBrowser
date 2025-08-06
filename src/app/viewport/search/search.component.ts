@@ -16,6 +16,7 @@ import {IconService} from "../../services/icon.service";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {has} from "lodash";
+import {FlagButtonComponent} from "../../details/common/flag-button/flag-button.component";
 
 const MIN_SUGGEST_LENGTH = 2;
 
@@ -33,6 +34,7 @@ type Scope = 'local' | 'global';
     MatProgressSpinner,
     MatTooltip,
     MatCheckbox,
+    FlagButtonComponent,
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss',

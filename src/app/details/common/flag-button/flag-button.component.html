@@ -1,4 +1,4 @@
-<button mat-icon-button (click)="toggle()" [class.flagged]="flagged()" class="flag-button">
+<button mat-icon-button (click)="toggle()" [class.flagged]="flagged()" class="flag-button" [style.--size.px]="size()" [style.--touch-size.px]="touchSize()">
   <mat-icon fontSet="symbols">
     {{flagged() ? 'flag_check' : 'flag'}}
   </mat-icon>

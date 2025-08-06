@@ -15,6 +15,8 @@ import {MatIcon} from "@angular/material/icon";
 export class FlagButtonComponent {
   id = input.required<string>()
   flagged = computed(() => this.state.flag().includes(this.id()))
+  size = input(40)
+  touchSize = input(48)
 
   constructor(public state: UrlStateService) {
   }
