@@ -44,6 +44,7 @@
     "cytoscape": "3.31.0",
     "cytoscape-fcose": "^2.2.0",
     "cytoscape-layers": "^3.0.0",
+    "ng-table-virtual-scroll": "^1.6.1",
     "ngx-custom-material-file-input": "^19.0.0",
     "ngx-reactome-style": "file:.yalc/ngx-reactome-style",
     "ngx-ui-tour-md-menu": "^14.0.1",

@@ -3,7 +3,7 @@ import {MoleculeGroup} from "../molecule-tab.component";
 import {
   MatCell,
   MatCellDef,
-  MatColumnDef,
+  MatColumnDef, MatFooterRow,
   MatHeaderCell,
   MatHeaderCellDef,
   MatHeaderRow,
@@ -11,7 +11,7 @@ import {
   MatRow,
   MatRowDef,
   MatTable,
-  MatTableDataSource
+  MatTableDataSource, MatTableModule
 } from "@angular/material/table";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -20,6 +20,8 @@ import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatTooltip} from "@angular/material/tooltip";
+import {TableVirtualScrollDataSource, TableVirtualScrollModule} from "ng-table-virtual-scroll";
+import {ScrollingModule} from "@angular/cdk/scrolling";
 
 
 type MoleculeRow = {
@@ -32,16 +34,6 @@ type MoleculeRow = {
 @Component({
   selector: 'cr-molecule-download-table',
   imports: [
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCell,
-    MatHeaderRow,
-    MatRow,
-    MatHeaderCellDef,
-    MatCellDef,
-    MatHeaderRowDef,
-    MatRowDef,
     MatCheckbox,
     MatSort,
     MatSortHeader,
@@ -53,7 +45,10 @@ type MoleculeRow = {
     MatMenuTrigger,
     MatMenu,
     MatMenuItem,
-    MatTooltip
+    MatTooltip,
+    TableVirtualScrollModule,
+    ScrollingModule,
+    MatTableModule
   ],
   templateUrl: './molecule-download-table.component.html',
   styleUrl: './molecule-download-table.component.scss'
@@ -97,13 +92,24 @@ export class MoleculeDownloadTableComponent {
     return fields;
   })
 
-  filteredData = computed(() => {
+  filteredData = computed<MoleculeRow[]>(() => {
     return this.tableData().filter(molecule =>
       this.selectedCategory().includes(molecule.type)
     );
   })
 
-  dataSource = new MatTableDataSource<MoleculeRow>([]);
+  maxWidths = computed(() => {
+    const columns = this.displayedColumns()
+    const maxData = new Map<string, string>(columns.map(column => [column, '']));
+    this.filteredData().forEach(row => {
+      columns.forEach(column => {
+        if (maxData.get(column)!.length < row[column].length) maxData.set(column, row[column]);
+      })
+    })
+    return maxData;
+  })
+
+  dataSource = new TableVirtualScrollDataSource<MoleculeRow>([]);
 
   constructor() {
 
