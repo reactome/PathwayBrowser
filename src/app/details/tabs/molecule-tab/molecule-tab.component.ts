@@ -13,6 +13,7 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
+import {GroupByPipe} from "../../../pipes/group-by.pipe";
 
 
 export type MoleculeGroup = {
@@ -43,11 +44,12 @@ export enum PropertyType {
     MatDivider,
     ObjectTreeComponent,
     MatProgressSpinner,
-    SortByDatePipe,
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
-    MoleculeDownloadTableComponent
+    MoleculeDownloadTableComponent,
+    GroupByPipe,
+    SortByDatePipe
   ],
   styleUrl: './molecule-tab.component.scss'
 })

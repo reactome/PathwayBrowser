@@ -15,11 +15,19 @@
 
         <mat-divider class="divider"></mat-divider>
         <div class="composition-container">
-          @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId) {
-            <cr-object-tree [type]="group.category" [data]="[item.entity]"
-                            [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
-                            [moleculeView]="true"></cr-object-tree>
+          <!--todo: clean-->
+          @for (grouped of group.data | groupBy:'highlight' | sortByText:'key':'desc'; track grouped) {
+            @for (item of grouped.value | sortByDate:'stoichiometry'; track item.entity.dbId) {
+              <cr-object-tree [type]="group.category" [data]="[item.entity]"
+                              [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
+                              [moleculeView]="true"></cr-object-tree>
+            }
           }
+          <!--          @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId) {-->
+          <!--            <cr-object-tree [type]="group.category" [data]="[item.entity]"-->
+          <!--                            [stoichiometry]=item.stoichiometry [highlight]="item.highlight"-->
+          <!--                            [moleculeView]="true"></cr-object-tree>-->
+          <!--          }-->
         </div>
       }
 

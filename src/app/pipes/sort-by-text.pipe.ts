@@ -9,9 +9,9 @@ export class SortByTextPipe implements PipeTransform {
   transform<T>(array: T[], key: keyof T, order: 'asc' | 'desc' = 'asc'): T[] {
     if (!array || !key) return array;
 
-    return array.slice().sort((a, b) => {
-      const valueA = a[key] as string;
-      const valueB = b[key] as string;
+    return [...array].sort((a, b) => {
+      const valueA = String(a[key]);
+      const valueB = String(b[key]);
       return order === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
     })
   }
