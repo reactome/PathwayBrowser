@@ -500,16 +500,18 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   readonly classRegex = /class:(\w+)([!.]drug)?/
 
-  getElements(tokens: (string | number)[], cy: cytoscape.Core): cytoscape.CollectionArgument {
+  getElements(tokens: (string | number)[], cy: cytoscape.Core, includeContainers = false): cytoscape.CollectionArgument {
     let elements: cytoscape.Collection;
 
     elements = cy.collection()
     tokens.forEach(token => {
       if (typeof token === 'string') {
         if (token.startsWith('R-')) {
-          elements = elements.or(`[graph.stId="${token}"]`)
+          let tokenElements = cy.collection(`[graph.stId="${token}"]`);
           // Load children
-          if (this.leafIdToParentIds.has(token)) this.leafIdToParentIds.get(token)!.forEach(parent => elements = elements.or(`[graph.stId="${parent}"]`))
+          if ((includeContainers || tokenElements.length === 0) && this.leafIdToParentIds.has(token)) this.leafIdToParentIds.get(token)!.forEach(parent => tokenElements = tokenElements.or(`[graph.stId="${parent}"]`))
+          elements = elements.or(tokenElements);
+
           // Consider it as a subpathway when there are no elements found and get all reactions
           if (elements.length === 0) {
             let allSubpathwaysElements = elements.or('[subpathways]');
@@ -566,7 +568,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   }
 
   flag(accs: (string | number)[], cy: cytoscape.Core): cytoscape.CollectionArgument {
-    return this.flagElements(this.getElements(accs, cy), cy)
+    return this.flagElements(this.getElements(accs, cy, true), cy)
   }
 
   flagElements(toFlag: cytoscape.CollectionArgument, cy: cytoscape.Core): cytoscape.CollectionArgument {
