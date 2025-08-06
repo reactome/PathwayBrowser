@@ -86,13 +86,13 @@ export class IconService {
       name: 'polymerisation',
       tooltip: 'Reactions that follow the pattern: Polymer + Unit - Polymer (there may be a catalyst involved).\n' +
         'Used to describe the mechanistic detail of a polymerisation',
-      route: 'polymerisation'
+      route: 'binding'
     },
     Depolymerisation: {
       name: 'depolymerisation',
       tooltip: 'Reactions that follow the pattern: Polymer + Unit - Polymer (there may be a catalyst involved).\n' +
         'Used to describe the mechanistic detail of a depolymerisation',
-      route: 'depolymerisation'
+      route: 'dissociation'
     },
     FailedReaction: {name: 'failed-reaction', tooltip: 'Failed Reaction', route: 'failed-reaction'},
 
