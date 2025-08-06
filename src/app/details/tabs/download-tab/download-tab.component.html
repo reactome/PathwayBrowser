@@ -41,10 +41,10 @@
 
   <!--pathway format-->
   @if (finalEventId()) {
-    <h3 class="category">Format</h3>
+    <h3 class="category">Pathway Format</h3>
     <div class="container pathway">
       @for (item of pathwayItems; track item) {
-        <a mat-flat-button class="button" [href]=item.url download>
+        <a mat-flat-button class="button" [href]=item.url target="_blank" [download]=item.fileName>
           <span>{{ item.name }}</span>
         </a>
       }
@@ -59,7 +59,7 @@
       <!--GSA analysis-->
       @if (gsaReports()) {
         @for (report of gsaReports(); track report.name) {
-          <a mat-flat-button class="button" [href]="report.url" download>
+          <a mat-flat-button class="button" [href]="report.url" target="_blank" download>
             <mat-icon fontSet="symbols">{{ getGsaIcon(report.name) }}</mat-icon>
             <span>{{ getGsaLabel(report.name) }}</span>
           </a>
@@ -68,7 +68,7 @@
 
       @for (item of analysisItems; track item) {
         @if (item.isShown()) {
-          <a mat-flat-button class="button" [href]=item.url [matTooltip]="item.description" download>
+          <a mat-flat-button class="button" [href]=item.url [matTooltip]="item.description" target="_blank" download>
             <mat-icon fontSet="symbols">{{ item.icon }}</mat-icon>
             <span>{{ item.title }}</span>
           </a>
