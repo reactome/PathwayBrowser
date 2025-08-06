@@ -158,7 +158,8 @@ export class DownloadTabComponent {
               private http: HttpClient,
               private dataState: DataStateService,
               private analysis: AnalysisService,
-              private reacfoam: ReacfoamService) {
+              private reacfoam: ReacfoamService,
+              public ehld: EhldService,) {
   }
 
   protected readonly environment = environment;

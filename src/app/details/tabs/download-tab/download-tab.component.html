@@ -51,6 +51,18 @@
     </div>
   }
 
+  <!--pathway diagram-->
+  @if (ehld.hasEHLD()) {
+    <h3 class="category">Pathway Diagram</h3>
+    <div class="container pathway">
+      <a mat-flat-button class="button"
+         [href]="`/ContentService/exporter/diagram/${pathwayId()}.svg`" target="_blank" download>
+        <span>SVG</span>
+      </a>
+    </div>
+  }
+
+
   <!--Analysis-->
   @if (hasResult()) {
     <h3 class="category">Analysis Results</h3>
