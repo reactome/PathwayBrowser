@@ -1,0 +1,5 @@
+@mixin configure-flag-button($size, $touch-size, $icon-ratio) {
+  --size: #{$size};
+  --icon-ratio: #{$icon-ratio};
+  --touch-size: #{$touch-size};
+}

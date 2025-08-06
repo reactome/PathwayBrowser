@@ -81,7 +81,7 @@
                 <button mat-icon-button (click)="state.select.set(entry?.stId || entry?.dbId || null)">
                   <mat-icon svgIcon="select"/>
                 </button>
-                <cr-flag-button [id]="entry.stId" [size]="20" [touchSize]="24"></cr-flag-button>
+                <cr-flag-button [id]="entry.stId" class="flag-button"></cr-flag-button>
               </div>
             } @else {
               <mat-progress-spinner [diameter]="entryHeight()" mode="indeterminate">Loading ...</mat-progress-spinner>
