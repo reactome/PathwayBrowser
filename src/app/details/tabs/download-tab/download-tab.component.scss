@@ -24,7 +24,7 @@
     font: var(--mat-sys-body-medium);
     box-shadow: var(--mat-sys-level1);
     height: var(--bottom-panel-tabs-header-height);
-    margin-top:10px
+    margin-top: 10px
   }
 
 }
@@ -38,20 +38,22 @@
 
 }
 
-
-.pathway-download {
+.container {
   gap: 20px;
   padding-bottom: 10px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-
 }
 
-.analysis-download {
-  display: grid;
+.reacfoam {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.pathway {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.analysis {
   grid-template-columns: repeat(3, 1fr);
-  flex-direction: column;
-  gap: 20px
 }
 
 
@@ -83,5 +85,5 @@
   flex-direction: column;
   align-items: center;
   width: 100cqw;
-  margin-top:20px
+  margin-top: 20px
 }

@@ -42,7 +42,7 @@
   <!--pathway format-->
   @if (finalEventId()) {
     <h3 class="category">Format</h3>
-    <div class="pathway-download">
+    <div class="container pathway">
       @for (item of pathwayItems; track item) {
         <a mat-flat-button class="button" [href]=item.url download>
           <span>{{ item.name }}</span>
@@ -54,17 +54,7 @@
   <!--Analysis-->
   @if (hasResult()) {
     <h3 class="category">Analysis Results</h3>
-    <div class="analysis-download">
-
-
-      @for (item of analysisItems; track item) {
-        @if (item.isShown()) {
-          <a mat-flat-button class="button" [href]=item.url [matTooltip]="item.description" download>
-            <mat-icon fontSet="symbols">{{ item.icon }}</mat-icon>
-            <span>{{ item.title }}</span>
-          </a>
-        }
-      }
+    <div class="container analysis">
 
       <!--GSA analysis-->
       @if (gsaReports()) {
@@ -75,11 +65,19 @@
           </a>
         }
       }
+
+      @for (item of analysisItems; track item) {
+        @if (item.isShown()) {
+          <a mat-flat-button class="button" [href]=item.url [matTooltip]="item.description" download>
+            <mat-icon fontSet="symbols">{{ item.icon }}</mat-icon>
+            <span>{{ item.title }}</span>
+          </a>
+        }
+      }
     </div>
   }
 
-
-  <div class="analysis-download">
+  <div class="analysis container">
     @if (hasGSAReports() && !gsaReports()) {
       <div class="spinner-container">
         <mat-spinner/>

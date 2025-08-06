@@ -1,4 +1,4 @@
-import {computed, Injectable, Signal} from '@angular/core';
+import {computed, Injectable, signal, Signal} from '@angular/core';
 import {SpeciesService} from "../services/species.service";
 import {environment} from "../../environments/environment";
 import {map, Observable} from "rxjs";
