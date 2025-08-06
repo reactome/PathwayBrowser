@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, WritableSignal} from '@angular/core';
+import {Component, computed, effect, Inject, input, viewChildren, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -13,6 +13,12 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
+import {CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY} from "@angular/cdk/scrolling";
+import {ScrollingModule as ExperimentalScrollingModule} from "@angular/cdk-experimental/scrolling";
+import {
+  ExpandableVirtualScrollStrategy
+} from "../../../utils/expandable-virtual-scroll/expandable-virtual-scroll.strategy";
+import {ItemResizeObserverDirective} from "../../../utils/expandable-virtual-scroll/item-resize-observer.directive";
 
 
 // TODO: Find a way to not crash when too many data, e.g. selecting a top level pathway. (using virtual scrolls probably, but wit a way to expand rows)
@@ -49,11 +55,19 @@ export enum PropertyType {
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
-    MoleculeDownloadTableComponent
+    MoleculeDownloadTableComponent,
+    ScrollingModule,
+    // ExperimentalScrollingModule,
+    ItemResizeObserverDirective,
   ],
-  styleUrl: './molecule-tab.component.scss'
+  styleUrl: './molecule-tab.component.scss',
+  providers: [{
+    provide: VIRTUAL_SCROLL_STRATEGY,
+    useClass: ExpandableVirtualScrollStrategy
+  }]
 })
 export class MoleculeTabComponent {
+
 
   readonly selectableObject = input.required<SelectableObject>();
   pathwayId = this.state.pathwayId as WritableSignal<string>;
@@ -64,9 +78,12 @@ export class MoleculeTabComponent {
   isReacfoamView = computed(() => this.pathwayId() === undefined);
 
 
+
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private state: UrlStateService) {
+              private state: UrlStateService,
+              @Inject(VIRTUAL_SCROLL_STRATEGY)
+              public readonly strategy: ExpandableVirtualScrollStrategy) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
