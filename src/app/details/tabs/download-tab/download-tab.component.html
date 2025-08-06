@@ -1,29 +1,66 @@
 <div class="download-container">
-  <h3 class="header">Pathway Format {{ finalPathwayId() }}</h3>
-  <div class="pathway-download">
 
-    @for (item of pathwayItems; track item) {
-      <a mat-stroked-button class="button" [href]=item.url download>
-        @if (item.isSVGIcon) {
-          <div class="icon" [innerHTML]="item.icon() | safe:'html':true"></div>
-        } @else {
-          <mat-icon>{{ item.icon() }}</mat-icon>
-        }
-        <span>{{ item.type }}</span>
+  @if (!hasDownload()) {
+    <div>
+      <h3> 📥 Download</h3>
+      <p>When a pathway is displayed in the panel above,
+        download buttons are available for exporting the diagram in various formats for reuse or reference.
+        Supported formats include <b>PDF</b>, <b>SBML</b>, <b>SBGN</b>, <b>BioPAX 2</b>, <b>BioPAX 3</b>.
+        A link to the <b>Newt Editor</b> is also provided, allowing you to edit the pathway diagram interactively.
+      </p>
+      <p>After performing an analysis, you can also download a corresponding <b>analysis report</b>.</p>
+    </div>
+  }
+
+  @if (finalPathwayName()) {
+    <div class="header ">
+      <span>Download {{ finalPathwayName() }} {{ finalEventId() }}</span>
+      <a class="newt button" [href]=newtUrl() target="_blank">
+        <div class="newtIcon" [matTooltip]="'view SBGN in NEWT editor'"
+             [innerHTML]="newtIcon()  | safe:'html':true"></div>
       </a>
-    }
+    </div>
+  }
 
-  </div>
+  <!-- reacfoam -->
+  @if (!hasDetail() || (!hasDetail() && hasResult())) {
+    <h3 class="category">Reacfoam - Voronoi Treemap</h3>
+    <div class="container reacfoam">
+      <a mat-flat-button class="button" (click)="onReacfoamDownload('image/png')">
+        <mat-icon fontSet="symbols">image</mat-icon>
+        <span>PNG</span>
+      </a>
 
+      <a mat-flat-button class="button" (click)="onReacfoamDownload('image/jpeg')">
+        <mat-icon fontSet="symbols">image</mat-icon>
+        <span>JPEG</span>
+      </a>
+    </div>
+  }
+
+
+  <!--pathway format-->
+  @if (finalEventId()) {
+    <h3 class="category">Format</h3>
+    <div class="container pathway">
+      @for (item of pathwayItems; track item) {
+        <a mat-flat-button class="button" [href]=item.url download>
+          <span>{{ item.name }}</span>
+        </a>
+      }
+    </div>
+  }
+
+  <!--Analysis-->
   @if (hasResult()) {
-    <mat-divider class="divider"></mat-divider>
-    <h3 class="header">Analysis Results</h3>
-    <div class="analysis-download">
+    <h3 class="category">Analysis Results</h3>
+    <div class="container analysis">
 
-      @if (hasGSAReports()) {
+      <!--GSA analysis-->
+      @if (gsaReports()) {
         @for (report of gsaReports(); track report.name) {
-          <a mat-stroked-button class="button" [href]="report.url" target="_blank">
-            <mat-icon class="padding-right-ten">{{ getGsaIcon(report.name) }}</mat-icon>
+          <a mat-flat-button class="button" [href]="report.url" download>
+            <mat-icon fontSet="symbols">{{ getGsaIcon(report.name) }}</mat-icon>
             <span>{{ getGsaLabel(report.name) }}</span>
           </a>
         }
@@ -31,9 +68,8 @@
 
       @for (item of analysisItems; track item) {
         @if (item.isShown()) {
-          <a mat-stroked-button class="button" [href]=item.url download>
-            <!--            <div class="icon" [innerHTML]="item.icon() | safe:'html':true"></div>-->
-            <mat-icon>analytics</mat-icon>
+          <a mat-flat-button class="button" [href]=item.url [matTooltip]="item.description" download>
+            <mat-icon fontSet="symbols">{{ item.icon }}</mat-icon>
             <span>{{ item.title }}</span>
           </a>
         }
@@ -41,5 +77,12 @@
     </div>
   }
 
-
+  <div class="analysis container">
+    @if (hasGSAReports() && !gsaReports()) {
+      <div class="spinner-container">
+        <mat-spinner/>
+        <p>Loading GSA analysis results, please wait...</p>
+      </div>
+    }
+  </div>
 </div>

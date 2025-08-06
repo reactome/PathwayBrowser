@@ -1,4 +1,4 @@
-import {computed, Injectable, Signal} from '@angular/core';
+import {computed, Injectable, signal, Signal} from '@angular/core';
 import {SpeciesService} from "../services/species.service";
 import {environment} from "../../environments/environment";
 import {map, Observable} from "rxjs";
@@ -94,6 +94,8 @@ export interface PathwayGroup extends FoamTree.DataObject {
   path: string[]
 }
 
+export type DownloadFormat ='image/png' | 'image/jpeg';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -111,6 +113,16 @@ export class ReacfoamService {
   }
 
   speciesName = computed(() => this.species.currentSpecies().displayName.replaceAll(" ", "_"))
+
+  readonly downloadRequest = signal<DownloadFormat | null>(null);
+
+  requestDownload(format: DownloadFormat) {
+    this.downloadRequest.set(format);
+  }
+
+  resetDownload() {
+    this.downloadRequest.set(null);
+  }
 
   fetchEventsHierarchy(species: Species, params: Partial<EventsHierarchy.QueryParams>): Observable<EventsHierarchy.Data[]> {
     cleanObject(params)

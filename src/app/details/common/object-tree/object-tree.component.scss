@@ -47,6 +47,11 @@
   border-radius: 50px;
 }
 
+.highlight {
+  background-color: var(--primary-container);
+  border-radius: 50px;
+}
+
 .left {
   display: flex;
   flex: 0 1 auto; /* Default flex properties for left element */

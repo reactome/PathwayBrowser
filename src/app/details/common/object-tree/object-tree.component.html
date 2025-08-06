@@ -25,7 +25,8 @@
       }
     </div>
 
-    <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
+    <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)"
+         [class.highlight]="moleculeView() && node.highlight ? 'highlight' :''">
       <div class="left">
         <mat-icon class="symbol-icon"
                   [matTooltip]="moleculeView()? getSymbol(element.displayIcon).tooltip: getSymbol(element).tooltip"
@@ -50,10 +51,6 @@
 
 
       <div class="right">
-
-        @if (moleculeView() && node.highlight) {
-          <span class="highlight-tag">📌</span>
-        }
 
         @if (moleculeView()) {
           <span class="molecule name">

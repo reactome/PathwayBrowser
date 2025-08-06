@@ -1,19 +1,19 @@
 import {Component, computed, input, Signal} from '@angular/core';
-import {DatabaseObject} from "../../../model/graph/database-object.model";
-import {getProperty, isDefined} from "../../../services/utils";
-import {Anatomy} from "../../../model/graph/external-ontology/anatomy.model";
-import {ReviewStatus} from "../../../model/graph/review-status.model";
-import {Summation} from 'src/app/model/graph/summation.model';
-import {DataKeys} from "../../../constants/constants";
-import {Relationship} from "../../../model/graph/relationship.model";
-import {Disease} from "../../../model/graph/external-ontology/disease.model";
-import {CellType} from "../../../model/graph/external-ontology/cell-type.model";
+import {DatabaseObject} from "../../../../model/graph/database-object.model";
+import {getProperty, isDefined} from "../../../../services/utils";
+import {Anatomy} from "../../../../model/graph/external-ontology/anatomy.model";
+import {ReviewStatus} from "../../../../model/graph/review-status.model";
+import {Summation} from '../../../../model/graph/summation.model';
+import {DataKeys} from "../../../../constants/constants";
+import {Relationship} from "../../../../model/graph/relationship.model";
+import {Disease} from "../../../../model/graph/external-ontology/disease.model";
+import {CellType} from "../../../../model/graph/external-ontology/cell-type.model";
 import HasCompartment = Relationship.HasCompartment;
 import {NgIf, TitleCasePipe} from "@angular/common";
-import {OntologyTermComponent} from "../ontology-term/ontology-term.component";
+import {OntologyTermComponent} from "../../../common/ontology-term/ontology-term.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {IncludeRefPipe} from "../../../pipes/include-ref.pipe";
-import {RefsTreeComponent} from "../refs-tree/refs-tree.component";
+import {IncludeRefPipe} from "../../../../pipes/include-ref.pipe";
+import {RefsTreeComponent} from "../../../common/refs-tree/refs-tree.component";
 
 
 @Component({

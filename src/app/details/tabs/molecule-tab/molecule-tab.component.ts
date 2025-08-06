@@ -13,6 +13,7 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
+import {GroupByPipe} from "../../../pipes/group-by.pipe";
 
 
 // TODO: Find a way to not crash when too many data, e.g. selecting a top level pathway. (using virtual scrolls probably, but wit a way to expand rows)
@@ -45,11 +46,12 @@ export enum PropertyType {
     MatDivider,
     ObjectTreeComponent,
     MatProgressSpinner,
-    SortByDatePipe,
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
-    MoleculeDownloadTableComponent
+    MoleculeDownloadTableComponent,
+    GroupByPipe,
+    SortByDatePipe
   ],
   styleUrl: './molecule-tab.component.scss'
 })
@@ -61,7 +63,7 @@ export class MoleculeTabComponent {
   // Get selected pathway id on Reacfoam view
   objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
-  isReacfoamView = computed(() => this.pathwayId() === undefined);
+  isReacfoamView = computed(() => !(this.state.select() || this.state.pathwayId()));
 
 
   constructor(private participant: ParticipantService,
@@ -134,7 +136,7 @@ export class MoleculeTabComponent {
     }
 
 
-    // todo remove finalResults
+
     const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([category, dataMap]) => ({
       category,
       data: Array.from(dataMap.values())
