@@ -227,6 +227,17 @@ export class ReacfoamComponent implements OnDestroy {
       this.foamTree().redraw()
     });
 
+    effect(() => {
+      const format = this.reacfoam.downloadRequest();
+      if (format) {
+        const params: FoamTree.ImageFormat = {
+          format,
+          ...(format === 'image/jpeg' ? {quality: 0.9} : {})
+        }
+        this.export(params);
+        this.reacfoam.resetDownload();
+      }
+    });
   }
 
   ngOnDestroy(): void {

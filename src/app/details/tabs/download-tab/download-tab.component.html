@@ -24,10 +24,18 @@
 
   <!-- reacfoam -->
   @if (!hasDetail() || (!hasDetail() && hasResult())) {
-    <h3 class="category">Voronoi Treemap</h3>
-    <a mat-flat-button class="button" [href]="" download>
-      <span>Reacfoam</span>
-    </a>
+    <h3 class="category">Reacfoam - Voronoi Treemap</h3>
+    <div class="container reacfoam">
+      <a mat-flat-button class="button" (click)="onReacfoamDownload('image/png')">
+        <mat-icon fontSet="symbols">image</mat-icon>
+        <span>PNG</span>
+      </a>
+
+      <a mat-flat-button class="button" (click)="onReacfoamDownload('image/jpeg')">
+        <mat-icon fontSet="symbols">image</mat-icon>
+        <span>JPEG</span>
+      </a>
+    </div>
   }
 
 

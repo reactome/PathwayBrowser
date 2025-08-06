@@ -11,6 +11,7 @@ import {toSignal} from "@angular/core/rxjs-interop";
 import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {DownloadFormat, ReacfoamService} from "../../../reacfoam/reacfoam.service";
 
 
 type PathwayItem = {
@@ -152,7 +153,8 @@ export class DownloadTabComponent {
   constructor(private state: UrlStateService,
               private http: HttpClient,
               private dataState: DataStateService,
-              private analysis: AnalysisService) {
+              private analysis: AnalysisService,
+              private reacfoam: ReacfoamService) {
   }
 
   protected readonly environment = environment;
@@ -175,4 +177,7 @@ export class DownloadTabComponent {
     return name
   }
 
+  onReacfoamDownload(format: DownloadFormat) {
+    this.reacfoam.requestDownload(format);
+  }
 }
