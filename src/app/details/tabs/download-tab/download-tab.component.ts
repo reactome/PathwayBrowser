@@ -91,25 +91,25 @@ export class DownloadTabComponent {
   pathwayItems: PathwayItem[] = [
     {
       name: 'SBML',
-      url: `/ContentService/exporter/event/${this.finalEventId()}.sbml`
+      url: computed(() => `/ContentService/exporter/event/${this.finalEventId()}.sbml`)
     },
     {
       name: 'SBGN',
-      url: `/ContentService/exporter/event/${this.finalEventId()}.sbgn`,
+      url: computed(() => `/ContentService/exporter/event/${this.finalEventId()}.sbgn`),
     },
     {
       name: 'BioPAX2',
-      url: `/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level2/${this.finalEventId()?.split('-')[2]}`,
-      fileName: `${this.finalEventId()?.split('-')[2]}.xml`
+      url: computed(() => `/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level2/${this.finalEventId()?.split('-')[2]}`),
+      fileName: computed(() => `${this.finalEventId()?.split('-')[2]}.xml`)
     },
     {
       name: 'BioPAX3',
-      url: `/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level3/${this.finalEventId()?.split('-')[2]}`,
-      fileName: `${this.finalEventId()?.split('-')[2]}.xml`
+      url: computed(() => `/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level3/${this.finalEventId()?.split('-')[2]}`),
+      fileName: computed(() => `${this.finalEventId()?.split('-')[2]}.xml`)
     },
     {
       name: 'PDF',
-      url: `/ContentService/exporter/document/event/${this.finalEventId()}.pdf`,
+      url: computed(() => `/ContentService/exporter/document/event/${this.finalEventId()}.pdf`),
     }
   ]
 
@@ -117,7 +117,7 @@ export class DownloadTabComponent {
     {
       title: 'Results CSV',
       description: 'Download the pathway analysis results in CSV format for selected resource',
-      url: `/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`,
+      url: computed(() => `/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`),
       icon: 'table',
       isShown: computed(() => !this.analysis.isGSA())
     },
@@ -125,7 +125,7 @@ export class DownloadTabComponent {
     {
       title: 'Results JSON',
       description: 'Download a compressed file containing the complete analysis results in JSON format fot all resources',
-      url: `/AnalysisService/download/${this.token()}/result.json.gz`,
+      url: computed(() => `/AnalysisService/download/${this.token()}/result.json.gz`),
       icon: 'data_object',
       isShown: signal(true)
     },
@@ -133,7 +133,7 @@ export class DownloadTabComponent {
     {
       title: 'Result PDF',
       description: 'Download a detailed report with the most significant pathway analysis results in PDF format',
-      url: `/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`,
+      url: computed(() => `/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`),
       icon: 'docs',
       isShown: computed(() => !this.analysis.isGSA())
     },
@@ -141,7 +141,7 @@ export class DownloadTabComponent {
     {
       title: 'Identifier Mapping CSV',
       description: 'Download the identifier mappings between the submitted data and the selected resource in CSV format',
-      url: `/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`,
+      url: computed(() => `/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`),
       icon: 'table',
       isShown: signal(true)
     },
@@ -149,7 +149,7 @@ export class DownloadTabComponent {
     {
       title: 'Not Found Identifiers CSV',
       description: 'Download a CSV file containing those identifiers from the submitted sample that we were not mapped',
-      url: `/AnalysisService/download/${this.token()}/entities/notfound/not_found.csv`,
+      url: computed(() => `/AnalysisService/download/${this.token()}/entities/notfound/not_found.csv`),
       icon: 'table',
       isShown: signal(true)
     }]
@@ -158,7 +158,7 @@ export class DownloadTabComponent {
               private http: HttpClient,
               private dataState: DataStateService,
               private analysis: AnalysisService,
-              private reacfoam: ReacfoamService,
+              private download: DownloadService,
               public ehld: EhldService,) {
   }
 
