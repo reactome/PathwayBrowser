@@ -1,4 +1,15 @@
-import {Component, computed, effect, ElementRef, OnDestroy, signal, Signal, untracked, viewChild} from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  linkedSignal,
+  OnDestroy,
+  signal,
+  Signal,
+  untracked,
+  viewChild
+} from '@angular/core';
 import {FoamTree} from "@carrotsearch/foamtree";
 import {PathwayGroup, ReacfoamService} from "./reacfoam.service";
 import {Router} from "@angular/router";
@@ -7,6 +18,9 @@ import {UrlStateService} from "../services/url-state.service";
 import {AnalysisService} from "../services/analysis.service";
 import {AnalysisLegendComponent} from "../legend/analysis-legend/analysis-legend.component";
 import {DataStateService} from "../services/data-state.service";
+import {isRLE} from "../services/utils";
+import {SpeciesService} from "../services/species.service";
+import {firstValueFrom} from "rxjs";
 
 
 @Component({
@@ -125,12 +139,13 @@ export class ReacfoamComponent implements OnDestroy {
   } as FoamTree.InitialOptions<PathwayGroup>));
 
   foamTree = computed(() => new FoamTree<PathwayGroup>(this.options()));
-  selectedId = computed(() => this.reacfoam.buildId(this.state.select(), this.state.path()));
+  select = linkedSignal(() => this.state.select());
+  selectedId = computed(() => this.reacfoam.buildId(this.select(), this.state.path()));
   correctedSelectedId = computed(() => this.state.select() ?
     (
       this.foamTree().get('hierarchy', this.selectedId()) ?
         this.selectedId() :
-        this.reacfoam.idToStId()?.get(this.state.select()!)
+        this.reacfoam.idToStId()?.get(this.select()!)
     ) :
     null
   );
@@ -165,6 +180,7 @@ export class ReacfoamComponent implements OnDestroy {
     private state: UrlStateService,
     private data: DataStateService,
     public analysis: AnalysisService,
+    private species: SpeciesService,
     private dark: DarkService,
     private router: Router) {
     effect(() => { // Initialise
@@ -181,6 +197,17 @@ export class ReacfoamComponent implements OnDestroy {
       if (this.reacfoam.data()) {
         this.setFlag(this.reacfoam.data()!)
         this.foamTree().redraw()
+      }
+    });
+    // Select parent pathway of reaction if a reaction is selected
+    effect(async () => {
+      const selectedElement = this.data.selectedElement();
+      if (selectedElement && isRLE(selectedElement)) {
+        const flaggingResult = await firstValueFrom(this.data.getReacfoamFlagging(selectedElement.stId, this.species.currentSpecies().displayName));
+        if (flaggingResult.matches && flaggingResult.matches.length === 1) {
+          console.log('Selecting in reacfoam the parent pathway of a reaction as it is only contained in one pathway')
+          this.select.set(flaggingResult.matches[0]);
+        }
       }
     });
     effect(() => this.container()?.nativeElement && this.sizeObserver.observe(this.container().nativeElement));

@@ -29,6 +29,11 @@ type FireworksFlagResult = {
   interactsWith?: string[]
 };
 
+type FlaggingResult = {
+  matches: string[],
+  interactsWith: string[]
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,14 +64,14 @@ export class DataStateService {
   public selectedElement = this._selectedElement.asReadonly().value
   public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
-  selectionData = computed<SelectionData>(() => ({
+  private _selectionData = computed<SelectionData>(() => ({
     selectedElement: this.selectedElement(),
     selectedElementLoading: this.selectedElementLoading(),
     currentPathway: this.state.pathwayId()
   }))
 
   selectedPathwayStId = linkedSignal<SelectionData, string | undefined>({
-    source: this.selectionData,
+    source: this._selectionData,
     computation: (source: SelectionData, previous?: { source: SelectionData, value: string | undefined }) => {
       if (source.selectedElementLoading && previous) return previous.value;
       if (source.selectedElement && isPathway(source.selectedElement)) return source.selectedElement.stId
@@ -87,41 +92,48 @@ export class DataStateService {
 
   flagResource = rxResource({
     request: this.flagRequest,
-    loader: ({request: {diagram, tokens, species}}) => forkJoin(tokens.map(query => {
-      return diagram// When in diagram / ehld view // When in reacfoam view
-        ? this.http.get<DiagramFlagResult>(`${environment.host}/ContentService/search/diagram/${diagram}/flag`, {params: {query}}).pipe(
-          catchError(() => of({} as DiagramFlagResult)),
-          map(r => ({
-            matches: r.occurrences,
-            interactsWith: r.interactsWith
-          }))
+    loader: ({request: {diagram, tokens, species}}) => tokens.length === 0 ?
+      of({matches: [], interactsWith: []}) // No tokens
+      : forkJoin(tokens.map(query => { // Combine tokens
+        return diagram// When in diagram / ehld view // When in reacfoam view
+          ? this.getDiagramFlagging(diagram, query)
+          : this.getReacfoamFlagging(query, species)
+      })).pipe(
+        map(results => results.reduce<FlaggingResult>(
+            (acc, result) => {
+              if (result.matches) acc.matches.push(...result.matches);
+              if (result.interactsWith) acc.interactsWith!.push(...result.interactsWith);
+              return acc;
+            },
+            {matches: [], interactsWith: []}
+          )
         )
-        : this.http.get<FireworksFlagResult>(`${environment.host}/ContentService/search/fireworks/flag`, {
-          params: {
-            query,
-            species
-          }
-        }).pipe(
-          catchError(() => of({} as FireworksFlagResult)),
-          map(r => ({
-            matches: r.llps,
-            interactsWith: r.interactsWith
-          }))
-        )
-    })).pipe(
-      map(results => results.reduce<{
-        matches: string[],
-        interactsWith: string[]
-      }>(
-        (acc, result) => {
-          if (result.matches) acc.matches.push(...result.matches);
-          if (result.interactsWith) acc.interactsWith!.push(...result.interactsWith);
-          return acc;
-        },
-        {matches: [], interactsWith: []})
       )
-    )
   })
+
+  getReacfoamFlagging(query: string, species: string): Observable<Partial<FlaggingResult>> {
+    return this.http.get<FireworksFlagResult>(`${environment.host}/ContentService/search/fireworks/flag`, {
+      params: {query, species}
+    }).pipe(
+      catchError(() => of({} as FireworksFlagResult)),
+      map(r => ({
+        matches: r.llps,
+        interactsWith: r.interactsWith
+      }))
+    );
+  }
+
+  getDiagramFlagging(diagram: string, query: string): Observable<Partial<FlaggingResult>> {
+    return this.http.get<DiagramFlagResult>(`${environment.host}/ContentService/search/diagram/${diagram}/flag`, {
+      params: {query}
+    }).pipe(
+      catchError(() => of({} as DiagramFlagResult)),
+      map(r => ({
+        matches: r.occurrences,
+        interactsWith: r.interactsWith
+      }))
+    );
+  }
 
   flagIdentifiers = computed(() => {
     const identifiers: string[] = this.state.flag().filter(token => token.startsWith("class:"));
