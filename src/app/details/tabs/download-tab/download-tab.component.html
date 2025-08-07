@@ -15,7 +15,7 @@
   @if (finalPathwayName()) {
     <div class="header ">
       <span>Download {{ finalPathwayName() }} {{ finalEventId() }}</span>
-      <a  [href]=newtUrl() target="_blank">
+      <a [href]=newtUrl() target="_blank">
         <div class="newtIcon" [matTooltip]="'view SBGN in NEWT editor'"
              [innerHTML]="newtIcon()  | safe:'html':true"></div>
       </a>

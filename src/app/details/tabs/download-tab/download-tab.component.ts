@@ -143,7 +143,11 @@ export class DownloadTabComponent {
     },
     {
       name: 'PDF',
-      url: computed(() => `/ContentService/exporter/document/event/${this.finalEventId()}.pdf`),
+      url: computed(() => {
+        const url = `/ContentService/exporter/document/event/${this.finalEventId()}.pdf`;
+        const analysisUrl = `/ContentService/exporter/document/event/${this.finalEventId()}.pdf?token=${this.token()}`;
+        return this.hasResult() ? analysisUrl : url
+      }),
     }
   ]
 
@@ -151,7 +155,7 @@ export class DownloadTabComponent {
     {
       title: 'Results CSV',
       description: 'Download the pathway analysis results in CSV format for selected resource',
-      url: computed(() => `/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`),
+      url: computed(() => `/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource()}/result.csv`),
       icon: 'table',
       isShown: computed(() => !this.analysis.isGSA())
     },
@@ -216,6 +220,12 @@ export class DownloadTabComponent {
     return name
   }
 
+  getEhldExportUrl(format: string) {
+    const analysisUrl = `/ContentService/exporter/diagram/${this.pathwayId()}.${format}?token=${this.token()}`
+    const url = `/ContentService/exporter/diagram/${this.pathwayId()}.${format}`
+    return this.hasResult() ? analysisUrl : url
+  }
+
   onReacfoamDownload(format: DownloadFormat) {
     this.download.requestDownload(DownloadTarget.REACFOAM, format);
   }
@@ -223,4 +233,6 @@ export class DownloadTabComponent {
   onDiagramDownload(format: DownloadFormat) {
     this.download.requestDownload(DownloadTarget.DIAGRAM, format);
   }
+
+  protected readonly DownloadFormat = DownloadFormat;
 }
