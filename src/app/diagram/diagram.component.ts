@@ -358,8 +358,14 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         this.cy.on('zoom', () => this.controlZoom.set(this.zoomToControlTransform(this.cy.zoom())));
 
         this.reactomeStyle.clearCache();
-        this.cy.on('dblclick', '.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
+        this.cy.on('dblclick', '.SUB.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
           queryParamsHandling: "preserve",
+          preserveFragment: true
+        }))
+
+        this.cy.on('dblclick', '.Interacting.Pathway', (e) => this.router.navigate([e.target.data('graph.stId')], {
+          queryParams: {select: this.pathwayId()},
+          queryParamsHandling: "merge",
           preserveFragment: true
         }))
 
