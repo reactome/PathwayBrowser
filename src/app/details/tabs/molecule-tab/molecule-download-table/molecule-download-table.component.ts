@@ -153,6 +153,7 @@ export class MoleculeDownloadTableComponent {
     a.href = window.URL.createObjectURL(blob);
     a.download = `Participating Molecules [${this.objId()}].tsv`;
     a.click();
+    a.remove();
   }
 
   onCategoryToggle(category: string) {
