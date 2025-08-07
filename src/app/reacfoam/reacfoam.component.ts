@@ -6,6 +6,7 @@ import {DarkService} from "../services/dark.service";
 import {UrlStateService} from "../services/url-state.service";
 import {AnalysisService} from "../services/analysis.service";
 import {AnalysisLegendComponent} from "../legend/analysis-legend/analysis-legend.component";
+import {DownloadFormat, DownloadService} from "../services/download.service";
 
 
 @Component({
@@ -154,7 +155,8 @@ export class ReacfoamComponent implements OnDestroy {
     private state: UrlStateService,
     public analysis: AnalysisService,
     private dark: DarkService,
-    private router: Router) {
+    private router: Router,
+    private download: DownloadService) {
     effect(() => { // Initialise
       this.reacfoam.data(); // Set data whenever it is updated
       // if (!untracked(this.relaxing)) // Avoid errors happening when setting data while relaxing
@@ -228,14 +230,14 @@ export class ReacfoamComponent implements OnDestroy {
     });
 
     effect(() => {
-      const format = this.reacfoam.downloadRequest();
-      if (format) {
+      const request = this.download.downloadRequest();
+      if (request) {
         const params: FoamTree.ImageFormat = {
-          format,
-          ...(format === 'image/jpeg' ? {quality: 0.9} : {})
+          format: this.download.toFoamtreeType(request.format),
+          ...(request.format === DownloadFormat.JPEG ? {quality: 0.9} : {})
         }
         this.export(params);
-        this.reacfoam.resetDownload();
+        this.download.resetDownload();
       }
     });
   }

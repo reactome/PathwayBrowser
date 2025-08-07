@@ -34,7 +34,7 @@ import {
 } from "rxjs";
 import {UrlStateService} from "../services/url-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
-import {AnalysisService, Examples} from "../services/analysis.service";
+import {AnalysisService} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
 import {isDefined, isPathwayWithDiagram} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
@@ -45,7 +45,7 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 
 import {DarkService} from "../services/dark.service";
-import {Pathway} from "../model/graph/event/pathway.model";
+import {DownloadFormat, DownloadService} from "../services/download.service";
 
 
 const INIT_RX = 2;
@@ -89,6 +89,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               private event: EventService,
               private router: Router,
               private route: ActivatedRoute,
+              private download: DownloadService,
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
     effect(() => this.pathwayId() && this.loadDiagram());
@@ -114,6 +115,27 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       this.dark.isDark();
       this.updateStyle();
     })
+
+    effect(() => {
+      const request = this.download.downloadRequest();
+      if (request) {
+        this.export(request.format);
+        this.download.resetDownload();
+      }
+    });
+
+  }
+
+  export(format: string) {
+    const options: cytoscape.ExportOptions = {
+      full: true,
+      ...(format === DownloadFormat.JPEG ? {quality: 0.9} : {})
+    }
+    const a = document.createElement('a');
+    a.href = format === DownloadFormat.PNG ? this.cy.png(options) : this.cy.jpg(options);
+    a.download = `${this.pathwayId()}.${format}`;
+    a.click();
+    a.remove();
   }
 
   zoomToCytoscapeTransform = (x: number) => this.minZoom() * Math.pow(this.maxZoom() / this.minZoom(), (x - this.controlMinZoom()) / this.controlRange());

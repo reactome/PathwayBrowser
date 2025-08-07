@@ -9,20 +9,21 @@ import {toSignal} from "@angular/core/rxjs-interop";
 import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {DownloadFormat, ReacfoamService} from "../../../reacfoam/reacfoam.service";
 import {EhldService} from "../../../services/ehld.service";
+import {DownloadFormat, DownloadService, DownloadTarget, IMAGES_FORMAT} from "../../../services/download.service";
+import {DownloadButtonComponent} from "./download-button/download-button.component";
 
 
 type PathwayItem = {
   name: string;
-  url: string;
-  fileName?: string;
+  url: Signal<string>;
+  fileName?: Signal<string> | undefined;
 }
 
 type AnaLysisItem = {
   title: string;
   description?: string;
-  url: string;
+  url: Signal<string>;
   icon: string;
   isShown: Signal<boolean>;
 }
@@ -182,6 +183,10 @@ export class DownloadTabComponent {
   }
 
   onReacfoamDownload(format: DownloadFormat) {
-    this.reacfoam.requestDownload(format);
+    this.download.requestDownload(DownloadTarget.REACFOAM, format);
+  }
+
+  onDiagramDownload(format: DownloadFormat) {
+    this.download.requestDownload(DownloadTarget.DIAGRAM, format);
   }
 }
