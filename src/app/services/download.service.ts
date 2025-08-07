@@ -7,8 +7,9 @@ export enum DownloadTarget {
 }
 
 export enum DownloadFormat {
-    PNG = 'png',
-    JPEG = 'jpeg'
+  SVG = 'svg',
+  PNG = 'png',
+  JPEG = 'jpeg',
 }
 
 export const IMAGES_FORMAT = {

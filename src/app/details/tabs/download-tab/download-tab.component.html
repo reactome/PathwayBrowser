@@ -27,18 +27,14 @@
   @if (pathwayId()) {
     <h3 class="category">Pathway Diagram</h3>
     <div class="container diagram">
-      @if (ehld.hasEHLD()) {
-        <cr-download-button [url]="`/ContentService/exporter/diagram/${pathwayId()}.svg`"
-                            [label]="'SVG'"
-                            [download]='true'>
+      @for (item of diagramItems(); track item) {
+        <cr-download-button
+          [url]="item.url?.()"
+          [label]="item.format.toUpperCase()"
+          [icon]="item.icon"
+          [download]="item.download"
+          (click)="item.method?.()">
         </cr-download-button>
-      } @else {
-        @for (format of formats; track format) {
-          <cr-download-button (click)="onDiagramDownload(format)"
-                              [label]="format.toUpperCase()"
-                              [icon]="'image'">
-          </cr-download-button>
-        }
       }
     </div>
   }
@@ -48,10 +44,12 @@
     <h3 class="category">Reacfoam - Voronoi Treemap</h3>
     <div class="container reacfoam">
       @for (format of formats; track format) {
-        <cr-download-button (click)="onReacfoamDownload(format)"
-                            [label]="format.toUpperCase()"
-                            [icon]="'image'">
-        </cr-download-button>
+        @if (format !== DownloadFormat.SVG) {
+          <cr-download-button (click)="onReacfoamDownload(format)"
+                              [label]="format.toUpperCase()"
+                              [icon]="'image'">
+          </cr-download-button>
+        }
       }
     </div>
   }

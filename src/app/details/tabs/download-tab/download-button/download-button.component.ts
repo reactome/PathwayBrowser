@@ -24,4 +24,8 @@ export class DownloadButtonComponent {
   openInNewTab = input<string>('_blank');
   click = output<void>();
 
+  onClick(event: MouseEvent) {
+    event.stopPropagation();
+    this.click.emit();
+  }
 }

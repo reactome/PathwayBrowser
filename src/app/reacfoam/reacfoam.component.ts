@@ -231,7 +231,7 @@ export class ReacfoamComponent implements OnDestroy {
 
     effect(() => {
       const request = this.download.downloadRequest();
-      if (request) {
+      if (request && this.download.isFoamtreeFormat(request.format)) {
         const params: FoamTree.ImageFormat = {
           format: this.download.toFoamtreeType(request.format),
           ...(request.format === DownloadFormat.JPEG ? {quality: 0.9} : {})

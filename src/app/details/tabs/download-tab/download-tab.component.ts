@@ -10,7 +10,7 @@ import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {EhldService} from "../../../services/ehld.service";
-import {DownloadFormat, DownloadService, DownloadTarget, IMAGES_FORMAT} from "../../../services/download.service";
+import {DownloadFormat, DownloadService, DownloadTarget} from "../../../services/download.service";
 import {DownloadButtonComponent} from "./download-button/download-button.component";
 
 
@@ -26,6 +26,15 @@ type AnaLysisItem = {
   url: Signal<string>;
   icon: string;
   isShown: Signal<boolean>;
+}
+
+type DiagramItem = {
+  format: string;
+  icon?: string;
+  url?: Signal<string>;
+  method?: () => void
+  hasEHLD?: Signal<boolean>
+  download?: boolean
 }
 
 
@@ -85,7 +94,32 @@ export class DownloadTabComponent {
   hasGSAReports = computed(() => this.analysis.gsaReportsRequired());
   gsaReports = computed(() => this.analysis.gsaReports());
 
-  formats = Object.values(IMAGES_FORMAT);
+
+  formats: DownloadFormat[] = Object.values(DownloadFormat) as DownloadFormat[];
+
+  diagramItems = computed<DiagramItem[]>(() => {
+    const hasEHLD = this.ehld.hasEHLD();
+    const filteredFormats = this.formats.filter(format => {
+      return hasEHLD || format !== DownloadFormat.SVG;
+    });
+
+    return filteredFormats.map(format => {
+      if (hasEHLD) {
+        return {
+          format: format,
+          url: signal(this.getEhldExportUrl(format)),
+          icon: 'image',
+          download: true
+        }
+      } else {
+        return {
+          format: format,
+          icon: 'image',
+          method: () => this.onDiagramDownload(format)
+        }
+      }
+    });
+  })
 
 
   pathwayItems: PathwayItem[] = [
