@@ -1,8 +1,6 @@
 import {Component, computed, signal, Signal, WritableSignal} from '@angular/core';
-import {MatAnchor} from "@angular/material/button";
 import {UrlStateService} from "../../../services/url-state.service";
 import {HttpClient} from "@angular/common/http";
-import {MatIcon} from "@angular/material/icon";
 import {DataStateService} from "../../../services/data-state.service";
 import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
@@ -33,11 +31,10 @@ type AnaLysisItem = {
 @Component({
   selector: 'cr-download-tab',
   imports: [
-    MatAnchor,
-    MatIcon,
     SafePipe,
     MatTooltip,
     MatProgressSpinner,
+    DownloadButtonComponent,
 
   ],
   templateUrl: './download-tab.component.html',
@@ -86,6 +83,8 @@ export class DownloadTabComponent {
 
   hasGSAReports = computed(() => this.analysis.gsaReportsRequired());
   gsaReports = computed(() => this.analysis.gsaReports());
+
+  formats = Object.values(IMAGES_FORMAT);
 
 
   pathwayItems: PathwayItem[] = [

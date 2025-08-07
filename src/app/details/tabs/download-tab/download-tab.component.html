@@ -15,10 +15,31 @@
   @if (finalPathwayName()) {
     <div class="header ">
       <span>Download {{ finalPathwayName() }} {{ finalEventId() }}</span>
-      <a class="newt button" [href]=newtUrl() target="_blank">
+      <a  [href]=newtUrl() target="_blank">
         <div class="newtIcon" [matTooltip]="'view SBGN in NEWT editor'"
              [innerHTML]="newtIcon()  | safe:'html':true"></div>
       </a>
+    </div>
+  }
+
+
+  <!--pathway diagram-->
+  @if (pathwayId()) {
+    <h3 class="category">Pathway Diagram</h3>
+    <div class="container diagram">
+      @if (ehld.hasEHLD()) {
+        <cr-download-button [url]="`/ContentService/exporter/diagram/${pathwayId()}.svg`"
+                            [label]="'SVG'"
+                            [download]='true'>
+        </cr-download-button>
+      } @else {
+        @for (format of formats; track format) {
+          <cr-download-button (click)="onDiagramDownload(format)"
+                              [label]="format.toUpperCase()"
+                              [icon]="'image'">
+          </cr-download-button>
+        }
+      }
     </div>
   }
 
@@ -26,15 +47,12 @@
   @if (!hasDetail() || (!hasDetail() && hasResult())) {
     <h3 class="category">Reacfoam - Voronoi Treemap</h3>
     <div class="container reacfoam">
-      <a mat-flat-button class="button" (click)="onReacfoamDownload('image/png')">
-        <mat-icon fontSet="symbols">image</mat-icon>
-        <span>PNG</span>
-      </a>
-
-      <a mat-flat-button class="button" (click)="onReacfoamDownload('image/jpeg')">
-        <mat-icon fontSet="symbols">image</mat-icon>
-        <span>JPEG</span>
-      </a>
+      @for (format of formats; track format) {
+        <cr-download-button (click)="onReacfoamDownload(format)"
+                            [label]="format.toUpperCase()"
+                            [icon]="'image'">
+        </cr-download-button>
+      }
     </div>
   }
 
@@ -44,24 +62,13 @@
     <h3 class="category">Pathway Format</h3>
     <div class="container pathway">
       @for (item of pathwayItems; track item) {
-        <a mat-flat-button class="button" [href]=item.url target="_blank" [download]=item.fileName>
-          <span>{{ item.name }}</span>
-        </a>
+        <cr-download-button [url]="item.url()"
+                            [download]="item.fileName ? item.fileName(): true"
+                            [label]="item.name">
+        </cr-download-button>
       }
     </div>
   }
-
-  <!--pathway diagram-->
-  @if (ehld.hasEHLD()) {
-    <h3 class="category">Pathway Diagram</h3>
-    <div class="container pathway">
-      <a mat-flat-button class="button"
-         [href]="`/ContentService/exporter/diagram/${pathwayId()}.svg`" target="_blank" download>
-        <span>SVG</span>
-      </a>
-    </div>
-  }
-
 
   <!--Analysis-->
   @if (hasResult()) {
@@ -71,19 +78,22 @@
       <!--GSA analysis-->
       @if (gsaReports()) {
         @for (report of gsaReports(); track report.name) {
-          <a mat-flat-button class="button" [href]="report.url" target="_blank" download>
-            <mat-icon fontSet="symbols">{{ getGsaIcon(report.name) }}</mat-icon>
-            <span>{{ getGsaLabel(report.name) }}</span>
-          </a>
+          <cr-download-button [url]="report.url"
+                              [download]="true"
+                              [icon]="getGsaIcon(report.name)"
+                              [label]="getGsaLabel(report.name)">
+          </cr-download-button>
         }
       }
 
       @for (item of analysisItems; track item) {
         @if (item.isShown()) {
-          <a mat-flat-button class="button" [href]=item.url [matTooltip]="item.description" target="_blank" download>
-            <mat-icon fontSet="symbols">{{ item.icon }}</mat-icon>
-            <span>{{ item.title }}</span>
-          </a>
+          <cr-download-button [url]="item.url()"
+                              [matTooltip]="item.description"
+                              [download]="true"
+                              [icon]="item.icon"
+                              [label]="item.title">
+          </cr-download-button>
         }
       }
     </div>

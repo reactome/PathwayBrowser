@@ -44,6 +44,10 @@
   display: grid;
 }
 
+.diagram {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .reacfoam {
   grid-template-columns: repeat(2, 1fr);
 }
@@ -56,28 +60,10 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-
-.button {
-
-  text-decoration: none;
+.newtIcon {
+  width: 18px;
   display: flex;
-  background: var(--tertiary-contrast-3);
-
-  .newtIcon {
-    width: 18px;
-    display: flex;
-    color: var(--tertiary-contrast-3);
-  }
-
-  ::ng-deep .mdc-button__label {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-}
-
-.newt {
-  background: none;
+  color: var(--tertiary-contrast-3);
 }
 
 .spinner-container {
