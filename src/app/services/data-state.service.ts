@@ -77,8 +77,7 @@ export class DataStateService {
   flagRequest = computed(() => {
     const params = ({
       tokens: this.state.flag()
-        .filter(token => !token.startsWith("class:"))
-        .filter(token => !token.startsWith("R-")),
+        .filter(token => !token.startsWith("class:")),
       diagram: this.state.pathwayId(),
       species: this.species.currentSpecies().displayName,
     })
@@ -97,7 +96,12 @@ export class DataStateService {
             interactsWith: r.interactsWith
           }))
         )
-        : this.http.get<FireworksFlagResult>(`${environment.host}/ContentService/search/fireworks/flag`, {params: {query, species}}).pipe(
+        : this.http.get<FireworksFlagResult>(`${environment.host}/ContentService/search/fireworks/flag`, {
+          params: {
+            query,
+            species
+          }
+        }).pipe(
           catchError(() => of({} as FireworksFlagResult)),
           map(r => ({
             matches: r.llps,
@@ -105,27 +109,32 @@ export class DataStateService {
           }))
         )
     })).pipe(
-      map(results => results.reduce((acc, result) => {
-        if (result.matches) acc.matches!.push(...result.matches);
-        if (result.interactsWith) acc.interactsWith!.push(...result.interactsWith) ;
-        return acc;
-      }), {matches: [], interactsWith:[]})
+      map(results => results.reduce<{
+        matches: string[],
+        interactsWith: string[]
+      }>(
+        (acc, result) => {
+          if (result.matches) acc.matches.push(...result.matches);
+          if (result.interactsWith) acc.interactsWith!.push(...result.interactsWith);
+          return acc;
+        },
+        {matches: [], interactsWith: []})
+      )
     )
   })
 
   flagIdentifiers = computed(() => {
-    const identifiers: string[] = this.state.flag().filter(token => token.startsWith("class:") || token.startsWith("R-"));
+    const identifiers: string[] = this.state.flag().filter(token => token.startsWith("class:"));
     const match = this.flagResource.value();
     if (match?.matches) identifiers.push(...match.matches);
-    if (this.state.flagInteractors() &&  match?.interactsWith) identifiers.push(...match.interactsWith);
+    if (this.state.flagInteractors() && match?.interactsWith) identifiers.push(...match.interactsWith);
     return identifiers;
   })
 
 
   constructor(private state: UrlStateService, private http: HttpClient, private species: SpeciesService) {
-    effect(() => {
-      console.log('flagging', this.flagIdentifiers())
-    });
+    effect(() => console.log('Flagging', this.flagIdentifiers()));
+    effect(() => console.log('Flagging error', this.flagResource.error()));
     effect(() => {
       if (this._selectedElement.error()) this.state.select.set(null); // If selection doesn't exist (wrong id), we remove selection
     });
