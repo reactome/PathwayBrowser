@@ -104,19 +104,20 @@ export class DownloadTabComponent {
     });
 
     return filteredFormats.map(format => {
-      if (hasEHLD) {
+      const isPPTX = format === DownloadFormat.PPTX
+      if (hasEHLD || isPPTX) {
         return {
           format: format,
-          url: signal(this.getEhldExportUrl(format)),
+          url: signal(this.getExportUrl(format)),
           icon: 'image',
           download: true
         }
-      } else {
-        return {
-          format: format,
-          icon: 'image',
-          method: () => this.onDiagramDownload(format)
-        }
+      }
+
+      return {
+        format: format,
+        icon: 'image',
+        method: () => this.onDiagramDownload(format)
       }
     });
   })
@@ -220,7 +221,7 @@ export class DownloadTabComponent {
     return name
   }
 
-  getEhldExportUrl(format: string) {
+  getExportUrl(format: string) {
     const analysisUrl = `/ContentService/exporter/diagram/${this.pathwayId()}.${format}?token=${this.token()}`
     const url = `/ContentService/exporter/diagram/${this.pathwayId()}.${format}`
     return this.hasResult() ? analysisUrl : url

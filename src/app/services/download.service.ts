@@ -10,6 +10,7 @@ export enum DownloadFormat {
   SVG = 'svg',
   PNG = 'png',
   JPEG = 'jpeg',
+  PPTX = 'pptx',
 }
 
 export const IMAGES_FORMAT = {

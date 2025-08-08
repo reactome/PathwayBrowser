@@ -44,7 +44,7 @@
     <h3 class="category">Reacfoam - Voronoi Treemap</h3>
     <div class="container reacfoam">
       @for (format of formats; track format) {
-        @if (format !== DownloadFormat.SVG) {
+        @if ([DownloadFormat.PNG, DownloadFormat.JPEG].includes(format)) {
           <cr-download-button (click)="onReacfoamDownload(format)"
                               [label]="format.toUpperCase()"
                               [icon]="'image'">
