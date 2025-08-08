@@ -46,6 +46,8 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 import {DarkService} from "../services/dark.service";
 import {DownloadFormat, DownloadService} from "../services/download.service";
+import {Pathway} from "../model/graph/event/pathway.model";
+import {DataStateService} from "../services/data-state.service";
 
 
 const INIT_RX = 2;
@@ -90,12 +92,14 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               private router: Router,
               private route: ActivatedRoute,
               private download: DownloadService,
+              private data: DataStateService
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
     effect(() => this.pathwayId() && this.loadDiagram());
     effect(() => {
-      if (this.state.flag() && !this.flagging) this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.state.flag(), cy)))
-      this.flagging = false;
+      const flag = this.data.flagIdentifiers();
+      if (flag.length > 0) this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.data.flagIdentifiers(), cy)))
+      // this.flagging = false;
     }, {debugName: 'diagram flagging'});
     effect(() => {
       if (this.state.select() && !this.selecting) this.avoidSideEffect(() => this.cys.forEach(cy => this.select(this.state.select()!, cy)))
@@ -206,6 +210,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   reactomeStyleCompare!: Style;
   legend!: cytoscape.Core;
   cys: cytoscape.Core[] = [];
+
+  leafIdToParentIds = new Map<string, string[]>();
 
   selecting = false // Avoid zooming in diagram when selection came from in diagram
   flagging = false // Avoid flagging in diagram when flagging came from in diagram
@@ -360,6 +366,18 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         });
         this.cys[0] = this.cy;
         this.reactomeStyle.bindToCytoscape(this.cy);
+
+        this.leafIdToParentIds.clear();
+        this.cy.nodes().forEach(node => {
+          node.data('graph.leaves')?.forEach((leaf: Graph.Node) => {
+            if (!this.leafIdToParentIds.has(leaf.stId)) this.leafIdToParentIds.set(leaf.stId, [])
+            const parents = this.leafIdToParentIds.get(leaf.stId)!;
+            parents.push(node.data('graph.stId'));
+          })
+        })
+
+        console.log(this.leafIdToParentIds)
+
         this.cy.on('zoom', () => this.controlZoom.set(this.zoomToControlTransform(this.cy.zoom())));
 
         this.reactomeStyle.clearCache();
@@ -513,6 +531,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       if (typeof token === 'string') {
         if (token.startsWith('R-')) {
           elements = elements.or(`[graph.stId="${token}"]`)
+          // Load children
+          if (this.leafIdToParentIds.has(token)) this.leafIdToParentIds.get(token)!.forEach(parent => elements = elements.or(`[graph.stId="${parent}"]`))
           // Consider it as a subpathway when there are no elements found and get all reactions
           if (elements.length === 0) {
             let allSubpathwaysElements = elements.or('[subpathways]');
@@ -743,7 +763,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
             const style: Style = cy.data('reactome');
 
             cy.nodes('.PhysicalEntity').forEach(node => {
-              const leaves: Graph.Node[] = node.data('graph.leaves');
+              const leaves: Graph.Node[] = node.data('graph.leaves') || [node.data('graph')];
               const exp = leaves
                 ?.map(leaf => analysisEntityMap.get(leaf.identifier))
                 ?.sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
@@ -834,7 +854,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   private stateToDiagram() {
     for (let cy of this.cys) {
-      this.flag(this.state.flag(), cy);
+      this.flag(this.data.flagIdentifiers(), cy);
       this.select(this.state.select()!, cy);
     }
 

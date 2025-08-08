@@ -7,6 +7,7 @@ import {UrlStateService} from "../services/url-state.service";
 import {AnalysisService} from "../services/analysis.service";
 import {AnalysisLegendComponent} from "../legend/analysis-legend/analysis-legend.component";
 import {DownloadFormat, DownloadService} from "../services/download.service";
+import {DataStateService} from "../services/data-state.service";
 
 
 @Component({
@@ -150,9 +151,20 @@ export class ReacfoamComponent implements OnDestroy {
     })
   });
 
+  cleanFlagIdentifiers = computed(() => new Set(this.data.flagIdentifiers().filter(id => id.startsWith('R-'))))
+  flagging = computed(() => this.cleanFlagIdentifiers().size !== 0)
+
+  setFlag(groups: PathwayGroup[]) {
+    groups?.forEach((group: PathwayGroup) => {
+      group.flag = this.flagging() ? this.cleanFlagIdentifiers().has(group.stId) : false
+      group.groups && this.setFlag(group.groups)
+    })
+  }
+
   constructor(
     private reacfoam: ReacfoamService,
     private state: UrlStateService,
+    private data: DataStateService,
     public analysis: AnalysisService,
     private dark: DarkService,
     private router: Router,
@@ -164,6 +176,13 @@ export class ReacfoamComponent implements OnDestroy {
 
       if (untracked(this.correctedSelectedId)) { // Initial select
         this.foamTree().select({groups: untracked(this.correctedSelectedId), keepPrevious: false}) // Preselect the group before relaxation happens to have the selection indicator during relaxation
+      }
+    });
+    effect(() => {
+      this.cleanFlagIdentifiers();
+      if (this.reacfoam.data()) {
+        this.setFlag(this.reacfoam.data()!)
+        this.foamTree().redraw()
       }
     });
     effect(() => this.container()?.nativeElement && this.sizeObserver.observe(this.container().nativeElement));
@@ -192,13 +211,17 @@ export class ReacfoamComponent implements OnDestroy {
           // }
 
           if (this.analysis.result()) { // Analysis
-            values.labelColor = 'auto'
+            values.labelColor = 'auto';
             const fdr = props.group.fdr;
 
             const notFoundColor = this.reacfoam.surfaceColor().hex();
 
-            if (!fdr || fdr > this.state.significance()) values.groupColor = notFoundColor;
-            else {
+            if (this.flagging() && props.group.flag) {
+              values.groupColor = this.reacfoam.flagColor().hex()
+              values.labelColor = this.reacfoam.surfaceColor().hex()
+            } else if (!fdr || fdr > this.state.significance()) {
+              values.groupColor = notFoundColor;
+            } else {
               if (this.analysis.type() === 'OVERREPRESENTATION' || this.analysis.type() === 'SPECIES_COMPARISON') { // FDR ~ color
                 values.groupColor = this.analysis.palette().scale(props.group.fdr).hex()
               } else { // expression ~ color
@@ -218,9 +241,13 @@ export class ReacfoamComponent implements OnDestroy {
               values.groupColor = props.group.familyColor.darken(depth * 0.15).saturate(depth * 0.3).hex();
               values.labelColor = props.group.familyColor.darken(4).saturate(5).hex();
             }
-
             // values.groupColor =  props.group.depthColor.hex();
             // values.labelColor = 'auto'
+
+            if (this.flagging()) {
+              values.groupColor = props.group.flag ? this.reacfoam.flagColor().hex() : this.reacfoam.surfaceColor().hex();
+              values.labelColor = props.group.flag ? this.reacfoam.surfaceColor().hex() : this.reacfoam.onSurfaceColor().hex();
+            }
           }
 
 
@@ -246,7 +273,7 @@ export class ReacfoamComponent implements OnDestroy {
     this.sizeObserver.disconnect();
   }
 
-  export(params : FoamTree.ImageFormat) {
+  export(params: FoamTree.ImageFormat) {
     const a = document.createElement('a');
     a.href = this.foamTree().get('imageData', params)
     a.download = `reacfoam.${params.format.split('/')[1]}`;

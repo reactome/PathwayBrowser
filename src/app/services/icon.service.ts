@@ -6,6 +6,7 @@ import {HttpClient} from "@angular/common/http";
 import {isExactlyCellLineagePath, isEWAS, isRLE} from "./utils";
 import {DatabaseObject} from "../model/graph/database-object.model";
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,8 +39,18 @@ export class IconService {
     route: 'genetically-modified-residue'
   }
 
+  reactions = {
+    uncertain: {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'},
+    binding: {name: 'binding', tooltip: 'Association/Binding reaction', route: 'binding'},
+    dissociation: {name: 'dissociation', tooltip: 'Dissociation reaction', route: 'dissociation'},
+    omitted: {name: 'omitted', tooltip: 'Omitted reaction', route: 'omitted'}, //BlackBoxEvent
+    transition: {name: 'transition', tooltip: 'Transition reaction', route: 'transition'}
+  }
+
+
   reactomeSubjectIcons: { [key: string]: { name: string; tooltip?: string; route: string } } = {
     Pathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
+    TopLevelPathway: {name: 'pathway', tooltip: 'Pathway', route: 'pathway'},
     BlackBoxEvent: {name: 'omitted', tooltip: 'Black Box Event', route: 'omitted'},
     EntityWithAccessionedSequence: this.protein,
     Complex: {
@@ -48,15 +59,18 @@ export class IconService {
       route: 'complex'
     },
     SimpleEntity: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
+    ReferenceMolecule: {name: 'small-molecule', tooltip: 'Simple Entity', route: 'small-molecule'},
     Cell: {name: 'cell', tooltip: 'Cell Type', route: 'cell'},
     DefinedSet: {name: 'defined-set', tooltip: 'Defined Set', route: 'defined-set'},
     OtherEntity: {name: 'other-entity', tooltip: 'Other Entity', route: 'other-entity'},
     Polymer: {name: 'polymer', tooltip: 'Polymer', route: 'polymer'},
     CandidateSet: {name: 'candidate-set', tooltip: 'Candidate Set', route: 'candidate-set'},
-    ReferenceDNASequence: {name: 'gene', tooltip: 'Reference DNA Sequence', route: 'gene'},
-    ReferenceRNASequence: {name: 'RNA', tooltip: 'Reference RNA Sequence', route: 'RNA'},
+    ReferenceDNASequence: {name: 'gene', tooltip: 'DNA Sequence', route: 'gene'},
+    ReferenceRNASequence: {name: 'RNA', tooltip: 'RNA Sequence', route: 'RNA'},
     ReferenceGeneProduct: this.protein,
+    ReferenceTherapeutic: {name: 'drug', tooltip: 'Drug', route: 'chemical-drug'},
     ReferenceIsoform: this.protein,
+    Interactor: {name: 'interactor', tooltip: 'Interactor', route: 'interactor'},
     GenomeEncodedEntity: {
       name: 'genome-encoded-entity',
       tooltip: 'Genome Encoded Entity',
@@ -109,15 +123,8 @@ export class IconService {
 
 
     //Reaction type
-    "uncertain": {name: 'uncertain', tooltip: 'Uncertain reaction', route: 'uncertain'}
-    ,
-    "binding": {name: 'binding', tooltip: 'Association/Binding reaction', route: 'binding'}
-    ,
-    "dissociation": {name: 'dissociation', tooltip: 'Dissociation reaction', route: 'dissociation'}
-    ,
-    "omitted": {name: 'omitted', tooltip: 'Omitted reaction', route: 'omitted'}
-    , //BlackBoxEvent
-    "transition": {name: 'transition', tooltip: 'Transition reaction', route: 'transition'}
+    Reaction: this.reactions.binding, // Default reaction
+    ...this.reactions
 
   };
 
@@ -147,6 +154,10 @@ export class IconService {
     {name: 'search', tooltip: 'Search', route: 'search'},
     {name: 'intact', tooltip: 'IntAct', route: 'intact'},
     {name: 'select', tooltip: 'Select', route: 'select'},
+    {name: 'local-scope', tooltip: 'Current Pathway', route: 'local-scope'},
+    {name: 'global-scope', tooltip: 'All Pathways', route: 'global-scope'},
+
+
   ];
 
 // Not in used for now, leave here for future use
@@ -214,7 +225,7 @@ export class IconService {
 
   getIconDetails(obj: DatabaseObject | string): { name: string; tooltip?: string; route?: string } {
 
-    const defaultIcon = {name: 'pathway', tooltip: 'Unknown Event'};
+    const defaultIcon = {name: '?', tooltip: obj};
 
     let key: string | undefined;
 
@@ -232,6 +243,7 @@ export class IconService {
       }
     }
 
+    if (!key || !this.reactomeSubjectIcons[key]) console.warn("Failed to retrieve icon for", obj)
     return this.reactomeSubjectIcons[key] || defaultIcon;
   }
 

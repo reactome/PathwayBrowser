@@ -1,11 +1,15 @@
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {catchError, filter, firstValueFrom, map, of, switchMap} from "rxjs";
+import {ActivatedRoute, NavigationEnd, Params, Router} from "@angular/router";
+import {catchError, combineLatestWith, filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {PaletteName} from "./analysis.service";
 import {Analysis} from "../model/analysis.model";
+import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+
+
+const FRAGMENT_PATTERN = /\/(?<id>R-[A-Z]{3}-\d+)?&?(?<params>.*)/;
 
 
 export type UrlParam<T> = WritableSignal<T> & {
@@ -15,7 +19,7 @@ export type UrlParam<T> = WritableSignal<T> & {
 };
 
 export function urlParam<T>(initialValue: T, type: UrlParam<T>['type'], otherTokens?: string[]): UrlParam<T> {
-  const writableSignal = signal<T>(initialValue) as UrlParam<T>;
+  const writableSignal = signal<T>(initialValue, {equal: (a, b) => JSON.stringify(a) === JSON.stringify(b)}) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
   writableSignal.initialValue = initialValue;
   writableSignal.type = type;
@@ -25,6 +29,7 @@ export function urlParam<T>(initialValue: T, type: UrlParam<T>['type'], otherTok
 
 type State = UrlStateService['values']
 
+@UntilDestroy()
 @Injectable({
   providedIn: 'root'
 })
@@ -95,15 +100,43 @@ export class UrlStateService implements State {
       });
     });
 
+    route.fragment.pipe(untilDestroyed(this)).subscribe((fragment) => {
+      if (fragment) { // Convert fragments to params
+        let params: Params = {};
+        let id = undefined; // Default routing
 
-    route.queryParamMap.subscribe(async params => {
+        const match = fragment.match(FRAGMENT_PATTERN);
+        if (match && match.groups) {
+          if (match.groups['id']) {
+            id = match.groups['id'];
+          }
+          if (match.groups['params']) {
+            match.groups['params']
+              .split("&")
+              .map(param => param.split("="))
+              .forEach(([key, value]) => {
+                params[key] = value || true;
+              })
+          }
+        }
+
+        this.router.navigate(id ? [id] : [], {
+          queryParamsHandling: 'merge',
+          fragment: fragment.replace(FRAGMENT_PATTERN, ''),
+          preserveFragment: false,
+          queryParams: params
+        });
+      }
+    })
+
+    route.queryParams.pipe(untilDestroyed(this)).subscribe(async (params) => {
       for (const mainToken in this.values) {
         const param = this.values[mainToken as keyof State] as UrlParam<any>;
         const tokens: string[] = [mainToken, ...param.otherTokens || []];
-        const token = tokens.find(token => params.has(token));
+        const token = tokens.find(token => params[token] !== undefined);
         if (token) {
           const initialValue = param.initialValue;
-          let value = params.get(token);
+          let value = params[token];
           if (value === undefined || value === null) param.set(value);
           else {
             if (isArray(initialValue)) {
@@ -144,7 +177,7 @@ export class UrlStateService implements State {
         queryParams[key] = isArray(paramValue) ? paramValue.join(';') : paramValue;
       }
       console.log('Updating URL from state', queryParams)
-      this.router.navigate([], {queryParams});
+      this.router.navigate([], {queryParams, preserveFragment: true});
     });
   }
 

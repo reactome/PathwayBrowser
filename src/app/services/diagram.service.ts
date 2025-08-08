@@ -267,20 +267,18 @@ export class DiagramService {
         const idToGraphEdges = new Map(graph.edges.map(edge => [edge.dbId, edge]));
 
         const getLeaves = (node: Graph.Node, leaves: Set<Graph.Node>) => {
-          if (node.leaves && node.leaves.length > 0) {
-            node.leaves.forEach(leave => leaves.add(leave));
-          } else {
-            if (node.children && node.children.length > 0)
-              node.children.forEach(child => getLeaves(dbIdToGraphNode.get(child)!, leaves))
-            else
-              leaves.add(node);
-          }
+          if (node.children && node.children.length > 0)
+            node.children.forEach(child => getLeaves(dbIdToGraphNode.get(child)!, leaves))
+          else
+            leaves.add(node);
         }
 
         idToGraphNodes.forEach(node => {
-          let leaves = new Set<Graph.Node>();
-          getLeaves(node, leaves);
-          node.leaves = [...leaves];
+          if (node.children?.length > 0) {
+            let leaves = new Set<Graph.Node>();
+            getLeaves(node, leaves);
+            node.leaves = [...leaves];
+          }
         })
 
         const dbIdToGraphEdge = new Map<number, Graph.Edge>(graph.edges.map(edge => ([edge.dbId, edge])))
@@ -639,6 +637,7 @@ export class DiagramService {
             }
           )
 
+        console.log('All data created')
         return {
           nodes: [...compartmentNodes, ...reactionNodes, ...entityNodes, ...shadowNodes],
           edges: [...edges, ...linkEdges]
