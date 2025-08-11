@@ -100,7 +100,8 @@ export class DownloadTabComponent {
   diagramItems = computed<DiagramItem[]>(() => {
     const hasEHLD = this.ehld.hasEHLD();
     const filteredFormats = this.formats.filter(format => {
-      return hasEHLD || format !== DownloadFormat.SVG;
+      const allowGif = this.analysis.isGSA() || this.analysis.type() === "EXPRESSION";
+      return (hasEHLD || format !== DownloadFormat.SVG) && (allowGif || format !== DownloadFormat.GIF);
     });
 
     return filteredFormats.map(format => {

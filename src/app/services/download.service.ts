@@ -2,8 +2,8 @@ import {Injectable, signal} from '@angular/core';
 
 
 export enum DownloadTarget {
-    REACFOAM = 'reacfoam',
-    DIAGRAM = 'diagram'
+  REACFOAM = 'reacfoam',
+  DIAGRAM = 'diagram'
 }
 
 export enum DownloadFormat {
@@ -11,6 +11,7 @@ export enum DownloadFormat {
   PNG = 'png',
   JPEG = 'jpeg',
   PPTX = 'pptx',
+  GIF = 'gif',
 }
 
 export const IMAGES_FORMAT = {
@@ -22,34 +23,34 @@ export const IMAGES_FORMAT = {
 export type ImageType = typeof IMAGES_FORMAT[keyof typeof IMAGES_FORMAT];
 
 export type DownloadRequest = {
-    target: DownloadTarget.DIAGRAM | DownloadTarget.REACFOAM;
-    format: DownloadFormat;
+  target: DownloadTarget.DIAGRAM | DownloadTarget.REACFOAM;
+  format: DownloadFormat;
 } | null
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class DownloadService {
 
-    readonly downloadRequest = signal<DownloadRequest>(null)
+  readonly downloadRequest = signal<DownloadRequest>(null)
 
-    requestDownload(target: DownloadTarget, format: DownloadFormat) {
-        this.downloadRequest.set({target, format})
-    }
+  requestDownload(target: DownloadTarget, format: DownloadFormat) {
+    this.downloadRequest.set({target, format})
+  }
 
-    resetDownload() {
-        this.downloadRequest.set(null);
-    }
+  resetDownload() {
+    this.downloadRequest.set(null);
+  }
 
-    constructor() {
-    }
+  constructor() {
+  }
 
-    isFoamtreeFormat(format: DownloadFormat): format is ImageType {
-        return format === DownloadFormat.PNG || format === DownloadFormat.JPEG;
-    }
+  isFoamtreeFormat(format: DownloadFormat): format is ImageType {
+    return format === DownloadFormat.PNG || format === DownloadFormat.JPEG;
+  }
 
-    toFoamtreeType(format: ImageType) {
-        return `image/${format}` as 'image/png' | 'image/jpeg';
-    }
+  toFoamtreeType(format: ImageType) {
+    return `image/${format}` as 'image/png' | 'image/jpeg';
+  }
 
 }
