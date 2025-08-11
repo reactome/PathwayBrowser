@@ -16,7 +16,7 @@ export class DetailsComponent {
 
   obj = this.dataState.selectedElement;
   hasResult = computed(() => !!(this.analysis.result()));
-  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()))
+  hasDetail = computed(() => (this.dataState.hasDetail()))
 
   selectedTabIndex = linkedSignal<number>(
     () => this.hasResult() ? 2 : // Has results => results tab

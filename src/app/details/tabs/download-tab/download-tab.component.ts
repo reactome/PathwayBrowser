@@ -75,7 +75,7 @@ export class DownloadTabComponent {
   });
 
   hasResult = computed(() => !!(this.analysis.result()));
-  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
+  hasDetail = computed(() => (this.dataState.hasDetail()));
 
   hasDownload = computed(() => {
     if (this.hasResult()) return true;

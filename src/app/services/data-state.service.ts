@@ -59,6 +59,8 @@ export class DataStateService {
   public selectedElement = this._selectedElement.asReadonly().value
   public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
+  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
+
   selectionData = computed<SelectionData>(() => ({
     selectedElement: this.selectedElement(),
     selectedElementLoading: this.selectedElementLoading(),
