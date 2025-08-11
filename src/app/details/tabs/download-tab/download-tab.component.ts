@@ -74,7 +74,7 @@ export class DownloadTabComponent {
     return undefined
   });
 
-  hasResult = computed(() => !!(this.analysis.result()) || this.analysis.gsaReportsRequired());
+  hasResult = computed(() => !!(this.analysis.result()));
   hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
 
   hasDownload = computed(() => {
@@ -154,7 +154,7 @@ export class DownloadTabComponent {
 
   analysisItems: AnaLysisItem[] = [
     {
-      title: 'Results CSV',
+      title: 'CSV Result',
       description: 'Download the pathway analysis results in CSV format for selected resource',
       url: computed(() => `/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource()}/result.csv`),
       icon: 'table',
@@ -162,7 +162,7 @@ export class DownloadTabComponent {
     },
 
     {
-      title: 'Results JSON',
+      title: 'JSON Result',
       description: 'Download a compressed file containing the complete analysis results in JSON format fot all resources',
       url: computed(() => `/AnalysisService/download/${this.token()}/result.json.gz`),
       icon: 'data_object',
@@ -170,7 +170,7 @@ export class DownloadTabComponent {
     },
 
     {
-      title: 'Result PDF',
+      title: 'PDF Result',
       description: 'Download a detailed report with the most significant pathway analysis results in PDF format',
       url: computed(() => `/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`),
       icon: 'docs',

@@ -15,7 +15,7 @@ import {UrlStateService} from "../services/url-state.service";
 export class DetailsComponent {
 
   obj = this.dataState.selectedElement;
-  hasResult = computed(() => !!(this.analysis.result() || this.analysis.gsaReportsRequired()));
+  hasResult = computed(() => !!(this.analysis.result()));
   hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()))
 
   selectedTabIndex = linkedSignal<number>(
