@@ -140,7 +140,7 @@
           <div class="top-right">
             <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle
                               id="dark-toggle"></mat-slide-toggle>
-            <button mat-icon-button [color]="'primary'" class="quote">
+            <button mat-icon-button [color]="'primary'" class="quote" (click)="openCitationDialog()">
               <mat-icon [svgIcon]="'format-quote'"></mat-icon>
             </button>
             <div class="logo">
