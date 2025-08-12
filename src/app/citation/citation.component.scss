@@ -1,9 +1,22 @@
-.header{
+@use '@angular/material' as mat;
+
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  .button{
+  .button {
     margin-right: 13px;
+  }
+}
+
+.dialog-container {
+  @include mat.dialog-overrides((
+    subhead-color: var(--primary),
+  ));
+
+
+  .mat-mdc-dialog-actions {
+    gap: 20px
   }
 }

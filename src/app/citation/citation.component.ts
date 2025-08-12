@@ -6,8 +6,9 @@ import {
   MatDialogContent,
   MatDialogTitle
 } from "@angular/material/dialog";
+import {Citation, CitationService} from "../services/citation.service";
+import {DownloadButtonComponent} from "../details/tabs/download-tab/download-button/download-button.component";
 import {MatButton} from "@angular/material/button";
-import {CitationService} from "../services/citation.service";
 
 
 @Component({
@@ -17,34 +18,37 @@ import {CitationService} from "../services/citation.service";
     MatDialogActions,
     MatButton,
     MatDialogClose,
-    MatDialogTitle
+    MatDialogTitle,
+    DownloadButtonComponent,
+    MatButton,
   ],
   templateUrl: './citation.component.html',
   styleUrl: './citation.component.scss'
 })
 export class CitationComponent {
 
-  data = inject(MAT_DIALOG_DATA);
+  data: Citation = inject(MAT_DIALOG_DATA);
 
-  citationContent = computed(() => this.data.citationData.value());
+  citationContent = computed(() => this.data.content());
   id = computed(() => this.data.id());
+  downloadItems = computed(() => this.data.downloadItems());
+
 
   staticCitation = computed(() => {
-    return this.citation.isStatic() ? this.citationContent() : null
+    return !this.citation.isPathwayCitation(this.citationContent()) ? this.citationContent() : null
   });
 
   imageCitation = computed(() => {
-    return !this.citation.isStatic() ? this.citationContent().imageCitation : null;
+    const content = this.citationContent();
+    return this.citation.isPathwayCitation(content) ? content.imageCitation : null;
   });
 
   pathwayCitation = computed(() => {
-    return !this.citation.isStatic() ? this.citationContent().pathwayCitation : null;
+    const content = this.citationContent();
+    return this.citation.isPathwayCitation(content) ? content.pathwayCitation : null;
   });
 
   constructor(public citation: CitationService) {
   }
 
-  export() {
-
-  }
 }

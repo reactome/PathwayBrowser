@@ -1,31 +1,39 @@
-<div class="header"><h2 mat-dialog-title>Cite Us!</h2>
-  <button class="button" mat-button mat-dialog-close>Close</button>
+<div class="dialog-container">
+  <div class="header">
+    <h2 mat-dialog-title>
+      Cite Us!
+    </h2>
+    <button class="button" mat-button mat-dialog-close>Close</button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    @if (staticCitation()) {
+      <p>{{ staticCitation() }}</p>
+    }
+    @if (pathwayCitation()) {
+      <h4>Pathway Citation: </h4>
+      <p>{{ pathwayCitation() }}</p>
+    }
+    @if (imageCitation()) {
+      <h4>Image Citation:</h4>
+      <p>{{ imageCitation() }}</p>
+    }
+    <h4>Download As: </h4>
+
+  </mat-dialog-content>
+
+
+  <mat-dialog-actions align="center">
+    @for (downloadItem of downloadItems(); track downloadItem) {
+      <cr-download-button [url]="downloadItem.url"
+                          [download]="true"
+                          [label]="(downloadItem.format).toUpperCase()"
+                          [openInNewTab]="'_self'"
+                          [icon]="'text_snippet'"
+      >
+      </cr-download-button>
+    }
+
+
+  </mat-dialog-actions>
 </div>
-
-<mat-dialog-content class="mat-typography">
-
-  @if (citation.isStatic()) {
-    <p>{{ staticCitation() }}</p>
-  }
-
-  @if (pathwayCitation()) {
-    <h4>Pathway Citation: </h4>
-    <p>{{ pathwayCitation() }}</p>
-  }
-
-  @if (imageCitation()) {
-    <h4>Image Citation:</h4>
-    <p>{{ imageCitation() }}</p>
-  }
-
-  <h4>Download As: </h4>
-
-</mat-dialog-content>
-
-
-<mat-dialog-actions align="center">
-  <button mat-flat-button (click)="export()">BIB</button>
-  <button mat-flat-button (click)="export()">RIS</button>
-  <button mat-flat-button (click)="export()">TXT</button>
-
-</mat-dialog-actions>

@@ -1,4 +1,4 @@
-import {computed, effect, inject, Injectable, signal} from '@angular/core';
+import {computed, effect, inject, Injectable, Signal, signal} from '@angular/core';
 import {Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
@@ -22,6 +22,17 @@ export enum StaticCitation {
   REACTOME_KNOWLEDGEBASE_ID = "37941124"
 }
 
+
+export type Citation = {
+  id: Signal<string>;
+  content: Signal<string | PathwayCitation>;
+  downloadItems: Signal<DownloadUrl[]>
+}
+
+export type DownloadUrl = {
+  url: string;
+  format: string
+}
 
 export enum ExportFormat {
   BIB = 'bib',
@@ -84,7 +95,7 @@ export class CitationService {
     loader: (params) => this.getCitation(params.request)
   })
 
-  getCitation(id: string): Observable<string| PathwayCitation> {
+  getCitation(id: string): Observable<string | PathwayCitation> {
     const staticUrl = `${environment.host}/ContentService/citation/static/${id}`;
     const pathwayUrl = `${environment.host}/ContentService/citation/pathway/${id}?dateAccessed=${this.currentDate}`;
     return this.isStatic() ? this.http.get(`${staticUrl}`, {responseType: 'text'}) : this.http.get<PathwayCitation>(`${pathwayUrl}`)
@@ -92,15 +103,33 @@ export class CitationService {
 
   openDialog() {
     const citation = this.citationData.value();
-    if (citation) {
+    const id = this.currentCitationId();
+    if (citation && id) {
       const dialogRef = this.dialog.open(CitationComponent, {
         data: {
-          citationData: this.citationData,
-          id: this.updatedCitationId
+          content: this.citationData.value,
+          id: this.currentCitationId(),
+          downloadItems: signal(this.getExportUrls(id))
         }
       });
       dialogRef.afterClosed();
     }
   }
 
+  getExportUrls(id: string) {
+    const urls: DownloadUrl[] = [];
+    const isPathway = !this.isStatic();
+    const formats = Object.values(ExportFormat)
+    let url: DownloadUrl;
+    for (const format of formats) {
+      const link = `${environment.host}/ContentService/citation/export?id=${id}&ext=${format}&isPathway=${isPathway}&dateAccessed=${this.currentDate}`;
+      url = {url: link, format: format};
+      urls.push(url);
+    }
+    return urls;
+  }
+
+  isPathwayCitation(obj: string | PathwayCitation): obj is PathwayCitation {
+    return (typeof obj === 'object' && obj !== null && 'imageCitation' in obj && 'pathwayCitation' in obj);
+  }
 }
