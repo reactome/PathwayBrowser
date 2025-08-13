@@ -110,7 +110,9 @@ export class CitationService {
           content: this.citationData.value,
           id: this.currentCitationId(),
           downloadItems: signal(this.getExportUrls(id))
-        }
+        },
+        enterAnimationDuration: '450ms',
+        exitAnimationDuration: '450ms',
       });
       dialogRef.afterClosed();
     }

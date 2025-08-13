@@ -3,23 +3,25 @@
     <h2 mat-dialog-title>
       Cite Us!
     </h2>
-    <button class="button" mat-button mat-dialog-close>Close</button>
+
+    <button class="close-button" mat-dialog-close mat-icon-button>
+      <mat-icon>close</mat-icon>
+    </button>
+
   </div>
 
-  <mat-dialog-content class="mat-typography">
+  <mat-dialog-content [class.text-align]="citation.isStatic()" class="mat-typography">
     @if (staticCitation()) {
       <p>{{ staticCitation() }}</p>
     }
     @if (pathwayCitation()) {
-      <h4>Pathway Citation: </h4>
+      <h4>Pathway</h4>
       <p>{{ pathwayCitation() }}</p>
     }
     @if (imageCitation()) {
-      <h4>Image Citation:</h4>
+      <h4>Image</h4>
       <p>{{ imageCitation() }}</p>
     }
-    <h4>Download As: </h4>
-
   </mat-dialog-content>
 
 
@@ -29,11 +31,8 @@
                           [download]="true"
                           [label]="(downloadItem.format).toUpperCase()"
                           [openInNewTab]="'_self'"
-                          [icon]="'text_snippet'"
-      >
+                          [icon]="'file_download'">
       </cr-download-button>
     }
-
-
   </mat-dialog-actions>
 </div>

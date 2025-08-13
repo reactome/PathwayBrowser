@@ -4,9 +4,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 50px;
+  background: var(--primary-container);;
 
-  .button {
-    margin-right: 13px;
+  .close-button {
+    margin-right: 15px;
+    color: var(--primary);
+
+    @include mat.icon-button-overrides((
+      focus-state-layer-opacity: 0
+    ));
   }
 }
 
@@ -15,8 +22,11 @@
     subhead-color: var(--primary),
   ));
 
-
   .mat-mdc-dialog-actions {
     gap: 20px
   }
+}
+
+.text-align {
+  text-align: justify;
 }

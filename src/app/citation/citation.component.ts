@@ -8,7 +8,8 @@ import {
 } from "@angular/material/dialog";
 import {Citation, CitationService} from "../services/citation.service";
 import {DownloadButtonComponent} from "../details/tabs/download-tab/download-button/download-button.component";
-import {MatButton} from "@angular/material/button";
+import {MatIconButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
 
 
 @Component({
@@ -16,11 +17,11 @@ import {MatButton} from "@angular/material/button";
   imports: [
     MatDialogContent,
     MatDialogActions,
-    MatButton,
     MatDialogClose,
     MatDialogTitle,
     DownloadButtonComponent,
-    MatButton,
+    MatIcon,
+    MatIconButton
   ],
   templateUrl: './citation.component.html',
   styleUrl: './citation.component.scss'
