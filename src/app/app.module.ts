@@ -80,7 +80,6 @@ import {InfoTabComponent} from "./details/tabs/info-tab/info-tab.component";
 import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component";
 import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
 import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-viewer/structure-viewer.component";
-import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
 import {AnalysisFormComponent} from "./viewport/analysis-form/analysis-form.component";
 import {CompareFormComponent} from "./viewport/compare-form/compare-form.component";
 import {GsaFormModule} from "reactome-gsa-form"
@@ -177,7 +176,6 @@ import {SearchComponent} from "./viewport/search/search.component";
     PublicationComponent,
     ExternalReferenceComponent,
     CrossReferencesComponent,
-    MoleculeDetailsComponent,
     DownloadTabComponent,
     AnalysisFormComponent,
     CompareFormComponent,

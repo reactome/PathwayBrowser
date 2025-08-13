@@ -1,19 +1,43 @@
 <div class="details-content-container">
-@if (className() === MoleculeType.PROTEIN && refEntity() && xRefs()) {
-  <cr-structure-viewer [obj]=refEntity() [xRefs]="xRefs()" [moleculeType]="MoleculeType.PROTEIN"></cr-structure-viewer>
-  <mat-divider class="divider-color"></mat-divider>
-}
 
-<!-- Details content -->
-<cr-description-overview [obj]="obj()" [showSpecies]="false"></cr-description-overview>
-@if (refEntity()) {
-  <mat-divider class="divider-color"></mat-divider>
-  <!-- External Reference -->
-  <cr-external-reference [referenceEntity]=refEntity()></cr-external-reference>
-}
-<!-- Cross References -->
-@if (refEntity() && xRefs()) {
-  <mat-divider></mat-divider>
-  <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
-}
+  <!-- provide more details for the selectable object on details tab, protein structure only, overview,  externalRefs, xRefs-->
+  @if (!isMoleculeView()) {
+    @if (hasProteinStructureOnDetail()) {
+      <cr-structure-viewer [obj]=refEntity()! [xRefs]="xRefs()"
+                           [moleculeType]="MoleculeType.PROTEIN">
+
+      </cr-structure-viewer>
+      <mat-divider></mat-divider>
+    }
+    <!-- Details content -->
+    <cr-description-overview [obj]="obj()" [showSpecies]="false"></cr-description-overview>
+    <!-- External Reference -->
+    @if (refEntity()) {
+      <mat-divider></mat-divider>
+      <cr-external-reference [referenceEntity]=refEntity()!></cr-external-reference>
+    }
+  } @else {
+    <!-- provide molecule details on molecule tab, structure for protein and chemical and xRefs-->
+    @if (hasStructureOnMolecule()) {
+      <cr-structure-viewer [obj]=obj()
+                           [xRefs]="xRefs()"
+                           [moleculeType]="moleculeType()">
+      </cr-structure-viewer>
+
+      @if (xRefs().length > 0) {
+        <mat-divider>
+          <mat-divider></mat-divider>
+        </mat-divider>
+      }
+    }
+  }
+
+  <!-- Cross References -->
+  @if (xRefs().length > 0) {
+    <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
+    <!-- only provide this info for RNA/DNA which is Entity from backend on molecule tab -->
+  } @else if (isMoleculeView() && moleculeType() === MoleculeType.ENTITY) {
+    <p class="padding">No further information is available. Click the arrow icon in the top right to view more
+      details.</p>
+  }
 </div>

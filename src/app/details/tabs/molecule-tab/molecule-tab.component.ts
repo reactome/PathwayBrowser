@@ -1,4 +1,4 @@
-import {Component, computed, effect, Inject, input, viewChildren, WritableSignal} from '@angular/core';
+import {Component, computed, effect, Inject, input, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -43,6 +43,13 @@ export enum PropertyType {
   DRUG = "Drugs",
   OTHERS = "Others"
 }
+// molecule type from backend when sending enhanced query
+export enum MoleculeType {
+  PROTEIN = "Protein", //Protein
+  CHEMICAL_DRUG = "ChemicalDrug", // Drugs
+  ENTITY = "Entity", // DRA/RNA
+  CHEMICAL = "Chemical" //Chemical
+}
 
 @Component({
   selector: 'cr-molecule-tab',
@@ -81,12 +88,12 @@ export class MoleculeTabComponent {
   isReacfoamView = computed(() => !(this.state.select() || this.state.pathwayId()));
 
 
-
   constructor(private participant: ParticipantService,
               private entity: EntityService,
               private state: UrlStateService,
               @Inject(VIRTUAL_SCROLL_STRATEGY)
-              public readonly strategy: ExpandableVirtualScrollStrategy) {
+              public readonly strategy: ExpandableVirtualScrollStrategy,
+              private groupByPipe: GroupByPipe) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
@@ -153,8 +160,6 @@ export class MoleculeTabComponent {
       }
     }
 
-
-
     const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([category, dataMap]) => ({
       category,
       data: Array.from(dataMap.values())
@@ -163,12 +168,9 @@ export class MoleculeTabComponent {
   }
 
   getReactionParticipants(pathwayResults: MoleculeGroup[], refEntities: ReferenceEntity[]) {
-
     const dbIds = new Set(refEntities?.map(e => e.dbId));
-
     return pathwayResults.map(group => {
       let found = 0;
-
       const updatedData = group.data.map(molecule => {
         const isFound = dbIds.has(molecule.entity.dbId);
         if (isFound) found++;
@@ -210,7 +212,6 @@ export class MoleculeTabComponent {
     const found = graph.found;
     const total = graph.data.length;
     return found ? `${found}/${total}` : `${total}`
-
   }
 
   protected readonly isPathway = isPathway;
