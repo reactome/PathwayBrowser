@@ -105,8 +105,8 @@ export class DownloadTabComponent {
     });
 
     return filteredFormats.map(format => {
-      const isPPTX = format === DownloadFormat.PPTX
-      if (hasEHLD || isPPTX) {
+      const isExportable = [DownloadFormat.SVG, DownloadFormat.PPTX,DownloadFormat.GIF].includes(format);
+      if (isExportable) {
         return {
           format: format,
           url: signal(this.getExportUrl(format)),
@@ -114,7 +114,7 @@ export class DownloadTabComponent {
           download: true
         }
       }
-
+      // png and jpeg for new style diagram, svg is on its way...
       return {
         format: format,
         icon: 'image',
