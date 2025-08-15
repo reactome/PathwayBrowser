@@ -10,6 +10,17 @@
 
   </div>
 
+  <div class="save">
+    <button class="save-button" mat-button [cdkCopyToClipboard]="citationToCopy()" (click)="onCopyClick()">
+      <mat-icon>{{ copyIcon() }}</mat-icon>
+      {{ copyLabel() }}
+    </button>
+    <a class="save-button" [href]="`mailto:?subject=Reactome Citation&body=${citationToCopy()}`" mat-button>
+      <mat-icon>email</mat-icon>
+      Email
+    </a>
+  </div>
+
   <mat-dialog-content [class.text-align]="citation.isStatic()" class="mat-typography">
     @if (staticCitation()) {
       <p>{{ staticCitation() }}</p>

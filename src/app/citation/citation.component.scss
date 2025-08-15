@@ -30,3 +30,14 @@
 .text-align {
   text-align: justify;
 }
+
+.save {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 5px;
+
+  .save-button {
+    height: 30px;
+    margin-top: 5px;
+  }
+}
