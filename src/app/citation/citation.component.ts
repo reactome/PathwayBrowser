@@ -23,7 +23,11 @@ import {FormsModule} from "@angular/forms";
     MatDialogTitle,
     DownloadButtonComponent,
     MatIcon,
-    MatIconButton
+    MatIconButton,
+    CdkCopyToClipboard,
+    MatButton,
+    FormsModule,
+    MatAnchor
   ],
   templateUrl: './citation.component.html',
   styleUrl: './citation.component.scss'
