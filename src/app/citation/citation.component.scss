@@ -34,7 +34,8 @@
 .save {
   display: flex;
   justify-content: flex-end;
-  padding-right: 5px;
+  padding-right: 15px;
+  gap: 8px;
 
   .save-button {
     height: 30px;
