@@ -77,9 +77,7 @@ export class StructureViewerComponent {
     return this.selected()?.startsWith("AF-") ? Source.ALPHA_FOLD : Source.PDB;
   })
 
-  /**?
-   *  protein structure data from AlphaFold and PDB
-   */
+  /** protein structure data from AlphaFold and PDB */
   proteinStructureData = computed(() => {
 
     if (!this.isProtein()) return null;

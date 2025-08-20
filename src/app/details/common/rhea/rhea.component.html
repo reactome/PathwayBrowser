@@ -1,0 +1,49 @@
+<div class="container">
+  @for (row of rheaResources(); track row.id) {
+    <div class="row">
+      <div class="label-container"><a [href]="row.url" target="_blank"> RHEA {{ row.id }}</a></div>
+      <div class="composition-container">
+
+        <!--        <div class="equation">{{ row.equation }}</div>-->
+        <div class="rhea-reaction-wrapper">
+          <div class="rhea-reaction">
+            @for (item of row.participants; track item.uniqueId; let i = $index; let last = $last) {
+              @let size = row.participants.length;
+              <div class="participant">
+                <span>{{ item.label }} </span>
+                <span><a [href]="`https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:${item.id}`"
+                         target="_blank">{{ item.id }}</a></span>
+                <div [class.structure-size]="size > 3 ? 'structure-size' : ''"
+                     [innerHTML]="structuredSVGs().get(item.id) || '' | safe: 'html':true"></div>
+              </div>
+
+              <!--          <ng-container *ngIf="!last">-->
+                <!--            <ng-container *ngIf="item.side === 'left' && row.participants[i+1]?.side === 'right'">-->
+                <!--              =-->
+                <!--            </ng-container>-->
+                <!--            <ng-container *ngIf="item.side === row.participants[i+1]?.side">-->
+                <!--              +-->
+                <!--            </ng-container>-->
+                <!--          </ng-container>-->
+
+              @if (!last) {
+                @if (item.position === 'left' && row.participants[i + 1].position === 'right') {
+                  @if (size === 2) {
+                    <div class="connector">=</div>
+                  } @else {
+                    <div class="connector">=></div>
+                  }
+                }
+
+                @if (item.position === row.participants[i + 1].position) {
+                  <div class="connector">+</div>
+                }
+              }
+
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

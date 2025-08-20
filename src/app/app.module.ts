@@ -89,6 +89,7 @@ import {routerReducer, StoreRouterConnectingModule} from "@ngrx/router-store";
 import {EffectsModule} from "@ngrx/effects";
 import {DownloadTabComponent} from "./details/tabs/download-tab/download-tab.component";
 import {SearchComponent} from "./viewport/search/search.component";
+import {RheaComponent} from "./details/common/rhea/rhea.component";
 
 @NgModule({
   declarations: [
@@ -188,6 +189,7 @@ import {SearchComponent} from "./viewport/search/search.component";
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),
     SearchComponent,
+    RheaComponent,
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

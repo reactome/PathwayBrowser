@@ -86,6 +86,7 @@ export const Labels = {
   MEMBERS: 'Members',
   CANDIDATES: 'Candidates',
   MARKERS: 'Markers',
+  BIOCHEMICAL_REACTION: 'Biochemical Reaction'
 } as const;
 
 export enum SchemaClasses {
