@@ -90,6 +90,7 @@ import {routerReducer, StoreRouterConnectingModule} from "@ngrx/router-store";
 import {EffectsModule} from "@ngrx/effects";
 import {DownloadTabComponent} from "./details/tabs/download-tab/download-tab.component";
 import {SearchComponent} from "./viewport/search/search.component";
+import {PassiveDirective} from "./utils/passive.directive";
 
 @NgModule({
   declarations: [
@@ -190,6 +191,7 @@ import {SearchComponent} from "./viewport/search/search.component";
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),
     SearchComponent,
+    PassiveDirective,
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

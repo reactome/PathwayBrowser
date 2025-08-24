@@ -12,7 +12,7 @@ import {EhldService} from "../services/ehld.service";
 import {AnalysisService} from "../services/analysis.service";
 import {IconService} from "../services/icon.service";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isDefined, isPathway} from "../services/utils";
+import {isPathway} from "../services/utils";
 import {DatabaseObjectService} from "../services/database-object.service";
 import {toObservable} from "@angular/core/rxjs-interop";
 
@@ -473,7 +473,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  onScroll($event: WheelEvent, node: Event) {
+  onScroll($event: WheelEvent) {
     const nameElement = $event.target as HTMLElement;
     this.onScrollStart(nameElement);
 

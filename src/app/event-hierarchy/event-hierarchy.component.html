@@ -51,7 +51,7 @@
                 <div class="font name"
                      (mouseover)="onNameHover($event ,node)"
                      (mouseleave)="onNameHoverLeave($event, node)"
-                     (wheel)="onScroll($event, node)">
+                     [passive]="{wheel: onScroll.bind(this)}">
                   {{ node.displayName }}
                 </div>
               </div>
@@ -111,7 +111,7 @@
               <div class="name-container">
                 <div class="font name" (mouseover)="onNameHover($event, node)"
                      (mouseleave)="onNameHoverLeave($event, node)"
-                     (wheel)="onScroll($event, node)">
+                     [passive]="{wheel: onScroll.bind(this)}">
                   {{ node.displayName }}
                 </div>
               </div>
