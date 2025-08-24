@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {
   BehaviorSubject,
@@ -29,8 +29,8 @@ import {DatabaseObjectService} from "./database-object.service";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 import {Relationship} from "../model/graph/relationship.model";
 import {toObservable} from "@angular/core/rxjs-interop";
-import HasEvent = Relationship.HasEvent;
 import {Pathway} from "../model/graph/event/pathway.model";
+import HasEvent = Relationship.HasEvent;
 
 
 export type SelectableObject = Event | PhysicalEntity;
@@ -40,8 +40,8 @@ export type SelectableObject = Event | PhysicalEntity;
 })
 export class EventService {
 
-  private readonly _TOP_LEVEL_PATHWAYS = `${environment.host}/ContentService/data/pathways/top/`;
-  private readonly _ANCESTORS = `${environment.host}/ContentService/data/event/`;
+  private readonly _TOP_LEVEL_PATHWAYS = `${CONTENT_SERVICE}/data/pathways/top/`;
+  private readonly _ANCESTORS = `${CONTENT_SERVICE}/data/event/`;
 
   treeData$: BehaviorSubject<Event[]> = new BehaviorSubject<Event[]>([]);
 
@@ -234,7 +234,7 @@ export class EventService {
   private handleEntitySelectionFromUrlUpdate(event: PhysicalEntity, diagramId: string | undefined, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>): Observable<Event[]> {
     const diagramTreeEvent = allVisibleTreeNodes.find(node => node.stId === diagramId);
     if (diagramTreeEvent) {
-      return this.handleExistingEventSelection(diagramTreeEvent, tree, allVisibleTreeNodes).pipe(
+      return this.handleExistingEventSelection(diagramTreeEvent, diagramId, tree, allVisibleTreeNodes).pipe(
         map(([treeData, treeEvent]) => {
           this.setCurrentEventAndObj(diagramTreeEvent, event);
           return treeData;
@@ -248,35 +248,54 @@ export class EventService {
   private handleReactionSelectionFromUrlUpdate(event: Event, diagramId: string | undefined, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
-      return this.handleExistingEventSelection(treeNode, tree, allVisibleTreeNodes).pipe(
+      return this.handleExistingEventSelection(treeNode, diagramId, tree, allVisibleTreeNodes).pipe(
         map(([treeData, treeNode]) => {
+          this.updatePathwayIdIfSelectedReactionAbsentInCurrent(treeNode, diagramId, allVisibleTreeNodes, tree, hitReactions);
           this.setCurrentEventAndObj(treeNode, event);
           return treeData;
         })
       );
     } else {
       return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, hitReactions).pipe(
-        tap(() => isEvent(event) && this.setCurrentEventAndObj(event, event))
+        tap(() => this.updatePathwayIdIfSelectedReactionAbsentInCurrent(event, diagramId, allVisibleTreeNodes, tree, hitReactions)),
+        tap(() => this.setCurrentEventAndObj(event, event)),
       );
     }
   }
 
-  // Subpathway and interacting pathway
+  private updatePathwayIdIfSelectedReactionAbsentInCurrent(selectedReaction: Event, diagramId: string | undefined, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, hitReactions: number[]): void {
+    const isInDiagram = selectedReaction.ancestors?.some(ancestor => ancestor.stId === diagramId);
+    if (diagramId && !isInDiagram) {
+      diagramId = this.getPathwayWithDiagram(selectedReaction)?.stId;
+      if (diagramId) {
+        this.state.pathwayId.set(diagramId);
+        const ancestorIds = new Set(selectedReaction.ancestors.map(a => a.stId));
+        allVisibleTreeNodes
+          .filter(node => !ancestorIds.has(node.stId))
+          .forEach( node => {
+            node.isSelected = false
+            tree.collapse(node);
+          }
+        )
+        this.setBreadcrumbs(selectedReaction.ancestors);
+      }
+    }
+  }
+
+// Subpathway and interacting pathway
   private handlePathwaySelectionFromUrlUpdate(event: Event, diagramId: string | undefined, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, treeNodes: Event[], hitReactions: number[]): Observable<Event[]> {
     const treeNode = allVisibleTreeNodes.find(node => node.stId === event.stId);
     if (treeNode !== undefined) {
       // Subpathway, already in the tree view
-      return this.handleExistingEventSelection(treeNode, tree, allVisibleTreeNodes).pipe(
+      return this.handleExistingEventSelection(treeNode, diagramId, tree, allVisibleTreeNodes).pipe(
         map(([treeData, event]) => {
           this.setCurrentEventAndObj(event, event);
           this.loadEventData(treeNode)//todo: this.setCurrentEventAndObj(treeEvent, event)?
-          console.log('Subpathway, already in the tree view')
           return treeData;
         })
       );
     } else {
       // Interacting pathway, not visible in the tree view
-      console.log('Interacting pathway, not visible in the tree view');
       this.clearAllSelectedEvents(treeNodes);
       return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, hitReactions);
     }
@@ -343,20 +362,26 @@ export class EventService {
 
     console.log('Build tree with selected event', idToBuild);
     const ancestors = idToBuild
-      ? this.fetchEventAncestors(idToBuild).pipe(map(ancestors => this.getFinalAncestor(ancestors)))
+      ? this.fetchEventAncestors(idToBuild).pipe(map(ancestors => this.getFinalAncestor(ancestors, diagramId ? [diagramId] : undefined)))
       : from([[] as Event[]]);
 
     return ancestors.pipe(
+      tap(a => object.ancestors = a),
       switchMap(ancestors => this.buildNestedTree(object, this.treeData$.value, ancestors, diagramId, object.stId, tree, hitReactions)),
       tap((tree) => this.setTreeData(tree))
     );
   }
 
-  // Select any reaction, subpathway and interacting pathway from diagram
-  private handleExistingEventSelection(treeEvent: Event, tree: MatTree<Event, string>, flatTreeNodes: Event[]): Observable<[Event[], Event]> {
+  /**
+   * Select any reaction, subpathway and interacting pathway from diagram
+   *
+   * if DiagramId is set, will use it to find the correct ancestor
+   */
+
+  private handleExistingEventSelection(treeEvent: Event, diagramId: string | undefined, tree: MatTree<Event, string>, flatTreeNodes: Event[]): Observable<[Event[], Event]> {
     return this.fetchEventAncestors(treeEvent.stId).pipe(
       map(ancestors => {
-        const finalAncestor = this.getFinalAncestor(ancestors);
+        const finalAncestor = this.getFinalAncestor(ancestors, diagramId ? [diagramId] : undefined);
         // Create a Set to store the stIds from ancestors for quick lookup
         const ancestorStIds = new Set(finalAncestor.map(ancestor => ancestor.stId));
         // Loop through the treeNodes and check if the stId exists in the Set
@@ -580,8 +605,8 @@ export class EventService {
     }
   }
 
-  getFinalAncestor(ancestors: Event[][]): Event[] {
-    const pathIds = this.state.path();
+  getFinalAncestor(ancestors: Event[][], pathIds?: string[]): Event[] {
+    pathIds = pathIds || this.state.path();
     let finalAncestor: Event[];
     // When path is given through URL, this link is from Location in PWB on detail page
     if (pathIds && ancestors.length > 1) {
