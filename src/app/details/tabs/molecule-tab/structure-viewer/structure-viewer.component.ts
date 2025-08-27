@@ -107,7 +107,7 @@ export class StructureViewerComponent {
     loader: () => {
       const id = this.chebiStructureId.value();
       if (!id) return EMPTY;
-      return this.http.get(`https://www.ebi.ac.uk/chebi/beta/api/public/structure/${id}`, {responseType: 'text'})
+      return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}`, {responseType: 'text'})
     }
   })
 
@@ -146,7 +146,7 @@ export class StructureViewerComponent {
 
   getChebiStructureId(entryId: string | null) {
     if (!entryId) return of(null);
-    const url = `https://www.ebi.ac.uk/chebi/beta/api/public/compound/${entryId}`
+    const url = `https://www.ebi.ac.uk/chebi/backend/api/public/compound/${entryId}`
     return this.http.get<any>(url).pipe(
       map(res => res.default_structure.id)
     );
