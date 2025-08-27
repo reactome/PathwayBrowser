@@ -1,7 +1,7 @@
 import {Component, computed, effect, input, signal, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
-import {getProperty, groupAndSortBy, isPhysicalEntity} from "../../../services/utils";
+import {getProperty, groupAndSortBy, isPhysicalEntity, isReferenceSummary} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
@@ -25,6 +25,7 @@ import {
   EntityWithAccessionedSequence
 } from "../../../model/graph/physical-entity/entity-with-accessioned-sequence.model";
 import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
+import {isArray} from "lodash";
 
 
 @Component({
@@ -41,7 +42,7 @@ export class DescriptionTabComponent {
   })
 
   _otherForms = rxResource({
-    request: () => isPhysicalEntity(this.obj()) && this.referenceEntity() && this.obj().stId,
+    request: () => isPhysicalEntity(this.obj()) && !isReferenceSummary(this.obj()) && this.referenceEntity() && this.obj().stId,
     loader: (param) => param.request ? this.entity.getOtherForms(param.request) : of(null)
   })
 
@@ -52,6 +53,12 @@ export class DescriptionTabComponent {
 
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
+  readonly name = computed(() =>
+    this.obj().name
+      ? isArray(this.obj().name)
+        ? this.obj().name[0]
+        : this.obj().name
+      : this.obj().displayName);
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
   readonly groupedReferences = computed(() => groupAndSortBy(this.literatureRefs(), ref => ref.year, (key1, key2) => key2 - key1));
@@ -94,10 +101,16 @@ export class DescriptionTabComponent {
   interactorsLength = computed(() => this._interactors.value()?.length || 0);
 
   catalystActivity: Signal<CatalystActivity[]> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITY));
+  catalystActivities: Signal<CatalystActivity[]> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITIES));
   catalystRef: Signal<CatalystActivityReference> = computed(() => getProperty(this.obj(), DataKeys.CATALYST_ACTIVITY_REFERENCE));
 
   regulations: Signal<Regulation[]> = computed(() => getProperty(this.obj(), DataKeys.REGULATED_BY));
   regulationRefs: Signal<RegulationReference[]> = computed(() => getProperty(this.obj(), DataKeys.REGULATION_REFERENCE));
+
+  regulates: Signal<Regulation[]> = computed(() => [
+    ...(getProperty(this.obj(), DataKeys.POSITIVELY_REGULATES) || []),
+    ...(getProperty(this.obj(), DataKeys.NEGATIVELY_REGULATES) || []),
+  ]);
 
   modifications: Signal<HasModifiedResidue[]> = computed(() => getProperty(this.obj(), DataKeys.MODIFIED_RESIDUES));
 
@@ -127,7 +140,9 @@ export class DescriptionTabComponent {
   crossReferencesTemplate$ = viewChild.required<TemplateRef<any>>('crossReferencesTemplate');
   markerTemplate$ = viewChild.required<TemplateRef<any>>('markerTemplate');
   regulationTemplate$ = viewChild.required<TemplateRef<any>>('regulationTemplate');
+  regulatesTemplate$ = viewChild.required<TemplateRef<any>>('regulatesTemplate');
   catalystActivityTemplate$ = viewChild.required<TemplateRef<any>>('catalystActivityTemplate');
+  catalystActivitiesTemplate$ = viewChild.required<TemplateRef<any>>('catalystActivitiesTemplate');
   inferencesTemplate$ = viewChild.required<TemplateRef<any>>('inferencesTemplate');
   otherFormsTemplate$ = viewChild.required<TemplateRef<any>>('otherFormsTemplate');
   literatureRefsTemplate$ = viewChild.required<TemplateRef<any>>('literatureRefsTemplate');
@@ -145,6 +160,7 @@ export class DescriptionTabComponent {
     label: string,
     hasDepthControl?: boolean,
     manual?: boolean,
+    scope?: 'entity' | 'event',
     template?: Signal<TemplateRef<any>>,
     isPresent?: Signal<boolean>,
   }[] = [
@@ -156,6 +172,7 @@ export class DescriptionTabComponent {
       isPresent: signal(true)
     },
     {key: DataKeys.REFERENCE_ENTITY, label: Labels.EXTERNAL_REFERENCE, manual: true, template: this.referenceTemplate$},
+    {key: DataKeys.SUMMARISED_ENTITIES, label: Labels.SUMMARISED_ENTITIES},
     {
       key: DataKeys.MODIFIED_RESIDUES,
       label: Labels.MODIFIED_RESIDUES,
@@ -175,10 +192,18 @@ export class DescriptionTabComponent {
       isPresent: computed(() => this.proteinMarkers().length + this.rnaMarkers().length > 0)
     },
 
-    {key: DataKeys.EVENTS, label: Labels.EVENTS, hasDepthControl: true},
+    {key: DataKeys.EVENTS, label: Labels.EVENTS, hasDepthControl: true, scope: 'event'},
     {key: DataKeys.INPUT, label: Labels.INPUTS, hasDepthControl: true},
     {key: DataKeys.OUTPUT, label: Labels.OUTPUTS, hasDepthControl: true},
     {key: DataKeys.REGULATED_BY, label: Labels.REGULATED_BY, manual: true, template: this.regulationTemplate$},
+    {
+      key: DataKeys.CATALYST_ACTIVITIES,
+      label: Labels.CATALYST_ACTIVITIES,
+      manual: true,
+      template: this.catalystActivitiesTemplate$,
+      isPresent: computed(() => this.catalystActivities()?.length > 0)
+    },
+
     {
       key: DataKeys.CATALYST_ACTIVITY,
       label: Labels.CATALYST_ACTIVITY,
@@ -195,10 +220,22 @@ export class DescriptionTabComponent {
       isPresent: computed(() => this.crossReference()?.length > 0)
     },
 
-    {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT},
-    {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT},
+    {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT, scope: 'event'},
+    {key: DataKeys.FOLLOWING_EVENT, label: Labels.FOLLOWING_EVENT, scope: 'event'},
     {key: DataKeys.INPUT_FOR, label: Labels.INPUT_FOR},
     {key: DataKeys.OUTPUT_FOR, label: Labels.OUTPUT_FOR},
+    {
+      key: DataKeys.REGULATES,
+      label: Labels.REGULATES,
+      manual: true,
+      template: this.regulatesTemplate$,
+      isPresent: computed(() => this.regulates().length > 0)
+    },
+    {key: DataKeys.COMPONENT_OF, label: Labels.COMPONENT_OF, hasDepthControl: true},
+    {key: DataKeys.MEMBER_OF, label: Labels.MEMBER_OF, hasDepthControl: true},
+    {key: DataKeys.CANDIDATE_OF, label: Labels.CANDIDATE_OF, hasDepthControl: true},
+    {key: DataKeys.EVENT_OF, label: Labels.EVENT_OF, hasDepthControl: true, scope: 'event'},
+
 
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true, template: this.inferencesTemplate$},
     {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},

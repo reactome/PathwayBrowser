@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 :host {
   width: 100%;
 }
@@ -50,4 +52,33 @@
 
 .item {
   overflow: hidden; // Allows flex container to shrink properly in Firefox
+}
+.external-reference-container {
+  display: flex;
+  gap: 8px;
+}
+
+.select.button {
+  background: var(--primary);
+  color: var(--on-primary);
+  --size: 20px;
+  --touch-size: 20px;
+  --icon-ratio: 0.8;
+
+  @include mat.icon-button-overrides((
+    state-layer-size: var(--size, 40px),
+    icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
+  ));
+
+  .mat-icon {
+    width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+  }
+
+}
+
+:host ::ng-deep .select.button .mat-mdc-button-touch-target{
+  width: var(--touch-size, 48px);
+  height: var(--touch-size, 48px);
 }

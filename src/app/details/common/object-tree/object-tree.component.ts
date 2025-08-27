@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
 import {isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
 import {
   MatNestedTreeNode,
@@ -9,7 +9,7 @@ import {
   MatTreeNodeToggle
 } from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
-import {forkJoin, map, of} from "rxjs";
+import {forkJoin, map, Observable, of} from "rxjs";
 import {SelectableObject} from "../../../services/event.service";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {SchemaClasses} from "../../../constants/constants";
@@ -47,7 +47,9 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     NgIf,
     ObjectTreeDetailsComponent
   ],
-  styleUrl: './object-tree.component.scss'
+  styleUrl: './object-tree.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationship.Has<E>> {
 
@@ -55,6 +57,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   depthIndex = model<number | undefined>();
   depthChangeSource = model<'controller' | 'tree' | undefined>(undefined);
   treeLength = model<number | undefined>(undefined);
+  scope = input<'entity' | 'event'>('entity');
 
   moleculeView = input<boolean>(false);
   stoichiometry = input<number>();
@@ -192,6 +195,10 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   })
 
 
+  inDepth(id: string | number, depth: number) : Observable<E>{
+    return this.scope() === 'entity' ? this.entity.getEntityInDepth(id, depth) : this.entity.getEventInDepth(id, depth);
+  }
+
   _selectedTreeNodeData = rxResource({
     request: () => this.selectedTreeNode()?.stId || this.selectedTreeNode()?.dbId,
     loader: (param) => {
@@ -202,7 +209,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
         return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request).pipe(map(result => result as unknown as E));
       } else {
         // PE -> Complex and Set
-        return this.entity.getEntityInDepth<E>(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
+        return this.inDepth(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
           .pipe(
             map(entityResult => {
               if (entityResult && entityResult.composedOf) {
@@ -282,7 +289,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       return of({...node, element: normalElement});
     }
 
-    return this.entity.getEntityInDepth<E>(id, depth).pipe(
+    return this.inDepth(id, depth).pipe(
       map((entityResult) => {
         const composedOf = entityResult.composedOf || [];
         const nestedElement = {
@@ -350,6 +357,11 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     });
   }
 
+  static nonNestedClasses: Set<string> = new Set([
+    SchemaClasses.EWAS,
+    SchemaClasses.SIMPLE_ENTITY,
+    SchemaClasses.CHEMICAL_DRUG
+  ])
 
   isNestedView(selectedNode: E | undefined): boolean {
     if (!selectedNode) return true;
@@ -357,19 +369,10 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     // participants for molecule tab
     // If the node has an icon, treat it as non-nested
     const isStructure = this.moleculeView();
-    if (isStructure) {
-      return false
-    }
+    if (isStructure) return false
+    //TODO make it work for pathways
 
-    const nonNestedClasses: Set<string> = new Set([
-      SchemaClasses.EWAS,
-      SchemaClasses.SIMPLE_ENTITY,
-      SchemaClasses.CHEMICAL_DRUG
-    ])
-
-    const notNested = nonNestedClasses.has(selectedNode.schemaClass) ||
-      isPathway(selectedNode) ||
-      isRLE(selectedNode);
+    const notNested = ObjectTreeComponent.nonNestedClasses.has(selectedNode.schemaClass) || isRLE(selectedNode);
 
     return !notNested;
   }
@@ -589,9 +592,9 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     return element.displayName;
   }
 
-  getCompartments(element:E): string[] {
+  getCompartments(element: E): string[] {
 
-    if(this.moleculeView()) return [];
+    if (this.moleculeView()) return [];
     if (!this.isEvent(element)) {
       const comp = this.extractCompartmentPipe.transform(element.displayName);
       return comp ? [comp] : [];

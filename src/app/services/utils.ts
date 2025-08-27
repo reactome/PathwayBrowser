@@ -20,6 +20,7 @@ import {Publication} from "../model/graph/publication/publication.model";
 import {Book} from "../model/graph/publication/book.model";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
 import {Molecule} from "./participant.service";
+import {SummaryEntity} from "../model/graph/physical-entity/summary-entity.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -72,10 +73,14 @@ export function isPathway(obj: DatabaseObject): obj is Pathway | TopLevelPathway
 }
 
 const physicalEntityClasses: Set<String> = new Set([SchemaClasses.PE, SchemaClasses.COMPLEX, SchemaClasses.DRUG, SchemaClasses.CHEMICAL_DRUG, SchemaClasses.PROTEIN_DRUG, SchemaClasses.RNA_DRUG, SchemaClasses.ENTITY_SET, SchemaClasses.DEFINED_SET, SchemaClasses.CANDIDATE_SET, SchemaClasses.GENOME_ENCODED_ENTITY,
-  SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY, SchemaClasses.CELL]);
+  SchemaClasses.EWAS, SchemaClasses.OTHER_ENTITY, SchemaClasses.POLYMER, SchemaClasses.SIMPLE_ENTITY, SchemaClasses.CELL, SchemaClasses.SUMMARY_ENTITY]);
 
 export function isPhysicalEntity(obj: DatabaseObject): obj is PhysicalEntity {
   return physicalEntityClasses.has(obj.schemaClass);
+}
+
+export function isReferenceSummary(obj: DatabaseObject): obj is SummaryEntity {
+  return (obj as SummaryEntity).summarisedEntities !== undefined;
 }
 
 const ReferenceEntityClasses: Set<string> = new Set([
@@ -124,8 +129,8 @@ const moleculeClasses: Set<string> = new Set([
   SchemaClasses.REFERENCE_THERAPEUTIC
 ])
 
-export function isMolecule(obj: DatabaseObject): obj is Molecule{
-  return  moleculeClasses.has(obj.schemaClass);
+export function isMolecule(obj: DatabaseObject): obj is Molecule {
+  return moleculeClasses.has(obj.schemaClass);
 }
 
 
@@ -246,7 +251,7 @@ export function extractIdAfterColon(value: string): string {
  * rosiglitazone [Guide to Pharmacology:1056] ➡️ 1056
  * @param value
  */
-export function extractIdInBrackets(value: string): string{
+export function extractIdInBrackets(value: string): string {
   const match = value.match(/\[.*?:([^\]\s]+)\]/);
   return match ? match[1] : '';
 }
@@ -258,7 +263,7 @@ export function extractIdInBrackets(value: string): string{
  * @param input
  * @param getBeforeSpace
  */
-export function  extractFromSpace(input: string, getBeforeSpace: boolean = false): string {
+export function extractFromSpace(input: string, getBeforeSpace: boolean = false): string {
   if (!input) return '';
 
   const trimmed = input.trim();

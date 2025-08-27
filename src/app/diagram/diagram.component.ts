@@ -348,7 +348,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         this.cy.nodes().forEach(node => {
           node.data('graph.leaves')?.forEach((leaf: Graph.Node) => {
             if (!this.leafIdToParentIds.has(leaf.stId)) this.leafIdToParentIds.set(leaf.stId, [])
-            const parents = this.leafIdToParentIds.get(leaf.stId)!;
+            if (leaf.standardIdentifier && !this.leafIdToParentIds.has(leaf.standardIdentifier)) this.leafIdToParentIds.set(leaf.standardIdentifier, this.leafIdToParentIds.get(leaf.stId)!)
+            let parents = this.leafIdToParentIds.get(leaf.stId)!;
             parents.push(node.data('graph.stId'));
           })
         })
@@ -528,6 +529,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               }
             });
           }
+        } else if (token.includes(":")) { // ReferenceEntity stId
+          elements = elements.or(`[graph.standardIdentifier="${token}"]`);
+          if ((includeContainers || elements.length === 0) && this.leafIdToParentIds.has(token)) this.leafIdToParentIds.get(token)!.forEach(parent => elements = elements.or(`[graph.stId="${parent}"]`))
         } else {
           const matchArray = token.match(this.classRegex);
           if (matchArray) {
@@ -708,7 +712,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   private loadAnalysis(token: string | null) {
     const diagramId = this.pathwayId();
-    console.log(token, diagramId)
     if (!token || !diagramId) {
       this._loadAnalysisFn = undefined;
 

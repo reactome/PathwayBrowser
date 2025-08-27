@@ -1,7 +1,7 @@
 import {computed, effect, Injectable, signal} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {catchError, map, Observable, of} from "rxjs";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {OrthologousMap, Species} from "../model/graph/species.model";
 import {Event} from "../model/graph/event/event.model";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -15,8 +15,8 @@ import {SelectableObject} from "./event.service";
 })
 export class SpeciesService {
 
-  private readonly _MAIN_SPECIES = `${environment.host}/ContentService/data/species/main`;
-  private readonly _ORTHOLOGIES = `${environment.host}/ContentService/data/orthologies/ids/species/`
+  private readonly _MAIN_SPECIES = `${CONTENT_SERVICE}/data/species/main`;
+  private readonly _ORTHOLOGIES = `${CONTENT_SERVICE}/data/orthologies/ids/species/`
 
   defaultSpecies: Species = {
     displayName: 'Homo sapiens',
@@ -98,7 +98,7 @@ export class SpeciesService {
 
   getOrtholog(identifier: string | number | null, speciesDbID: number): Observable<Event | null> {
     if (!identifier) return of(null);
-    return this.http.get<Event>(`${environment.host}/ContentService/data/orthology/${identifier}/species/${speciesDbID}`);
+    return this.http.get<Event>(`${CONTENT_SERVICE}/data/orthology/${identifier}/species/${speciesDbID}`);
   }
 
 

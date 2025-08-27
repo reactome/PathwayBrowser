@@ -77,7 +77,7 @@
             fill="var(--primary, #006782)"/>
       <g id="pathways_2">
         <g id="Group 2608558">
-          <rect id="Rectangle 62" x="361" y="22" width="73" height="22" rx="4" fill="var(--surface-variant, #E9F2F6)"/>
+          <rect id="Rectangle 62" x="361" y="22" width="73" height="22" rx="4" fill="var(--outline-variant, #bcc8cf)"/>
           <rect id="Rectangle 68" class="collapse" style="--width:67px" x="361" y="22" width="67" height="22" rx="4"
                 fill="var(--primary, #006782)"/>
           <rect id="Rectangle 63" x="361" y="22" width="24" height="22" rx="4" fill="var(--primary, #006782)" stroke="var(--on-primary, #FFF)"/>
@@ -94,7 +94,7 @@
           </g>
         </g>
         <g id="Group 2608556">
-          <rect id="Rectangle 64" x="361" y="52" width="73" height="22" rx="4" fill="var(--surface-variant, #E9F2F6)"/>
+          <rect id="Rectangle 64" x="361" y="52" width="73" height="22" rx="4" fill="var(--outline-variant, #bcc8cf)"/>
           <rect id="Rectangle 69" class="collapse" style="--width:47px" x="361" y="52" width="47" height="22" rx="4"
                 fill="var(--primary, #006782)"/>
           <rect id="Rectangle 65" x="361" y="52" width="24" height="22" rx="4" fill="var(--primary, #006782)" stroke="var(--on-primary, #FFF)"/>
@@ -111,7 +111,7 @@
           </g>
         </g>
         <g id="Group 2608557">
-          <rect id="Rectangle 66" x="361" y="82" width="73" height="22" rx="4" fill="var(--surface-variant, #E9F2F6)"/>
+          <rect id="Rectangle 66" x="361" y="82" width="73" height="22" rx="4" fill="var(--outline-variant, #bcc8cf)"/>
           <rect id="Rectangle 70" class="collapse" style="--width:59px" x="361" y="82" width="59" height="22" rx="4"
                 fill="var(--primary, #006782)"/>
           <rect id="Rectangle 67" x="361" y="82" width="24" height="22" rx="4" fill="var(--primary, #006782)" stroke="var(--on-primary, #FFF)"/>

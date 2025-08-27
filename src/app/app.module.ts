@@ -91,6 +91,7 @@ import {EffectsModule} from "@ngrx/effects";
 import {DownloadTabComponent} from "./details/tabs/download-tab/download-tab.component";
 import {SearchComponent} from "./viewport/search/search.component";
 import {PassiveDirective} from "./utils/passive.directive";
+import {MatPaginator} from "@angular/material/paginator";
 
 @NgModule({
   declarations: [
@@ -192,6 +193,7 @@ import {PassiveDirective} from "./utils/passive.directive";
     StoreRouterConnectingModule.forRoot(),
     SearchComponent,
     PassiveDirective,
+    MatPaginator,
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

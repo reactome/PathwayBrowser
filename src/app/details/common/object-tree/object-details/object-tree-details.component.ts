@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input, OnDestroy, OnInit} from '@angular/core';
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
 import {SelectableObject} from "../../../../services/event.service";
 import {DatabaseIdentifier} from "../../../../model/graph/database-identifier.model";
@@ -19,7 +19,8 @@ import {MoleculeType} from "../../../tabs/molecule-tab/molecule-details/molecule
     CrossReferencesComponent
   ],
   templateUrl: './object-tree-details.component.html',
-  styleUrl: './object-tree-details.component.scss'
+  styleUrl: './object-tree-details.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ObjectTreeDetailsComponent {
 

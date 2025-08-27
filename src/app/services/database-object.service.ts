@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {map, Observable, Subject} from "rxjs";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {JSOGDeserializer} from "../utils/JSOGDeserializer";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 
 @Injectable({
@@ -11,8 +11,8 @@ import {HttpClient} from "@angular/common/http";
 export class DatabaseObjectService {
 
 
-  private readonly _ENHANCED_QUERY = `${environment.host}/ContentService/data/query/enhanced/`;
-  private readonly _DATA_QUERY = `${environment.host}/ContentService/data/query/`;
+  private readonly _ENHANCED_QUERY = `${CONTENT_SERVICE}/data/query/enhanced/`;
+  private readonly _DATA_QUERY = `${CONTENT_SERVICE}/data/query/`;
 
 
   private _selectedObj: Subject<DatabaseObject> = new Subject<DatabaseObject>();

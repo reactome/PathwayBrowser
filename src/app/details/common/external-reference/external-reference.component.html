@@ -2,7 +2,8 @@
   @for (property of externalRef(); track property.label) {
     <div class="row">
       <div class="label-container">{{ property.label || ''  | titlecase }}</div>
-      <div class="composition-container" [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
+      <div class="composition-container"
+           [ngClass]="{'columns-container':isArray(property.value) && !isString(property.value[0])}">
         @if (isArray(property.value) && !isString(property.value[0])) {
           @for (item of property.value; track item.dbId) {
             <span class="column-item">
@@ -11,7 +12,15 @@
           }
         } @else {
           @if (property.label === 'External Reference') {
-            <a [href]="referenceEntity().url" target="_blank">{{ referenceEntity().displayName }}</a>
+            <span class="external-reference-container">
+              <a [href]="referenceEntity().url" target="_blank">{{ referenceEntity().displayName }}</a>
+              @if (!data.selectIsSummary()) {
+                <button mat-icon-button class="button select" (click)="onSelect()"
+                        [matTooltip]="'Select summary of entity'">
+                  <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
+                </button>
+              }
+            </span>
           } @else {
             <span class="item">{{ property.value }}</span>
           }

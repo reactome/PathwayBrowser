@@ -12,7 +12,7 @@ import cytoscapeFcose, {FcoseLayoutOptions} from "cytoscape-fcose";
 import NodeDefinition = Reactome.Types.NodeDefinition;
 import ReactionDefinition = Reactome.Types.ReactionDefinition;
 import EdgeTypeDefinition = Reactome.Types.EdgeTypeDefinition;
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, DOWNLOAD, environment} from "../../environments/environment";
 
 cytoscape.use(cytoscapeFcose)
 
@@ -175,23 +175,23 @@ export class DiagramService {
   }
 
   public getNormalPathway(id: string): Observable<string> {
-    return this.http.get(`https://dev.reactome.org/ContentService/data/query/${id}/normalPathway`, {responseType: "text"}).pipe(
+    return this.http.get(`${CONTENT_SERVICE}/data/query/${id}/normalPathway`, {responseType: "text"}).pipe(
       map(data => data.split('\t')[0])
     )
   }
 
   public getDiagram(id: number | string): Observable<cytoscape.ElementsDefinition> {
     return forkJoin({
-      diagram: this.http.get<Diagram>(`${environment.host}/download/current/diagram/${id}.json`),
-      graph: this.http.get<Graph.Data>(`${environment.host}/download/current/diagram/${id}.graph.json`)
+      diagram: this.http.get<Diagram>(`${DOWNLOAD}/diagram/${id}.json`),
+      graph: this.http.get<Graph.Data>(`${DOWNLOAD}/diagram/${id}.graph.json`)
     }).pipe(
       tap(({diagram, graph}) => console.log('Normal diagram:', diagram, 'Normal graph', graph)),
       switchMap(({diagram, graph}) => {
         if (diagram.forNormalDraw !== undefined && !diagram.forNormalDraw) {
           return this.getNormalPathway(diagram.stableId).pipe(
             switchMap(normalPathwayId => forkJoin({
-              normalDiagram: this.http.get<Diagram>(`${environment.host}/download/current/diagram/${normalPathwayId}.json`),
-              normalGraph: this.http.get<Graph.Data>(`${environment.host}/download/current/diagram/${normalPathwayId}.graph.json`)
+              normalDiagram: this.http.get<Diagram>(`${DOWNLOAD}/diagram/${normalPathwayId}.json`),
+              normalGraph: this.http.get<Graph.Data>(`${DOWNLOAD}/diagram/${normalPathwayId}.graph.json`)
             })),
             tap(({
                    normalGraph,
@@ -816,7 +816,7 @@ export class DiagramService {
   }
 
   getEHLDSvg(id: number | string): Observable<string> {
-    return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'});
+    return this.http.get(`${DOWNLOAD}/ehld/${id}.svg`, {responseType: 'text'});
   }
 }
 

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {map, Observable, of, switchMap} from "rxjs";
 import {SearchResult} from "../model/search-results.model";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {isExactlyCellLineagePath, isEWAS, isRLE} from "./utils";
 import {DatabaseObject} from "../model/graph/database-object.model";
@@ -213,7 +213,7 @@ export class IconService {
   }
 
   fetchIcon(identifier: string): Observable<string | null> {
-    return this.http.get<SearchResult>(`${environment.host}/ContentService/search/query?query=${identifier}&types=Icon`).pipe(
+    return this.http.get<SearchResult>(`${CONTENT_SERVICE}/search/query?query=${identifier}&types=Icon`).pipe(
       map(response =>
         response.results[0].typeName === "Icon" ? response.results[0].entries[0] : null
       ),
@@ -232,8 +232,8 @@ export class IconService {
     if (typeof obj === 'string') {
       key = obj;
     } else {
-      if (isEWAS(obj)) {
-        key = obj.referenceType;
+      if (obj['referenceType'] !== undefined) {
+        key = obj['referenceType'] as string;
       } else if (isRLE(obj) && obj.category) {
         key = obj.category;
       } else if (isExactlyCellLineagePath(obj)) {

@@ -6,7 +6,7 @@ import {MatIcon} from "@angular/material/icon";
 import {DataStateService} from "../../../services/data-state.service";
 import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
-import {environment} from "../../../../environments/environment";
+import {ANALYSIS_SERVICE, CONTENT_SERVICE, RESTFUL_API} from "../../../../environments/environment";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -44,7 +44,7 @@ type AnaLysisItem = {
 export class DownloadTabComponent {
 
   newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
-  newtUrl = computed(()=> `https://web.newteditor.org/?URL=${environment.host}/ContentService/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
+  newtUrl = computed(()=> `https://web.newteditor.org/?URL=${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
 
   pathwayId = this.state.pathwayId as WritableSignal<string>;
   selectedElement = this.dataState.selectedElement;
@@ -89,23 +89,23 @@ export class DownloadTabComponent {
   pathwayItems: PathwayItem[] = [
     {
       name: 'SBML',
-      url: `${environment.host}/ContentService/exporter/event/${this.finalEventId()}.sbml`,
+      url: `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbml`,
     },
     {
       name: 'SBGN',
-      url: `${environment.host}/ContentService/exporter/event/${this.finalEventId()}.sbgn`,
+      url: `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn`,
     },
     {
       name: 'BioPAX2',
-      url: `${environment.host}/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level2/${this.finalEventId()}`,
+      url: `${RESTFUL_API}/biopaxExporter/Level2/${this.finalEventId()}`,
     },
     {
       name: 'BioPAX3',
-      url: `${environment.host}/ReactomeRESTfulAPI/RESTfulWS/biopaxExporter/Level3/${this.finalEventId()}`,
+      url: `${RESTFUL_API}/biopaxExporter/Level3/${this.finalEventId()}`,
     },
     {
       name: 'PDF',
-      url: `${environment.host}/ContentService/exporter/event/${this.finalEventId()}.pdf`,
+      url: `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.pdf`,
     }
   ]
 
@@ -113,7 +113,7 @@ export class DownloadTabComponent {
     {
       title: 'Results CSV',
       description:'Download the pathway analysis results in CSV format for selected resource',
-      url: `${environment.host}/AnalysisService/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`,
+      url: `${ANALYSIS_SERVICE}/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`,
       icon: 'table',
       isShown: computed(() => !this.analysis.isGSA())
     },
@@ -121,7 +121,7 @@ export class DownloadTabComponent {
     {
       title: 'Results JSON',
       description:'Download a compressed file containing the complete analysis results in JSON format fot all resources',
-      url: `${environment.host}/AnalysisService/download/${this.token()}/result.json.gz`,
+      url: `${ANALYSIS_SERVICE}/download/${this.token()}/result.json.gz`,
       icon: 'data_object',
       isShown: signal(true)
     },
@@ -129,7 +129,7 @@ export class DownloadTabComponent {
     {
       title: 'Result PDF',
       description:'Download a detailed report with the most significant pathway analysis results in PDF format',
-      url: `${environment.host}/AnalysisService/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`,
+      url: `${ANALYSIS_SERVICE}/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`,
       icon: 'docs',
       isShown: computed(() => !this.analysis.isGSA())
     },
@@ -137,7 +137,7 @@ export class DownloadTabComponent {
     {
       title: 'Identifier Mapping CSV',
       description:'Download the identifier mappings between the submitted data and the selected resource in CSV format',
-      url: `${environment.host}/AnalysisService/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`,
+      url: `${ANALYSIS_SERVICE}/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`,
       icon: 'table',
       isShown: signal(true)
     },
@@ -145,7 +145,7 @@ export class DownloadTabComponent {
     {
       title: 'Not Found Identifiers CSV',
       description:'Download a CSV file containing those identifiers from the submitted sample that we were not mapped',
-      url: `${environment.host}/AnalysisService/dowmload/${this.token()}/entities/notfound/not_found.csv`,
+      url: `${ANALYSIS_SERVICE}/dowmload/${this.token()}/entities/notfound/not_found.csv`,
       icon: 'table',
       isShown: signal(true)
     }]
@@ -156,8 +156,6 @@ export class DownloadTabComponent {
               private analysis: AnalysisService,
               private reacfoam: ReacfoamService) {
   }
-
-  protected readonly environment = environment;
 
   getGsaIcon(name: string) {
     switch (name) {

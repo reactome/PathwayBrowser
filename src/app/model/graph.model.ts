@@ -26,6 +26,7 @@ export namespace Graph {
     schemaClass: string;
     referenceType: string;
     leaves?: Node[];
+    standardIdentifier?: string;
   }
 
   export interface SubPathway extends Entity {

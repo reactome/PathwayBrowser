@@ -23,7 +23,12 @@
           [matTooltip]="symbol().tooltip"
           [svgIcon]="symbol().name">
         </mat-icon>
-        <span class="name">{{ obj().name[0] || obj().displayName }}</span>
+        <span class="name">
+          {{ name() }}
+          @if (obj().schemaClass === 'SummaryEntity') {
+            · <i>summary</i>
+          }
+        </span>
       </div>
       <div class="details-button">
         <a mat-button [href]="'/content/detail/' + obj().stId" target="_blank">
@@ -49,7 +54,7 @@
 
         @if (!element.manual) {
           <cr-controller-tree [type]="element.key" [data]="obj()[element.key]"
-                              [depthControl]="element.hasDepthControl ?? false"></cr-controller-tree>
+                              [depthControl]="element.hasDepthControl ?? false" [scope]="element.scope || 'entity'"/>
         } @else if (element.template) {
           <ng-container *ngTemplateOutlet="element.template!()"></ng-container>
         }
@@ -161,11 +166,25 @@
   </div>
 </ng-template>
 
+<ng-template #catalystActivitiesTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="catalystActivities()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
+  </div>
+</ng-template>
+
 
 <ng-template #regulationTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"
-                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
+                          [regulationRefs]="regulationRefs()" perspective="event"></cr-molecular-process>
+  </div>
+</ng-template>
+
+<ng-template #regulatesTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="regulates()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
   </div>
 </ng-template>
 

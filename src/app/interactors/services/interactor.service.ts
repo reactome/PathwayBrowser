@@ -1,7 +1,7 @@
 import {Injectable, signal} from "@angular/core";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import cytoscape, {NodeCollection, NodeSingular} from "cytoscape";
-import {catchError, map, Observable, of, Subject, switchMap} from "rxjs";
+import {catchError, map, Observable, of, switchMap} from "rxjs";
 import {
   CustomInteraction,
   Interactor,
@@ -15,7 +15,7 @@ import {
 
 import InteractorsLayout from "../layout/interactors-layout";
 import {DiagramService} from "../../services/diagram.service";
-import {environment} from "../../../environments/environment";
+import {CONTENT_SERVICE, OVERLAYS} from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root',
@@ -23,8 +23,8 @@ import {environment} from "../../../environments/environment";
 
 export class InteractorService {
 
-  private readonly _PREFIX_INTERACTOR = `${environment.host}/ContentService/interactors/`;
-  private readonly _PREFIX_DISEASE = `${environment.host}/overlays/disgenet/`;
+  private readonly _PREFIX_INTERACTOR = `${CONTENT_SERVICE}/interactors/`;
+  private readonly _PREFIX_DISEASE = `${OVERLAYS}/disgenet/`;
 
   private readonly _STATIC_URL = this._PREFIX_INTERACTOR + 'static/molecules/details';
   private readonly _PSICQUIC_RESOURCE_URL = this._PREFIX_INTERACTOR + 'psicquic/resources/'
@@ -103,7 +103,7 @@ export class InteractorService {
   }
 
   public getCustomInteractorsByAcc(acc: string) {
-    const url = `${environment.host}/ContentService/interactors/static/molecule/enhanced/${acc}/details`;
+    const url = `${CONTENT_SERVICE}/interactors/static/molecule/enhanced/${acc}/details`;
     return this.http.get<CustomInteraction[]>(url,)
   }
 

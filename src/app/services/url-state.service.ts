@@ -3,7 +3,7 @@ import {ActivatedRoute, NavigationEnd, Params, Router} from "@angular/router";
 import {catchError, combineLatestWith, filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {PaletteName} from "./analysis.service";
 import {Analysis} from "../model/analysis.model";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
@@ -151,7 +151,7 @@ export class UrlStateService implements State {
             } else if (param.type === 'boolean') {
               param.set(value === 'true');
             } else if (param.type === 'id') {
-              param.set(!isNaN(+value) ? await this.dbIdToStId(+value) : value)
+              param.set(await this.ensureStId(value));
             } else if (param.type === 'number') {
               param.set(parseFloat(value))
             } else {
@@ -186,7 +186,7 @@ export class UrlStateService implements State {
   }
 
   async dbIdToStId(dbId: number): Promise<string> {
-    return firstValueFrom(this.http.get(`${environment.host}/ContentService/data/query/${dbId}/stId`, {responseType: "text"}).pipe(
+    return firstValueFrom(this.http.get(`${CONTENT_SERVICE}/data/query/${dbId}/stId`, {responseType: "text"}).pipe(
       catchError(() => of(dbId + '')))
     );
   }

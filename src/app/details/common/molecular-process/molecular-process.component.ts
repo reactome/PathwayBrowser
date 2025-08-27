@@ -36,6 +36,8 @@ export class MolecularProcessComponent {
   readonly catalystActivityReference = input.required<CatalystActivityReference>({alias: "catalystActivityReference"});
   readonly regulationRefs = input.required<RegulationReference[]>({alias: 'regulationRefs'});
 
+  readonly perspective = input<'entity' | 'event'>('event');
+
   constructor(private iconService: IconService) {
   }
 
@@ -61,31 +63,37 @@ export class MolecularProcessComponent {
   }
 
 
-  private getRegulation(entry: Regulation) {
+  private getRegulation(entry: Regulation): MolecularProcess {
     return {
       dbId: entry.dbId,
       schemaClass: entry.schemaClass,
-      type: entry.schemaClass.includes('Negative') ? 'Negative Regulation' : 'Positive Regulation',
+      type: this.perspective() === 'event'
+        ? entry.schemaClass.includes('Negative') ? 'Negative Regulation' : 'Positive Regulation'
+        : entry.schemaClass.includes('Negative') ? 'Negatively Regulates' : 'Positively Regulates',
+      reactions: entry.regulatedEntity,
       go_BiologicalProcess: entry.activity,
       activeUnit: entry.activeUnit,
       regulator: entry.regulator,
       regulationReference: this.regulationRefs(),
-      isRegulation: true
-    } as unknown as MolecularProcess;
+      isRegulation: true,
+      displayName: 'Faked'
+    };
   }
 
-  private getCatalystActivity(entry: CatalystActivity) {
+  private getCatalystActivity(entry: CatalystActivity): MolecularProcess {
     return {
       dbId: entry.dbId,
       schemaClass: entry.schemaClass,
+      reactions: entry.catalyzedEvent,
       type: 'Catalysis',
       activity: entry.activity,
       ecNumber: entry.activity && entry.activity.ecNumber,
       activeUnit: entry.activeUnit,
       catalyst: entry.physicalEntity,
       catalystActivityReference: this.catalystActivityReference(),
-      isCatalystActivity: true
-    } as unknown as MolecularProcess;
+      isCatalystActivity: true,
+      displayName: 'Faked'
+    };
   }
 
   private getModifiedResidue(entry: HasModifiedResidue) {

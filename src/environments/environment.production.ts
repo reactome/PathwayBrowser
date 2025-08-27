@@ -4,3 +4,10 @@ export const environment = {
   s3: "https://s3.amazonaws.com/download.reactome.org",
   gsaServer: "production"
 };
+
+export const CONTENT_SERVICE = `${environment.host}/ContentService`;
+export const ANALYSIS_SERVICE = `${environment.host}/AnalysisService`;
+export const EXPERIMENT_SERVICE = `${environment.host}/experiment`;
+export const RESTFUL_API = `${environment.host}/ReactomeRESTfulAPI/RESTfulWS`;
+export const DOWNLOAD = `${environment.host}/download`;
+export const OVERLAYS = `${environment.host}/overlays`;

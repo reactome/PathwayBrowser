@@ -1,9 +1,9 @@
 import {computed, effect, Injectable, linkedSignal} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, forkJoin, map, Observable, of, tap} from "rxjs";
+import {catchError, forkJoin, map, Observable, of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {UrlStateService} from "./url-state.service";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE} from "../../environments/environment";
 import {JSOGDeserializer, JSOGObject} from "../utils/JSOGDeserializer";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {Pathway} from "../model/graph/event/pathway.model";
@@ -64,6 +64,8 @@ export class DataStateService {
   public selectedElement = this._selectedElement.asReadonly().value
   public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
+  public selectIsSummary = computed(() => this.state.select() ? this.state.select()!.includes(":") : false)
+
   private _selectionData = computed<SelectionData>(() => ({
     selectedElement: this.selectedElement(),
     selectedElementLoading: this.selectedElementLoading(),
@@ -97,7 +99,7 @@ export class DataStateService {
       : forkJoin(tokens.map(query => { // Combine tokens
         return diagram// When in diagram / ehld view // When in reacfoam view
           ? this.getDiagramFlagging(diagram, query)
-          : this.getReacfoamFlagging(query, species)
+          : this.getReacfoamFlagging(query, species!)
       })).pipe(
         map(results => results.reduce<FlaggingResult>(
             (acc, result) => {
@@ -112,8 +114,8 @@ export class DataStateService {
   })
 
   getReacfoamFlagging(query: string, species: string): Observable<Partial<FlaggingResult>> {
-    return this.http.get<FireworksFlagResult>(`${environment.host}/ContentService/search/fireworks/flag`, {
-      params: {query, species}
+    return this.http.get<FireworksFlagResult>(`${CONTENT_SERVICE}/search/fireworks/flag`, {
+      params: {query, species, scope: 'REFERENCE_ENTITY', includeInteractors: false},
     }).pipe(
       catchError(() => of({} as FireworksFlagResult)),
       map(r => ({
@@ -124,8 +126,8 @@ export class DataStateService {
   }
 
   getDiagramFlagging(diagram: string, query: string): Observable<Partial<FlaggingResult>> {
-    return this.http.get<DiagramFlagResult>(`${environment.host}/ContentService/search/diagram/${diagram}/flag`, {
-      params: {query}
+    return this.http.get<DiagramFlagResult>(`${CONTENT_SERVICE}/search/diagram/${diagram}/flag`, {
+      params: {query, scope: 'REFERENCE_ENTITY', includeInteractors: false}
     }).pipe(
       catchError(() => of({} as DiagramFlagResult)),
       map(r => ({
@@ -153,13 +155,13 @@ export class DataStateService {
   }
 
   fetchEnhancedData<T extends DatabaseObject>(id: string | number | null): Observable<T | undefined> {
-    let url = `${environment.host}/ContentService/data/query/enhanced/${id}?includeRef=true&view=nested-aggregated`;
+    let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}?includeRef=true&view=nested-aggregated`;
     if (id === null) return of();
     return this.http.get<T>(url).pipe(map(this.flattenReferences))
   }
 
   fetchAncestors(stId: string | null): Observable<Pathway[]> {
-    let url = `${environment.host}/ContentService/data/event/${stId}/ancestors?includeRef=true&view=nested-aggregated`;
+    let url = `${CONTENT_SERVICE}/data/event/${stId}/ancestors?includeRef=true&view=nested-aggregated`;
     if (stId === null) return of();
     return this.http.get<Pathway[][]>(url).pipe(
       map(ancestors => ancestors.flatMap(a => a.reverse())),

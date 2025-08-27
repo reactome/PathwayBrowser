@@ -1,4 +1,14 @@
-import {Component, computed, effect, ElementRef, input, linkedSignal, signal, viewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  input,
+  linkedSignal,
+  signal,
+  viewChild
+} from '@angular/core';
 import {DatabaseIdentifier} from "../../../../model/graph/database-identifier.model";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOptgroup, MatOption, MatSelect} from "@angular/material/select";
@@ -6,7 +16,7 @@ import {rxResource} from "@angular/core/rxjs-interop";
 import {extract, Style} from "reactome-cytoscape-style";
 import {DarkService} from "../../../../services/dark.service";
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
-import {EMPTY, map, of} from "rxjs";
+import {EMPTY, map, Observable, of} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {MoleculeType} from "../molecule-details/molecule-details.component";
 import {SafePipe} from "../../../../pipes/safe.pipe";
@@ -47,7 +57,9 @@ declare const PDBeMolstarPlugin: any;
     MatOption,
     SafePipe
   ],
-  styleUrl: './structure-viewer.component.scss'
+  styleUrl: './structure-viewer.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class StructureViewerComponent {
 
@@ -100,13 +112,12 @@ export class StructureViewerComponent {
   chebiStructureId = rxResource({
     request: () => this.chebiIdentifier(),
     loader: (params) => this.getChebiStructureId(params.request)
-
   });
 
   chebiStructureSVGData = rxResource({
-    request: () => this.chebiStructureId.value(),
-    loader: () => {
-      const id = this.chebiStructureId.value();
+    request: this.chebiStructureId.value,
+    loader: ({request}) => {
+      const id = request;
       if (!id) return EMPTY;
       return this.http.get(`https://www.ebi.ac.uk/chebi/beta/api/public/structure/${id}`, {responseType: 'text'})
     }
@@ -114,9 +125,9 @@ export class StructureViewerComponent {
 
   bestPdbStructure = rxResource({
     request: () => this.obj().identifier,
-    loader: () => {
+    loader: ({request}) => {
       if (!this.isProtein()) return EMPTY;
-      const id = this.obj().identifier;
+      const id = request;
       return this.http.get<BestStructure>(`https://www.ebi.ac.uk/pdbe/api/mappings/best_structures/${id}/`).pipe(
         map(response => {
           const value = response[id];
@@ -145,7 +156,7 @@ export class StructureViewerComponent {
   }
 
 
-  getChebiStructureId(entryId: string | null) {
+  getChebiStructureId(entryId: string | null): Observable<string | null> {
     if (!entryId) return of(null);
     const url = `https://www.ebi.ac.uk/chebi/beta/api/public/compound/${entryId}`
     return this.http.get<any>(url).pipe(

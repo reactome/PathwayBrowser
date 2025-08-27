@@ -28,8 +28,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   readonly pathwayId = model<string>();
   readonly split = input.required<SplitComponent>({alias: "eventSplit"});
-  @ViewChild('treeControlButton', {read: ElementRef}) treeControlButton!: ElementRef;
-  @ViewChild('eventIcon', {read: ElementRef}) eventIcon!: ElementRef;
+  @ViewChild('treeControlButton', {read: ElementRef}) treeControlButton?: ElementRef;
+  @ViewChild('eventIcon', {read: ElementRef}) eventIcon?: ElementRef<HTMLElement>;
   @ViewChild(MatTree) tree!: MatTree<Event, string>;
 
 
@@ -453,8 +453,8 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   }
 
   private calculateContentWidth(targetElement: HTMLElement, event: Event): number {
-    const iconWidth = this.eventIcon.nativeElement.getBoundingClientRect().width + this._ICON_PADDING; // width and padding
-    const treeControlButtonWidth = this.treeControlButton.nativeElement.getBoundingClientRect().width;
+    const iconWidth = this.eventIcon?.nativeElement.getBoundingClientRect().width || 18  + this._ICON_PADDING; // width and padding
+    const treeControlButtonWidth = this.treeControlButton?.nativeElement.getBoundingClientRect().width || 24;
     const baseWidth = targetElement.offsetWidth + iconWidth;
     return this.eventService.eventHasChild(event) ? baseWidth + treeControlButtonWidth : baseWidth;
   }

@@ -27,8 +27,8 @@ export class DetailsComponent {
 
   constructor(
     protected analysis: AnalysisService,
-    private dataState: DataStateService,
-    private state: UrlStateService) {
+    public dataState: DataStateService,
+    public state: UrlStateService) {
   }
 
 }

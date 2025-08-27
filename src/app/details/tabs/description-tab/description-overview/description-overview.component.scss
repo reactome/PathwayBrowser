@@ -109,7 +109,7 @@
 }
 
 .value {
-  padding-left: 10px;
+  padding: 0 10px;
   border-left: 2px solid var(--primary);
 
   display: flex;
@@ -124,7 +124,8 @@
   color: var(--on-surface);
   white-space: normal;
   text-align: justify;
-  justify-content: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 
   .italic {
     font-style: italic;

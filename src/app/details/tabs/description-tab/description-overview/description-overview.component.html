@@ -113,8 +113,8 @@
       <div class="label">Review Status</div>
       <div class="value spinner-container">
         <mat-progress-spinner color="primary" mode="determinate"
-                              [value]="reviewStar[reviewStatus()!.displayName!].percentage"></mat-progress-spinner>
-        <div class="score"> {{ reviewStar[reviewStatus()!.displayName!].score }}/5</div>
+                              [value]="reviewStar[reviewStatus()!.displayName].percentage"></mat-progress-spinner>
+        <div class="score"> {{ reviewStar[reviewStatus()!.displayName].score }}/5</div>
       </div>
     </div>
   }

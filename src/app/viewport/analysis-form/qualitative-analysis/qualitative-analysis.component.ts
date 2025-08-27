@@ -1,10 +1,20 @@
-import {AfterViewInit, Component, effect, ElementRef, output, signal, viewChild, WritableSignal} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  output,
+  signal,
+  viewChild,
+  WritableSignal
+} from '@angular/core';
 import {MatStep, MatStepLabel, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/material/stepper";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {ReactomeTableModule, Settings, TableComponent} from "reactome-table";
 import {HttpClient} from "@angular/common/http";
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
 import {map, switchMap, take} from "rxjs";
 import {AsyncPipe} from "@angular/common";
@@ -13,6 +23,7 @@ import {AnalysisService} from "../../../services/analysis.service";
 import type {DotLottie} from "@lottiefiles/dotlottie-web";
 import {UrlStateService} from "../../../services/url-state.service";
 import {LottieService} from "../../../services/lottie.service";
+import {DarkService} from "../../../services/dark.service";
 
 
 @UntilDestroy()
@@ -38,6 +49,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
   close = output<{ status: 'finished' | 'premature' }>()
   table = viewChild<TableComponent>('table')
   data = signal<string[][]>([['']])
+  theme = computed(() => this.darkService.isDark() ? 'dark' : 'light')
 
   settings: Partial<Settings> = {
     renameCols: true,
@@ -61,21 +73,39 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
   }
 
   dataStepForm = new FormControl(null);
+  interactorsIllustrationCanvas = viewChild<ElementRef<HTMLCanvasElement>>('interactorsIllustration')
+  interactorsIllustrationLottie?: DotLottie;
 
   constructor(
     private http: HttpClient,
     public analysis: AnalysisService,
     private state: UrlStateService,
-    private lottieService: LottieService
+    private lottieService: LottieService,
+    private darkService: DarkService,
   ) {
+    effect(async () => {
+      if (!this.interactorsIllustrationCanvas()) return;
+      this.interactorsIllustrationLottie = await this.lottieService.buildLottie({
+        autoplay: false,
+        loop: true,
+        canvas: this.interactorsIllustrationCanvas()!.nativeElement,
+        src: "assets/animations/light/interactors-animation.json"
+      })
+    });
+
+    effect(() => {
+      const theme = this.theme();
+      if (this.interactorsIllustrationLottie) this.interactorsIllustrationLottie.load({src: `assets/animations/${theme}/interactors-animation.json`, loop: true, autoplay: false})
+      if (this.lottieEnd) this.lottieEnd.load({src: `assets/animations/${theme}/loading-animation.json`, loop: true, autoplay: true})
+    })
 
     effect(async () => {
       if (!this.lottieCanvas()) return;
-      this.lottie = await this.lottieService.buildLottie({
+      this.lottieEnd = await this.lottieService.buildLottie({
         autoplay: true,
         loop: true,
         canvas: this.lottieCanvas()!.nativeElement,
-        src: "assets/animations/loading-ripple.lottie"
+        src: `assets/animations/${this.theme()}/loading-animation.json`
       })
     });
   }
@@ -108,16 +138,15 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
   }
 
   projectToHumanIllustration = this.http.get('assets/animations/orthology-animation.svg', {responseType: 'text'})
-  includeInteractorsIllustration = this.http.get('assets/animations/interactors-animation.svg', {responseType: 'text'})
 
   // STEP 3 Analysis
   analysisLaunched = false
   lottieCanvas = viewChild<ElementRef<HTMLCanvasElement>>('lottie')
-  lottie?: DotLottie;
+  lottieEnd?: DotLottie;
   token: string | null = null;
 
   async launchAnalysis() {
-    this.lottie?.load({src: "assets/animations/loading-ripple.lottie", loop: true, autoplay: true})
+    this.lottieEnd?.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
     this.analysisLaunched = true
     this.table()!.cleanData$.pipe(
       take(1),
@@ -127,7 +156,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
         })
       )
     ).subscribe((result) => {
-      this.lottie!.load({src: 'assets/animations/success-animation.json', loop: true, autoplay: true})
+      this.lottieEnd!.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     });

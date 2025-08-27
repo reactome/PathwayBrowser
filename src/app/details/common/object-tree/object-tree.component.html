@@ -26,7 +26,7 @@
     </div>
 
     <div class="mat-tree-node" [style.--level]="getConnectorLevel(treeNodeRef.level, false)"
-         [class.highlight]="moleculeView() && node.highlight ? 'highlight' :''">
+         [class.highlight]="moleculeView() && node.highlight">
       <div class="left">
         <mat-icon class="symbol-icon"
                   [matTooltip]="moleculeView()? getSymbol(element.displayIcon).tooltip: getSymbol(element).tooltip"
@@ -34,9 +34,7 @@
         </mat-icon>
 
         <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
-          <mat-icon class="mat-icon-rtl-mirror"
-                    [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'">
-          </mat-icon>
+          <mat-icon class="mat-icon-rtl-mirror" [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"/>
         </div>
         <span class="name" #name
               [matTooltip]="element.name?.[0]"
@@ -81,14 +79,16 @@
         @if (!moleculeView()) {
           <div class="select-container">
             <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-            <button mat-icon-button class="button" (click)="onSelectClick($event, element)">
-              <mat-icon class="custom-icon" [svgIcon]="'select'"></mat-icon>
+            <button mat-icon-button class="select button" (click)="onSelectClick($event, element)"
+                    [matTooltip]="'Select ' + (element.stId || element.dbId) ">
+              <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
             </button>
           </div>
         }
 
         <div class="goTo-container">
-          <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()">
+          <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()"
+             [matTooltip]="'Open origin of ' + (element.stId || element.dbId)">
             <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
           </a>
         </div>
@@ -96,21 +96,23 @@
     </div>
 
 
-    <!-- Add this details-group and details-tree is for making the connector works in Firefox, to make the mat-nested-tree to take the full height of the parent -->
-    <div [class.component-tree-invisible]="!tree.isExpanded(node)" role="group" class="group"
-         [class.details-group]="!isNestedView(node.element) && tree.isExpanded(node) ? 'details-group' : ''">
-      <!--make sure getting full object content to render with _selectedTreeNodeData.hasValue()-->
-      <ng-container
-        *ngIf="!isNestedView(node.element) && _selectedTreeNodeData.hasValue(); then details; else entity">
-      </ng-container>
-    </div>
+    @if (tree.isExpanded(node)) {
+      <!-- Add this details-group and details-tree is for making the connector works in Firefox, to make the mat-nested-tree to take the full height of the parent -->
+      <div role="group" class="group"
+           [class.details-group]="!isNestedView(node.element) && tree.isExpanded(node) ? 'details-group' : ''">
+        <!--make sure getting full object content to render with _selectedTreeNodeData.hasValue()-->
+        <ng-container
+          *ngIf="!isNestedView(node.element); then details; else entity">
+        </ng-container>
+      </div>
+    }
+
 
     <!-- Template for child nodes when parent is EWAS (protein) or Event -->
     <ng-template #details>
       <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
       <mat-nested-tree-node class='details-tree' (click)="$event.stopPropagation()">
-        <div class="details-connector-container"
-             [style.--level]="getConnectorLevel(treeNodeRef.level, true)">
+        <div class="details-connector-container" [style.--level]="getConnectorLevel(treeNodeRef.level, true)">
           <!--To create an array of a specific length-->
           @for (index of getArray(treeNodeRef.level, true); track index) {
             @let connector = index != getArray(treeNodeRef.level, true).length - 1 ?
@@ -126,8 +128,7 @@
           <cr-object-tree-details [obj]="element"
                                   [className]="element.className"
                                   [refEntity]="element.referenceEntity"
-                                  [xRefs]="element.referenceEntity?.crossReference ?? []">
-          </cr-object-tree-details>
+                                  [xRefs]="element.referenceEntity?.crossReference ?? []"/>
 
         } @else {
           <!--Point to molecule details which provide structure and xRefs-->

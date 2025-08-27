@@ -1,6 +1,6 @@
 import {computed, Injectable, signal} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 import {map, Observable, of} from "rxjs";
 import {DataStateService} from "./data-state.service";
@@ -33,13 +33,32 @@ export class EntityService {
   refEntities = computed(() => this._refEntities.value());
 
   getOtherForms(stId: string): Observable<PhysicalEntity[]> {
-    const url = `${environment.host}/ContentService/data/entity/${stId}/otherForms`;
+    const url = `${CONTENT_SERVICE}/data/entity/${stId}/otherForms`;
     return this.http.get<PhysicalEntity[]>(url);
   }
 
   getEntityInDepth<E extends DatabaseObject>(id: string | number, depth: number): Observable<E> {
-    const url = `${environment.host}/ContentService/data/entity/${id}/in-depth?maxDepth=${depth}&attributes=species%2Ccompartment%2CreferenceEntity&view=nested-aggregated&includeRef=true`;
-    return this.http.get<E>(url).pipe(map(this.dataStateService.flattenReferences))
+    const url = `${CONTENT_SERVICE}/data/entity/${id}/in-depth`;
+    return this.http.get<E>(url, {
+      params: {
+        includeRef: true,
+        view: 'nested-aggregated',
+        attributes: 'species,compartment,referenceEntity',
+        maxDepth: depth,
+      }
+    }).pipe(map(this.dataStateService.flattenReferences))
+  }
+
+  getEventInDepth<E extends DatabaseObject>(id: string | number, depth: number): Observable<E> {
+    const url = `${CONTENT_SERVICE}/data/event/${id}/in-depth`;
+    return this.http.get<E>(url, {
+      params: {
+        includeRef: true,
+        view: 'nested-aggregated',
+        attributes: 'species,compartment',
+        maxDepth: depth,
+      }
+    }).pipe(map(this.dataStateService.flattenReferences))
   }
 
   getTransformedExternalRef(refEntity: ReferenceEntity | undefined) {

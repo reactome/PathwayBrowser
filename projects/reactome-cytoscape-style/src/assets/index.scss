@@ -1,7 +1,7 @@
 @mixin configure-diagrams {
   .loading {
     background-size: auto 100% !important;
-    background: url(loader.gif) no-repeat center;
+    background: url(loader-light.gif) no-repeat center;
   }
 
   .video {
@@ -9,6 +9,9 @@
   }
 
   .dark {
+    .loading {
+      background: url(loader-dark.gif) no-repeat center;
+    }
     .video {
       filter: brightness(1);
     }

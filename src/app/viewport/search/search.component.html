@@ -64,30 +64,45 @@
             </div>
           }
         </div>
-        <cdk-virtual-scroll-viewport [style.height.px]="resultHeight()" #resultScroll class="scroller"
-                                     [itemSize]="entryHeight()"
-                                     [maxBufferPx]="entryHeight() * 10"
-                                     [minBufferPx]="entryHeight() * 5">
-          <div *cdkVirtualFor="let entry of currentScope(); trackBy trackEntry; let i = index"
-               [style.height.px]="entryHeight()"
-               class="result-row">
-            @if (entry) {
-              @let iconDetails = icons.getIconDetails(entry.exactType);
-              <mat-icon class="symbol-icon" [matTooltip]="iconDetails.tooltip" [svgIcon]="iconDetails.name"></mat-icon>
+        <div class="results-content">
+          <cdk-virtual-scroll-viewport [style.height.px]="resultHeight()" #resultScroll class="scroller"
+                                       [itemSize]="entryHeight()"
+                                       [maxBufferPx]="entryHeight() * 10"
+                                       [minBufferPx]="entryHeight() * 5">
+            <div *cdkVirtualFor="let entry of currentScope(); trackBy trackEntry; let i = index"
+                 [style.height.px]="entryHeight()" (click)="toggleSelection(entry)"
+                 [class.selected]="selectedResult()?.dbId === entry?.dbId"
+                 class="result-row">
+              @if (entry) {
+                @let iconDetails = icons.getIconDetails(entry.exactType);
+                <mat-icon class="symbol-icon" [class.ehld]="entry.hasEHLD" [matTooltip]="iconDetails.tooltip"
+                          [svgIcon]="iconDetails.name"></mat-icon>
 
-              <span>{{ entry.name }}</span>
+                <span>{{ entry.name }}</span>
 
-              <div class="right">
-                <button mat-icon-button (click)="state.select.set(entry?.stId || entry?.dbId || null)">
-                  <mat-icon svgIcon="select"/>
-                </button>
-                <cr-flag-button [id]="entry.stId" class="flag-button"></cr-flag-button>
-              </div>
-            } @else {
-              <mat-progress-spinner [diameter]="entryHeight()" mode="indeterminate">Loading ...</mat-progress-spinner>
-            }
-          </div>
-        </cdk-virtual-scroll-viewport>
+                <div class="right">
+                  <cr-flag-button [id]="entry.stId" class="flag-button" (click)="$event.stopPropagation()"></cr-flag-button>
+                </div>
+              } @else {
+                <mat-progress-spinner [diameter]="entryHeight()" mode="indeterminate">Loading ...</mat-progress-spinner>
+              }
+            </div>
+          </cdk-virtual-scroll-viewport>
+
+          @if (selectedResultPathwaysStable().length > 1) {
+            <shadow-scroll class="result-pathways" @result-pathways [height]="resultPathwaysHeight()" #resultPathways>
+              <span class="header">Available in:</span>
+              @for (pathway of selectedResultPathwaysStable(); track pathway.dbId) {
+                <div class="result-row" [matTooltip]="'Select ' + selectedResult()?.stId +' in '+ pathway.name"
+                     (click)="state.pathwayId.set(pathway.stId)" [class.selected]="pathway.stId === state.pathwayId()"
+                     matTooltipPosition="after">
+                  <mat-icon class='custom-icon' [class.ehld]="pathway.hasEHLD" svgIcon="pathway"></mat-icon>
+                  <span>{{ pathway.name }}</span>
+                </div>
+              }
+            </shadow-scroll>
+          }
+        </div>
       </div>
     }
 

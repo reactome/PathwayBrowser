@@ -53,3 +53,19 @@
 .tab-description-container {
   padding: 0 20px;
 }
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100cqw;
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height));
+  container: spinner / size;
+  justify-content: center;
+
+  mat-spinner {
+    --size: min(50cqh, 50cqw);
+    width: var(--size) !important;
+    height: var(--size) !important;
+  }
+}

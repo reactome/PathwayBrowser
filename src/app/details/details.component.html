@@ -23,7 +23,12 @@
           </div>
         }
 
-        @if (obj()) {
+        @if (dataState.selectedElementLoading()) {
+          <div class="spinner-container">
+            <mat-spinner></mat-spinner>
+            <p>Loading details of {{ state.select() || state.pathwayId() }}</p>
+          </div>
+        } @else if (obj()) {
           <cr-description-tab [obj]="obj()!" [analysisResult]="analysis.result()"></cr-description-tab>
         }
       </ng-template>

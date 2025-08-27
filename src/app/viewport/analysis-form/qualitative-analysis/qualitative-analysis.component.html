@@ -120,14 +120,19 @@
             }
           </div>
         </div>
-        <div class="card-checkbox flex-one" [class.checked]="includeInteractors()" (click)="toggle(includeInteractors)">
+        <div class="card-checkbox flex-one" [class.checked]="includeInteractors()" (click)="toggle(includeInteractors)"
+             (mouseenter)="interactorsIllustrationLottie?.play()" (focusin)="interactorsIllustrationLottie?.play()"
+             (mouseleave)="interactorsIllustrationLottie?.pause()" (focusout)="interactorsIllustrationLottie?.pause()">
           <div class="card-content">
             <div class="header">
               <p class="title">Include Interactors</p>
               <p class="description">IntAct interactors are used to increase the analysis background</p>
             </div>
 
-            <div class="illustration" [innerHTML]="includeInteractorsIllustration | async | safe: 'html' : true"></div>
+            <div class="illustration">
+              <canvas #interactorsIllustration></canvas>
+            </div>
+<!--            <div class="illustration" [innerHTML]="includeInteractorsIllustration | async | safe: 'html' : true"></div>-->
             <div class="explanations">
               <p class="title">Explanations</p>
               <p>

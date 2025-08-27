@@ -1,6 +1,6 @@
 import {computed, Injectable, signal, Signal} from '@angular/core';
 import {SpeciesService} from "../services/species.service";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Species} from "../model/graph/species.model";
@@ -127,7 +127,7 @@ export class ReacfoamService {
   fetchEventsHierarchy(species: Species, params: Partial<EventsHierarchy.QueryParams>): Observable<EventsHierarchy.Data[]> {
     cleanObject(params)
     console.log('fetch events hierarchy')
-    return this.http.get<EventsHierarchy.Data[]>(`${environment.host}/ContentService/data/eventsHierarchy/${species.taxId}`, {params})
+    return this.http.get<EventsHierarchy.Data[]>(`${CONTENT_SERVICE}/data/eventsHierarchy/${species.taxId}`, {params})
   }
 
 

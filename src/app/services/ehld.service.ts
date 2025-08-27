@@ -190,7 +190,7 @@ export class EhldService {
       const child = regionElement.children.item(i) as SVGElement | null;
       if (child &&
         !child.id.startsWith(this.overlay) &&
-        !child.id.startsWith(this.analysisInfoId)
+        !child.classList.contains(this.analysisInfoId)
       ) child.style.filter = `saturate(${(pathway?.entities.fdr || 1) < this.state.significance() ? 1 : 0})`;
     }
 

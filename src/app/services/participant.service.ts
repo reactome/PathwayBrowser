@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {DataStateService} from "./data-state.service";
 import {map, Observable} from "rxjs";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
-import {environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {PropertyType} from "../details/tabs/molecule-tab/molecule-tab.component";
 import {extractFromSpace} from "./utils";
@@ -40,7 +40,7 @@ export class ParticipantService {
 
 
   getParticipants(stId: string): Observable<Participant[]> {
-    const url = `${environment.host}/ContentService/data/participants/${stId}`;
+    const url = `${CONTENT_SERVICE}/data/participants/${stId}`;
     return this.http.get<Participant[]>(url).pipe(
       map(participants =>
         participants.map((participant) => ({
@@ -107,7 +107,7 @@ export class ParticipantService {
   }
 
   getReferenceEntities(stId: string): Observable<ReferenceEntity[]> {
-    const url = `${environment.host}/ContentService/data/participants/${stId}/referenceEntities`;
+    const url = `${CONTENT_SERVICE}/data/participants/${stId}/referenceEntities`;
     return this.http.get<ReferenceEntity[]>(url);
   }
 

@@ -117,8 +117,8 @@
   @extend .shared-style;
 }
 
-.goTo-container,
-.select-container {
+.goTo-container
+{
   padding: 0;
   gap: 5px;
   width: 20px;
@@ -136,6 +136,32 @@
     align-items: center;
   }
 }
+
+.select.button {
+  background: var(--primary);
+  color: var(--on-primary);
+  --size: 20px;
+  --touch-size: 20px;
+  --icon-ratio: 0.8;
+
+  @include mat.icon-button-overrides((
+    state-layer-size: var(--size, 40px),
+    icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
+  ));
+
+  .mat-icon {
+    width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+  }
+
+}
+
+:host ::ng-deep .select.button .mat-mdc-button-touch-target{
+  width: var(--touch-size, 48px);
+  height: var(--touch-size, 48px);
+}
+
 
 .symbol-icon {
   display: flex;

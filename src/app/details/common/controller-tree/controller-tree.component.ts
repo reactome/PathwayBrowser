@@ -1,5 +1,6 @@
-import {Component, input, signal} from '@angular/core';
+import {Component, computed, input, signal} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
+import {PageEvent} from "@angular/material/paginator";
 
 
 @Component({
@@ -13,11 +14,23 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
   readonly type = input.required<string>();
   readonly depthControl = input.required<boolean>();
   readonly data = input.required<E[]>();
-
+  readonly scope = input<'entity' | 'event'>('entity');
 
   depthIndex = signal(1);
   depthChangeSource = signal<'controller' | 'tree' | undefined>(undefined);
   maxDepth = signal(undefined);
+
+  hasPagination = computed(() => this.data().length > 20);
+  currentPage = signal<PageEvent>({pageIndex: 0, pageSize: 20, length: 0});
+  displayedData = computed(() => {
+    console.log(this.data())
+    return this.hasPagination()
+        ? this.data().slice(
+          this.currentPage().pageIndex * this.currentPage().pageSize,
+          (this.currentPage().pageIndex + 1) * this.currentPage().pageSize)
+        : this.data()
+    }
+  )
 
   firstPage() {
     this.depthChangeSource.set('controller');

@@ -122,36 +122,49 @@
       </div>
     }
 
+    @switch (perspective()) {
+      @case ('event') {
+        @if (item.activeUnit) {
+          <div class="row">
+            <div class="label-container">Active Unit</div>
+            <div class="composition-container tree-padding multiple">
+              @for (unit of item.activeUnit; track unit.dbId) {
+                <cr-object-tree [type]="'activeUnit'" [data]="[unit]"></cr-object-tree>
+              }
 
-    @if (item.activeUnit) {
-      <div class="row">
-        <div class="label-container">Active Unit</div>
-        <div class="composition-container tree-padding multiple">
-          @for (unit of item.activeUnit; track unit.dbId) {
-            <cr-object-tree [type]="'activeUnit'" [data]="[unit]"></cr-object-tree>
-          }
+            </div>
+          </div>
+        }
 
-        </div>
-      </div>
-    }
-
-    @if (item.regulator) {
-      <div class="row">
-        <div class="label-container">Regulator</div>
-        <div class="composition-container tree-padding">
-          <cr-object-tree [type]="'regulator'" [data]="[item.regulator]"></cr-object-tree>
-        </div>
-      </div>
-    }
+        @if (item.regulator) {
+          <div class="row">
+            <div class="label-container">Regulator</div>
+            <div class="composition-container tree-padding">
+              <cr-object-tree [type]="'regulator'" [data]="[item.regulator]"></cr-object-tree>
+            </div>
+          </div>
+        }
 
 
-    @if (item.catalyst) {
-      <div class="row">
-        <div class="label-container">Catalyst</div>
-        <div class="composition-container tree-padding">
-          <cr-object-tree [type]="'catalyst'" [data]="[item.catalyst]"></cr-object-tree>
-        </div>
-      </div>
+        @if (item.catalyst) {
+          <div class="row">
+            <div class="label-container">Catalyst</div>
+            <div class="composition-container tree-padding">
+              <cr-object-tree [type]="'catalyst'" [data]="[item.catalyst]"></cr-object-tree>
+            </div>
+          </div>
+        }
+      }
+      @case ('entity') {
+        @if (item.reactions) {
+          <div class="row">
+            <div class="label-container">Reaction</div>
+            <div class="composition-container tree-padding">
+              <cr-object-tree [type]="'reaction'" [data]="item.reactions" scope="event"></cr-object-tree>
+            </div>
+          </div>
+        }
+      }
     }
 
     @if (item.catalystActivityReference && item.catalystActivityReference.catalystActivity.dbId === item.dbId) {

@@ -4,7 +4,7 @@ import {MatIcon} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
 import {rxResource, toObservable} from "@angular/core/rxjs-interop";
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../../environments/environment";
 import {BehaviorSubject, catchError, Observable, of, Subscription, switchMap, take} from "rxjs";
 import {animate, sequence, state, style, transition, trigger} from "@angular/animations";
 import {SpeciesService} from "../../services/species.service";
@@ -15,10 +15,12 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {IconService} from "../../services/icon.service";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {has} from "lodash";
 import {FlagButtonComponent} from "../../details/common/flag-button/flag-button.component";
+import Entry = Search.Entry;
+import {ShadowScrollComponent} from "../../shared/shadow-scroll/shadow-scroll.component";
 
 const MIN_SUGGEST_LENGTH = 2;
+const AVAILABLE_IN_HEIGHT = 20;
 
 type Scope = 'local' | 'global';
 
@@ -35,6 +37,7 @@ type Scope = 'local' | 'global';
     MatTooltip,
     MatCheckbox,
     FlagButtonComponent,
+    ShadowScrollComponent,
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss',
@@ -55,6 +58,15 @@ type Scope = 'local' | 'global';
       ]),
       transition(':leave', [
         animate('500ms ease-in-out', style({height: '0'})),
+      ])
+    ]),
+    trigger('result-pathways', [
+      transition(':enter', [
+        style({width: 0, minWidth: '0%'}),
+        animate('500ms linear', style({width: '50%', minWidth: '50%'})),
+      ]),
+      transition(':leave', [
+        animate('500ms linear', style({minWidth: '0%'})),
       ])
     ]),
     trigger('collapsable', [
@@ -95,7 +107,7 @@ export class SearchComponent {
   suggestions = rxResource({
     request: this.searchText,
     loader: params => params.request.length >= MIN_SUGGEST_LENGTH
-      ? this.http.get<string[]>(`${environment.host}/ContentService/search/suggest`, {params: {query: params.request}})
+      ? this.http.get<string[]>(`${CONTENT_SERVICE}/search/suggest`, {params: {query: params.request}})
       : of([])
   });
 
@@ -110,6 +122,8 @@ export class SearchComponent {
     : undefined);
 
   resultsScroll = viewChild<CdkVirtualScrollViewport>('resultScroll')
+  resultPathways = viewChild<ShadowScrollComponent>('resultPathways')
+
 
   constructor(
     private http: HttpClient,
@@ -132,7 +146,10 @@ export class SearchComponent {
       if (!this.state.pathwayId()) this.currentScopeName.set('global');
     });
     effect(() => {
-      if (this.scopes.local.found() === 0 && this.scopes.global.found() !== 0) this.currentScopeName.set('global')
+      const loading = this.scopes.local.isLoading();
+      const local = this.scopes.local.found();
+      const global = this.scopes.global.found();
+      if (!loading && local === 0 && global !== 0) this.currentScopeName.set('global')
     });
     effect(() => {
       const [active, inactive] = this.currentScopeName() === 'global'
@@ -141,6 +158,19 @@ export class SearchComponent {
       active.active = true;
       inactive.active = false;
     })
+    effect(() => {
+      if (this.selectedResultPathwaysStable().length === 1) {
+        this.state.pathwayId.set(this.selectedResultPathwaysStable().at(0)!.stId)
+        this.state.select.set(this.selectedResult()?.stId || null)
+      }
+    })
+
+    effect(() => {
+      this.selectedResultPathwaysStable().length > 1 && setTimeout(() => {
+        this.resultPathways()?.elementRef?.nativeElement?.querySelector('.selected')?.scrollIntoView({behavior: 'smooth'})
+        setTimeout(() => this.resultPathways()?.updateShadows(), 100)
+      }, 500)
+    });
   }
 
   nextSuggest(event?: Event) {
@@ -162,6 +192,7 @@ export class SearchComponent {
     this.collapsed.set('opened')
     console.log('searching', searchText);
     this.typeFilter.set([])
+    this.selectedResult.set(undefined)
     this.searchParams.set({
       query: searchText,
       diagram: this.state.pathwayId() || '',
@@ -195,22 +226,26 @@ export class SearchComponent {
   scopes: Record<Scope, SearchDataSource> = {
     local: new SearchDataSource(this.searchParams$,
       (page, pageSize, params) => params.diagram && params.query.length > 0 ?
-        this.http.get<Search.Result>(`${environment.host}/ContentService/search/diagram/${params.diagram}`, {
+        this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/diagram/${params.diagram}`, {
           params: {
             ...params,
             start: page * pageSize,
             rows: pageSize,
+            includeInteractors: false,
+            scope: 'REFERENCE_ENTITY'
           } as Search.Paginated<Search.Params>
         })
         : of(Search.EMPTY_RESULTS)
     ),
     global: new SearchDataSource(this.searchParams$,
       (page, pageSize, params) => params.query.length > 0 ?
-        this.http.get<Search.Result>(`${environment.host}/ContentService/search/fireworks/`, {
+        this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/fireworks/`, {
           params: {
             ...params,
             start: page * pageSize,
             rows: pageSize,
+            includeInteractors: false,
+            scope: 'REFERENCE_ENTITY'
           } as Search.Paginated<Search.Params>
         })
         : of(Search.EMPTY_RESULTS)
@@ -222,6 +257,27 @@ export class SearchComponent {
   resultHeight = computed(() => {
     const [scope, ...sources] = [this.currentScopeName(), this.scopes.local.found(), this.scopes.global.found()]
     return Math.min(this.scopes[scope].found(), 10) * this.entryHeight()
+  })
+
+  resultPathwaysHeight = computed(() => AVAILABLE_IN_HEIGHT + Math.min(this.selectedResultPathwaysStable().length, 10) * this.entryHeight())
+
+  selectedResult = signal<Search.Entry | undefined>(undefined)
+  selectedResultId = computed(() => this.selectedResult()?.dbId)
+  selectedResultPathways = rxResource({
+    request: this.selectedResultId,
+    loader: ({request}) => this.http.get<Search.Entry[]>(`${CONTENT_SERVICE}/search/pathways/of/${request}`, {
+      params: {
+        includeInteractors: false,
+        directlyInDiagram: true,
+        species: this.species.currentSpecies().displayName,
+        fields: [' DB_ID', 'ST_ID', 'NAME', 'HAS_EHLD']
+      }
+    }),
+  })
+
+  selectedResultPathwaysStable = linkedSignal<{ results?: Search.Entry[], loading: boolean }, Search.Entry[]>({
+    source: () => ({results: this.selectedResultPathways.value(), loading: this.selectedResultPathways.isLoading()}),
+    computation: ({results, loading}, previous) => (loading ? previous?.value : results) || [],
   })
 
   entryHeight = input(24)
@@ -238,7 +294,10 @@ export class SearchComponent {
     this.collapsed.update(c => c === 'collapsed' ? 'opened' : 'collapsed')
   }
 
-  protected readonly has = has;
+  toggleSelection(entry: Entry | undefined) {
+    if (entry) this.selectedResult.update(current => current === entry ? undefined : entry)
+    this.state.select.set(this.selectedResult()?.stId || null)
+  }
 }
 
 
@@ -298,8 +357,8 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
     if (this.fetchedPages.has(page)) {
       return;
     }
+    this.isLoading.set(true);
     this.fetchedPages.add(page);
-
     // Use `setTimeout` to simulate fetching data from server.
     this.param$.pipe(
       take(1),
@@ -310,6 +369,7 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
       if (this.cachedEntries.length !== result.found) this.cachedEntries.length = result.found;
       this.cachedEntries.splice(page * this.pageSize, this.pageSize, ...result.entries);
       this.dataStream.next(this.cachedEntries);
+      this.isLoading.set(false);
     })
   }
 }
@@ -323,6 +383,7 @@ namespace Search {
     species?: string
     diagram?: string
     types?: string[],
+    includeInteractors?: boolean
   }
 
   export type Paginated<T> = T & {
@@ -336,6 +397,7 @@ namespace Search {
     databaseName: string;
     exactType: string;
     isDisease: boolean;
+    hasEHLD?: boolean;
     name: string;
     referenceIdentifier: string;
     referenceName: string;
