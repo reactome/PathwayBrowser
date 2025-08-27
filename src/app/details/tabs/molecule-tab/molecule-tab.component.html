@@ -6,8 +6,7 @@
 } @else {
   <div class="container">
     <div class="content">
-<!--      @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {-->
-      @if (moleculeData()[0]; as group) {
+      @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
         <div class="list" [id]=sanitizeId(group.category)>
         <span class="header">
           {{ group.category }} {{ getStatistics(group) }}
@@ -16,22 +15,14 @@
 
         <mat-divider class="divider"></mat-divider>
         <div class="composition-container">
-          <cdk-virtual-scroll-viewport  style="height: 500px">
-            <ng-container *cdkVirtualFor="let item of group.data | groupBy:'highlight' | sortByText:'key':'desc'; let index = index;" >
-              @for (item of item.value | sortByDate:'stoichiometry'; track item.entity.dbId) {
-              <div item-resize (heightChange)="strategy.setItemHeight(index, $event)" >
-                <cr-object-tree [type]="group.category" [data]="[item.entity]"
-                                [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
-                                [moleculeView]="true"></cr-object-tree>
-              </div>
-              }
-
-            </ng-container>
-
-          </cdk-virtual-scroll-viewport>
-<!--          @for (item of group.data | sortByDate:'stoichiometry'; track item.entity.dbId) {-->
-
-<!--          }-->
+          <!--todo: Add pagination-->
+          @for (grouped of group.data | groupBy:'highlight' | sortByText:'key':'desc'; track grouped) {
+            @for (item of grouped.value | sortByDate:'stoichiometry'; track item.entity.dbId) {
+              <cr-object-tree [type]="group.category" [data]="[item.entity]"
+                              [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
+                              [moleculeView]="true"></cr-object-tree>
+            }
+          }
         </div>
       }
 

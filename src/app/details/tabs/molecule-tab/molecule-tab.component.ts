@@ -1,4 +1,4 @@
-import {Component, computed, effect, Inject, input, WritableSignal} from '@angular/core';
+import {Component, computed, effect, input, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -13,12 +13,6 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
-import {CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY} from "@angular/cdk/scrolling";
-import {ScrollingModule as ExperimentalScrollingModule} from "@angular/cdk-experimental/scrolling";
-import {
-  ExpandableVirtualScrollStrategy
-} from "../../../utils/expandable-virtual-scroll/expandable-virtual-scroll.strategy";
-import {ItemResizeObserverDirective} from "../../../utils/expandable-virtual-scroll/item-resize-observer.directive";
 import {GroupByPipe} from "../../../pipes/group-by.pipe";
 
 
@@ -66,15 +60,8 @@ export enum MoleculeType {
     MoleculeDownloadTableComponent,
     GroupByPipe,
     SortByDatePipe,
-    ScrollingModule,
-    // ExperimentalScrollingModule,
-    ItemResizeObserverDirective,
   ],
   styleUrl: './molecule-tab.component.scss',
-  providers: [{
-    provide: VIRTUAL_SCROLL_STRATEGY,
-    useClass: ExpandableVirtualScrollStrategy
-  }]
 })
 export class MoleculeTabComponent {
 
@@ -91,8 +78,6 @@ export class MoleculeTabComponent {
   constructor(private participant: ParticipantService,
               private entity: EntityService,
               private state: UrlStateService,
-              @Inject(VIRTUAL_SCROLL_STRATEGY)
-              public readonly strategy: ExpandableVirtualScrollStrategy,
               private groupByPipe: GroupByPipe) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;

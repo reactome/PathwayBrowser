@@ -53,7 +53,7 @@ type DiagramItem = {
 export class DownloadTabComponent {
 
   newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
-  newtUrl = computed(()=> `https://web.newteditor.org/?URL=${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
+  newtUrl = computed(() => `https://web.newteditor.org/?URL=${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
 
   pathwayId = this.state.pathwayId as WritableSignal<string>;
   selectedElement = this.dataState.selectedElement;
@@ -107,7 +107,7 @@ export class DownloadTabComponent {
     });
 
     return filteredFormats.map(format => {
-      const isExportable = [DownloadFormat.SVG, DownloadFormat.PPTX,DownloadFormat.GIF].includes(format);
+      const isExportable = [DownloadFormat.SVG, DownloadFormat.PPTX, DownloadFormat.GIF].includes(format);
       if (isExportable) {
         return {
           format: format,
@@ -129,20 +129,20 @@ export class DownloadTabComponent {
   pathwayItems: PathwayItem[] = [
     {
       name: 'SBML',
-      url: `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbml`,
+      url: computed(() => `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbml`),
     },
     {
       name: 'SBGN',
-      url: `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn`,
+      url: computed(() => `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn`),
     },
     {
       name: 'BioPAX2',
-      url: `${RESTFUL_API}/biopaxExporter/Level2/${this.biopaxId()}`,
+      url: computed(() => `${RESTFUL_API}/biopaxExporter/Level2/${this.biopaxId()}`),
       fileName: computed(() => `${this.biopaxId()}.xml`)
     },
     {
       name: 'BioPAX3',
-      url: `${RESTFUL_API}/biopaxExporter/Level3/${this.biopaxId()}`,
+      url: computed(() => `${RESTFUL_API}/biopaxExporter/Level3/${this.biopaxId()}`),
       fileName: computed(() => `${this.biopaxId()}.xml`)
     },
     {
