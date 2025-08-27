@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, WritableSignal} from '@angular/core';
+import {Component, computed, effect, Inject, input, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -13,6 +13,12 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
+import {CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY} from "@angular/cdk/scrolling";
+import {ScrollingModule as ExperimentalScrollingModule} from "@angular/cdk-experimental/scrolling";
+import {
+  ExpandableVirtualScrollStrategy
+} from "../../../utils/expandable-virtual-scroll/expandable-virtual-scroll.strategy";
+import {ItemResizeObserverDirective} from "../../../utils/expandable-virtual-scroll/item-resize-observer.directive";
 import {GroupByPipe} from "../../../pipes/group-by.pipe";
 
 
@@ -37,6 +43,13 @@ export enum PropertyType {
   DRUG = "Drugs",
   OTHERS = "Others"
 }
+// molecule type from backend when sending enhanced query
+export enum MoleculeType {
+  PROTEIN = "Protein", //Protein
+  CHEMICAL_DRUG = "ChemicalDrug", // Drugs
+  ENTITY = "Entity", // DRA/RNA
+  CHEMICAL = "Chemical" //Chemical
+}
 
 @Component({
   selector: 'cr-molecule-tab',
@@ -46,16 +59,25 @@ export enum PropertyType {
     MatDivider,
     ObjectTreeComponent,
     MatProgressSpinner,
+    SortByDatePipe,
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
     MoleculeDownloadTableComponent,
     GroupByPipe,
-    SortByDatePipe
+    SortByDatePipe,
+    ScrollingModule,
+    // ExperimentalScrollingModule,
+    ItemResizeObserverDirective,
   ],
-  styleUrl: './molecule-tab.component.scss'
+  styleUrl: './molecule-tab.component.scss',
+  providers: [{
+    provide: VIRTUAL_SCROLL_STRATEGY,
+    useClass: ExpandableVirtualScrollStrategy
+  }]
 })
 export class MoleculeTabComponent {
+
 
   readonly selectableObject = input.required<SelectableObject>();
   pathwayId = this.state.pathwayId as WritableSignal<string>;
@@ -68,7 +90,10 @@ export class MoleculeTabComponent {
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private state: UrlStateService) {
+              private state: UrlStateService,
+              @Inject(VIRTUAL_SCROLL_STRATEGY)
+              public readonly strategy: ExpandableVirtualScrollStrategy,
+              private groupByPipe: GroupByPipe) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
@@ -135,8 +160,6 @@ export class MoleculeTabComponent {
       }
     }
 
-
-
     const finalResults: MoleculeGroup[] = Array.from(groupedMap, ([category, dataMap]) => ({
       category,
       data: Array.from(dataMap.values())
@@ -145,12 +168,9 @@ export class MoleculeTabComponent {
   }
 
   getReactionParticipants(pathwayResults: MoleculeGroup[], refEntities: ReferenceEntity[]) {
-
     const dbIds = new Set(refEntities?.map(e => e.dbId));
-
     return pathwayResults.map(group => {
       let found = 0;
-
       const updatedData = group.data.map(molecule => {
         const isFound = dbIds.has(molecule.entity.dbId);
         if (isFound) found++;
@@ -192,7 +212,6 @@ export class MoleculeTabComponent {
     const found = graph.found;
     const total = graph.data.length;
     return found ? `${found}/${total}` : `${total}`
-
   }
 
   protected readonly isPathway = isPathway;

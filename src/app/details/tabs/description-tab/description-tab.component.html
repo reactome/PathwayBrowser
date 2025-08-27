@@ -89,8 +89,13 @@
   </div>
 </ng-template>
 
+<!-- xRefs -->
 <ng-template #crossReferencesTemplate>
   <cr-cross-references [crossRefs]=crossReference()></cr-cross-references>
+</ng-template>
+
+<ng-template #rheaTemplate>
+  <cr-rhea [crossRefs]=crossReference()></cr-rhea>
 </ng-template>
 
 <!-- Cell markers -->
@@ -173,7 +178,7 @@
   </div>
 </ng-template>
 
-
+<!-- Regulation-->
 <ng-template #regulationTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"

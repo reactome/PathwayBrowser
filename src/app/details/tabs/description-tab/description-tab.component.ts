@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, signal, Signal, TemplateRef, ViewChild, viewChild} from '@angular/core';
+import {Component, computed, effect, input, signal, Signal, TemplateRef, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {getProperty, groupAndSortBy, isPhysicalEntity, isReferenceSummary} from "../../../services/utils";
@@ -20,12 +20,12 @@ import {Regulation} from "../../../model/graph/Regulation/regulation.model";
 import {RegulationReference} from "../../../model/graph/control-reference/regulation-reference.model";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
-import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {
   EntityWithAccessionedSequence
 } from "../../../model/graph/physical-entity/entity-with-accessioned-sequence.model";
 import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
-import {isArray} from "lodash";
+import {camelCase, isArray} from "lodash";
+import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 
 @Component({
@@ -53,6 +53,7 @@ export class DescriptionTabComponent {
 
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
+  readonly section = toSignal(this.route.fragment);
   readonly name = computed(() =>
     this.obj().name
       ? isArray(this.obj().name)
@@ -64,7 +65,7 @@ export class DescriptionTabComponent {
   readonly groupedReferences = computed(() => groupAndSortBy(this.literatureRefs(), ref => ref.year, (key1, key2) => key2 - key1));
 
   referenceEntity: Signal<ReferenceEntity> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
-  section = toSignal(this.route.fragment)
+
   readonly authorship: Signal<{ label: string, data: InstanceEdit[] }[]> = computed(() => {
     const arrayWrap = <E>(a: E[] | E) => Array.isArray(a) ? a : [a];
 
@@ -96,7 +97,6 @@ export class DescriptionTabComponent {
     return this.getGroupedOtherForms(value);
   })
 
-
   interactors = computed(() => this._interactors.value() || []);
   interactorsLength = computed(() => this._interactors.value()?.length || 0);
 
@@ -123,17 +123,15 @@ export class DescriptionTabComponent {
     return crossReference ? [...crossReference] : [];
   });
 
-
   proteinMarkers: Signal<EntityWithAccessionedSequence[]> = computed(() => getProperty(this.obj(), DataKeys.PROTEIN_MARKER) || [])
   rnaMarkers: Signal<EntityWithAccessionedSequence[]> = computed(() => getProperty(this.obj(), DataKeys.RNA_MARKERS) || [])
-
   markerReference: Signal<MarkerReference[]> = computed(() => getProperty(this.obj(), DataKeys.MARKER_REFERENCE))
 
   repeatedUnits: Signal<PhysicalEntity[]> = computed(() => getProperty(this.obj(), DataKeys.REPEATED_UNIT))
 
+  hasRhea = computed(()=>  ["RHEA", "Rhea"].includes(this.crossReference()[0]?.databaseName));
+
   overview$ = viewChild<HTMLDivElement>('overview');
-
-
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
   referenceTemplate$ = viewChild.required<TemplateRef<any>>('referenceTemplate');
   modificationsTemplate$ = viewChild.required<TemplateRef<any>>('modificationsTemplate');
@@ -148,7 +146,7 @@ export class DescriptionTabComponent {
   literatureRefsTemplate$ = viewChild.required<TemplateRef<any>>('literatureRefsTemplate');
   authorsTemplate$ = viewChild.required<TemplateRef<any>>('authorsTemplate');
   interactorsTemplate$ = viewChild.required<TemplateRef<any>>('interactorsTemplate');
-
+  rheaTemplate$ = viewChild.required<TemplateRef<any>>('rheaTemplate');
 
   protected readonly Labels = Labels;
   protected readonly DataKeys = DataKeys;
@@ -217,7 +215,15 @@ export class DescriptionTabComponent {
       label: Labels.CROSS_REFERENCES,
       manual: true,
       template: this.crossReferencesTemplate$,
-      isPresent: computed(() => this.crossReference()?.length > 0)
+      isPresent: computed(() => this.crossReference()?.length > 0 && !this.hasRhea())
+    },
+    // Rhea structure
+    {
+      key: camelCase(Labels.BIOCHEMICAL_REACTION),
+      label: Labels.BIOCHEMICAL_REACTION,
+      manual: true,
+      template: this.rheaTemplate$,
+      isPresent: computed(() => this.hasRhea())
     },
 
     {key: DataKeys.PRECEDING_EVENT, label: Labels.PRECEDING_EVENT, scope: 'event'},
@@ -249,7 +255,7 @@ export class DescriptionTabComponent {
 
     {key: DataKeys.LITERATURE_REFERENCE, label: Labels.REFERENCE, manual: true, template: this.literatureRefsTemplate$},
     {
-      key: Labels.AUTHORSHIP,
+      key: camelCase(Labels.AUTHORSHIP),
       label: Labels.AUTHORSHIP,
       manual: true,
       template: this.authorsTemplate$,
@@ -308,10 +314,12 @@ export class DescriptionTabComponent {
       case DataKeys.CATALYST_ACTIVITY:
         return this.catalystActivity() && this.catalystActivity().length > 0;
       case DataKeys.CROSS_REFERENCE:
-        return this.crossReference().length > 0;
+        return this.crossReference().length > 0 && !this.hasRhea();
+      case camelCase(Labels.BIOCHEMICAL_REACTION):
+        return this.hasRhea();
       case DataKeys.OTHER_FORMS:
         return this.otherForms() && this.otherForms().size > 0;
-      case Labels.AUTHORSHIP:
+      case camelCase(Labels.AUTHORSHIP):
         return this.authorship() && this.authorship().length > 0;
       case DataKeys.INTERACTORS:
         return this.interactors() && this.interactors().length > 0;

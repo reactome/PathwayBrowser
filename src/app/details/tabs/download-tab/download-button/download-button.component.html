@@ -1,0 +1,13 @@
+<a mat-flat-button class="button"
+   [attr.href]="url()"
+   [attr.download]="download() === true ? '' : download()"
+   [attr.target]="openInNewTab()"
+   [matTooltip]="tooltip()"
+   (click)="onClick($event)">
+
+  @if (icon()) {
+    <mat-icon fontSet="symbols">{{ icon() }}</mat-icon>
+  }
+  <span>{{ label() }}</span>
+</a>
+

@@ -64,7 +64,8 @@ export class DataStateService {
   public selectedElement = this._selectedElement.asReadonly().value
   public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
-  public selectIsSummary = computed(() => this.state.select() ? this.state.select()!.includes(":") : false)
+  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
+  selectIsSummary = computed(() => this.state.select() ? this.state.select()!.includes(":") : false)
 
   private _selectionData = computed<SelectionData>(() => ({
     selectedElement: this.selectedElement(),

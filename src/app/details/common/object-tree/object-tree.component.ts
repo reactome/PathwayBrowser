@@ -23,7 +23,6 @@ import {NgClass, NgIf} from "@angular/common";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
-import {MoleculeDetailsComponent} from "../../tabs/molecule-tab/molecule-details/molecule-details.component";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
 import {ObjectTreeDetailsComponent} from "./object-details/object-tree-details.component";
@@ -39,7 +38,6 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     NgClass,
     MatTooltip,
     MatIcon,
-    MoleculeDetailsComponent,
     MatTreeNodeOutlet,
     MatTreeNodeToggle,
     MatIconButton,

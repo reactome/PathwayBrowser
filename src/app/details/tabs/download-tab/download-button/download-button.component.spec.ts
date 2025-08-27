@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MoleculeDetailsComponent } from './molecule-details.component';
+import { DownloadButtonComponent } from './download-button.component';
 
-describe('MoleculeDetailsComponent', () => {
-  let component: MoleculeDetailsComponent;
-  let fixture: ComponentFixture<MoleculeDetailsComponent>;
+describe('DownloadButtonComponent', () => {
+  let component: DownloadButtonComponent;
+  let fixture: ComponentFixture<DownloadButtonComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MoleculeDetailsComponent]
+      imports: [DownloadButtonComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MoleculeDetailsComponent);
+    fixture = TestBed.createComponent(DownloadButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

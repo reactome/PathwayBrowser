@@ -80,7 +80,6 @@ import {InfoTabComponent} from "./details/tabs/info-tab/info-tab.component";
 import {ResultTabComponent} from "./details/tabs/result-tab/result-tab.component";
 import {MoleculeTabComponent} from "./details/tabs/molecule-tab/molecule-tab.component";
 import {StructureViewerComponent} from "./details/tabs/molecule-tab/structure-viewer/structure-viewer.component";
-import {MoleculeDetailsComponent} from "./details/tabs/molecule-tab/molecule-details/molecule-details.component";
 import {AnalysisFormComponent} from "./viewport/analysis-form/analysis-form.component";
 import {CompareFormComponent} from "./viewport/compare-form/compare-form.component";
 import {GsaFormModule} from "reactome-gsa-form"
@@ -90,6 +89,7 @@ import {routerReducer, StoreRouterConnectingModule} from "@ngrx/router-store";
 import {EffectsModule} from "@ngrx/effects";
 import {DownloadTabComponent} from "./details/tabs/download-tab/download-tab.component";
 import {SearchComponent} from "./viewport/search/search.component";
+import {RheaComponent} from "./details/common/rhea/rhea.component";
 import {PassiveDirective} from "./utils/passive.directive";
 import {MatPaginator} from "@angular/material/paginator";
 
@@ -179,7 +179,6 @@ import {MatPaginator} from "@angular/material/paginator";
     PublicationComponent,
     ExternalReferenceComponent,
     CrossReferencesComponent,
-    MoleculeDetailsComponent,
     DownloadTabComponent,
     AnalysisFormComponent,
     CompareFormComponent,
@@ -192,6 +191,7 @@ import {MatPaginator} from "@angular/material/paginator";
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),
     SearchComponent,
+    RheaComponent,
     PassiveDirective,
     MatPaginator,
   ],

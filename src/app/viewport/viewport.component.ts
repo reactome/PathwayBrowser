@@ -27,6 +27,8 @@ import {isPathway} from "../services/utils";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, state, style, transition, trigger} from "@angular/animations";
 import {drop} from "lodash";
+import {CitationService} from "../services/citation.service";
+
 
 const DETAIL_MIN_HEIGHT = 0;
 
@@ -134,6 +136,7 @@ export class ViewportComponent implements AfterViewInit {
               public state: UrlStateService,
               public general: GeneralService,
               public dataState: DataStateService,
+              public citation: CitationService,
   ) {
     effect(() => {
       if (this.dropdown() === null) {
@@ -222,6 +225,10 @@ export class ViewportComponent implements AfterViewInit {
   iterate() {
     if (!this.isLastProfile()) this.nextProfile();
     else this.updateProfile(0)
+  }
+
+  openCitationDialog() {
+  this.citation.openDialog();
   }
 
   protected readonly drop = drop;

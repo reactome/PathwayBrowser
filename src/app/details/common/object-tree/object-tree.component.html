@@ -122,21 +122,11 @@
             </div>
           }
         </div>
-
-        @if (!moleculeView()) {
-          <!--Point to entity details which contains more data and provide protein structure only-->
-          <cr-object-tree-details [obj]="element"
-                                  [className]="element.className"
-                                  [refEntity]="element.referenceEntity"
-                                  [xRefs]="element.referenceEntity?.crossReference ?? []"/>
-
-        } @else {
-          <!--Point to molecule details which provide structure and xRefs-->
-          @if (_selectedTreeNodeData.hasValue()) {
-            <cr-molecule-details [obj]="element" [xRefs]="element.crossReference"></cr-molecule-details>
-          }
-        }
-
+        <cr-object-tree-details [obj]="element"
+                                [className]="element.className"
+                                [isMoleculeView]="moleculeView()"
+                                [refEntity]="element.referenceEntity ?? null"
+                                [xRefs]="!moleculeView() ? element.referenceEntity?.crossReference ?? [] : element.crossReference ?? []"/>
       </mat-nested-tree-node>
     </ng-template>
 

@@ -1,0 +1,49 @@
+<div class="dialog-container">
+  <div class="header">
+    <h2 mat-dialog-title>
+      Cite Us!
+    </h2>
+
+    <button class="close-button" mat-dialog-close mat-icon-button>
+      <mat-icon>close</mat-icon>
+    </button>
+
+  </div>
+
+  <div class="save">
+    <button class="save-button" mat-button [cdkCopyToClipboard]="citationToCopy()" (click)="onCopyClick()">
+      <mat-icon>{{ copyIcon() }}</mat-icon>
+      {{ copyLabel() }}
+    </button>
+    <a class="save-button" [href]="`mailto:?subject=Reactome Citation&body=${citationToMail()}`" mat-button>
+      <mat-icon>email</mat-icon>
+      Email
+    </a>
+  </div>
+
+  <mat-dialog-content [class.text-align]="citation.isStatic()" class="mat-typography">
+    @if (staticCitation()) {
+      <p>{{ staticCitation() }}</p>
+    }
+    @if (pathwayCitation()) {
+      <h4>Pathway</h4>
+      <p>{{ pathwayCitation() }}</p>
+    }
+    @if (imageCitation()) {
+      <h4>Image</h4>
+      <p>{{ imageCitation() }}</p>
+    }
+  </mat-dialog-content>
+
+
+  <mat-dialog-actions align="center">
+    @for (downloadItem of downloadItems(); track downloadItem) {
+      <cr-download-button [url]="downloadItem.url"
+                          [download]="true"
+                          [label]="(downloadItem.format).toUpperCase()"
+                          [openInNewTab]="'_self'"
+                          [icon]="'file_download'">
+      </cr-download-button>
+    }
+  </mat-dialog-actions>
+</div>

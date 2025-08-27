@@ -45,6 +45,7 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 
 import {DarkService} from "../services/dark.service";
+import {DownloadFormat, DownloadService} from "../services/download.service";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {DataStateService} from "../services/data-state.service";
 
@@ -90,6 +91,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               private event: EventService,
               private router: Router,
               private route: ActivatedRoute,
+              private download: DownloadService,
               private data: DataStateService
   ) {
     this.isInitialLoad = Boolean(!this.router.getCurrentNavigation()?.previousNavigation);
@@ -117,6 +119,27 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       this.dark.isDark();
       this.updateStyle();
     })
+
+    effect(() => {
+      const request = this.download.downloadRequest();
+      if (request) {
+        this.export(request.format);
+        this.download.resetDownload();
+      }
+    });
+
+  }
+
+  export(format: string) {
+    const options: cytoscape.ExportOptions = {
+      full: true,
+      ...(format === DownloadFormat.JPEG ? {quality: 0.9} : {})
+    }
+    const a = document.createElement('a');
+    a.href = format === DownloadFormat.PNG ? this.cy.png(options) : this.cy.jpg(options);
+    a.download = `${this.pathwayId()}.${format}`;
+    a.click();
+    a.remove();
   }
 
   zoomToCytoscapeTransform = (x: number) => this.minZoom() * Math.pow(this.maxZoom() / this.minZoom(), (x - this.controlMinZoom()) / this.controlRange());

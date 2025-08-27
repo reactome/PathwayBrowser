@@ -19,22 +19,9 @@
     }
     <div class="structure-container" #viewer [hidden]="!isProtein()"></div>
 
-
     @if (chebiStructureSVGData.value() && isChemical()) {
       <div class="chebi-background" [innerHTML]="chebiStructureSVGData.value()! | safe:'html':true"></div>
     }
 
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-

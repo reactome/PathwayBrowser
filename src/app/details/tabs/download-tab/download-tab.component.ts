@@ -1,8 +1,6 @@
 import {Component, computed, signal, Signal, WritableSignal} from '@angular/core';
-import {MatAnchor} from "@angular/material/button";
 import {UrlStateService} from "../../../services/url-state.service";
 import {HttpClient} from "@angular/common/http";
-import {MatIcon} from "@angular/material/icon";
 import {DataStateService} from "../../../services/data-state.service";
 import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
@@ -11,31 +9,42 @@ import {toSignal} from "@angular/core/rxjs-interop";
 import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {DownloadFormat, ReacfoamService} from "../../../reacfoam/reacfoam.service";
+import {EhldService} from "../../../services/ehld.service";
+import {DownloadFormat, DownloadService, DownloadTarget} from "../../../services/download.service";
+import {DownloadButtonComponent} from "./download-button/download-button.component";
 
 
 type PathwayItem = {
   name: string;
-  url: string;
+  url: Signal<string>;
+  fileName?: Signal<string> | undefined;
 }
 
 type AnaLysisItem = {
   title: string;
   description?: string;
-  url: string;
+  url: Signal<string>;
   icon: string;
   isShown: Signal<boolean>;
+}
+
+type DiagramItem = {
+  format: string;
+  icon?: string;
+  url?: Signal<string>;
+  method?: () => void
+  hasEHLD?: Signal<boolean>
+  download?: boolean
 }
 
 
 @Component({
   selector: 'cr-download-tab',
   imports: [
-    MatAnchor,
-    MatIcon,
     SafePipe,
     MatTooltip,
     MatProgressSpinner,
+    DownloadButtonComponent,
 
   ],
   templateUrl: './download-tab.component.html',
@@ -57,6 +66,8 @@ export class DownloadTabComponent {
     return undefined;
   })
 
+  biopaxId = computed(() => this.finalEventId()?.split('-')[2])
+
   finalPathwayName = computed(() => {
     const pathway = this.dataState.currentPathway();
     const selected = this.selectedElement();
@@ -65,11 +76,11 @@ export class DownloadTabComponent {
     return undefined
   });
 
-  hasResult = computed(() => !!(this.analysis.result()) || this.analysis.gsaReportsRequired());
-  hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
+  hasResult = computed(() => !!(this.analysis.result()));
+  hasDetail = computed(() => (this.dataState.hasDetail()));
 
   hasDownload = computed(() => {
-    if(this.hasResult()) return true;
+    if (this.hasResult()) return true;
     return this.hasDetail();
   });
 
@@ -86,6 +97,35 @@ export class DownloadTabComponent {
   gsaReports = computed(() => this.analysis.gsaReports());
 
 
+  formats: DownloadFormat[] = Object.values(DownloadFormat) as DownloadFormat[];
+
+  diagramItems = computed<DiagramItem[]>(() => {
+    const hasEHLD = this.ehld.hasEHLD();
+    const filteredFormats = this.formats.filter(format => {
+      const allowGif = this.analysis.isGSA() || this.analysis.type() === "EXPRESSION";
+      return (hasEHLD || format !== DownloadFormat.SVG) && (allowGif || format !== DownloadFormat.GIF);
+    });
+
+    return filteredFormats.map(format => {
+      const isExportable = [DownloadFormat.SVG, DownloadFormat.PPTX,DownloadFormat.GIF].includes(format);
+      if (isExportable) {
+        return {
+          format: format,
+          url: signal(this.getExportUrl(format)),
+          icon: 'image',
+          download: true
+        }
+      }
+      // png and jpeg for new style diagram, svg is on its way...
+      return {
+        format: format,
+        icon: 'image',
+        method: () => this.onDiagramDownload(format)
+      }
+    });
+  })
+
+
   pathwayItems: PathwayItem[] = [
     {
       name: 'SBML',
@@ -97,55 +137,61 @@ export class DownloadTabComponent {
     },
     {
       name: 'BioPAX2',
-      url: `${RESTFUL_API}/biopaxExporter/Level2/${this.finalEventId()}`,
+      url: `${RESTFUL_API}/biopaxExporter/Level2/${this.biopaxId()}`,
+      fileName: computed(() => `${this.biopaxId()}.xml`)
     },
     {
       name: 'BioPAX3',
-      url: `${RESTFUL_API}/biopaxExporter/Level3/${this.finalEventId()}`,
+      url: `${RESTFUL_API}/biopaxExporter/Level3/${this.biopaxId()}`,
+      fileName: computed(() => `${this.biopaxId()}.xml`)
     },
     {
       name: 'PDF',
-      url: `${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.pdf`,
+      url: computed(() => {
+        const url = `${CONTENT_SERVICE}/exporter/document/event/${this.finalEventId()}.pdf`;
+        const analysisUrl = `${CONTENT_SERVICE}/exporter/document/event/${this.finalEventId()}.pdf?token=${this.token()}`;
+        return this.hasResult() ? analysisUrl : url
+      }),
     }
   ]
 
   analysisItems: AnaLysisItem[] = [
     {
-      title: 'Results CSV',
-      description:'Download the pathway analysis results in CSV format for selected resource',
-      url: `${ANALYSIS_SERVICE}/download/${this.token()}/pathways/${this.currentAnalysisResource}/result.csv`,
+      title: 'CSV Result',
+      description: 'Download the pathway analysis results in CSV format for selected resource',
+      url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/pathways/${this.currentAnalysisResource()}/result.csv`),
       icon: 'table',
       isShown: computed(() => !this.analysis.isGSA())
     },
 
     {
-      title: 'Results JSON',
-      description:'Download a compressed file containing the complete analysis results in JSON format fot all resources',
-      url: `${ANALYSIS_SERVICE}/download/${this.token()}/result.json.gz`,
+      title: 'JSON Result',
+      description: 'Download a compressed file containing the complete analysis results in JSON format fot all resources',
+      url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/result.json.gz`),
       icon: 'data_object',
       isShown: signal(true)
     },
 
     {
-      title: 'Result PDF',
-      description:'Download a detailed report with the most significant pathway analysis results in PDF format',
-      url: `${ANALYSIS_SERVICE}/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`,
+      title: 'PDF Result',
+      description: 'Download a detailed report with the most significant pathway analysis results in PDF format',
+      url: computed(() => `${ANALYSIS_SERVICE}/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`),
       icon: 'docs',
       isShown: computed(() => !this.analysis.isGSA())
     },
 
     {
       title: 'Identifier Mapping CSV',
-      description:'Download the identifier mappings between the submitted data and the selected resource in CSV format',
-      url: `${ANALYSIS_SERVICE}/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`,
+      description: 'Download the identifier mappings between the submitted data and the selected resource in CSV format',
+      url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`),
       icon: 'table',
       isShown: signal(true)
     },
 
     {
       title: 'Not Found Identifiers CSV',
-      description:'Download a CSV file containing those identifiers from the submitted sample that we were not mapped',
-      url: `${ANALYSIS_SERVICE}/dowmload/${this.token()}/entities/notfound/not_found.csv`,
+      description: 'Download a CSV file containing those identifiers from the submitted sample that we were not mapped',
+      url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/entities/notfound/not_found.csv`),
       icon: 'table',
       isShown: signal(true)
     }]
@@ -154,7 +200,8 @@ export class DownloadTabComponent {
               private http: HttpClient,
               private dataState: DataStateService,
               private analysis: AnalysisService,
-              private reacfoam: ReacfoamService) {
+              private download: DownloadService,
+              public ehld: EhldService,) {
   }
 
   getGsaIcon(name: string) {
@@ -175,7 +222,19 @@ export class DownloadTabComponent {
     return name
   }
 
-  onReacfoamDownload(format: DownloadFormat) {
-    this.reacfoam.requestDownload(format);
+  getExportUrl(format: string) {
+    const analysisUrl = `${CONTENT_SERVICE}/exporter/diagram/${this.pathwayId()}.${format}?token=${this.token()}`
+    const url = `${CONTENT_SERVICE}/exporter/diagram/${this.pathwayId()}.${format}`
+    return this.hasResult() ? analysisUrl : url
   }
+
+  onReacfoamDownload(format: DownloadFormat) {
+    this.download.requestDownload(DownloadTarget.REACFOAM, format);
+  }
+
+  onDiagramDownload(format: DownloadFormat) {
+    this.download.requestDownload(DownloadTarget.DIAGRAM, format);
+  }
+
+  protected readonly DownloadFormat = DownloadFormat;
 }

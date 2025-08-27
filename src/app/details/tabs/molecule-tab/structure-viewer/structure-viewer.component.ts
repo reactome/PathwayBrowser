@@ -18,8 +18,9 @@ import {DarkService} from "../../../../services/dark.service";
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
 import {EMPTY, map, Observable, of} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-import {MoleculeType} from "../molecule-details/molecule-details.component";
 import {SafePipe} from "../../../../pipes/safe.pipe";
+import {SelectableObject} from "../../../../services/event.service";
+import {MoleculeType} from "../molecule-tab.component";
 
 export interface StructureEntry {
   pdb_id: string;
@@ -63,7 +64,7 @@ declare const PDBeMolstarPlugin: any;
 })
 export class StructureViewerComponent {
 
-  readonly obj = input.required<ReferenceEntity>();
+  readonly obj = input.required<ReferenceEntity | SelectableObject>();
   readonly xRefs = input.required<DatabaseIdentifier[]>();
   readonly moleculeType = input.required<string | null>();
   viewer = viewChild.required<ElementRef<HTMLElement>>('viewer');
@@ -88,9 +89,7 @@ export class StructureViewerComponent {
     return this.selected()?.startsWith("AF-") ? Source.ALPHA_FOLD : Source.PDB;
   })
 
-  /**?
-   *  protein structure data from AlphaFold and PDB
-   */
+  /** protein structure data from AlphaFold and PDB */
   proteinStructureData = computed(() => {
 
     if (!this.isProtein()) return null;
