@@ -10,7 +10,6 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
-import {GroupByPipe} from "../../../pipes/group-by.pipe";
 import {MoleculeGroupComponent} from "./molecule-group/molecule-group.component";
 
 
@@ -71,8 +70,7 @@ export class MoleculeTabComponent {
 
   constructor(private participant: ParticipantService,
               private entity: EntityService,
-              private state: UrlStateService,
-              private groupByPipe: GroupByPipe) {
+              private state: UrlStateService) {
     effect(() => {
       const selectableObjStId = this.selectableObject()?.stId;
       const pathwayId = this.pathwayId();
@@ -101,7 +99,7 @@ export class MoleculeTabComponent {
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
 
     if (!this.hasNoMoleculeData()) {
-      if (this.selectableObject()?.stId === this.pathwayId()) {
+      if (this.selectableObject()?.stId === this.pathwayId() || !this.pathwayId()) {
         moleculeData = pathwayResults;
       } else {
         const refEntities = this.entity.refEntities() || [];
@@ -186,12 +184,4 @@ export class MoleculeTabComponent {
       .replace(/[^a-z0-9-_]/g, '');   // Remove special characters
   }
 
-
-  getStatistics(graph: MoleculeGroup) {
-    const found = graph.found;
-    const total = graph.data.length;
-    return found ? `${found}/${total}` : `${total}`
-  }
-
-  protected readonly isPathway = isPathway;
 }

@@ -92,7 +92,8 @@ const ReferenceEntityClasses: Set<string> = new Set([
   SchemaClasses.REFERENCE_GENE_PRODUCT,
   SchemaClasses.REFERENCE_ISOFORM,
   SchemaClasses.REFERENCE_RNA_SEQUENCE,
-  SchemaClasses.REFERENCE_THERAPEUTIC
+  SchemaClasses.REFERENCE_THERAPEUTIC,
+  SchemaClasses.SUMMARY_ENTITY,
 ]);
 
 export function isRefEntity(obj: DatabaseObject): obj is ReferenceEntity {

@@ -32,12 +32,13 @@ export class ObjectTreeDetailsComponent {
   readonly refEntity = input.required<ReferenceEntity | null>();
   readonly xRefs = input.required<DatabaseIdentifier[]>();
   readonly isMoleculeView = input.required<boolean>();
+  // TODO add reference entity details (referenceGene, referenceTranscript, etc.)
 
   hasProteinStructureOnDetail = computed(() => this.className() === MoleculeType.PROTEIN && this.refEntity() && this.xRefs());
   hasStructureOnMolecule = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL)
 
   moleculeType = computed(() => {
-    const entity = this.obj();
+    const entity = this.refEntity() || this.obj();
     if (isRefEntity(entity)) {
       return entity.moleculeType;
     }

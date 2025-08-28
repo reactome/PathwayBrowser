@@ -120,11 +120,12 @@
             </div>
           }
         </div>
+
         <cr-object-tree-details [obj]="element"
                                 [className]="element.className"
                                 [isMoleculeView]="moleculeView()"
-                                [refEntity]="element.referenceEntity ?? null"
-                                [xRefs]="!moleculeView() ? element.referenceEntity?.crossReference ?? [] : element.crossReference ?? []"/>
+                                [refEntity]="element.referenceEntity || element"
+                                [xRefs]="element.crossReference ?? []"/>
       </mat-nested-tree-node>
     </ng-template>
 

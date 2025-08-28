@@ -15,18 +15,17 @@ import {DataKeys, Labels} from "../constants/constants";
 })
 export class EntityService {
 
-  eventId = signal<string | undefined>(undefined);
-
   constructor(private http: HttpClient,
               private dataStateService: DataStateService,
               private participant: ParticipantService) {
   }
 
+  eventId = signal<string | undefined>(undefined);
+
   _refEntities = rxResource({
-    request: () => this.eventId(),
-    loader: () => {
-      const id = this.eventId()
-      return id ? this.participant.getReferenceEntities(id) : of(null);
+    request: this.eventId,
+    loader: ({request}) => {
+      return request ? this.participant.getReferenceEntities(request) : of(null);
     }
   });
 

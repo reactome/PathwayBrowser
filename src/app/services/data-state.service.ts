@@ -155,10 +155,16 @@ export class DataStateService {
     });
   }
 
-  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null): Observable<T | undefined> {
-    let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}?includeRef=true&view=nested-aggregated`;
+  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null, fetchIncomingRelationships = true): Observable<T | undefined> {
+    let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}`;
     if (id === null) return of();
-    return this.http.get<T>(url).pipe(map(this.flattenReferences))
+    return this.http.get<T>(url, {
+      params: {
+        fetchIncomingRelationships,
+        includeRef: true,
+        view: 'nested-aggregated'
+      }
+    }).pipe(map(this.flattenReferences))
   }
 
   fetchAncestors(stId: string | null): Observable<Pathway[]> {

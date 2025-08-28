@@ -37,7 +37,6 @@ export class MoleculeGroupComponent {
       .replace(/[^a-z0-9-_]/g, '');   // Remove special characters
   }
 
-
   getStatistics(graph: MoleculeGroup) {
     const found = graph.found;
     const total = graph.data.length;

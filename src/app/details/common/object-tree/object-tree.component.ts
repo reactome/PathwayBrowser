@@ -197,6 +197,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     return this.scope() === 'entity' ? this.entity.getEntityInDepth(id, depth) : this.entity.getEventInDepth(id, depth);
   }
 
+  // TODO only query for the required data, no need to know where the molecule is acting in this view
   _selectedTreeNodeData = rxResource({
     request: () => this.selectedTreeNode()?.stId || this.selectedTreeNode()?.dbId,
     loader: (param) => {
@@ -204,7 +205,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       // Check the condition to determine which method to call
       // Protein
       if (!this.isNestedView(selectedNode)) {
-        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request).pipe(map(result => result as unknown as E));
+        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request, false).pipe(map(result => result as unknown as E));
       } else {
         // PE -> Complex and Set
         return this.inDepth(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
@@ -383,7 +384,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   updateMatTreeDataSource(node: E) {
     const updatedTree = this.updateTree(this.dataSource.data, node);
 
-    this.dataSource.data = [];
+    // this.dataSource.data = [];
     this.dataSource.data = updatedTree;
   }
 
@@ -392,11 +393,11 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     const tree = [...existingTreeData];
     const flatTree = this.flattenTree(tree);
     const targetTreeNode = flatTree.find(node => {
-      if (result.stId != null) {
-        return node.element.stId === result.stId;
-      } else if (result.dbId != null) {
+      if (result.dbId != null) {
         return node.element.dbId === result.dbId;
-      }
+      } else if (result.stId != null) {
+        return node.element.stId === result.stId;
+      } else
       return false;
     });
 
@@ -404,7 +405,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       // Merge all properties from result directly into the element
       Object.assign(targetTreeNode.element, result); // MUTATES ORIGINAL ELEMENT
     }
-
     return tree;
   }
 
