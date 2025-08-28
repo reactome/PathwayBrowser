@@ -18,6 +18,7 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {FlagButtonComponent} from "../../details/common/flag-button/flag-button.component";
 import Entry = Search.Entry;
 import {ShadowScrollComponent} from "../../shared/shadow-scroll/shadow-scroll.component";
+import * as path from "node:path";
 
 const MIN_SUGGEST_LENGTH = 2;
 const AVAILABLE_IN_HEIGHT = 20;
@@ -160,8 +161,7 @@ export class SearchComponent {
     })
     effect(() => {
       if (this.selectedResultPathwaysStable().length === 1) {
-        this.state.pathwayId.set(this.selectedResultPathwaysStable().at(0)!.stId)
-        this.state.select.set(this.selectedResult()?.stId || null)
+        this.selectAndSetPathway(this.selectedResultPathwaysStable().at(0)!.stId);
       }
     })
 
@@ -279,6 +279,11 @@ export class SearchComponent {
     source: () => ({results: this.selectedResultPathways.value(), loading: this.selectedResultPathways.isLoading()}),
     computation: ({results, loading}, previous) => (loading ? previous?.value : results) || [],
   })
+
+  selectAndSetPathway(pathwayId: string) {
+    this.state.select.set(this.selectedResult()?.stId || null)
+    this.state.pathwayId.set(pathwayId)
+  }
 
   entryHeight = input(24)
   trackEntry = (index: number, value: Search.Entry | undefined) => value?.dbId || index

@@ -94,7 +94,7 @@
               <span class="header">Available in:</span>
               @for (pathway of selectedResultPathwaysStable(); track pathway.dbId) {
                 <div class="result-row" [matTooltip]="'Select ' + selectedResult()?.stId +' in '+ pathway.name"
-                     (click)="state.pathwayId.set(pathway.stId)" [class.selected]="pathway.stId === state.pathwayId()"
+                     (click)="selectAndSetPathway(pathway.stId)" [class.selected]="pathway.stId === state.pathwayId()"
                      matTooltipPosition="after">
                   <mat-icon class='custom-icon' [class.ehld]="pathway.hasEHLD" svgIcon="pathway"></mat-icon>
                   <span>{{ pathway.name }}</span>
