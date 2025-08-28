@@ -98,7 +98,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     effect(() => this.pathwayId() && this.loadDiagram());
     effect(() => {
       const flag = this.data.flagIdentifiers();
-      if (flag.length > 0) this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.data.flagIdentifiers(), cy)))
+      if (!this.data.flagResource.isLoading()) this.avoidSideEffect(() => this.cys.forEach(cy => this.flag(this.data.flagIdentifiers(), cy)))
       // this.flagging = false;
     }, {debugName: 'diagram flagging'});
     effect(() => {
