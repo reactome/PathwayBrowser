@@ -106,6 +106,12 @@
                 }
               ]
             },
+            "remote": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            },
             "local": {
               "optimization": false,
               "extractLicenses": false,
@@ -147,6 +153,9 @@
             },
             "local": {
               "buildTarget": "pathway-browser:build:local"
+            },
+            "remote": {
+              "buildTarget": "pathway-browser:build:remote"
             }
           },
           "defaultConfiguration": "local"
