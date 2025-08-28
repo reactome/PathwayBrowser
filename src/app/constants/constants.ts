@@ -71,7 +71,7 @@ export const Labels = {
   INPUTS: 'Inputs',
   OUTPUTS: 'Outputs',
   CATALYST_ACTIVITY: 'Catalyst Activity',
-  OTHER_FORMS: 'Other forms',
+  OTHER_FORMS: 'Other Forms',
   INFERENCES: 'Inferences',
   INTERACTORS: 'Interactors',
   INFERRED_FROM: 'Inferred From',
