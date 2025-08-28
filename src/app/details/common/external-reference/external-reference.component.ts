@@ -3,6 +3,9 @@ import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-e
 import {EntityService} from "../../../services/entity.service";
 import {isArray, isString} from "lodash";
 import {NgClass, TitleCasePipe} from "@angular/common";
+import {StructureViewerComponent} from "../../tabs/molecule-tab/structure-viewer/structure-viewer.component";
+import {MoleculeType} from "../../tabs/molecule-tab/molecule-tab.component";
+import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 
 @Component({
   selector: 'cr-external-reference',
@@ -10,21 +13,28 @@ import {NgClass, TitleCasePipe} from "@angular/common";
   styleUrl: './external-reference.component.scss',
   imports: [
     TitleCasePipe,
-    NgClass
+    NgClass,
+    StructureViewerComponent
   ]
 })
 export class ExternalReferenceComponent {
 
   readonly referenceEntity = input.required<ReferenceEntity>({alias: "referenceEntity"});
+  readonly xRefs = input<DatabaseIdentifier[]>([]);
 
 
   externalRef = computed(() => {
-
     const ref = this.referenceEntity();
     if (!ref) return [];
 
     return this.entity.getTransformedExternalRef(ref);
   });
+
+  moleculeType = computed(() => {
+    const entity = this.referenceEntity();
+    return entity ? entity.moleculeType : null;
+  })
+  hasStructure = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL);
 
 
   constructor(private entity: EntityService) {

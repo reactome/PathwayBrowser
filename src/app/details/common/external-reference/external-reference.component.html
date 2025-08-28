@@ -19,4 +19,12 @@
       </div>
     </div>
   }
+
+  @if (referenceEntity() && hasStructure()) {
+    <cr-structure-viewer [obj]=referenceEntity()
+                         [xRefs]="xRefs()"
+                         [moleculeType]="moleculeType()">
+    </cr-structure-viewer>
+  }
+
 </div>

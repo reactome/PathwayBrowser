@@ -136,7 +136,7 @@ export class RheaComponent {
             element.shadowRoot.adoptedStyleSheets = [sheet];
 
           })
-        }, 10)
+        }, 0)
 
       }
     });
