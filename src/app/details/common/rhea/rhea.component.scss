@@ -23,53 +23,64 @@
   padding-left: 10px;
   border-left: 2px solid var(--outline-variant);
   gap: 5px;
-  overflow-x: auto;
+  overflow: hidden;
   width: 100%;
-
-  //.equation {
-  //  display: flex;
-  //  flex-direction: row;
-  //  width: 100%;
-  //  white-space: nowrap;
-  //}
-
-
-  .rhea-reaction-wrapper {
-    overflow-x: auto;
-    width: 100%;
-
-    .rhea-reaction {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      justify-content: space-around;
-      gap: 15px;
-
-      .participant {
-        display: flex;
-        flex-direction: column;
-        align-items: center
-      }
-
-      .structure-size::ng-deep svg {
-        width: 150px;
-        height: 150px;
-      }
-
-      .connector {
-        display: flex;
-        align-items: center;
-      }
-
-    }
-
-  }
-
-
 }
 
-.rhea-reaction-wrapper:hover {
+//todo remove it when using widget
+//.rhea-reactions {
+//  display: grid;
+//  flex-direction: column;
+//  width: 100%;
+//  justify-content: space-around;
+//  gap: 15px;
+//}
+//
+//
+//.participant {
+//  //display: flex;
+//  //flex-direction: column;
+//  //align-items: center;
+//
+//  display: flex;
+//  flex-direction: row;
+//  justify-content: center;
+//  gap: 2px;
+//
+//  .label{
+//    text-align:center;
+//   // padding:5px
+//  }
+//}
+//
+//.rhea-reaction > .structure-size {
+//  grid-area: image;
+//}
+//
+//.structure-size::ng-deep svg {
+//  //width: 150px;
+//  //height: 150px;
+//  width:100%;
+//  grid-area: image;
+//  background: var(--surface);
+//}
+//
+//.connector {
+//  display: flex;
+//  align-items: center;
+//}
+
+.rhea-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100%;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 100%;
+}
+
+.rhea-widget:hover {
   background: var(--card);
   border-radius: 15px;
-
 }
