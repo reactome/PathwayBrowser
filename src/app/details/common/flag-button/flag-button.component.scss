@@ -13,11 +13,9 @@
   @include mat.icon-button-overrides((
     state-layer-size: var(--size, 40px),
     icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
-    //touch-target-display: none
   ));
 
   .mat-icon {
-    //margin-left: -2px;
     width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
     height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
     font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));

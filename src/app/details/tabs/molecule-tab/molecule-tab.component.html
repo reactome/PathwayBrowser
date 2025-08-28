@@ -7,23 +7,7 @@
   <div class="container">
     <div class="content">
       @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
-        <div class="list" [id]=sanitizeId(group.category)>
-        <span class="header">
-          {{ group.category }} {{ getStatistics(group) }}
-        </span>
-        </div>
-
-        <mat-divider class="divider"></mat-divider>
-        <div class="composition-container">
-          <!--todo: Add pagination-->
-          @for (grouped of group.data | groupBy:'highlight' | sortByText:'key':'desc'; track grouped) {
-            @for (item of grouped.value | sortByDate:'stoichiometry'; track item.entity.dbId) {
-              <cr-object-tree [type]="group.category" [data]="[item.entity]"
-                              [stoichiometry]=item.stoichiometry [highlight]="item.highlight"
-                              [moleculeView]="true"></cr-object-tree>
-            }
-          }
-        </div>
+          <cr-molecule-group [group]="group"></cr-molecule-group>
       }
 
       <div id="download" class="download-container">

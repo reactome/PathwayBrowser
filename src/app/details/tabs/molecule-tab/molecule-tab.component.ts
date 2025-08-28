@@ -5,15 +5,13 @@ import {SelectableObject} from "../../../services/event.service";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {SortByTextPipe} from "../../../pipes/sort-by-text.pipe";
-import {MatDivider} from "@angular/material/divider";
-import {ObjectTreeComponent} from "../../common/object-tree/object-tree.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {SortByDatePipe} from "../../../pipes/sort-by-date.pipe";
 import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from "@angular/material/expansion";
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
 import {isPathway} from "../../../services/utils";
 import {GroupByPipe} from "../../../pipes/group-by.pipe";
+import {MoleculeGroupComponent} from "./molecule-group/molecule-group.component";
 
 
 // TODO: Find a way to not crash when too many data, e.g. selecting a top level pathway. (using virtual scrolls probably, but wit a way to expand rows)
@@ -50,16 +48,12 @@ export enum MoleculeType {
   templateUrl: './molecule-tab.component.html',
   imports: [
     SortByTextPipe,
-    MatDivider,
-    ObjectTreeComponent,
     MatProgressSpinner,
-    SortByDatePipe,
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
     MoleculeDownloadTableComponent,
-    GroupByPipe,
-    SortByDatePipe,
+    MoleculeGroupComponent,
   ],
   styleUrl: './molecule-tab.component.scss',
 })
@@ -72,7 +66,7 @@ export class MoleculeTabComponent {
   // Get selected pathway id on Reacfoam view
   objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
 
-  isReacfoamView = computed(() => !(this.state.select() || this.state.pathwayId()));
+  hasNoMoleculeData = computed(() => !(this.state.select() || this.state.pathwayId()));
 
 
   constructor(private participant: ParticipantService,
@@ -106,7 +100,7 @@ export class MoleculeTabComponent {
 
     const pathwayResults = this.getPathwayParticipants(pathwayParticipants);
 
-    if (!this.isReacfoamView()) {
+    if (!this.hasNoMoleculeData()) {
       if (this.selectableObject()?.stId === this.pathwayId()) {
         moleculeData = pathwayResults;
       } else {
@@ -141,7 +135,7 @@ export class MoleculeTabComponent {
         existingEntity.stoichiometry++;
         // existingEntity.stoichiometry = (existingEntity.stoichiometry ?? 0) + 1;
       } else {
-        dataMap.set(entity.dbId, {entity, stoichiometry: 1, highlight: true})
+        dataMap.set(entity.dbId, {entity, stoichiometry: 1, highlight: false})
       }
     }
 

@@ -1,0 +1,111 @@
+@use '@angular/material' as mat;
+
+:host {
+  width: 100%;
+  ::ng-deep {
+    .mat-mdc-paginator {
+      .mat-mdc-paginator-container {
+        padding: 0;
+      }
+      .mdc-icon-button {
+
+        --size: 24px;
+        --icon-ratio: 1;
+
+        @include mat.icon-button-overrides((
+          state-layer-size: var(--size, 40px),
+          icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
+        ));
+
+        .mat-icon {
+          width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+          height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+          font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+        }
+      }
+
+      .mat-mdc-paginator-navigation-first {
+        order: -2;
+      }
+
+      .mat-mdc-paginator-navigation-previous {
+        order: -1;
+      }
+    }
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+#component-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 0;
+  width: var(--column-width);
+  flex-direction: row;
+  gap: 10px;
+
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+
+  --padding: 2px;
+
+}
+
+.controllers {
+  position: sticky;
+  top: 4px;
+  bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.composition-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding-left: 8px;
+  border-left: 2px solid var(--outline-variant);
+  flex: 1;
+  overflow: hidden;
+  padding-right: var(--padding);
+}
+
+
+.paginator {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .count {
+    border-radius: 20px;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    padding: 0 6px;
+  }
+
+  .header {
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--outline);
+    font-size: 16px;
+    line-height: 24px;
+  }
+}

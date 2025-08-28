@@ -101,9 +101,7 @@
       <div role="group" class="group"
            [class.details-group]="!isNestedView(node.element) && tree.isExpanded(node) ? 'details-group' : ''">
         <!--make sure getting full object content to render with _selectedTreeNodeData.hasValue()-->
-        <ng-container
-          *ngIf="!isNestedView(node.element); then details; else entity">
-        </ng-container>
+        <ng-container *ngIf="!isNestedView(node.element); then details; else entity"/>
       </div>
     }
 
