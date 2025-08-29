@@ -14,6 +14,7 @@ import {
   isEvent,
   isEWAS,
   isMolecule,
+  isRefEntity,
   isReferenceSummary,
   isRLE,
   isSelectableObject
@@ -44,11 +45,8 @@ import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
 import {ObjectTreeDetailsComponent} from "./object-details/object-tree-details.component";
-import {LoggerComponent} from "../../../shared/logger/logger.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
-
-type HasParent<R extends Relationship.Has<E>, E extends DatabaseObject> = R & { parent: R | undefined };
 
 @Component({
   selector: 'cr-object-tree',
@@ -651,4 +649,5 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     return shouldShorten ? this.getShortest(firstSpeciesName) : speciesName;
   }
 
+  protected readonly isRefEntity = isRefEntity;
 }
