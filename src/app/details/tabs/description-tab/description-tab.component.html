@@ -11,71 +11,69 @@
 </ng-template>
 
 
-@if (obj()) {
-  <div id="details">
-    <div class="content">
-      <!-- Header -->
-      <div class="header" [id]=DataKeys.OVERVIEW>
-        <div class="label">
-          <mat-icon
-            class="custom-icon"
-            [matTooltip]="symbol().tooltip"
-            [svgIcon]="symbol().name">
-          </mat-icon>
-          <span class="name">
+<div id="details">
+  <div class="content">
+    <!-- Header -->
+    <div class="header" [id]=DataKeys.OVERVIEW>
+      <div class="label">
+        <mat-icon
+          class="custom-icon"
+          [matTooltip]="symbol().tooltip"
+          [svgIcon]="symbol().name">
+        </mat-icon>
+        <span class="name">
             {{ name() }}
-            @if (obj().schemaClass === 'SummaryEntity') {
-              · <i>summary</i>
-            }
+          @if (obj().schemaClass === 'SummaryEntity') {
+            · <i>summary</i>
+          }
           </span>
-        </div>
-        <div class="details-button">
-          <a mat-button [href]="'/content/detail/' + obj().stId" target="_blank">
-            <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
-            <span class="details-label"> Details page</span>
-          </a>
-        </div>
       </div>
-      @for (element of elements; track element.key; let i = $index) {
-        @if (element.isPresent ? element.isPresent() : obj()[element.key]) {
-          <!-- Avoid overview label -->
-          @if (i > 0) {
-            <div class="divider-container" [id]="element.key">
-              <div class="divider-name-container">
-                <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
-              </div>
-              <div class="divider-line-container">
-                <mat-divider class="divider"></mat-divider>
-              </div>
+      <div class="details-button">
+        <a mat-button [href]="'/content/detail/' + obj().stId" target="_blank">
+          <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
+          <span class="details-label"> Details page</span>
+        </a>
+      </div>
+    </div>
+    @for (element of elements; track element.key; let i = $index) {
+      @if (element.isPresent ? element.isPresent() : obj()[element.key]) {
+        <!-- Avoid overview label -->
+        @if (i > 0) {
+          <div class="divider-container" [id]="element.key">
+            <div class="divider-name-container">
+              <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
             </div>
-          }
-          @if (!element.manual) {
-            <cr-controller-tree [type]="element.key" [data]="obj()[element.key]"
-              [depthControl]="element.hasDepthControl ?? false" [scope]="element.scope || 'entity'"/>
-          } @else if (element.template) {
-            <ng-container *ngTemplateOutlet="element.template!()"></ng-container>
-          }
+            <div class="divider-line-container">
+              <mat-divider class="divider"></mat-divider>
+            </div>
+          </div>
+        }
+        @if (!element.manual) {
+          <cr-controller-tree [type]="element.key" [data]="obj()[element.key]"
+                              [depthControl]="element.hasDepthControl ?? false" [scope]="element.scope || 'entity'"/>
+        } @else if (element.template) {
+          <ng-container *ngTemplateOutlet="element.template!()"></ng-container>
         }
       }
-    </div>
-    <div class="toc">
-      @for (element of elements; track element) {
-        @if (isTOCIncluded(element.key)) {
-          <a
-            [routerLink]="[]"
-            [fragment]="element.key" [queryParamsHandling]="'preserve'">
-            {{ element.label }}
-          </a>
-        }
-      }
-    </div>
+    }
   </div>
-}
+  <div class="toc">
+    @for (element of elements; track element) {
+      @if (isTOCIncluded(element.key)) {
+        <a
+          [routerLink]="[]"
+          [fragment]="element.key" [queryParamsHandling]="'preserve'">
+          {{ element.label }}
+        </a>
+      }
+    }
+  </div>
+</div>
 
 <ng-template #overviewTemplate>
   <!-- Overview -->
   <div class="overview" #overview [class.update-layout]="!icon.isLoading() && icon.value()"
-    [style.--icon-height.px]="overview$()?.clientHeight">
+       [style.--icon-height.px]="overview$()?.clientHeight">
     <cr-description-overview [obj]="obj()" [showSpecies]="true"></cr-description-overview>
     @if (!icon.isLoading() && icon.value()) {
       <div class="icon-container">
@@ -116,7 +114,7 @@
 <ng-template #modificationsTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="modifications()" [catalystActivityReference]="catalystRef()"
-    [regulationRefs]="regulationRefs()"></cr-molecular-process>
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
   </div>
 </ng-template>
 
@@ -164,14 +162,14 @@
 <ng-template #catalystActivityTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="catalystActivity()" [catalystActivityReference]="catalystRef()"
-    [regulationRefs]="regulationRefs()"></cr-molecular-process>
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
   </div>
 </ng-template>
 
 <ng-template #catalystActivitiesTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="catalystActivities()" [catalystActivityReference]="catalystRef()"
-    [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
+                          [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
   </div>
 </ng-template>
 
@@ -179,14 +177,14 @@
 <ng-template #regulationTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"
-    [regulationRefs]="regulationRefs()" perspective="event"></cr-molecular-process>
+                          [regulationRefs]="regulationRefs()" perspective="event"></cr-molecular-process>
   </div>
 </ng-template>
 
 <ng-template #regulatesTemplate>
   <div class="element-container">
     <cr-molecular-process [entries]="regulates()" [catalystActivityReference]="catalystRef()"
-    [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
+                          [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
   </div>
 </ng-template>
 
@@ -217,7 +215,7 @@
             <div class="authorship-item">
               @for (author of ie.author; let i = $index; track author.dbId) {
                 <a [href]="'/content/detail/' + author.dbId" target="_blank"
-                  [ngClass]="{'margin-right': !author.orcidId}">
+                   [ngClass]="{'margin-right': !author.orcidId}">
                   {{ author.firstname }} {{ author.surname }}
                 </a>
 

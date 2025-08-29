@@ -23,7 +23,7 @@
       }
     </div>
     @if (hasPagination()) {
-      <mat-paginator hidePageSize pageSize="20" [length]="data().length" (page)="currentPage.set($event)"></mat-paginator>
+      <mat-paginator hidePageSize [pageSize]="pageSize()" [length]="data().length" (page)="currentPage.set($event)"></mat-paginator>
     }
   </div>
 

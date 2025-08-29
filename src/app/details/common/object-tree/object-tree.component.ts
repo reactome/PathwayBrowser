@@ -1,10 +1,19 @@
-import {ChangeDetectionStrategy, Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  model,
+  signal,
+  TrackByFunction,
+  ViewChild
+} from '@angular/core';
 import {
   isChemical,
   isEvent,
   isEWAS,
   isMolecule,
-  isPathway,
   isReferenceSummary,
   isRLE,
   isSelectableObject
@@ -28,15 +37,18 @@ import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
-import { NgClass } from "@angular/common";
+import {NgClass} from "@angular/common";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
 import {ObjectTreeDetailsComponent} from "./object-details/object-tree-details.component";
+import {LoggerComponent} from "../../../shared/logger/logger.component";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
+
+type HasParent<R extends Relationship.Has<E>, E extends DatabaseObject> = R & { parent: R | undefined };
 
 @Component({
   selector: 'cr-object-tree',
@@ -51,8 +63,8 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     MatTreeNodeToggle,
     MatIconButton,
     MatTreeNodeDef,
-    ObjectTreeDetailsComponent
-],
+    ObjectTreeDetailsComponent,
+  ],
   styleUrl: './object-tree.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 
@@ -108,7 +120,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
               private entity: EntityService,
               private dataStateService: DataStateService,
               private urlState: UrlStateService,
-              private extractCompartmentPipe: ExtractCompartmentPipe
+              private extractCompartmentPipe: ExtractCompartmentPipe,
   ) {
 
     // Initial tree data
@@ -201,7 +213,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   })
 
 
-  inDepth(id: string | number, depth: number) : Observable<E>{
+  inDepth(id: string | number, depth: number): Observable<E> {
     return this.scope() === 'entity' ? this.entity.getEntityInDepth(id, depth) : this.entity.getEventInDepth(id, depth);
   }
 
@@ -377,7 +389,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     // If the node has an icon, treat it as non-nested
     const isStructure = this.moleculeView();
     if (isStructure) return false
-    //TODO make it work for pathways
 
     const notNested = ObjectTreeComponent.nonNestedClasses.has(selectedNode.schemaClass) || isRLE(selectedNode);
 
@@ -388,39 +399,40 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     return e ? (e.offsetWidth < e.scrollWidth) : false;
   }
 
+  // Important to use the updateCounter to trigger the update on the parent node when the child node is updated
+  trackBy: TrackByFunction<R> = (index, node) => node.element.dbId + '-' + node.element._updateCounter
 
   updateMatTreeDataSource(node: E) {
-    const updatedTree = this.updateTree(this.dataSource.data, node);
-
-    // this.dataSource.data = [];
-    this.dataSource.data = updatedTree;
+    const tree = this.dataSource.data;
+    this.updateTree(tree, node);
+    this.dataSource.data = tree;
   }
 
-  updateTree(existingTreeData: R[], result: E): R[] {
+  //TODO because of MatNestedTree, we are only able to update a leaf node by updating as well its parent, all the way till the root. To optimise more, we need to use a MatFlatTree which would allow us to really just update the targeted node
 
-    const tree = [...existingTreeData];
-    const flatTree = this.flattenTree(tree);
-    const targetTreeNode = flatTree.find(node => {
-      if (result.dbId != null) {
-        return node.element.dbId === result.dbId;
-      } else if (result.stId != null) {
-        return node.element.stId === result.stId;
-      } else
-      return false;
-    });
-
-    if (targetTreeNode) {
-      // Merge all properties from result directly into the element
-      Object.assign(targetTreeNode.element, result); // MUTATES ORIGINAL ELEMENT
+  updateTree(existingTreeData: R[], result: E): R | void {
+    for (let i = 0; i < existingTreeData.length; i++) {
+      const node = existingTreeData[i];
+      if (node.element.dbId === result.dbId) {
+        Object.assign(node.element, result); // MUTATES ORIGINAL ELEMENT
+        node.element._updateCounter = (node.element._updateCounter || 0) + 1;
+        result.composedOf = result.composedOf || []
+        return node;
+      } else {
+        const r = this.updateTree((node.element.composedOf || []) as R[], result);
+        if (r) {
+          node.element._updateCounter = (node.element._updateCounter || 0) + 1;
+          return r;
+        }
+      }
     }
-    return tree;
   }
 
   flattenTree(nodes: R[]): R[] {
     return nodes.flatMap(node => [
       node,
       ...(node.element.composedOf ?
-        this.flattenTree(node.element.composedOf as R[]) :
+        this.flattenTree((node.element.composedOf as R[])) :
         [])
     ]);
   }

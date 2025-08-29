@@ -14,5 +14,6 @@ export interface DatabaseObject {
   // tree
   composedOf?: Relationship.Has<DatabaseObject>[];
   isLoaded?: boolean;
+  _updateCounter?: number;
 
 }

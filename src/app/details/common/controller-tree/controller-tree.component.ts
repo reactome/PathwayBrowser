@@ -1,4 +1,4 @@
-import {Component, computed, input, signal} from '@angular/core';
+import {Component, computed, input, linkedSignal, signal} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {PageEvent} from "@angular/material/paginator";
 
@@ -16,14 +16,15 @@ export class ControllerTreeComponent<E extends DatabaseObject> {
   readonly data = input.required<E[]>();
   readonly scope = input<'entity' | 'event'>('entity');
 
+  readonly pageSize = input(30);
+
   depthIndex = signal(1);
   depthChangeSource = signal<'controller' | 'tree' | undefined>(undefined);
   maxDepth = signal(undefined);
 
-  hasPagination = computed(() => this.data().length > 20);
-  currentPage = signal<PageEvent>({pageIndex: 0, pageSize: 20, length: 0});
+  hasPagination = computed(() => this.data().length > this.pageSize());
+  currentPage = linkedSignal<PageEvent>(() => ({pageIndex: 0, pageSize: this.pageSize(), length: 0}));
   displayedData = computed(() => {
-    console.log(this.data())
     return this.hasPagination()
         ? this.data().slice(
           this.currentPage().pageIndex * this.currentPage().pageSize,
