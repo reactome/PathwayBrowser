@@ -47,7 +47,7 @@
                 [ngClass]="{'active-button': currentResource().name === resource.name}">
                 <div class="resource-name">
                   <span>{{ resource.name }}</span>
-                  @if (isDataFromPsicquicLoading && currentResource()?.name === resource.name) {
+                  @if (isDataFromPsicquicLoading && currentResource().name === resource.name) {
                     <mat-spinner class="spinner-color" diameter="20"
                     ></mat-spinner>
                   }
@@ -60,7 +60,7 @@
 
       <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Custom' }"></ng-container>
 
-      @if (resourceTokens?.length != 0) {
+      @if (resourceTokens.length != 0) {
         <mat-selection-list [multiple]=false hideSingleSelectionIndicator=true>
           @for (resourceToken of resourceTokens; track resourceToken) {
             <mat-list-option [value]="resourceToken"
