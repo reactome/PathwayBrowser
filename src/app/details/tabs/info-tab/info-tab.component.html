@@ -17,16 +17,18 @@
       <li><b>Drag</b> to move around the pathway map.</li>
       <li><b>Zoom</b> in to reveal more detail — down to the molecular structure.</li>
       <li><b>Hover</b> over molecules and reactions to highlight them — get close enough, and you’ll see structures come
-        to life.
-      </li>
-      <li><b>Click</b> for in-depth info on participants and processes.</li>
-      <li *ngIf="interactor.currentResource().name !== null"><b>Click on the bubbles</b> to display related molecules
-        and concepts within context
-      </li>
-      <li><b>Use the toolbar</b> to search, compare to variation of the pathway, and overlay experimental data.</li>
-    </ul>
-    Explore biology in motion — from pathways to molecules.
+      to life.
+    </li>
+    <li><b>Click</b> for in-depth info on participants and processes.</li>
+    @if (interactor.currentResource().name !== null) {
+      <li><b>Click on the bubbles</b> to display related molecules
+      and concepts within context
+    </li>
   }
+  <li><b>Use the toolbar</b> to search, compare to variation of the pathway, and overlay experimental data.</li>
+</ul>
+Explore biology in motion — from pathways to molecules.
+}
 } @else {
   <h3>🔍 Explore Reactome Pathways</h3>
   Discover all pathways in a dynamic Voronoi map — each cell scaled by its molecular content.

@@ -3,17 +3,15 @@ import {LiteratureReference} from "../../../model/graph/publication/literature-r
 import {Publication} from "../../../model/graph/publication/publication.model";
 import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatIcon} from "@angular/material/icon";
-import {NgForOf, NgIf} from "@angular/common";
+
 
 @Component({
   selector: 'cr-publication',
   templateUrl: './publication.component.html',
   imports: [
     SafePipe,
-    MatIcon,
-    NgIf,
-    NgForOf
-  ],
+    MatIcon
+],
   styleUrl: './publication.component.scss'
 })
 export class PublicationComponent{

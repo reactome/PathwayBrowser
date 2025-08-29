@@ -28,7 +28,7 @@ import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
 import {cloneDeep} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
-import {NgClass, NgIf} from "@angular/common";
+import { NgClass } from "@angular/common";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
@@ -51,9 +51,8 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     MatTreeNodeToggle,
     MatIconButton,
     MatTreeNodeDef,
-    NgIf,
     ObjectTreeDetailsComponent
-  ],
+],
   styleUrl: './object-tree.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 

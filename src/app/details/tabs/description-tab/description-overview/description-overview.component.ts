@@ -9,7 +9,7 @@ import {Relationship} from "../../../../model/graph/relationship.model";
 import {Disease} from "../../../../model/graph/external-ontology/disease.model";
 import {CellType} from "../../../../model/graph/external-ontology/cell-type.model";
 import HasCompartment = Relationship.HasCompartment;
-import {NgIf, TitleCasePipe} from "@angular/common";
+import { TitleCasePipe } from "@angular/common";
 import {OntologyTermComponent} from "../../../common/ontology-term/ontology-term.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {IncludeRefPipe} from "../../../../pipes/include-ref.pipe";
@@ -24,9 +24,8 @@ import {RefsTreeComponent} from "../../../common/refs-tree/refs-tree.component";
     OntologyTermComponent,
     MatProgressSpinner,
     IncludeRefPipe,
-    RefsTreeComponent,
-    NgIf
-  ],
+    RefsTreeComponent
+],
   styleUrl: './description-overview.component.scss'
 })
 export class DescriptionOverviewComponent {
