@@ -16,7 +16,7 @@
     @if (!isMoleculeView())  {
       <mat-divider/>
     }
-    <cr-external-reference [referenceEntity]=refEntity()! [xRefs]="xRefs()" [displayReference]="false"></cr-external-reference>
+    <cr-external-reference [referenceEntity]=refEntity()! [xRefs]="xRefs()" [displayReference]="!isMoleculeView()"></cr-external-reference>
   }
 
   <!-- Cross References -->
