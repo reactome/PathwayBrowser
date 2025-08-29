@@ -24,16 +24,17 @@ import {AnalysisService} from "./analysis.service";
 import {EhldService} from "./ehld.service";
 import {TopLevelPathway} from "../model/graph/event/top-level-pathway.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {isDefined, isEvent, isPathway, isPhysicalEntity, isRLE} from "./utils";
+import {isDefined, isPathway, isPhysicalEntity, isRLE} from "./utils";
 import {DatabaseObjectService} from "./database-object.service";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
 import {Relationship} from "../model/graph/relationship.model";
 import {toObservable} from "@angular/core/rxjs-interop";
 import {Pathway} from "../model/graph/event/pathway.model";
 import HasEvent = Relationship.HasEvent;
+import {SummaryEntity} from "../model/graph/physical-entity/summary-entity.model";
 
 
-export type SelectableObject = Event | PhysicalEntity;
+export type SelectableObject = Event | PhysicalEntity | SummaryEntity;
 
 @Injectable({
   providedIn: 'root'

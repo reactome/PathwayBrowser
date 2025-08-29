@@ -1,5 +1,14 @@
 import {ChangeDetectionStrategy, Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
-import {isChemical, isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
+import {
+  isChemical,
+  isEvent,
+  isEWAS,
+  isMolecule,
+  isPathway,
+  isReferenceSummary,
+  isRLE,
+  isSelectableObject
+} from "../../../services/utils";
 import {
   MatNestedTreeNode,
   MatTree,
@@ -567,6 +576,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
 
   getUrl(element: E): string {
+    if (isReferenceSummary(element)) return element.url;
     if ((isEWAS(element) || isChemical(element)) && element.referenceEntity?.url) {
       return element.referenceEntity.url;
     }

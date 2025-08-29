@@ -23,7 +23,7 @@ import {DataStateService} from "../../../services/data-state.service";
     MatIconButton,
     MatTooltip,
     NgClass,
-    StructureViewerComponent
+    StructureViewerComponent,
   ]
 })
 export class ExternalReferenceComponent {
@@ -31,6 +31,7 @@ export class ExternalReferenceComponent {
   readonly referenceEntity = input.required<ReferenceEntity>();
   readonly xRefs = input<DatabaseIdentifier[]>([]);
 
+  readonly displayReference = input<boolean>(true);
 
   externalRef = computed(() => {
     const ref = this.referenceEntity();

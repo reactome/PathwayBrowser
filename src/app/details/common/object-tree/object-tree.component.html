@@ -76,15 +76,13 @@
           </span>
         }
 
-        @if (!moleculeView()) {
-          <div class="select-container">
-            <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-            <button mat-icon-button class="select button" (click)="onSelectClick($event, element)"
-                    [matTooltip]="'Select ' + (element.stId || element.dbId) ">
-              <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
-            </button>
-          </div>
-        }
+        <div class="select-container">
+          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+          <button mat-icon-button class="select button" (click)="onSelectClick($event, element)"
+                  [matTooltip]="'Select ' + (element.stId || element.dbId) ">
+            <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
+          </button>
+        </div>
 
         <div class="goTo-container">
           <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()"
@@ -125,7 +123,8 @@
                                 [className]="element.className"
                                 [isMoleculeView]="moleculeView()"
                                 [refEntity]="element.referenceEntity || element"
-                                [xRefs]="element.crossReference ?? []"/>
+                                [xRefs]="element.crossReference ?? []"
+                                [isLoading]="_selectedTreeNodeData.isLoading()"/>
       </mat-nested-tree-node>
     </ng-template>
 

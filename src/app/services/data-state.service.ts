@@ -8,7 +8,7 @@ import {JSOGDeserializer, JSOGObject} from "../utils/JSOGDeserializer";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {SelectableObject} from "./event.service";
-import {isPathway} from "./utils";
+import {isPathway, isReferenceEntityStId} from "./utils";
 import {SpeciesService} from "./species.service";
 
 type SelectionData = {
@@ -65,7 +65,7 @@ export class DataStateService {
   public selectedElementLoading = this._selectedElement.asReadonly().isLoading
 
   hasDetail = computed(() => !!(this.state.select() || this.state.pathwayId()));
-  selectIsSummary = computed(() => this.state.select() ? this.state.select()!.includes(":") : false)
+  selectIsSummary = computed(() => isReferenceEntityStId(this.state.select()))
 
   private _selectionData = computed<SelectionData>(() => ({
     selectedElement: this.selectedElement(),

@@ -2,42 +2,26 @@
 
   <!-- provide more details for the selectable object on details tab,overview,  externalRefs(including structure for protein and chemical), xRefs-->
   @if (!isMoleculeView()) {
-
-<!--    Structure has been moved to external reference-->
-<!--    @if (hasProteinStructureOnDetail()) {-->
-<!--      <cr-structure-viewer [obj]=refEntity()! [xRefs]="xRefs()"-->
-<!--                           [moleculeType]="MoleculeType.PROTEIN">-->
-
-<!--      </cr-structure-viewer>-->
-<!--      <mat-divider></mat-divider>-->
-<!--    }-->
-
-    <!-- Details content -->
     <cr-description-overview [obj]="obj()" [showSpecies]="false"></cr-description-overview>
-    <!-- External Reference -->
-    @if (refEntity()) {
-      <mat-divider></mat-divider>
-      <cr-external-reference [referenceEntity]=refEntity()! [xRefs]="xRefs()"></cr-external-reference>
-    }
+  }
 
-  } @else {
-    <!-- provide molecule details on molecule tab, structure for protein/chemical and xRefs-->
-    @if (hasStructureOnMolecule()) {
-      <cr-structure-viewer [obj]=obj()
-                           [xRefs]="xRefs()"
-                           [moleculeType]="moleculeType()">
-      </cr-structure-viewer>
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+  }
 
-      @if (xRefs().length > 0) {
-        <mat-divider>
-          <mat-divider></mat-divider>
-        </mat-divider>
-      }
+  <!-- External Reference -->
+  @if (refEntity()) {
+    @if (!isMoleculeView())  {
+      <mat-divider/>
     }
+    <cr-external-reference [referenceEntity]=refEntity()! [xRefs]="xRefs()" [displayReference]="false"></cr-external-reference>
   }
 
   <!-- Cross References -->
   @if (xRefs().length > 0) {
+    <mat-divider/>
     <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
     <!-- only provide this info for RNA/DNA which is Entity from backend on molecule tab -->
   } @else if (isMoleculeView() && moleculeType() === MoleculeType.ENTITY) {

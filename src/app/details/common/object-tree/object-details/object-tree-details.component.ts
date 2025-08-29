@@ -11,15 +11,16 @@ import {ExternalReferenceComponent} from "../../external-reference/external-refe
 import {CrossReferencesComponent} from "../../cross-references/cross-references.component";
 import {isRefEntity} from "../../../../services/utils";
 import {MoleculeType} from "../../../tabs/molecule-tab/molecule-tab.component";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'cr-object-tree-details',
   imports: [
-    StructureViewerComponent,
     MatDivider,
     DescriptionOverviewComponent,
     ExternalReferenceComponent,
-    CrossReferencesComponent
+    CrossReferencesComponent,
+    MatProgressSpinner
   ],
   templateUrl: './object-tree-details.component.html',
   styleUrl: './object-tree-details.component.scss',
@@ -32,10 +33,7 @@ export class ObjectTreeDetailsComponent {
   readonly refEntity = input.required<ReferenceEntity | null>();
   readonly xRefs = input.required<DatabaseIdentifier[]>();
   readonly isMoleculeView = input.required<boolean>();
-  // TODO add reference entity details (referenceGene, referenceTranscript, etc.)
-
-  hasProteinStructureOnDetail = computed(() => this.className() === MoleculeType.PROTEIN && this.refEntity() && this.xRefs());
-  hasStructureOnMolecule = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL)
+  readonly isLoading = input<boolean>(false);
 
   moleculeType = computed(() => {
     const entity = this.refEntity() || this.obj();

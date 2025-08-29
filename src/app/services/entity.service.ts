@@ -1,14 +1,15 @@
 import {computed, Injectable, signal} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {CONTENT_SERVICE, environment} from "../../environments/environment";
+import {CONTENT_SERVICE} from "../../environments/environment";
 import {PhysicalEntity} from "../model/graph/physical-entity/physical-entity.model";
-import {map, Observable, of} from "rxjs";
+import {filter, map, Observable, of, take} from "rxjs";
 import {DataStateService} from "./data-state.service";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
 import {DatabaseObject} from "../model/graph/database-object.model";
-import {rxResource} from "@angular/core/rxjs-interop";
+import {rxResource, toObservable} from "@angular/core/rxjs-interop";
 import {ParticipantService} from "./participant.service";
 import {DataKeys, Labels} from "../constants/constants";
+import {isDefined, isRefEntity, isReferenceEntityStId, isReferenceSummary} from "./utils";
 
 @Injectable({
   providedIn: 'root'
@@ -22,10 +23,16 @@ export class EntityService {
 
   eventId = signal<string | undefined>(undefined);
 
+  selectedElement$ = toObservable(this.dataStateService.selectedElement);
+
   _refEntities = rxResource({
     request: this.eventId,
     loader: ({request}) => {
-      return request ? this.participant.getReferenceEntities(request) : of(null);
+      return request
+        ? isReferenceEntityStId(request)
+          ? this.selectedElement$.pipe(filter(isDefined), filter(isRefEntity), map(ref => [ref]), take(1))
+          : this.participant.getReferenceEntities(request)
+        : of(null);
     }
   });
 

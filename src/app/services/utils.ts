@@ -101,6 +101,9 @@ export function isRefEntity(obj: DatabaseObject): obj is ReferenceEntity {
   return ReferenceEntityClasses.has(obj.schemaClass);
 }
 
+export function isReferenceEntityStId(id: string | undefined | null): boolean {
+  return id?.includes(':') || false
+}
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
   return obj.schemaClass === SchemaClasses.EWAS;
 }
