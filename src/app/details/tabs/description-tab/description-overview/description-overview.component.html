@@ -11,19 +11,20 @@
       <div class="label">Type</div>
       <div class="value">
         <!-- Display category for RLE -->
-        <ng-container *ngIf="category; else showClassName">
+        @if (category()) {
+          @if (obj().schemaClass === 'FailedReaction') {
+            Failed
+          }
           {{ category() | titlecase }} {{ className() }}
-          <ng-container *ngIf="obj().schemaClass === 'Polymerisation' || obj().schemaClass === 'Depolymerisation'">
+          @if (obj().schemaClass === 'Polymerisation' || obj().schemaClass === 'Depolymerisation') {
             &middot; <span class='italic'>{{ obj().schemaClass }}</span>
-          </ng-container>
-        </ng-container>
-
-        <ng-template #showClassName>
+          }
+        } @else {
           {{ className() === 'TopLevelPathway' ? 'Pathway' : className() }}
-          <ng-container *ngIf="obj().schemaClass !== className()">
+          @if (obj().schemaClass !== className()) {
             [{{ obj().schemaClass }}]
-          </ng-container>
-        </ng-template>
+          }
+        }
       </div>
     </div>
 
@@ -92,14 +93,18 @@
     @if (tissue()) {
       <div class="row">
         <div class="label">Tissue</div>
-        <div class="value"><cr-ontology-term [term]="tissue()"/> </div>
+        <div class="value">
+          <cr-ontology-term [term]="tissue()"/>
+        </div>
       </div>
     }
 
     @if (tissueLayer()) {
       <div class="row">
         <div class="label">Tissue Layer</div>
-        <div class="value"><cr-ontology-term [term]="tissueLayer()"/></div>
+        <div class="value">
+          <cr-ontology-term [term]="tissueLayer()"/>
+        </div>
       </div>
     }
 
@@ -122,7 +127,7 @@
   @if (summations()) {
     <div class="row">
       <div class="label">Summation</div>
-      <div class="value flex-grow" >
+      <div class="value flex-grow">
         @for (summation of summations(); track $index) {
           <div [innerHTML]="summation.text | includeRef: allRefs()" [class.columns]="summation.text.length > 500"></div>
 

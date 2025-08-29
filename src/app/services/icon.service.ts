@@ -5,6 +5,7 @@ import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {isExactlyCellLineagePath, isEWAS, isRLE} from "./utils";
 import {DatabaseObject} from "../model/graph/database-object.model";
+import {SchemaClasses} from "../constants/constants";
 
 
 @Injectable({
@@ -244,7 +245,14 @@ export class IconService {
     }
 
     if (!key || !this.reactomeSubjectIcons[key]) console.warn("Failed to retrieve icon for", obj)
-    return this.reactomeSubjectIcons[key] || defaultIcon;
+    let details = this.reactomeSubjectIcons[key] || defaultIcon;
+    if (typeof obj !== "string" && isRLE(obj) && obj.schemaClass === SchemaClasses.FAILED_REACTION)
+      details = {
+        tooltip: "Failed " + details.tooltip,
+        name: "failed-reaction",
+        route: 'failed-reaction'
+      }
+    return details;
   }
 
 
