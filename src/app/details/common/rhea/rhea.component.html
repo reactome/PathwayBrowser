@@ -1,48 +1,63 @@
 <div class="container">
-  @for (row of rheaResources(); track row.id) {
+  @for (row of rheaResources(); let i = $index; track row.id) {
+
     <div class="row">
       <div class="label-container"><a [href]="row.url" target="_blank"> RHEA {{ row.id }}</a></div>
       <div class="composition-container">
 
-        <!--        <div class="equation">{{ row.equation }}</div>-->
-        <div class="rhea-reaction-wrapper">
-          <div class="rhea-reaction">
-            @for (item of row.participants; track item.uniqueId; let i = $index; let last = $last) {
-              @let size = row.participants.length;
-              <div class="participant">
-                <span>{{ item.label }} </span>
-                <span><a [href]="`https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:${item.id}`"
-                         target="_blank">{{ item.id }}</a></span>
-                <div [class.structure-size]="size > 3 ? 'structure-size' : ''"
-                     [innerHTML]="structuredSVGs().get(item.id) || '' | safe: 'html':true"></div>
-              </div>
-
-              <!--          <ng-container *ngIf="!last">-->
-                <!--            <ng-container *ngIf="item.side === 'left' && row.participants[i+1]?.side === 'right'">-->
-                <!--              =-->
-                <!--            </ng-container>-->
-                <!--            <ng-container *ngIf="item.side === row.participants[i+1]?.side">-->
-                <!--              +-->
-                <!--            </ng-container>-->
-                <!--          </ng-container>-->
-
-              @if (!last) {
-                @if (item.position === 'left' && row.participants[i + 1].position === 'right') {
-                  @if (size === 2) {
-                    <div class="connector">=</div>
-                  } @else {
-                    <div class="connector">=></div>
-                  }
-                }
-
-                @if (item.position === row.participants[i + 1].position) {
-                  <div class="connector">+</div>
-                }
-              }
-
-            }
-          </div>
+        <div class="rhea-widget">
+          <rhea-visualizer [attr.rheaid]="row.id"></rhea-visualizer>
         </div>
+
+        <!--todo: remove it when dropping it-->
+        <!--****** CUSTOM LAYOUT-->
+        <!--        <div class="rhea-reactions" #reactionContainer-->
+
+        <!--             [ngStyle]="{-->
+        <!--           'display': 'grid',-->
+        <!--           'grid-template-rows': 'auto auto',-->
+        <!--           'grid-gap': '0',-->
+        <!--           'grid-template-columns': layouts()[i]?.columns || 'repeat(' + row.participants.length + ', 1fr)',-->
+        <!--           'grid-template-areas': layouts()[i]?.areas || 'none'-->
+        <!--         }">-->
+
+        <!--          <div class='structure-size chebi-background'-->
+        <!--               [innerHTML]="structuredSVGs().get(row.id) || '' | safe: 'html':true" [ngStyle]="{-->
+        <!--             'grid-column': '1 / -1',-->
+        <!--             'grid-row': '1',-->
+        <!--             'margin-top': '20px'-->
+        <!--           }"></div>-->
+
+        <!--          @for (item of row.participants; track item.uniqueId; let j = $index; let last = $last) {-->
+        <!--            @let size = row.participants.length;-->
+        <!--            &lt;!&ndash;              @let id = item.idprefix === 'chebi' ? item.id : item.reactivePart[0].id;&ndash;&gt;-->
+        <!--            <div class="participant" [ngStyle]="{'grid-area': 'p' + j}">-->
+        <!--                <span class="label"><a [href]="`https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:${item.id}`"-->
+        <!--                                       target="_blank">{{ item.label }} </a> </span>-->
+        <!--              &lt;!&ndash;                <span><a [href]="`https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:${item.id}`"&ndash;&gt;-->
+        <!--              &lt;!&ndash;                         target="_blank">CHEBI:{{ item.id }}</a></span>&ndash;&gt;-->
+        <!--              &lt;!&ndash;                                <div [class.structure-size]="size > 3"&ndash;&gt;-->
+        <!--              &lt;!&ndash;                                     [innerHTML]="structuredSVGs().get(row.id) || '' | safe: 'html':true"></div>&ndash;&gt;-->
+        <!--            </div>-->
+
+        <!--            &lt;!&ndash;              @if (!last) {&ndash;&gt;-->
+        <!--              &lt;!&ndash;                @if (item.position === 'left' && row.participants[j + 1].position === 'right') {&ndash;&gt;-->
+        <!--              &lt;!&ndash;                  @if (size === 2) {&ndash;&gt;-->
+        <!--              &lt;!&ndash;                    <div class="connector">=</div>&ndash;&gt;-->
+        <!--              &lt;!&ndash;                  } @else {&ndash;&gt;-->
+        <!--              &lt;!&ndash;                    <div class="connector">=></div>&ndash;&gt;-->
+        <!--              &lt;!&ndash;                  }&ndash;&gt;-->
+        <!--              &lt;!&ndash;                }&ndash;&gt;-->
+
+        <!--              &lt;!&ndash;                @if (item.position === row.participants[j + 1].position) {&ndash;&gt;-->
+        <!--              &lt;!&ndash;                  <div class="connector">+</div>&ndash;&gt;-->
+        <!--              &lt;!&ndash;                }&ndash;&gt;-->
+        <!--              &lt;!&ndash;              }&ndash;&gt;-->
+        <!--          }-->
+        <!--        </div>-->
+        <!--******-->
+
+
       </div>
     </div>
   }

@@ -94,6 +94,7 @@
   <cr-cross-references [crossRefs]=crossReference()></cr-cross-references>
 </ng-template>
 
+<!-- rhea structure -->
 <ng-template #rheaTemplate>
   <cr-rhea [crossRefs]=crossReference()></cr-rhea>
 </ng-template>
@@ -111,7 +112,7 @@
 
 <!-- External Reference -->
 <ng-template #referenceTemplate>
-  <cr-external-reference [referenceEntity]=referenceEntity()!></cr-external-reference>
+  <cr-external-reference [referenceEntity]=referenceEntity() [xRefs]="crossReference()"></cr-external-reference>
 </ng-template>
 
 

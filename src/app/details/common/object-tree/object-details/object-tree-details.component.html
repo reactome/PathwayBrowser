@@ -1,23 +1,27 @@
 <div class="details-content-container">
 
-  <!-- provide more details for the selectable object on details tab, protein structure only, overview,  externalRefs, xRefs-->
+  <!-- provide more details for the selectable object on details tab,overview,  externalRefs(including structure for protein and chemical), xRefs-->
   @if (!isMoleculeView()) {
-    @if (hasProteinStructureOnDetail()) {
-      <cr-structure-viewer [obj]=refEntity()! [xRefs]="xRefs()"
-                           [moleculeType]="MoleculeType.PROTEIN">
 
-      </cr-structure-viewer>
-      <mat-divider></mat-divider>
-    }
+<!--    Structure has been moved to external reference-->
+<!--    @if (hasProteinStructureOnDetail()) {-->
+<!--      <cr-structure-viewer [obj]=refEntity()! [xRefs]="xRefs()"-->
+<!--                           [moleculeType]="MoleculeType.PROTEIN">-->
+
+<!--      </cr-structure-viewer>-->
+<!--      <mat-divider></mat-divider>-->
+<!--    }-->
+
     <!-- Details content -->
     <cr-description-overview [obj]="obj()" [showSpecies]="false"></cr-description-overview>
     <!-- External Reference -->
     @if (refEntity()) {
       <mat-divider></mat-divider>
-      <cr-external-reference [referenceEntity]=refEntity()!></cr-external-reference>
+      <cr-external-reference [referenceEntity]=refEntity()! [xRefs]="xRefs()"></cr-external-reference>
     }
+
   } @else {
-    <!-- provide molecule details on molecule tab, structure for protein and chemical and xRefs-->
+    <!-- provide molecule details on molecule tab, structure for protein/chemical and xRefs-->
     @if (hasStructureOnMolecule()) {
       <cr-structure-viewer [obj]=obj()
                            [xRefs]="xRefs()"

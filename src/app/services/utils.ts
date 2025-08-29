@@ -20,6 +20,7 @@ import {Publication} from "../model/graph/publication/publication.model";
 import {Book} from "../model/graph/publication/book.model";
 import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.model";
 import {Molecule} from "./participant.service";
+import {SimpleEntity} from "../model/graph/physical-entity/simple-entity.model";
 import {SummaryEntity} from "../model/graph/physical-entity/summary-entity.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -102,6 +103,10 @@ export function isRefEntity(obj: DatabaseObject): obj is ReferenceEntity {
 
 export function isEWAS(obj: DatabaseObject): obj is EntityWithAccessionedSequence {
   return obj.schemaClass === SchemaClasses.EWAS;
+}
+
+export function isChemical(obj: DatabaseObject): obj is SimpleEntity {
+  return obj.schemaClass === SchemaClasses.SIMPLE_ENTITY;
 }
 
 const reactionLikeEventClasses: Set<string> = new Set([

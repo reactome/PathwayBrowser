@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, computed, effect, input, model, signal, ViewChild} from '@angular/core';
-import {isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
+import {isChemical, isEvent, isEWAS, isMolecule, isPathway, isRLE, isSelectableObject} from "../../../services/utils";
 import {
   MatNestedTreeNode,
   MatTree,
@@ -567,13 +567,13 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
 
   getUrl(element: E): string {
-    if (isEWAS(element) && element.referenceEntity?.url) {
+    if ((isEWAS(element) || isChemical(element)) && element.referenceEntity?.url) {
       return element.referenceEntity.url;
     }
-    if (isMolecule(element)) {
+    if (this.moleculeView() && isMolecule(element)) {
       return element.url
     }
-    // Non proteins or molecule, linking to details page
+    // Not proteins/chemical or molecule, linking to details page
     return `/content/detail/${element.stId}`;
   }
 

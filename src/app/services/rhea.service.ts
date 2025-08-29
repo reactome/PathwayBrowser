@@ -18,6 +18,8 @@ export interface Participant {
   label: string;
   position: string;
   uniqueId: string;
+  idprefix: string; // rhea-comp | chebi , backend returns idprefix
+  reactivePart: Participant[];
 }
 
 
