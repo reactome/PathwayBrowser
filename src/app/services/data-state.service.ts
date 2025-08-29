@@ -155,12 +155,13 @@ export class DataStateService {
     });
   }
 
-  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null, fetchIncomingRelationships = true): Observable<T | undefined> {
+  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null, fetchIncomingRelationships = true, summariseReferenceEntity = true): Observable<T | undefined> {
     let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}`;
     if (id === null) return of();
     return this.http.get<T>(url, {
       params: {
         fetchIncomingRelationships,
+        summariseReferenceEntity,
         includeRef: true,
         view: 'nested-aggregated'
       }
@@ -168,9 +169,14 @@ export class DataStateService {
   }
 
   fetchAncestors(stId: string | null): Observable<Pathway[]> {
-    let url = `${CONTENT_SERVICE}/data/event/${stId}/ancestors?includeRef=true&view=nested-aggregated`;
+    let url = `${CONTENT_SERVICE}/data/event/${stId}/ancestors`;
     if (stId === null) return of();
-    return this.http.get<Pathway[][]>(url).pipe(
+    return this.http.get<Pathway[][]>(url, {
+      params: {
+        includeRef: true,
+        view: 'nested-aggregated'
+      }
+    }).pipe(
       map(ancestors => ancestors.flatMap(a => a.reverse())),
       map(this.flattenReferences))
   }

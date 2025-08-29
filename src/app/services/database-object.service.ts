@@ -19,16 +19,23 @@ export class DatabaseObjectService {
   public selectedObj$ = this._selectedObj.asObservable();
 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
 
   setCurrentObj(obj: DatabaseObject) {
     this._selectedObj.next(obj);
   }
 
-  fetchEnhancedEntry<T extends DatabaseObject>(stId: string): Observable<T> {
-    let url = `${this._ENHANCED_QUERY}${stId}?includeRef=true&view=nested-aggregated`;
-    return this.http.get<T>(url).pipe(
+  fetchEnhancedEntry<T extends DatabaseObject>(stId: string, summariseReferenceEntity = false): Observable<T> {
+    let url = `${this._ENHANCED_QUERY}${stId}`;
+    return this.http.get<T>(url, {
+      params: {
+        includeRef: true,
+        view: 'nested-aggregated',
+        summariseReferenceEntity
+      }
+    }).pipe(
       map((response: T) => {
         const deserializer = new JSOGDeserializer();
         const resolvedResponse = deserializer.deserialize(response);
