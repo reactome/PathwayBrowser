@@ -22,9 +22,15 @@ import {ReferenceEntity} from "../model/graph/reference-entity/reference-entity.
 import {Molecule} from "./participant.service";
 import {SimpleEntity} from "../model/graph/physical-entity/simple-entity.model";
 import {SummaryEntity} from "../model/graph/physical-entity/summary-entity.model";
+import {ReferenceSequence} from "../model/graph/reference-entity/reference-sequence.model";
+import {ReferenceGeneProduct} from "../model/graph/reference-entity/reference-gene-product.model";
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
+}
+
+export function isDefinedAndNotEmpty<T>(value: T[] | undefined | null): value is T[] {
+  return value !== undefined && value !== null && value.length > 0
 }
 
 export function groupAndSortBy<E, K>(elements: E[], getKey: (element: E) => K, orderBy: (key1: K, key2: K) => number): {
@@ -184,6 +190,18 @@ export function isReferenceGroup(obj: DatabaseObject): obj is ReferenceGroup {
 
 export function isReferenceMolecule(obj: DatabaseObject): obj is ReferenceMolecule {
   return obj.schemaClass === SchemaClasses.REFERENCE_MOLECULE
+}
+
+const referenceSequenceClasses: Set<string> = new Set([SchemaClasses.REFERENCE_SEQUENCE, SchemaClasses.REFERENCE_DNA_SEQUENCE, SchemaClasses.REFERENCE_DNA_SEQUENCE, SchemaClasses.REFERENCE_GENE_PRODUCT, SchemaClasses.REFERENCE_ISOFORM]);
+
+export function isReferenceSequence(obj: DatabaseObject): obj is ReferenceSequence {
+  return referenceSequenceClasses.has(obj.schemaClass);
+}
+
+const referenceGeneProductClasses: Set<string> = new Set([SchemaClasses.REFERENCE_GENE_PRODUCT, SchemaClasses.REFERENCE_ISOFORM]);
+
+export function isReferenceGeneProduct(obj: DatabaseObject): obj is ReferenceGeneProduct {
+  return referenceGeneProductClasses.has(obj.schemaClass);
 }
 
 export function isRefOrBook(publication: Publication): publication is LiteratureReference | Book {

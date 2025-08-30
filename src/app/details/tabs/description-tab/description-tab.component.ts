@@ -1,7 +1,13 @@
 import {Component, computed, effect, input, signal, Signal, TemplateRef, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
-import {getProperty, groupAndSortBy, isPhysicalEntity, isReferenceSummary} from "../../../services/utils";
+import {
+  getProperty,
+  groupAndSortBy, isDefinedAndNotEmpty,
+  isPhysicalEntity,
+  isReferenceSequence,
+  isReferenceSummary
+} from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
 import {ActivatedRoute} from "@angular/router";
@@ -54,12 +60,37 @@ export class DescriptionTabComponent {
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
   readonly section = toSignal(this.route.fragment);
-  readonly name = computed(() =>
-    this.obj().name
-      ? isArray(this.obj().name)
-        ? this.obj().name[0]
-        : this.obj().name
-      : this.obj().displayName);
+
+  static referenceTypeToNameSuffix = new Map<string, string>([
+      ["ReferenceMolecule", ""],
+      ["ReferenceGeneProduct", ""],
+      ["ReferenceDNASequence", " Gene"],
+      ["ReferenceRNASequence", " mRNA"],
+      ["ReferenceTherapeutic", " Drug"]
+    ]
+  );
+
+  readonly name = computed(() => {
+    const obj = this.obj();
+
+    let name = obj.name
+      ? isArray(obj.name)
+        ? obj.name[0]
+        : obj.name
+      : obj.displayName;
+
+    if (isReferenceSummary(obj)) {
+      const suffix = DescriptionTabComponent.referenceTypeToNameSuffix.get(obj.referenceEntity.schemaClass)
+      if (
+        isReferenceSequence(obj.referenceEntity) &&
+        isDefinedAndNotEmpty(obj.referenceEntity.geneName)
+      ) name = obj.referenceEntity.geneName[0];
+      return name + suffix;
+    }
+
+    return name
+  })
+
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
   readonly groupedReferences = computed(() => groupAndSortBy(this.literatureRefs(), ref => ref.year, (key1, key2) => key2 - key1));
@@ -129,7 +160,7 @@ export class DescriptionTabComponent {
 
   repeatedUnits: Signal<PhysicalEntity[]> = computed(() => getProperty(this.obj(), DataKeys.REPEATED_UNIT))
 
-  hasRhea = computed(()=>  ["RHEA", "Rhea"].includes(this.crossReference()[0]?.databaseName));
+  hasRhea = computed(() => ["RHEA", "Rhea"].includes(this.crossReference()[0]?.databaseName));
 
   overview$ = viewChild<HTMLDivElement>('overview');
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
