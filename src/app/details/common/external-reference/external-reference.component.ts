@@ -34,10 +34,7 @@ export class ExternalReferenceComponent {
   readonly displayReference = input<boolean>(true);
 
   externalRef = computed(() => {
-    const ref = this.referenceEntity();
-    if (!ref) return [];
-
-    return this.entity.getTransformedExternalRef(ref);
+    return this.entity.getTransformedExternalRef(this.referenceEntity());
   });
 
   moleculeType = computed(() => {
