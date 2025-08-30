@@ -158,7 +158,7 @@
               "buildTarget": "pathway-browser:build:remote"
             }
           },
-          "defaultConfiguration": "local"
+          "defaultConfiguration": "remote"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
