@@ -19,7 +19,7 @@ export interface PhysicalEntity extends DatabaseObject {
   cellType: CellType[];
   componentOf: Relationship.ComponentOf[];
   consumedByEvent: Relationship.InputOf[];
-  crossReference: DatabaseIdentifier[];
+  crossReference?: DatabaseIdentifier[];
   inferredTo: PhysicalEntity[];
   inferredFrom: PhysicalEntity[];
   inDisease?: Boolean;
