@@ -3,7 +3,8 @@ import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {
   getProperty,
-  groupAndSortBy, isDefinedAndNotEmpty,
+  groupAndSortBy,
+  isDefinedAndNotEmpty,
   isPhysicalEntity,
   isReferenceSequence,
   isReferenceSummary
@@ -85,7 +86,7 @@ export class DescriptionTabComponent {
         isReferenceSequence(obj.referenceEntity) &&
         isDefinedAndNotEmpty(obj.referenceEntity.geneName)
       ) name = obj.referenceEntity.geneName[0];
-      return name + suffix;
+      return (obj.referenceEntity.schemaClass === 'ReferenceIsoform') ? `${name} Isoform ${obj.variantIdentifier} ` : name + suffix;
     }
 
     return name

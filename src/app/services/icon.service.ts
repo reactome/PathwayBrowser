@@ -226,7 +226,7 @@ export class IconService {
 
   getIconDetails(obj: DatabaseObject | string): { name: string; tooltip?: string; route?: string } {
 
-    const defaultIcon = {name: '?', tooltip: obj};
+    const defaultIcon = {name: '?', tooltip: '' + obj};
 
     let key: string | undefined;
 
@@ -245,7 +245,7 @@ export class IconService {
     }
 
     if (!key || !this.reactomeSubjectIcons[key]) console.warn("Failed to retrieve icon for", obj)
-    let details = this.reactomeSubjectIcons[key] || defaultIcon;
+    let details = key && this.reactomeSubjectIcons[key] || defaultIcon;
     if (typeof obj !== "string" && isRLE(obj) && obj.schemaClass === SchemaClasses.FAILED_REACTION)
       details = {
         tooltip: "Failed " + details.tooltip,
