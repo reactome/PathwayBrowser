@@ -167,7 +167,7 @@ export class DataStateService {
     summariseReferenceEntity: boolean,
     includeDisease: boolean
   }>): Observable<T | undefined> {
-    let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}`;
+    let url = `${CONTENT_SERVICE}/data/query/enhanced/v2/${id}`;
     if (id === null) return of();
     if (!isReferenceEntityStId(id.toString()) && params) params.includeDisease = true; // Always include disease data for non summary elements
 

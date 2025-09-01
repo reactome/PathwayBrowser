@@ -11,7 +11,7 @@ import {HttpClient} from "@angular/common/http";
 export class DatabaseObjectService {
 
 
-  private readonly _ENHANCED_QUERY = `${CONTENT_SERVICE}/data/query/enhanced/`;
+  private readonly _ENHANCED_QUERY = `${CONTENT_SERVICE}/data/query/enhanced/v2/`;
   private readonly _DATA_QUERY = `${CONTENT_SERVICE}/data/query/`;
 
 
