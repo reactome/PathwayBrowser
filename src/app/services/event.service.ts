@@ -357,7 +357,7 @@ export class EventService {
   private buildTreeWithSelectedEvent(object: Event, diagramId: string | undefined, isFromDiagram: boolean, tree: MatTree<Event, string>, hitReactions: number[]): Observable<Event[]> {
     // When selected event is a subpathway or interacting pathway
     const idToBuild = isFromDiagram
-      ? (isPathway(object) && object.stId != diagramId ? diagramId : object.stId)
+      ? (isPathway(object) && object.stId != diagramId ? object.stId : diagramId)
       : object.stId;
     this.dboService.setCurrentObj(object);
 
