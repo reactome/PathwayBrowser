@@ -115,7 +115,7 @@
             <cr-object-tree-details [obj]="element"
                                     [className]="element.className"
                                     [isMoleculeView]="moleculeView()"
-                                    [refEntity]="element.referenceEntity"
+                                    [refEntity]="element.referenceEntity || isRefEntity(element) ? element : undefined"
                                     [xRefs]="element.crossReference ?? []"
                                     [isLoading]="_selectedTreeNodeData.isLoading()"/>
           </mat-nested-tree-node>
