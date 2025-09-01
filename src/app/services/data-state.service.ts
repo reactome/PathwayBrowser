@@ -64,7 +64,7 @@ export class DataStateService {
       id: this.state.select() || this.state.pathwayId(),
       summariseDisease: this.state.summariseDisease()
     }),
-    loader: (params) => !params.request.id ? of() : this.fetchEnhancedData<SelectableObject>(params.request.id, {includeDisease: params.request.summariseDisease})
+    loader: (params) => !params.request.id ? of() : this.fetchEnhancedData<SelectableObject>(params.request.id, {includeDisease: params.request.summariseDisease === true})
   })
 
   public selectedElement = this._selectedElement.asReadonly().value
