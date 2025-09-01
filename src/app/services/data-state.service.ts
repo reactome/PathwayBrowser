@@ -42,7 +42,8 @@ export class DataStateService {
     request: () => this.state.pathwayId(),
     loader: (params) => this.fetchEnhancedData<Pathway>(params.request, {
       summariseReferenceEntity: false,
-      fetchIncomingRelationships: false
+      fetchIncomingRelationships: false,
+      includeDisease: true
     })
   })
 
@@ -172,7 +173,7 @@ export class DataStateService {
       params: {
         fetchIncomingRelationships: true,
         summariseReferenceEntity: true,
-        includeDisease: false,
+        includeDisease: true,
         ...params,
         includeRef: true,
         view: 'nested-aggregated'
