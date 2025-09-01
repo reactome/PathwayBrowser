@@ -33,7 +33,8 @@ export class DatabaseObjectService {
       params: {
         includeRef: true,
         view: 'nested-aggregated',
-        summariseReferenceEntity
+        summariseReferenceEntity,
+        includeDisease: true,
       }
     }).pipe(
       map((response: T) => {

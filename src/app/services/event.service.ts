@@ -273,11 +273,11 @@ export class EventService {
         const ancestorIds = new Set(selectedReaction.ancestors.map(a => a.stId));
         allVisibleTreeNodes
           .filter(node => !ancestorIds.has(node.stId))
-          .forEach( node => {
-            node.isSelected = false
-            tree.collapse(node);
-          }
-        )
+          .forEach(node => {
+              node.isSelected = false
+              tree.collapse(node);
+            }
+          )
         this.setBreadcrumbs(selectedReaction.ancestors);
       }
     }
@@ -430,7 +430,6 @@ export class EventService {
 
     return from(ancestors).pipe(
       concatMap((ancestor, index) => {
-
         // Search in last matched event's children or full tree
         const treeEventResources = this.lastMatchedEvent && isPathway(this.lastMatchedEvent) ? this.lastMatchedEvent.events?.map(e => e.element) : tree;
         let targetTreeEvent = this.findTreeEvent(treeEventResources, ancestor.stId);
