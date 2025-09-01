@@ -33,6 +33,7 @@ import {
 import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
 import {camelCase, isArray} from "lodash";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
+import {UrlStateService} from "../../../services/url-state.service";
 
 
 @Component({
@@ -70,6 +71,8 @@ export class DescriptionTabComponent {
       ["ReferenceTherapeutic", " Drug"]
     ]
   );
+
+  readonly isReferenceSummary = computed(() => isReferenceSummary(this.obj()));
 
   readonly name = computed(() => {
     const obj = this.obj();
@@ -307,6 +310,7 @@ export class DescriptionTabComponent {
               private route: ActivatedRoute,
               private entity: EntityService,
               private interactorService: InteractorService,
+              public state: UrlStateService
   ) {
     effect(() => {
       !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({

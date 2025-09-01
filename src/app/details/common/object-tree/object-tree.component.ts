@@ -223,7 +223,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       // Check the condition to determine which method to call
       // Protein
       if (!this.isNestedView(selectedNode)) {
-        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request, false).pipe(map(result => result as unknown as E));
+        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request, {fetchIncomingRelationships: false, summariseReferenceEntity: false}).pipe(map(result => result as unknown as E));
       } else {
         // PE -> Complex and Set
         return this.inDepth(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1

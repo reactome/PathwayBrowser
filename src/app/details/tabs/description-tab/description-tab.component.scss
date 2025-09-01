@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 #details {
 
   overflow-y: auto;
@@ -325,4 +327,27 @@
   .padding {
     padding: 4px 0;
   }
+}
+
+.disease {
+  margin-left: 10px;
+  @include mat.slide-toggle-overrides((
+    track-width: 38px,
+    track-height: 26px,
+    with-icon-handle-size: 18px,
+    pressed-handle-size: 18px,
+    selected-with-icon-handle-horizontal-margin: 0 16px,
+    selected-pressed-handle-horizontal-margin: 0 16px,
+
+    label-text-font: var(--mat-sys-label-large-font),
+    label-text-size: var(--mat-sys-label-large-size),
+    label-text-weight: var(--mat-sys-label-large-weight),
+
+    selected-track-color: var(--error),
+    selected-pressed-track-color: var(--error),
+    selected-hover-track-color: var(--error),
+    selected-focus-track-color: var(--error),
+    selected-focus-handle-color: var(--error-container),
+    selected-hover-handle-color: var(--error-container),
+  ));
 }

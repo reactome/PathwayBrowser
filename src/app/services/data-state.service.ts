@@ -40,7 +40,10 @@ type FlaggingResult = {
 export class DataStateService {
   _currentPathway = rxResource({
     request: () => this.state.pathwayId(),
-    loader: (params) => this.fetchEnhancedData<Pathway>(params.request)
+    loader: (params) => this.fetchEnhancedData<Pathway>(params.request, {
+      summariseReferenceEntity: false,
+      fetchIncomingRelationships: false
+    })
   })
 
   public currentPathway = computed(() => {
@@ -57,8 +60,11 @@ export class DataStateService {
   })
 
   private _selectedElement = rxResource({
-    request: () => this.state.select() || this.state.pathwayId(),
-    loader: (params) => this.fetchEnhancedData<SelectableObject>(params.request)
+    request: () => ({
+      id: this.state.select() || this.state.pathwayId(),
+      summariseDisease: this.state.summariseDisease()
+    }),
+    loader: (params) => !params.request.id ? of() : this.fetchEnhancedData<SelectableObject>(params.request.id, {includeDisease: params.request.summariseDisease})
   })
 
   public selectedElement = this._selectedElement.asReadonly().value
@@ -155,13 +161,19 @@ export class DataStateService {
     });
   }
 
-  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null, fetchIncomingRelationships = true, summariseReferenceEntity = true): Observable<T | undefined> {
+  fetchEnhancedData<T extends DatabaseObject>(id: string | number | null, params?: Partial<{
+    fetchIncomingRelationships: boolean,
+    summariseReferenceEntity: boolean,
+    includeDisease: boolean
+  }>): Observable<T | undefined> {
     let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}`;
     if (id === null) return of();
     return this.http.get<T>(url, {
       params: {
-        fetchIncomingRelationships,
-        summariseReferenceEntity,
+        fetchIncomingRelationships: true,
+        summariseReferenceEntity: true,
+        includeDisease: false,
+        ...params,
         includeRef: true,
         view: 'nested-aggregated'
       }

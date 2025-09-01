@@ -56,6 +56,7 @@ export class UrlStateService implements State {
     maxExpressionFilter: urlParam<number | undefined>(undefined, "number"),
     fdrFilter: urlParam<number | undefined>(undefined, "number"),
     gsaFilter: urlParam<number[]>([], "number"),
+    summariseDisease: urlParam<boolean | undefined>(undefined, "boolean"),
   };
 
   public readonly select = this.values.select
@@ -78,6 +79,7 @@ export class UrlStateService implements State {
   public readonly maxExpressionFilter = this.values.maxExpressionFilter
   public readonly fdrFilter = this.values.fdrFilter
   public readonly gsaFilter = this.values.gsaFilter
+  public readonly summariseDisease = this.values.summariseDisease
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 

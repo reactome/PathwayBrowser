@@ -23,8 +23,11 @@
         </mat-icon>
         <span class="name">
             {{ name() }}
-          @if (obj().schemaClass === 'SummaryEntity') {
+          @if (isReferenceSummary()) {
             · <i>summary</i>
+            <mat-slide-toggle class="disease" [(ngModel)]="state.summariseDisease">
+              Include disease data
+            </mat-slide-toggle>
           }
           </span>
       </div>
