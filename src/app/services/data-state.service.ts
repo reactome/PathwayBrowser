@@ -169,6 +169,8 @@ export class DataStateService {
   }>): Observable<T | undefined> {
     let url = `${CONTENT_SERVICE}/data/query/enhanced/${id}`;
     if (id === null) return of();
+    if (!isReferenceEntityStId(id.toString()) && params) params.includeDisease = true; // Always include disease data for non summary elements
+
     return this.http.get<T>(url, {
       params: {
         fetchIncomingRelationships: true,
