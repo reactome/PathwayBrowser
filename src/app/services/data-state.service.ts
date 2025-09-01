@@ -42,7 +42,7 @@ export class DataStateService {
     request: () => this.state.pathwayId(),
     loader: (params) => this.fetchEnhancedData<Pathway>(params.request, {
       summariseReferenceEntity: false,
-      fetchIncomingRelationships: false,
+      fetchIncomingRelationships: true, // needed for compare mode
       includeDisease: true
     })
   })
