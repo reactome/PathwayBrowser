@@ -228,7 +228,7 @@ export class ViewportComponent implements AfterViewInit {
   }
 
   openCitationDialog() {
-  this.citation.openDialog();
+    this.citation.openDialog();
   }
 
   protected readonly drop = drop;

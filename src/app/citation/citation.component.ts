@@ -36,9 +36,9 @@ export class CitationComponent {
 
   data: Citation = inject(MAT_DIALOG_DATA);
 
-  citationContent = computed(() => this.data.content());
-  id = computed(() => this.data.id());
-  downloadItems = computed(() => this.data.downloadItems());
+  id = this.data.id
+  citationContent =  this.data.content
+  downloadItems = this.data.downloadItems
 
   copyLabel = signal('Copy');
   copyIcon = signal('content_copy');

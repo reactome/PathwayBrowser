@@ -48,15 +48,13 @@ export class CitationService {
   readonly dialog = inject(MatDialog);
 
   currentCitationId = signal<string | undefined>(undefined);
+  currentCitationExportURLS = computed(() => this.currentCitationId() ? this.getExportUrls(this.currentCitationId()!) : [])
   currentDate = new Date().toDateString();
 
   constructor(private http: HttpClient,
               private dataState: DataStateService,
               private analysis: AnalysisService,) {
 
-    effect(() => {
-      this.currentCitationId.set(this.updatedCitationId())
-    });
   }
 
   updatedCitationId() {
@@ -68,7 +66,7 @@ export class CitationService {
       const selected = this.dataState.selectedElement();
       if (selected && isPathway(selected)) return selected.stId;
 
-      // Fallback for  no pathway/selection
+      // Fallback for no pathway/selection
       return StaticCitation.REACTOME_KNOWLEDGEBASE_ID;
     }
     // If analysis results exist
@@ -88,10 +86,7 @@ export class CitationService {
 
 
   citationData = rxResource({
-    request: () => {
-      const id = this.updatedCitationId();
-      return id ?? undefined;
-    },
+    request: this.currentCitationId,
     loader: (params) => this.getCitation(params.request)
   })
 
@@ -103,13 +98,14 @@ export class CitationService {
 
   openDialog() {
     const citation = this.citationData.value();
+    this.currentCitationId.set(this.updatedCitationId());
     const id = this.currentCitationId();
     if (citation && id) {
       const dialogRef = this.dialog.open(CitationComponent, {
         data: {
           content: this.citationData.value,
-          id: this.currentCitationId(),
-          downloadItems: signal(this.getExportUrls(id))
+          id: this.currentCitationId,
+          downloadItems: this.currentCitationExportURLS
         },
         enterAnimationDuration: '450ms',
         exitAnimationDuration: '450ms',
