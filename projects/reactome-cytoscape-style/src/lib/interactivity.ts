@@ -291,7 +291,7 @@ export class Interactivity {
   }
 
   removeStructureContainer(loadingContainer: HTMLElement, node: cytoscape.NodeSingular) {
-    console.log('Remove structure container', loadingContainer, node)
+    // console.log('Remove diagram structure container because not found', loadingContainer, node)
     loadingContainer.classList.remove('loading')
 
     let baseFontSize = extract(this.properties.font.size);
@@ -345,16 +345,12 @@ export class Interactivity {
                 svg.setAttribute("viewBox", `${bbox.x - 1} ${bbox.y - 1} ${bbox.width + 2} ${bbox.height + 2}`);
                 elem.classList.remove('loading');
               })
-              .catch(e => {
-                console.error(e)
-                this.removeStructureContainer(elem, node);
-              })
+              .catch(e => this.removeStructureContainer(elem, node))
           }
 
           if (isPromise(structureId)) {
             structureId.then(initStructure)
           } else {
-            console.log(node, structureId)
             initStructure(structureId)
           }
 
