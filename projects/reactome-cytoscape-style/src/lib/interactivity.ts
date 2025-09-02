@@ -4,6 +4,7 @@ import {Properties} from "./properties";
 import {ReactomeEvent, ReactomeEventTypes} from "./model/reactome-event.model";
 import Layers, {IHTMLLayer, layers, LayersPlugin} from 'cytoscape-layers';
 import * as _ from "lodash";
+import {isPromise} from "rxjs/internal/util/isPromise";
 
 
 cytoscape.use(Layers)
@@ -20,9 +21,9 @@ export class Interactivity {
     this.initHover(cy);
     this.initSelect(cy);
     this.initClick(cy);
-    this.initStructureVideo(cy);
-    // this.initStructureMolecule(cy);
     this.initZoom(cy);
+    this.initStructureVideo(cy);
+    this.initStructureMolecule(cy);
   }
 
   expandReaction(reactionNode: cytoscape.NodeCollection) {
@@ -249,8 +250,8 @@ export class Interactivity {
                   let errors = 0;
                   const sources = video.querySelectorAll('source')!;
                   sources.forEach(source => source.addEventListener('error', (e) => {
-                    errors ++;
-                    if (errors === sources.length) this.removeProteinVideo(video, node)
+                    errors++;
+                    if (errors === sources.length) this.removeStructureContainer(video, node)
                   }));
 
                   video.load();
@@ -289,15 +290,17 @@ export class Interactivity {
       .on('mouseout', 'node.Protein', handler(v => v.pause()));
   }
 
-  removeProteinVideo(video: HTMLVideoElement, node: cytoscape.NodeSingular) {
-    video.classList.remove('loading')
+  removeStructureContainer(loadingContainer: HTMLElement, node: cytoscape.NodeSingular) {
+    console.log('Remove structure container', loadingContainer, node)
+    loadingContainer.classList.remove('loading')
+
     let baseFontSize = extract(this.properties.font.size);
     node.style({
       'font-size': baseFontSize,
       'text-margin-x': 0,
       'text-max-width': "100%",
     })
-    this.proteins = this.proteins.not(node);
+    this.structureContainers = this.structureContainers.not(node);
   };
 
   private moleculeLayer?: IHTMLLayer;
@@ -312,12 +315,49 @@ export class Interactivity {
     layers.renderPerNode(
       this.moleculeLayer,
       (elem: HTMLElement, node: cytoscape.NodeSingular) => {
-        elem.style.visibility = node.visible() ? 'visible' : 'hidden';
       },
       {
         init: (elem: HTMLElement, node: cytoscape.NodeSingular) => {
-          elem.innerHTML = node.data('html') || '';
+          elem.classList.add('molecule-structure')
+          elem.classList.add('loading')
+          const w = node.data('width') - 4; // retrieve border width
+          const h = node.data('height') - 4; // retrieve border width
+          const cos45 = 0.7071067811865476;
+          const margin = (1 - cos45) * (Math.min(h, w) / 2); // Margin to cut the rounded corner exactly at 45deg
+          elem.style.width = (w / 2) - margin + 'px';
+          elem.style.height = h - (2 * margin) + 'px';
           elem.style.display = "flex"
+
+          const structureId = node.data('chebiStructureId');
+          const initStructure = (id: number) => {
+            if (id === undefined) return this.removeStructureContainer(elem, node);
+            const svgURL = `https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}/`;
+            fetch(svgURL)
+              .then(res => res.text())
+              .then(res => {
+                elem.innerHTML = res;
+                const svg = elem.querySelector('svg');
+                if (!svg) return this.removeStructureContainer(elem, node);
+                // Remove white background
+                svg.querySelector('rect:first-of-type')?.remove()
+                // Readjust svg content to fit in the container
+                const bbox = svg.getBBox();
+                svg.setAttribute("viewBox", `${bbox.x - 1} ${bbox.y - 1} ${bbox.width + 2} ${bbox.height + 2}`);
+                elem.classList.remove('loading');
+              })
+              .catch(e => {
+                console.error(e)
+                this.removeStructureContainer(elem, node);
+              })
+          }
+
+          if (isPromise(structureId)) {
+            structureId.then(initStructure)
+          } else {
+            console.log(node, structureId)
+            initStructure(structureId)
+          }
+
         },
         transform: `translate(-100%, -50%)`,
         position: 'center',
@@ -342,11 +382,11 @@ export class Interactivity {
     Object.values(this.onZoom).forEach(onZoom => onZoom())
   }
 
-  proteins!: cytoscape.NodeCollection;
+  structureContainers!: cytoscape.NodeCollection;
 
   updateProteins() {
-    this.proteins = this.cy.nodes('.Protein')
-      // .or('.Molecule');
+    this.structureContainers = this.cy.nodes('.Protein')
+      .or('.Molecule');
   }
 
   initZoom(cy: cytoscape.Core) {
@@ -390,7 +430,7 @@ export class Interactivity {
       const maxWidth = this.interpolate(z, [this.p(zoomStart, 100), this.p(zoomEnd, 50)]);
       this.margin = this.interpolate(z, [this.p(zoomStart, 0), this.p(zoomEnd, 0.25)]);
       const fontSize = this.interpolate(z, [this.p(zoomStart, baseFontSize), this.p(zoomEnd, baseFontSize / 2)]);
-      this.proteins.style(
+      this.structureContainers.style(
         {
           'font-size': fontSize,
           'text-margin-x': (n: cytoscape.NodeSingular) => this.margin * n.data("width"),

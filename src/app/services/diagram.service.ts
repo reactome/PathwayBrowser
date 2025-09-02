@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {catchError, forkJoin, map, Observable, of, switchMap, tap} from "rxjs";
+import {catchError, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Diagram, Edge, Node, NodeConnector, Position, Prop, Rectangle} from "../model/diagram.model";
 import {Graph} from "../model/graph.model";
@@ -9,10 +9,10 @@ import {array} from "vectorious";
 
 import cytoscape from "cytoscape";
 import cytoscapeFcose, {FcoseLayoutOptions} from "cytoscape-fcose";
+import {CONTENT_SERVICE, DOWNLOAD, environment} from "../../environments/environment";
 import NodeDefinition = Reactome.Types.NodeDefinition;
 import ReactionDefinition = Reactome.Types.ReactionDefinition;
 import EdgeTypeDefinition = Reactome.Types.EdgeTypeDefinition;
-import {CONTENT_SERVICE, DOWNLOAD, environment} from "../../environments/environment";
 
 cytoscape.use(cytoscapeFcose)
 
@@ -180,12 +180,23 @@ export class DiagramService {
     )
   }
 
+  public getCHEBIStructureIds(ids: Set<string>): Map<string, Promise<number>> {
+    const chebiIds = [...ids];
+    const request$ = this.http.post<Record<string, any>>(`https://www.ebi.ac.uk/chebi/backend/api/public/compounds/`, {chebi_ids: chebiIds}).pipe(
+      shareReplay(1) // ensures all subscribers share the same request
+    );
+    return new Map<string, Promise<number>>(chebiIds.map(id => [
+      id,
+      firstValueFrom(request$.pipe(map(response => response[id]?.data?.default_structure?.id)))
+    ]));
+  }
+
   public getDiagram(id: number | string): Observable<cytoscape.ElementsDefinition> {
     return forkJoin({
       diagram: this.http.get<Diagram>(`${DOWNLOAD}/diagram/${id}.json`),
       graph: this.http.get<Graph.Data>(`${DOWNLOAD}/diagram/${id}.graph.json`)
     }).pipe(
-      tap(({diagram, graph}) => console.log('Normal diagram:', diagram, 'Normal graph', graph)),
+      tap(({diagram, graph}) => console.log('Original diagram:', diagram, 'Original graph', graph)),
       switchMap(({diagram, graph}) => {
         if (diagram.forNormalDraw !== undefined && !diagram.forNormalDraw) {
           return this.getNormalPathway(diagram.stableId).pipe(
@@ -217,8 +228,16 @@ export class DiagramService {
         }
       }),
       tap((mergedResponse) => console.log('All responses:', mergedResponse)),
-      map(({diagram, graph}) => {
-
+      map(mergedResponse => ({
+        ...mergedResponse,
+        chebiMapping: this.getCHEBIStructureIds(
+          new Set(mergedResponse.graph.nodes
+            .filter(node => node.standardIdentifier?.startsWith('chebi:'))
+            .map(node => node.identifier)
+          )
+        )
+      })),
+      map(({diagram, graph, chebiMapping}) => {
         console.log("edge.reactionType", new Set(diagram.edges.flatMap(edge => edge.reactionType)))
         console.log("node.connectors.types", new Set(diagram.nodes.flatMap(node => node.connectors.flatMap(con => con.type))))
         console.log("node.renderableClass", new Set(diagram.nodes.flatMap(node => node.renderableClass)))
@@ -418,11 +437,10 @@ export class DiagramService {
           let html = undefined;
           let width = scale(item.prop.width);
           let height = scale(item.prop.height);
-          let preferredId = unitId || idToGraphNodes.get(item.id)?.identifier;
+          let preferredId = unitId || idToGraphNodes.get(item.id)!.identifier;
+          let chebiStructureId = chebiMapping.get(preferredId)!
           if (classes.some(clazz => clazz === 'Protein')) {
             html = this.getStructureVideoHtml({...item, type: 'Protein'}, width, height, preferredId);
-          } else if (classes.some(clazz => clazz === 'Molecule')) {
-            html = `<img src="https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&chebiId=${preferredId}&dimensions=1080&transbg=true" style="max-width: ${width / 2 - 4}px; max-height:${height}px" alt="">`;
           }
           if (isBackground && !item.isFadeOut) {
             replacementMap.set(item.id.toString(), item.id.toString())
@@ -439,6 +457,7 @@ export class DiagramService {
                 graph: idToGraphNodes.get(item.id),
                 acc: preferredId,
                 html,
+                chebiStructureId,
                 isFadeOut,
                 isBackground,
                 replacement,

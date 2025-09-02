@@ -109,7 +109,7 @@ export class StructureViewerComponent {
 
 
   chebiStructureId = rxResource({
-    request: () => this.chebiIdentifier(),
+    request: this.chebiIdentifier,
     loader: (params) => this.getChebiStructureId(params.request)
   });
 

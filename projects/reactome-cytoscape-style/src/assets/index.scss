@@ -4,6 +4,13 @@
     background: url(loader-light.gif) no-repeat center;
   }
 
+  .molecule-structure {
+    svg {
+      height: 100%;
+      width: 100%;
+    }
+  }
+
   .video {
     filter: brightness(1.2);
   }
