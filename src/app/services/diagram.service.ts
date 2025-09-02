@@ -406,9 +406,7 @@ export class DiagramService {
           let unitId = undefined;
           if (item.schemaClass === "Polymer") {
             const polymerGraphNode = dbIdToGraphNode.get(item.reactomeId)!;
-            console.log(polymerGraphNode);
             const unitGraph = dbIdToGraphNode.get(polymerGraphNode.children[0])!;
-
             const unitClass = this.nodeTypeMap.get(unitGraph.schemaClass) || this.nodeTypeMap.get(this.schemaClassToNodeTypeMap.get(unitGraph.schemaClass === 'EntityWithAccessionedSequence' ? unitGraph.referenceType : unitGraph.schemaClass)!) || ['GenomeEncodedEntity', 'PhysicalEntity'];
             classes = [...unitClass, "Polymer"]
             unitId = unitGraph.identifier;
