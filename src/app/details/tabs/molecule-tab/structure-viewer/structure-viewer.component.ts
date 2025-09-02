@@ -16,7 +16,7 @@ import {rxResource} from "@angular/core/rxjs-interop";
 import {extract, Style} from "reactome-cytoscape-style";
 import {DarkService} from "../../../../services/dark.service";
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
-import {EMPTY, map, Observable, of} from "rxjs";
+import {catchError, EMPTY, map, Observable, of} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {SafePipe} from "../../../../pipes/safe.pipe";
 import {SelectableObject} from "../../../../services/event.service";
@@ -67,15 +67,15 @@ export class StructureViewerComponent {
   readonly obj = input.required<ReferenceEntity | SelectableObject>();
   readonly xRefs = input.required<DatabaseIdentifier[]>();
   readonly moleculeType = input.required<string | null>();
-  viewer = viewChild.required<ElementRef<HTMLElement>>('viewer');
+  viewer = viewChild<ElementRef<HTMLElement>>('viewer');
   isProtein = computed(() => this.moleculeType() === MoleculeType.PROTEIN);
   isChemical = computed(() => this.moleculeType() === MoleculeType.CHEMICAL);
-  chebiIdentifier = signal<string | null>(null);
+  chebiIdentifier = signal<string | undefined>(undefined);
 
 
   reactomeStyle: Style = new Style(document.body);
 
-  alphaFoldEntryId = computed(() => {
+  alphaFoldEntryId = linkedSignal(() => {
     if (this.isProtein()) {
       const id = this.obj().identifier;
       return `AF-${id}-F1`;
@@ -93,24 +93,24 @@ export class StructureViewerComponent {
   proteinStructureData = computed(() => {
 
     if (!this.isProtein()) return null;
-    const afId = this.alphaFoldEntryId();
 
-    const result = [
-      {source: Source.ALPHA_FOLD, identifiers: [afId]},
-    ]
+    const result = []
+
+    const afId = this.alphaFoldEntryId();
+    if (afId) result.push({source: Source.ALPHA_FOLD, identifiers: [afId]})
 
     const pdbIdentifiers = this.getPDBIdentifiers(this.xRefs());
+    if (pdbIdentifiers.length > 0) result.push({source: Source.PDB, identifiers: pdbIdentifiers})
 
-    if (pdbIdentifiers.length > 0) {
-      result.push({source: Source.PDB, identifiers: pdbIdentifiers})
-    }
     return result;
   });
 
 
   chebiStructureId = rxResource({
     request: this.chebiIdentifier,
-    loader: (params) => this.getChebiStructureId(params.request)
+    loader: (params) => this.getChebiStructureId(params.request).pipe(
+      catchError(err => EMPTY)
+    )
   });
 
   chebiStructureSVGData = rxResource({
@@ -118,7 +118,9 @@ export class StructureViewerComponent {
     loader: ({request}) => {
       const id = request;
       if (!id) return EMPTY;
-      return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}`, {responseType: 'text'})
+      return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}`, {responseType: 'text'}).pipe(
+        catchError(err => EMPTY)
+      )
     }
   })
 
@@ -132,11 +134,13 @@ export class StructureViewerComponent {
           const value = response[id];
           const ids = new Set(value.map(item => item.pdb_id.toUpperCase()));
           return Array.from(ids)
-        })
+        }),
+        catchError(err => EMPTY)
       )
     }
   })
 
+  hasAnyStructure = computed(() => this.chebiStructureSVGData.hasValue() || !!this.proteinStructureData()?.length)
 
   bgColor = computed(() => {
     this.dark.isDark(); // Compute on dark update
@@ -144,19 +148,19 @@ export class StructureViewerComponent {
   })
 
   constructor(private dark: DarkService, private http: HttpClient) {
-
     effect(() => {
-      if (this.isProtein()) {
+      const [isProtein, isChemical] = [this.isProtein(), this.isChemical()]
+      if (isProtein) {
         this.getProteinStructure();
-      } else if (this.isChemical()) {
+      } else if (isChemical) {
         this.chebiIdentifier.set(this.obj().identifier);
       }
     });
   }
 
 
-  getChebiStructureId(entryId: string | null): Observable<string | null> {
-    if (!entryId) return of(null);
+  getChebiStructureId(entryId: string | undefined): Observable<string | undefined> {
+    if (!entryId) return of(undefined);
     const url = `https://www.ebi.ac.uk/chebi/backend/api/public/compound/${entryId}`
     return this.http.get<any>(url).pipe(
       map(res => res.default_structure.id)
@@ -194,19 +198,25 @@ export class StructureViewerComponent {
       ...options,
     }
 
+    // If only alfaFold data is available, check if the structure is available
+    if (this.alphaFoldEntryId()) {
+      fetch(`https://alphafold.ebi.ac.uk/files/${this.alphaFoldEntryId()}-model_v1.cif`, {method: 'HEAD'})
+        .then(e => !e.ok && this.alphaFoldEntryId.set(null));
+    }
+
     const finalOptions = selected.startsWith('AF-') ? alphaFoldOptions : pdbOptions;
-    viewerInstance.render(this.viewer().nativeElement, finalOptions);
+    viewerInstance.render(viewerRef.nativeElement, finalOptions)
   }
 
   getPDBIdentifiers(xRefs: DatabaseIdentifier[]) {
-    const bestStructure = new Map(this.bestPdbStructure.value()?.map((id, index)=>[id, index]));
+    const bestStructure = new Map(this.bestPdbStructure.value()?.map((id, index) => [id, index]));
 
     return xRefs
       .filter((ref: DatabaseIdentifier) => ref.databaseName === Source.PDB)
       .map(ref => ref.identifier)
       .sort((a, b) => {
 
-        if(bestStructure){
+        if (bestStructure) {
           const aIndex = bestStructure.has(a) ? bestStructure.get(a)! : Number.MAX_SAFE_INTEGER;
           const bIndex = bestStructure.has(b) ? bestStructure.get(b)! : Number.MAX_SAFE_INTEGER;
 
@@ -215,24 +225,24 @@ export class StructureViewerComponent {
           }
         }
         // fallback method when no best structure available
-       return  this.sortByAlphabeticalOrder(a,b);
+        return this.sortByAlphabeticalOrder(a, b);
       })
   }
 
   sortByAlphabeticalOrder(a: string, b: string) {
-      //starts with digit
-      const aDigit = /^\d/.test(a);
-      const bDigit = /^\d/.test(b);
+    //starts with digit
+    const aDigit = /^\d/.test(a);
+    const bDigit = /^\d/.test(b);
 
-      if (aDigit && bDigit) {
-        return a.localeCompare(b);
-      } else if (aDigit) {
-        return -1;// a comes before b
-      } else if (bDigit) {
-        return 1;// b comes before a
-      } else {
-        return a.localeCompare(b);// For non-digit,sort normally
-      }
+    if (aDigit && bDigit) {
+      return a.localeCompare(b);
+    } else if (aDigit) {
+      return -1;// a comes before b
+    } else if (bDigit) {
+      return 1;// b comes before a
+    } else {
+      return a.localeCompare(b);// For non-digit,sort normally
+    }
   }
 
 }
