@@ -294,13 +294,15 @@ export class Interactivity {
 
 
   addLoading(container: HTMLElement) {
-    const template = document.createElement('template');
-    template.innerHTML = `<video class='loader' autoplay loop muted playsinline><source src='assets/loader-dark.webm' type='video/webm'></video>`
-    container.appendChild(template.content.firstChild as HTMLVideoElement);
+    // const template = document.createElement('template');
+    // template.innerHTML = `<video class='loader' autoplay loop muted playsinline><source src='assets/loader-dark.webm' type='video/webm'></video>`
+    // container.appendChild(template.content.firstChild as HTMLVideoElement);
+    container.classList.add('loading')
   }
 
   removeLoading(container: HTMLElement) {
-    container.querySelector('.loader')?.remove();
+    // container.querySelector('.loader')?.remove();
+    container.classList.remove('loading')
   }
 
   removeStructureContainer(loadingContainer: HTMLElement, node: cytoscape.NodeSingular) {

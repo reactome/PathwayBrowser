@@ -1,6 +1,6 @@
 @mixin configure-diagrams {
   .loading {
-    background: url(loader-light.gif) no-repeat center / contain ;
+    background: url(loader.gif) no-repeat center / contain ;
   }
   video.loader {
     width: 100%;
@@ -26,7 +26,7 @@
 
   .dark {
     .loading {
-      background: url(loader-dark.gif) no-repeat center / contain;
+      //background: url(loader.gif) no-repeat center / contain;
     }
     .video {
       filter: brightness(1);
