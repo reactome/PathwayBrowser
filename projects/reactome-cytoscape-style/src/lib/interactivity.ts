@@ -245,13 +245,14 @@ export class Interactivity {
               if (isElementInViewport(elem)) {
                 // console.log('rendering', name)
                 if (this.videoLayer?.node.style.opacity !== '0' && video.readyState === video.HAVE_NOTHING && video.networkState === video.NETWORK_IDLE) {
-                  video.classList.add('loading');
-                  video.oncanplay = e => video.classList.remove('loading')
+                  // video.classList.add('loading');
+                  this.addLoading(elem);
+                  video.oncanplay = e => this.removeLoading(elem);
                   let errors = 0;
                   const sources = video.querySelectorAll('source')!;
                   sources.forEach(source => source.addEventListener('error', (e) => {
                     errors++;
-                    if (errors === sources.length) this.removeStructureContainer(video, node)
+                    if (errors === sources.length) this.removeStructureContainer(elem, node)
                   }));
 
                   video.load();
@@ -272,6 +273,7 @@ export class Interactivity {
       }
     );
 
+
     this.videoLayer?.node.classList.add('video')
     const handler = (action: (video: HTMLVideoElement) => void) => async (event: cytoscape.EventObject) => {
       const videoId = event.target.id();
@@ -290,9 +292,21 @@ export class Interactivity {
       .on('mouseout', 'node.Protein', handler(v => v.pause()));
   }
 
+
+  addLoading(container: HTMLElement) {
+    const template = document.createElement('template');
+    template.innerHTML = `<video class='loader' autoplay loop muted playsinline><source src='/assets/loader-dark.webm' type='video/webm'></video>`
+    container.appendChild(template.content.firstChild as HTMLVideoElement);
+  }
+
+  removeLoading(container: HTMLElement) {
+    container.querySelector('.loader')?.remove();
+  }
+
   removeStructureContainer(loadingContainer: HTMLElement, node: cytoscape.NodeSingular) {
     // console.log('Remove diagram structure container because not found', loadingContainer, node)
     loadingContainer.classList.remove('loading')
+    this.removeLoading(loadingContainer);
 
     let baseFontSize = extract(this.properties.font.size);
     node.style({
@@ -319,7 +333,8 @@ export class Interactivity {
       {
         init: (elem: HTMLElement, node: cytoscape.NodeSingular) => {
           elem.classList.add('molecule-structure')
-          elem.classList.add('loading')
+          // elem.classList.add('loading')
+          this.addLoading(elem);
           const w = node.data('width') - 4; // retrieve border width
           const h = node.data('height') - 4; // retrieve border width
           const cos45 = 0.7071067811865476;
@@ -331,17 +346,18 @@ export class Interactivity {
           const structure = node.data('chebiStructure') as string;
           const initStructure = (svgData: string) => {
             if (svgData === undefined) return this.removeStructureContainer(elem, node);
-                elem.innerHTML = svgData;
-                const svg = elem.querySelector('svg');
-                if (!svg) return this.removeStructureContainer(elem, node);
-                // Avoid molecule bonds to scale with size
-                // svg.querySelectorAll('path').forEach(p => p.setAttribute("vector-effect", `non-scaling-stroke`));
-                // Remove white background
-                svg.querySelector('rect:first-of-type')?.remove()
-                // Readjust svg content to fit in the container
-                const bbox = svg.getBBox();
-                svg.setAttribute("viewBox", `${bbox.x - 1} ${bbox.y - 1} ${bbox.width + 2} ${bbox.height + 2}`);
-                elem.classList.remove('loading');
+            elem.innerHTML = svgData;
+            const svg = elem.querySelector('svg');
+            if (!svg) return this.removeStructureContainer(elem, node);
+            // Avoid molecule bonds to scale with size
+            // svg.querySelectorAll('path').forEach(p => p.setAttribute("vector-effect", `non-scaling-stroke`));
+            // Remove white background
+            svg.querySelector('rect:first-of-type')?.remove()
+            // Readjust svg content to fit in the container
+            const bbox = svg.getBBox();
+            svg.setAttribute("viewBox", `${bbox.x - 1} ${bbox.y - 1} ${bbox.width + 2} ${bbox.height + 2}`);
+            elem.classList.remove('loading');
+            this.removeLoading(elem);
           }
 
           if (isPromise(structure)) {

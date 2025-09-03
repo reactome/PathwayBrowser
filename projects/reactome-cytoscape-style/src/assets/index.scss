@@ -2,6 +2,11 @@
   .loading {
     background: url(loader-light.gif) no-repeat center / contain ;
   }
+  video.loader {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+  }
 
   .molecule-structure {
     svg {
