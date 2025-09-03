@@ -1,13 +1,17 @@
 @mixin configure-diagrams {
   .loading {
-    background-size: auto 100% !important;
-    background: url(loader-light.gif) no-repeat center;
+    background: url(loader-light.gif) no-repeat center / contain ;
   }
 
   .molecule-structure {
     svg {
       height: 100%;
       width: 100%;
+
+      path {
+        //stroke-width: 0.3px !important; // OKay-ish when no vector scaling
+        stroke-width: 1.5 !important;
+      }
     }
   }
 
@@ -17,7 +21,7 @@
 
   .dark {
     .loading {
-      background: url(loader-dark.gif) no-repeat center;
+      background: url(loader-dark.gif) no-repeat center / contain;
     }
     .video {
       filter: brightness(1);

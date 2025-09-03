@@ -334,6 +334,8 @@ export class Interactivity {
                 elem.innerHTML = svgData;
                 const svg = elem.querySelector('svg');
                 if (!svg) return this.removeStructureContainer(elem, node);
+                // Avoid molecule bonds to scale with size
+                // svg.querySelectorAll('path').forEach(p => p.setAttribute("vector-effect", `non-scaling-stroke`));
                 // Remove white background
                 svg.querySelector('rect:first-of-type')?.remove()
                 // Readjust svg content to fit in the container
