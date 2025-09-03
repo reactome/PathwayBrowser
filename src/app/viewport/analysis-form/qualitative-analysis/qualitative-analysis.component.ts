@@ -86,6 +86,10 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
     effect(async () => {
       if (!this.interactorsIllustrationCanvas()) return;
       this.interactorsIllustrationLottie = await this.lottieService.buildLottie({
+        renderConfig: {
+          autoResize: true,
+          freezeOnOffscreen: true
+        },
         autoplay: false,
         loop: true,
         canvas: this.interactorsIllustrationCanvas()!.nativeElement,
@@ -96,16 +100,21 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
     effect(() => {
       const theme = this.theme();
       if (this.interactorsIllustrationLottie) this.interactorsIllustrationLottie.load({src: `assets/animations/${theme}/interactors-animation.json`, loop: true, autoplay: false})
-      if (this.lottieEnd) this.lottieEnd.load({src: `assets/animations/${theme}/loading-animation.json`, loop: true, autoplay: true})
+      if (this.lottieEnd) this.lottieEnd.load({src: `assets/animations/${theme}/loader-animation.json`, loop: true, autoplay: true})
     })
 
     effect(async () => {
       if (!this.lottieCanvas()) return;
+      console.log('Building lottie')
       this.lottieEnd = await this.lottieService.buildLottie({
+        renderConfig: {
+          autoResize: true,
+          freezeOnOffscreen: true
+        },
         autoplay: true,
         loop: true,
         canvas: this.lottieCanvas()!.nativeElement,
-        src: `assets/animations/${this.theme()}/loading-animation.json`
+        src: `assets/animations/${this.theme()}/loader-animation.json`
       })
     });
   }
@@ -156,7 +165,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
         })
       )
     ).subscribe((result) => {
-      this.lottieEnd!.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
+      this.lottieEnd!.load({src: `assets/animations/${this.theme()}/success-animation.json`, loop: true, autoplay: true})
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     });
