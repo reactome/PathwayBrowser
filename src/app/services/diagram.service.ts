@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {catchError, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
+import {catchError, filter, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Diagram, Edge, Node, NodeConnector, Position, Prop, Rectangle} from "../model/diagram.model";
 import {Graph} from "../model/graph.model";
@@ -13,6 +13,7 @@ import {CONTENT_SERVICE, DOWNLOAD, environment} from "../../environments/environ
 import NodeDefinition = Reactome.Types.NodeDefinition;
 import ReactionDefinition = Reactome.Types.ReactionDefinition;
 import EdgeTypeDefinition = Reactome.Types.EdgeTypeDefinition;
+import {isDefined} from "./utils";
 
 cytoscape.use(cytoscapeFcose)
 
@@ -189,7 +190,7 @@ export class DiagramService {
       id,
       firstValueFrom(request$.pipe(
         map(response => response[id]?.data?.default_structure?.id),
-        switchMap(id => this.loadStructureSvg(id)),
+        switchMap(id => isDefined(id) ? this.loadStructureSvg(id) : of(undefined)),
         catchError(err => of(undefined))
       ))
     ]));
