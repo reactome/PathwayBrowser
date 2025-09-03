@@ -295,7 +295,7 @@ export class Interactivity {
 
   addLoading(container: HTMLElement) {
     const template = document.createElement('template');
-    template.innerHTML = `<video class='loader' autoplay loop muted playsinline><source src='/assets/loader-dark.webm' type='video/webm'></video>`
+    template.innerHTML = `<video class='loader' autoplay loop muted playsinline><source src='assets/loader-dark.webm' type='video/webm'></video>`
     container.appendChild(template.content.firstChild as HTMLVideoElement);
   }
 
