@@ -180,15 +180,23 @@ export class DiagramService {
     )
   }
 
-  public getCHEBIStructureIds(ids: Set<string>): Map<string, Promise<number>> {
+  public getCHEBIStructure(ids: Set<string>): Map<string, Promise<string | undefined>> {
     const chebiIds = [...ids];
     const request$ = this.http.post<Record<string, any>>(`https://www.ebi.ac.uk/chebi/backend/api/public/compounds/`, {chebi_ids: chebiIds}).pipe(
       shareReplay(1) // ensures all subscribers share the same request
     );
-    return new Map<string, Promise<number>>(chebiIds.map(id => [
+    return new Map<string, Promise<string | undefined>>(chebiIds.map(id => [
       id,
-      firstValueFrom(request$.pipe(map(response => response[id]?.data?.default_structure?.id)))
+      firstValueFrom(request$.pipe(
+        map(response => response[id]?.data?.default_structure?.id),
+        switchMap(id => this.loadStructureSvg(id)),
+        catchError(err => of(undefined))
+      ))
     ]));
+  }
+
+  public loadStructureSvg(id: number): Observable<string> {
+    return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}/`, {responseType: "text"})
   }
 
   public getDiagram(id: number | string): Observable<cytoscape.ElementsDefinition> {
@@ -230,7 +238,7 @@ export class DiagramService {
       tap((mergedResponse) => console.log('All responses:', mergedResponse)),
       map(mergedResponse => ({
         ...mergedResponse,
-        chebiMapping: this.getCHEBIStructureIds(
+        chebiMapping: this.getCHEBIStructure(
           new Set(mergedResponse.graph.nodes
             .filter(node => node.standardIdentifier?.startsWith('chebi:'))
             .map(node => node.identifier)
@@ -436,7 +444,7 @@ export class DiagramService {
           let width = scale(item.prop.width);
           let height = scale(item.prop.height);
           let preferredId = unitId || idToGraphNodes.get(item.id)!.identifier;
-          let chebiStructureId = chebiMapping.get(preferredId)!
+          let chebiStructure = chebiMapping.get(preferredId)
           if (classes.some(clazz => clazz === 'Protein')) {
             html = this.getStructureVideoHtml({...item, type: 'Protein'}, width, height, preferredId);
           }
@@ -455,7 +463,7 @@ export class DiagramService {
                 graph: idToGraphNodes.get(item.id),
                 acc: preferredId,
                 html,
-                chebiStructureId,
+                chebiStructure,
                 isFadeOut,
                 isBackground,
                 replacement,

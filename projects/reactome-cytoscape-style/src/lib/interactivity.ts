@@ -328,14 +328,10 @@ export class Interactivity {
           elem.style.height = h - (2 * margin) + 'px';
           elem.style.display = "flex"
 
-          const structureId = node.data('chebiStructureId');
-          const initStructure = (id: number) => {
-            if (id === undefined) return this.removeStructureContainer(elem, node);
-            const svgURL = `https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}/`;
-            fetch(svgURL)
-              .then(res => res.text())
-              .then(res => {
-                elem.innerHTML = res;
+          const structure = node.data('chebiStructure') as string;
+          const initStructure = (svgData: string) => {
+            if (svgData === undefined) return this.removeStructureContainer(elem, node);
+                elem.innerHTML = svgData;
                 const svg = elem.querySelector('svg');
                 if (!svg) return this.removeStructureContainer(elem, node);
                 // Remove white background
@@ -344,14 +340,12 @@ export class Interactivity {
                 const bbox = svg.getBBox();
                 svg.setAttribute("viewBox", `${bbox.x - 1} ${bbox.y - 1} ${bbox.width + 2} ${bbox.height + 2}`);
                 elem.classList.remove('loading');
-              })
-              .catch(e => this.removeStructureContainer(elem, node))
           }
 
-          if (isPromise(structureId)) {
-            structureId.then(initStructure)
+          if (isPromise(structure)) {
+            structure.then(initStructure)
           } else {
-            initStructure(structureId)
+            initStructure(structure)
           }
 
         },
