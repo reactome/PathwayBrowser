@@ -24,6 +24,13 @@
     filter: brightness(1.2);
   }
 
+  // On Firefox, the transparency doesn't work so we embed the video in the node
+  @supports (-moz-appearance:none) {
+    video {
+      transform: scale(0.4);
+    }
+  }
+
   .dark {
     .loading {
       //background: url(loader.gif) no-repeat center / contain;
