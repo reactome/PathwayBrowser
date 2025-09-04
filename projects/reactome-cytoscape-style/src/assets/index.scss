@@ -1,6 +1,9 @@
 @mixin configure-diagrams {
   .loading {
     background: url(loader.gif) no-repeat center / contain ;
+    video {
+      visibility: hidden;
+    }
   }
   video.loader {
     width: 100%;
@@ -28,6 +31,8 @@
   @supports (-moz-appearance:none) {
     video {
       transform: scale(0.4);
+      border-radius: 999px;
+      background: black;
     }
   }
 
