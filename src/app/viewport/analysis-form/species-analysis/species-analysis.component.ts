@@ -11,6 +11,8 @@ import {FormControl} from "@angular/forms";
 import {LottieService} from "../../../services/lottie.service";
 import {MatRipple} from "@angular/material/core";
 import {MatTooltip} from "@angular/material/tooltip";
+import {switchMap, take} from "rxjs";
+import {DarkService} from "../../../services/dark.service";
 
 @Component({
   selector: 'cr-species-analysis',
@@ -39,11 +41,15 @@ export class SpeciesAnalysisComponent {
     this.selectedSpecies.update(s => s === species ? null : species)
   }
 
+  theme = computed(() => this.darkService.isDark() ? 'dark' : 'light')
+
+
   constructor(
     private analysis: AnalysisService,
     private state: UrlStateService,
     private speciesService: SpeciesService,
     private lottieService: LottieService,
+    private darkService: DarkService,
   ) {
     effect(() => this.speciesControl.setValue(this.selectedSpecies()));
     effect(async () => {
@@ -52,7 +58,7 @@ export class SpeciesAnalysisComponent {
         autoplay: true,
         loop: true,
         canvas: this.lottieCanvas()!.nativeElement,
-        src: "assets/animations/loading-ripple.lottie"
+        src: `assets/animations/${this.theme()}/loader-animation.json`
       })
     });
   }
@@ -65,10 +71,10 @@ export class SpeciesAnalysisComponent {
 
   analyse() {
     if (this.selectedSpecies() === null) return
-    this.lottie?.load({src: "assets/animations/loading-ripple.lottie", loop: true, autoplay: true})
+    this.lottie?.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
     this.analysisLaunched = true;
     this.analysis.analyseSpecies(this.selectedSpecies()!).subscribe((result) => {
-      this.lottie!.load({src: 'assets/animations/success-animation.json', loop: true, autoplay: true})
+      this.lottie!.load({src: `assets/animations/${this.theme()}/success-animation.json`, loop: true, autoplay: true})
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     })

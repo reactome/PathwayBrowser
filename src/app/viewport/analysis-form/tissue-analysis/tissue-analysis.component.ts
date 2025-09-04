@@ -17,6 +17,7 @@ import {MatStep, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/
 import {FormBuilder, FormControl} from "@angular/forms";
 import {AsyncPipe} from "@angular/common";
 import {UrlStateService} from "../../../services/url-state.service";
+import {DarkService} from "../../../services/dark.service";
 
 @Component({
   selector: 'cr-tissue-analysis',
@@ -136,6 +137,8 @@ export class TissueAnalysisComponent {
 
 
   lottieCanvas = viewChild<ElementRef<HTMLCanvasElement>>('lottie')
+  theme = computed(() => this.darkService.isDark() ? 'dark' : 'light')
+
 
   selectTissuesControl: FormControl
 
@@ -144,7 +147,8 @@ export class TissueAnalysisComponent {
     private analysis: AnalysisService,
     private state: UrlStateService,
     private lottieService: LottieService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private darkService: DarkService,
   ) {
     this.selectTissuesControl = this.fb.nonNullable.control([] as string[], selected => selected.getRawValue().length === 0 ? {invalid: true} : null)
     effect(() => this.selectTissuesControl.setValue(this.selectedTissues()));
@@ -155,7 +159,7 @@ export class TissueAnalysisComponent {
         autoplay: true,
         loop: true,
         canvas: this.lottieCanvas()!.nativeElement,
-        src: "assets/animations/loading-ripple.lottie"
+        src: `assets/animations/${this.theme()}/loader-animation.json`
       })
     });
   }
@@ -241,13 +245,13 @@ export class TissueAnalysisComponent {
   token: string | null = null;
 
   analyse() {
-    this.lottie?.load({src: "assets/animations/loading-ripple.lottie", loop: true, autoplay: true})
+    this.lottie?.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
     this.analysisLaunched = true;
     this.analysis.analyseFromUrl(this.tissue.getSampleURL(this.experiment()!.id, {
       omitNulls: true,
       columns: this.selectedTissues().map(tissue => this.tissuesMap()[tissue])
     })).subscribe((result) => {
-      this.lottie!.load({src: 'assets/animations/success-animation.json', loop: true, autoplay: true})
+      this.lottie!.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     })
