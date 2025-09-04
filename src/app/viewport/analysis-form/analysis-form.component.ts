@@ -1,13 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  createNgModule,
-  Injector,
-  output, signal,
-  viewChild,
-  ViewContainerRef
-} from '@angular/core';
-import {MatTab, MatTabChangeEvent, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
+import {ChangeDetectionStrategy, Component, input, output} from '@angular/core';
+import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
 import {AsyncPipe} from "@angular/common";
 import {QualitativeAnalysisComponent} from "./qualitative-analysis/qualitative-analysis.component";
 import {HttpClient} from "@angular/common/http";
@@ -15,8 +7,6 @@ import {SafePipe} from "../../pipes/safe.pipe";
 import {GsaFormModule} from "reactome-gsa-form";
 import {AnalysisService} from "../../services/analysis.service";
 import {UrlStateService} from "../../services/url-state.service";
-import {Report} from "reactome-gsa-form/lib/model/report-status.model";
-import {AnalysisResult} from "reactome-gsa-form/lib/model/analysis-result.model";
 import {QuantitativeAnalysisComponent} from "./quantitative-analysis/quantitative-analysis.component";
 import {TissueAnalysisComponent} from "./tissue-analysis/tissue-analysis.component";
 import {SpeciesAnalysisComponent} from "./species-analysis/species-analysis.component";
@@ -48,6 +38,7 @@ export class AnalysisFormComponent {
   tissue = this.http.get('assets/icons/analysis/TissueCompare.svg', {responseType: 'text'})
 
   close = output<{ status: 'finished' | 'premature' }>()
+  status = input.required<'open'| 'closed'>()
 
   constructor(private http: HttpClient,  private state: UrlStateService, public analysis: AnalysisService) {
   }

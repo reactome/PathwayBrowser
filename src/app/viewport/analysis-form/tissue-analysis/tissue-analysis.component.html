@@ -92,7 +92,7 @@
   <mat-step label="Analysis">
 
       <div class="loader-container" >
-        @if (analysisLaunched) {
+        @if (analysisLaunched()) {
           <canvas #lottie class="loader"></canvas>
         }
       </div>
@@ -103,7 +103,7 @@
           <mat-icon class="red">close</mat-icon>
           Close
         </button>
-        <button mat-flat-button (click)="loadAnalysis()" [disabled]="token === undefined">See results</button>
+        <button mat-flat-button (click)="loadAnalysis()" [disabled]="!analysisAvailable()">See results</button>
       </div>
 
   </mat-step>

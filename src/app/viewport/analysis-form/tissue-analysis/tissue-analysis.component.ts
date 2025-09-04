@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, linkedSignal, output, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, linkedSignal, output, signal, viewChild} from '@angular/core';
 import {MatFormField, MatLabel, MatOption, MatSelect} from "@angular/material/select";
 import {TissueExperimentService} from "./tissue-experiment/tissue-experiment.service";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
@@ -127,6 +127,8 @@ import {DarkService} from "../../../services/dark.service";
 })
 export class TissueAnalysisComponent {
   close = output<{ status: 'finished' | 'premature' }>()
+  status = input.required<'open'| 'closed'>()
+
 
   summaries = computed(() => this.tissue.summaries.value()?.summaries || [])
   experiment = linkedSignal(() => this.summaries().at(0))
@@ -153,14 +155,33 @@ export class TissueAnalysisComponent {
     this.selectTissuesControl = this.fb.nonNullable.control([] as string[], selected => selected.getRawValue().length === 0 ? {invalid: true} : null)
     effect(() => this.selectTissuesControl.setValue(this.selectedTissues()));
 
+    effect(() => {
+      const [theme, analysisLaunched, analysisAvailable] = [this.theme(), this.analysisLaunched(), this.analysisAvailable()];
+      if (analysisLaunched && this.lottie) {
+        this.lottie.load({
+          src: `assets/animations/${theme}/${analysisAvailable ? 'success' : 'loader'}-animation.json`,
+          loop: !analysisAvailable,
+          autoplay: true
+        })
+      }
+    });
+
     effect(async () => {
       if (!this.lottieCanvas()) return;
       this.lottie = await this.lottieService.buildLottie({
+        renderConfig: {
+          autoResize: true,
+          freezeOnOffscreen: true
+        },
         autoplay: true,
         loop: true,
         canvas: this.lottieCanvas()!.nativeElement,
         src: `assets/animations/${this.theme()}/loader-animation.json`
       })
+    });
+
+    effect(() => {
+      if (this.status() === 'open' && this.lottie) setTimeout(() => this.lottie!.play(), 800);
     });
   }
 
@@ -241,17 +262,19 @@ export class TissueAnalysisComponent {
   }
 
   lottie?: DotLottie;
-  analysisLaunched = false
   token: string | null = null;
 
+  analysisLaunched = signal(false)
+  analysisAvailable = signal(false)
+
   analyse() {
-    this.lottie?.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
-    this.analysisLaunched = true;
+    this.analysisLaunched.set(true);
+    this.analysisAvailable.set(false);
     this.analysis.analyseFromUrl(this.tissue.getSampleURL(this.experiment()!.id, {
       omitNulls: true,
       columns: this.selectedTissues().map(tissue => this.tissuesMap()[tissue])
     })).subscribe((result) => {
-      this.lottie!.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
+      this.analysisAvailable.set(true);
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     })

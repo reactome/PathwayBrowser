@@ -174,16 +174,17 @@
   <mat-step>
     <ng-template matStepLabel>Analysis</ng-template>
 
-    <div class="loader-container" >
-      @if (analysisLaunched) {
-          <canvas #lottie class="loader"></canvas>
+    <div class="loader-container">
+      @if (analysisLaunched()) {
+        <canvas #lottie class="loader"></canvas>
       }
     </div>
 
 
     <div class="stepper-controls">
       <button mat-stroked-button matStepperPrevious>Previous</button>
-      <button mat-flat-button matStepperNext [disabled]="token === null" (click)="displayAnalysis()">See results</button>
+      <button mat-flat-button matStepperNext [disabled]="!analysisAvailable()" (click)="displayAnalysis()">See results
+      </button>
     </div>
 
   </mat-step>

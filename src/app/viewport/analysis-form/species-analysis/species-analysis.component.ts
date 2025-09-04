@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, output, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, output, signal, viewChild} from '@angular/core';
 import {MatStep, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/material/stepper";
 import {MatButton} from "@angular/material/button";
 import type {DotLottie} from "@lottiefiles/dotlottie-web";
@@ -31,6 +31,8 @@ import {DarkService} from "../../../services/dark.service";
 })
 export class SpeciesAnalysisComponent {
   close = output<{ status: 'finished' | 'premature' }>()
+  status = input.required<'open'| 'closed'>()
+
   lottieCanvas = viewChild<ElementRef<HTMLCanvasElement>>('lottie')
 
   comparableSpecies = computed(() => (this.speciesService.allShortenSpecies() || []).filter(s => s.taxId !== '9606'));
@@ -53,28 +55,49 @@ export class SpeciesAnalysisComponent {
   ) {
     effect(() => this.speciesControl.setValue(this.selectedSpecies()));
     effect(async () => {
-      if (!this.lottieCanvas()) return;
+      if (!this.lottieCanvas() || this.lottie) return;
       this.lottie = await this.lottieService.buildLottie({
+        renderConfig: {
+          autoResize: true,
+          freezeOnOffscreen: true
+        },
         autoplay: true,
-        loop: true,
+        loop: !this.analysisAvailable(),
         canvas: this.lottieCanvas()!.nativeElement,
-        src: `assets/animations/${this.theme()}/loader-animation.json`
+        src: `assets/animations/${this.theme()}/${this.analysisAvailable() ? 'success' : 'loader'}-animation.json`
       })
+    });
+
+    effect(() => {
+      const [theme, analysisLaunched, analysisAvailable] = [this.theme(), this.analysisLaunched(), this.analysisAvailable()];
+      if (analysisLaunched && this.lottie) {
+        this.lottie.load({
+          src: `assets/animations/${theme}/${analysisAvailable ? 'success' : 'loader'}-animation.json`,
+          loop: !analysisAvailable,
+          autoplay: true
+        })
+      }
+    });
+
+    effect(() => {
+      if (this.status() === 'open' && this.lottie) setTimeout(() => this.lottie!.play(), 800);
     });
   }
 
   protected readonly Math = Math;
 
   lottie?: DotLottie;
-  analysisLaunched = false
   token: string | null = null;
+
+  analysisLaunched = signal(false)
+  analysisAvailable = signal(false)
 
   analyse() {
     if (this.selectedSpecies() === null) return
-    this.lottie?.load({src: `assets/animations/${this.theme()}/loader-animation.json`, loop: true, autoplay: true})
-    this.analysisLaunched = true;
+    this.analysisLaunched.set(true);
+    this.analysisAvailable.set(false);
     this.analysis.analyseSpecies(this.selectedSpecies()!).subscribe((result) => {
-      this.lottie!.load({src: `assets/animations/${this.theme()}/success-animation.json`, loop: true, autoplay: true})
+      this.analysisAvailable.set(true);
       this.token = result.summary.token;
       this.close.emit({status: 'finished'})
     })

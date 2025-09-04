@@ -11,7 +11,7 @@
           </div>
         </div>
       </ng-template>
-      <cr-qualitative-analysis (close)="close.emit($event)"/>
+      <cr-qualitative-analysis (close)="close.emit($event)" [status]="status()"/>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>
@@ -24,7 +24,7 @@
           </div>
         </div>
       </ng-template>
-      <cr-quantitative-analysis (close)="close.emit($event)"/>
+      <cr-quantitative-analysis (close)="close.emit($event)" [status]="status()"/>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>
@@ -37,7 +37,7 @@
           </div>
         </div>
       </ng-template>
-      <cr-species-analysis (close)="close.emit($event)"/>
+      <cr-species-analysis (close)="close.emit($event)" [status]="status()"/>
     </mat-tab>
     <mat-tab>
       <ng-template mat-tab-label>
@@ -50,7 +50,7 @@
           </div>
         </div>
       </ng-template>
-      <cr-tissue-analysis (close)="close.emit($event)"/>
+      <cr-tissue-analysis (close)="close.emit($event)" [status]="status()"/>
     </mat-tab>
   </mat-tab-group>
 </div>

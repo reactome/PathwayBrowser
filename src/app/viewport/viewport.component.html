@@ -19,7 +19,7 @@
             <mat-icon class="custom-icon">arrow_drop_down</mat-icon>
           </div>
           <div class="interactor" (click)="toggleVisibility('interactor')"
-            [ngClass]="{'selected': visibility.interactor}">
+               [ngClass]="{'selected': visibility.interactor}">
             <mat-icon class="custom-icon" svgIcon="overlay"></mat-icon>
             <div class="overlay-content">
               <span>Overlay</span>
@@ -38,158 +38,159 @@
 
         <div [style.display]="visibility.interactor ? 'block':'none'">
           <cr-interactors #interactors [cy]="diagram()?.cy" [cys]="diagram()?.cys" [hasEHLD]="hasEHLD()"
-          (initialiseReplaceElements)="diagram()?.initialiseReplaceElements()"></cr-interactors>
+                          (initialiseReplaceElements)="diagram()?.initialiseReplaceElements()"></cr-interactors>
         </div>
 
         <div class="event-hierarchy">
           <cr-event-hierarchy [(pathwayId)]="pathwayId" [eventSplit]="sideSplit"></cr-event-hierarchy>
         </div>
       </div>
-    <!--      </div>-->
-  </as-split-area>
+      <!--      </div>-->
+    </as-split-area>
 
-  <as-split-area [size]="80">
-    <div class="right-panel">
-      <div class="top">
-        <div class="top-left">
+    <as-split-area [size]="80">
+      <div class="right-panel">
+        <div class="top">
+          <div class="top-left">
 
-          <div class="analysis-button-group">
-            <button (click)="dropdown.set(dropdown() ? null : 'analysis')" mat-ripple class="primary">
-              <mat-icon>query_stats</mat-icon>
-              Analyze
-            </button>
-            @if (hasMultipleProfile()) {
-              <div class="profile-controls" [@appear]>
-
-                <!-- TODO find a CSS based way to link the label width to buttons -->
-                <div class="label" [style.max-width.px]="buttons.clientWidth">
-                  {{ analysis.sampleIndex() + 1 }}/{{ analysis.samples().length }} : {{ state.sample() }}
-                </div>
-                <div class="buttons" #buttons>
-                  <button mat-ripple class="primary" [@appear]
-                    matTooltip="Previous sample"
-                    (click)="previousProfile()"
-                    [disabled]="isFirstProfile()">
-                    <mat-icon>skip_previous</mat-icon>
-                  </button>
-                  <button mat-ripple class="primary" [@appear]
-                    (click)="toggleIterate()"
-                    [matTooltip]=" interval ? 'Pause samples' : 'Play samples'"
-                    >
-                    <mat-icon [fontIcon]="interval ? 'pause' : 'play_arrow'"></mat-icon>
-                  </button>
-                  <button mat-ripple class="primary" [@appear]
-                    matTooltip="Next sample"
-                    (click)="nextProfile()"
-                    [disabled]="isLastProfile()">
-                    <mat-icon>skip_next</mat-icon>
-                  </button>
-                  <button mat-ripple class="primary" [@appear]
-                    matTooltip="Set sample display duration"
-                    [matMenuTriggerFor]="speed">
-                    <mat-icon>speed</mat-icon>
-                  </button>
-                </div>
-              </div>
-            }
-
-            @if (analysis.result()) {
-              <button class="error" mat-ripple (click)="clear()" matTooltip="Clear analyis" [@appear]>
-                <mat-icon>close</mat-icon>
+            <div class="analysis-button-group">
+              <button (click)="dropdown.set(dropdown() ? null : 'analysis')" mat-ripple class="primary">
+                <mat-icon>query_stats</mat-icon>
+                Analyze
               </button>
-            }
-          </div>
-          <mat-menu #speed="matMenu">
-            <mat-radio-group [(ngModel)]="playSpeed">
-              @for (option of [1, 2, 5, 10, 15]; track option) {
-                <div mat-menu-item>
-                  <mat-radio-button [value]="option">{{ option }} s</mat-radio-button>
+              @if (hasMultipleProfile()) {
+                <div class="profile-controls" [@appear]>
+
+                  <!-- TODO find a CSS based way to link the label width to buttons -->
+                  <div class="label" [style.max-width.px]="buttons.clientWidth">
+                    {{ analysis.sampleIndex() + 1 }}/{{ analysis.samples().length }} : {{ state.sample() }}
+                  </div>
+                  <div class="buttons" #buttons>
+                    <button mat-ripple class="primary" [@appear]
+                            matTooltip="Previous sample"
+                            (click)="previousProfile()"
+                            [disabled]="isFirstProfile()">
+                      <mat-icon>skip_previous</mat-icon>
+                    </button>
+                    <button mat-ripple class="primary" [@appear]
+                            (click)="toggleIterate()"
+                            [matTooltip]=" interval ? 'Pause samples' : 'Play samples'"
+                    >
+                      <mat-icon [fontIcon]="interval ? 'pause' : 'play_arrow'"></mat-icon>
+                    </button>
+                    <button mat-ripple class="primary" [@appear]
+                            matTooltip="Next sample"
+                            (click)="nextProfile()"
+                            [disabled]="isLastProfile()">
+                      <mat-icon>skip_next</mat-icon>
+                    </button>
+                    <button mat-ripple class="primary" [@appear]
+                            matTooltip="Set sample display duration"
+                            [matMenuTriggerFor]="speed">
+                      <mat-icon>speed</mat-icon>
+                    </button>
+                  </div>
                 </div>
               }
-            </mat-radio-group>
-          </mat-menu>
 
-          <mat-menu #an="matMenu">
-            <button mat-menu-item (click)="state.analysis.set('MjAyNTA2MjQxMDI3MTNfNzgx')">GSA</button>
-          </mat-menu>
-
-          @if (normalPathway()) {
-            <button mat-stroked-button [routerLink]="['/', normalPathway()?.stId]"
-              queryParamsHandling="preserve">
-              <mat-icon>compare</mat-icon>
-              <span>Compare</span>
-              <mat-icon iconPositionEnd>check</mat-icon>
-            </button>
-          } @else {
-            <button mat-stroked-button [disabled]="diseasePathways().length === 0" [matMenuTriggerFor]="compare">
-              <mat-icon>compare</mat-icon>
-              Compare
-            </button>
-            <mat-menu #compare="matMenu">
-              @for (comparablePathway of diseasePathways(); track comparablePathway.stId) {
-                <a mat-menu-item [routerLink]="['/', comparablePathway.stId]"
-                queryParamsHandling="preserve">{{ comparablePathway.displayName }}</a>
+              @if (analysis.result()) {
+                <button class="error" mat-ripple (click)="clear()" matTooltip="Clear analyis" [@appear]>
+                  <mat-icon>close</mat-icon>
+                </button>
               }
-            </mat-menu>
-          }
-
-        </div>
-
-        <div class="title">
-          {{ title() }}
-        </div>
-
-        <div class="top-right">
-          <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle
-          id="dark-toggle"></mat-slide-toggle>
-          <button mat-icon-button [color]="'primary'" class="quote" (click)="openCitationDialog()">
-            <mat-icon [svgIcon]="'format-quote'"></mat-icon>
-          </button>
-          <div class="logo">
-            <a href="/" id="main">
-              <mat-icon [svgIcon]="'logo'"></mat-icon>
-            </a>
-            <span class="version">v{{ general.version$ | async }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="content" #content>
-        <as-split direction="vertical" gutterSize="4" useTransition="true">
-          <as-split-area [size]="viewShare()" id="view" class="hide-overflow" #view>
-            @if (pathwayId()) {
-              @if (loadingPathwayData()) {
-                <div class="spinner-container">
-                  <mat-progress-spinner mode="indeterminate" />
-                </div>
-              } @else {
-                @if (hasEHLD()) {
-                  <cr-ehld [(pathwayId)]="pathwayId"/>
-                } @else {
-                  <cr-diagram [(pathwayId)]="pathwayId" #diagram [interactor]="interactors"/>
+            </div>
+            <mat-menu #speed="matMenu">
+              <mat-radio-group [(ngModel)]="playSpeed">
+                @for (option of [1, 2, 5, 10, 15]; track option) {
+                  <div mat-menu-item>
+                    <mat-radio-button [value]="option">{{ option }} s</mat-radio-button>
+                  </div>
                 }
-              }
+              </mat-radio-group>
+            </mat-menu>
+
+            <mat-menu #an="matMenu">
+              <button mat-menu-item (click)="state.analysis.set('MjAyNTA2MjQxMDI3MTNfNzgx')">GSA</button>
+            </mat-menu>
+
+            @if (normalPathway()) {
+              <button mat-stroked-button [routerLink]="['/', normalPathway()?.stId]"
+                      queryParamsHandling="preserve">
+                <mat-icon>compare</mat-icon>
+                <span>Compare</span>
+                <mat-icon iconPositionEnd>check</mat-icon>
+              </button>
             } @else {
-              <cr-reacfoam/>
+              <button mat-stroked-button [disabled]="diseasePathways().length === 0" [matMenuTriggerFor]="compare">
+                <mat-icon>compare</mat-icon>
+                Compare
+              </button>
+              <mat-menu #compare="matMenu">
+                @for (comparablePathway of diseasePathways(); track comparablePathway.stId) {
+                  <a mat-menu-item [routerLink]="['/', comparablePathway.stId]"
+                     queryParamsHandling="preserve">{{ comparablePathway.displayName }}</a>
+                }
+              </mat-menu>
             }
 
-            <div class="dropdown" [@dropdown]="dropdown() === 'analysis' ? 'open' : 'closed'">
-              <cr-analysis-form (close)="dropdown.set(null)"/>
+          </div>
+
+          <div class="title">
+            {{ title() }}
+          </div>
+
+          <div class="top-right">
+            <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle
+                              id="dark-toggle"></mat-slide-toggle>
+            <button mat-icon-button [color]="'primary'" class="quote" (click)="openCitationDialog()">
+              <mat-icon [svgIcon]="'format-quote'"></mat-icon>
+            </button>
+            <div class="logo">
+              <a href="/" id="main">
+                <mat-icon [svgIcon]="'logo'"></mat-icon>
+              </a>
+              <span class="version">v{{ general.version$ | async }}</span>
             </div>
-            <div class="dropdown" [@dropdown]="dropdown()  === 'compare' ? 'open' : 'closed'">
-              <cr-compare-form (close)="dropdown.set(null)"/>
-            </div>
+          </div>
+        </div>
+        <div class="content" #content>
+          <as-split direction="vertical" gutterSize="4" useTransition="true">
+            <as-split-area [size]="viewShare()" id="view" class="hide-overflow" #view>
+              @if (pathwayId()) {
+                @if (loadingPathwayData()) {
+                  <div class="spinner-container">
+                    <mat-progress-spinner mode="indeterminate"/>
+                  </div>
+                } @else {
+                  @if (hasEHLD()) {
+                    <cr-ehld [(pathwayId)]="pathwayId"/>
+                  } @else {
+                    <cr-diagram [(pathwayId)]="pathwayId" #diagram [interactor]="interactors"/>
+                  }
+                }
+              } @else {
+                <cr-reacfoam/>
+              }
+              @let analysisStatus = dropdown() === 'analysis' ? 'open' : 'closed';
+              <div class="dropdown" [@dropdown]="analysisStatus">
+                <cr-analysis-form (close)="dropdown.set(null)" [status]="analysisStatus"/>
+              </div>
+              <div class="dropdown" [@dropdown]="dropdown()  === 'compare' ? 'open' : 'closed'">
+                <cr-compare-form (close)="dropdown.set(null)"/>
+              </div>
 
-          </as-split-area>
+            </as-split-area>
 
-          <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"
-          [class.hidden]="detailShare() === 0"></div>
+            <div *asSplitGutter="let isDragged = isDragged" class="custom-gutter" [class.dragged]="isDragged"
+                 [class.hidden]="detailShare() === 0"></div>
 
-          <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()" id="bottom-panel">
-            <cr-details-panel></cr-details-panel>
-          </as-split-area>
-        </as-split>
+            <as-split-area [size]="detailShare()" [minSize]="detailMinSize()" [visible]="detailVisible()"
+                           id="bottom-panel">
+              <cr-details-panel></cr-details-panel>
+            </as-split-area>
+          </as-split>
+        </div>
       </div>
-    </div>
-  </as-split-area>
-</as-split>
+    </as-split-area>
+  </as-split>
 </div>
