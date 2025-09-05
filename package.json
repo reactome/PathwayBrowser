@@ -49,6 +49,7 @@
     "ng-table-virtual-scroll": "^1.6.1",
     "ngx-custom-material-file-input": "^19.0.0",
     "ngx-reactome-style": "file:.yalc/ngx-reactome-style",
+    "reactome-cytoscape-style": "0.0.1",
     "ngx-ui-tour-md-menu": "^14.0.1",
     "reactome-gsa-form": "^19.1.0",
     "reactome-table": "^19.0.1",

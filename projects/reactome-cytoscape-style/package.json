@@ -4,13 +4,13 @@
   "peerDependencies": {
     "cytoscape": "^3.30.0",
     "lodash.memoize": "^4.1.2",
-    "chroma-js": "^2.4.2"
+    "chroma-js": "^3.1.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@types/chroma-js": "^2.4.4"
+    "@types/chroma-js": "^3.1.1"
   },
   "sideEffects": false
 }
