@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve",
-    "start-local": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve --configuration=local",
+    "start": "ng serve",
+    "start-with-deps": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve",
+    "start-local": "ng serve --configuration=local",
     "dev:reactome-cytoscape-style": "ng build reactome-cytoscape-style --configuration development --watch &",
     "build:reactome-cytoscape-style": "ng build reactome-cytoscape-style",
     "test:reactome-cytoscape-style": "ng test reactome-cytoscape-style",
