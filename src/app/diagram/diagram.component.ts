@@ -440,7 +440,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
             // this.router.navigate([diagramId], {
             //   queryParamsHandling: "preserve"
             // }).then(() => {
-              this.state.select.set(event.stId);
+            this.state.select.set(event.stId);
             // });
 
             return this.loadElvDiagram();
@@ -586,18 +586,58 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       selected = selected.add(selected.connectedNodes());
     }
 
-    if (this._ignore) {
-      cy.animate({
-        fit: {
-          eles: selected,
-          padding: 100
-        },
+    if (cy === this.cy) {
+
+      let running = true;
+
+      this.cy.animate({
+        fit: {eles: selected, padding: 100},
         duration: 1000,
-        easing: "ease-in-out"
-      })
+        easing: 'ease-in-out',
+      }, {
+        complete: ()=>  {
+          running = false;
+        }
+      });
+
+      if (this.cyCompare) {
+        const syncFrame = () => {
+          if (!running) return;
+          this.syncViewports(this.cy, this.cytoscapeContainer!.nativeElement, this.cyCompare, this.compareContainer!.nativeElement, true)
+          requestAnimationFrame(syncFrame);
+        }
+        requestAnimationFrame(syncFrame);
+      }
+
     }
 
+
     return selected;
+  }
+
+  getFittedViewport(cy: cytoscape.Core, eles: cytoscape.CollectionArgument, padding = 100) {
+    // Save original state
+    const origPan = cy.pan();
+    const origZoom = cy.zoom();
+
+    let targetPan, targetZoom;
+
+    cy.batch(() => {
+      // Jump to the fit position
+      cy.fit(eles, padding);
+
+      // Read target values
+      targetPan = {...cy.pan()};
+      targetZoom = cy.zoom();
+
+      // Restore original state
+      cy.pan(origPan);
+      cy.zoom(origZoom);
+    });
+
+    console.log(targetPan, targetZoom, origPan, origZoom)
+
+    return {pan: {...targetPan! as cytoscape.Position}, zoom: targetZoom! as number};
   }
 
   flag(accs: (string | number)[], cy: cytoscape.Core): cytoscape.CollectionArgument {
@@ -716,9 +756,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   }
 
   syncing = false;
-  syncViewports = (source: cytoscape.Core, sourceContainer: HTMLElement, target: cytoscape.Core, targetContainer: HTMLElement) => {
-    if (this.syncing) return;
-    this.syncing = true;
+  syncViewports = (source: cytoscape.Core, sourceContainer: HTMLElement, target: cytoscape.Core, targetContainer: HTMLElement, overrideIgnore = false) => {
+    if (this.syncing && !overrideIgnore) return;
+    if (!overrideIgnore) this.syncing = true;
     this.updateReplacementVisibility();
 
     const position = {...source.pan()};
@@ -729,7 +769,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       zoom: source.zoom(),
       pan: position,
     })
-    this.syncing = false;
+    if (!overrideIgnore) this.syncing = false;
   };
 
 
