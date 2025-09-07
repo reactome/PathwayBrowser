@@ -265,7 +265,7 @@ export class EventService {
   }
 
   private updatePathwayIdIfSelectedReactionAbsentInCurrent(selectedReaction: Event, diagramId: string | undefined, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, hitReactions: number[]): void {
-    const isInDiagram = selectedReaction.ancestors?.some(ancestor => ancestor.stId === diagramId);
+    const isInDiagram = selectedReaction.ancestors?.some(ancestor => ancestor.stId === diagramId || ancestor.stId === this.diagramPathway?.normalPathway?.stId);
     if (diagramId && !isInDiagram) {
       diagramId = this.getPathwayWithDiagram(selectedReaction)?.stId;
       if (diagramId) {
