@@ -2,7 +2,7 @@ import {AfterViewInit, Component, effect, ElementRef, input, model, OnDestroy, V
 import {Event} from "../model/graph/event/event.model";
 import {EventService, SelectableObject} from "../services/event.service";
 import {SpeciesService} from "../services/species.service";
-import {combineLatestWith, filter, fromEvent, map, Observable, of, switchMap, take, tap} from "rxjs";
+import {combineLatest, combineLatestWith, filter, fromEvent, map, Observable, of, switchMap, take, tap} from "rxjs";
 import {MatTree, MatTreeNestedDataSource} from "@angular/material/tree";
 import {UrlStateService} from "../services/url-state.service";
 import {SplitComponent} from "angular-split";
@@ -81,16 +81,19 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   }
 
   //TODO check how species ignore is important
-  selecting = toObservable(this.state.select).pipe(
-    tap(value => this.selectedIdFromUrl = value!),
+  selecting = combineLatest({
+    select: toObservable(this.state.select),
+    pathwayId: toObservable(this.pathwayId),
+  }).pipe(
+    tap(({select, pathwayId}) => this.selectedIdFromUrl = select!),
     //todo: revisit here to check the logic
-    filter(value => !this._ignore
+    filter(() => !this._ignore
         && !this._isInitialLoad
       // && !this.speciesService.getIgnore()
     ),// Ignore the changes from Tree itself , first load and species changes
     // debounceTime(200), // todo: needs improvement to avoid use debounceTime; Wait the new diagramId to arrive when double click pathway on EHLD.
-    switchMap(id => {
-      const idToUse = id ? id : this.pathwayId();
+    switchMap(({select, pathwayId}) => {
+      const idToUse = select ? select : pathwayId;
       return idToUse
         ? this.dboService.fetchEnhancedEntry<SelectableObject>(idToUse).pipe(map(enhancedEvent => ({
           idToUse,
@@ -453,7 +456,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   }
 
   private calculateContentWidth(targetElement: HTMLElement, event: Event): number {
-    const iconWidth = this.eventIcon?.nativeElement.getBoundingClientRect().width || 18  + this._ICON_PADDING; // width and padding
+    const iconWidth = this.eventIcon?.nativeElement.getBoundingClientRect().width || 18 + this._ICON_PADDING; // width and padding
     const treeControlButtonWidth = this.treeControlButton?.nativeElement.getBoundingClientRect().width || 24;
     const baseWidth = targetElement.offsetWidth + iconWidth;
     return this.eventService.eventHasChild(event) ? baseWidth + treeControlButtonWidth : baseWidth;
