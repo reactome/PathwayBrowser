@@ -114,8 +114,8 @@
             </mat-menu>
 
             @if (normalPathway()) {
-              <button mat-stroked-button [routerLink]="['/', normalPathway()?.stId]"
-                      queryParamsHandling="preserve">
+              <button mat-stroked-button [routerLink]="['/', normalPathway()?.stId]" [queryParams]="{select: null}"
+                      queryParamsHandling="merge">
                 <mat-icon>compare</mat-icon>
                 <span>Compare</span>
                 <mat-icon iconPositionEnd>check</mat-icon>
@@ -127,8 +127,8 @@
               </button>
               <mat-menu #compare="matMenu">
                 @for (comparablePathway of diseasePathways(); track comparablePathway.stId) {
-                  <a mat-menu-item [routerLink]="['/', comparablePathway.stId]"
-                     queryParamsHandling="preserve">{{ comparablePathway.displayName }}</a>
+                  <a mat-menu-item [routerLink]="['/', comparablePathway.stId]" [queryParams]="{select: null}"
+                     queryParamsHandling="merge">{{ comparablePathway.displayName }}</a>
                 }
               </mat-menu>
             }
