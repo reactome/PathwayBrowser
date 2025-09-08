@@ -36,7 +36,7 @@ import {IconService} from "../../../services/icon.service";
 import {EntityService} from "../../../services/entity.service";
 import {DataStateService} from "../../../services/data-state.service";
 import {Relationship} from "../../../model/graph/relationship.model";
-import {cloneDeep} from "lodash";
+import {cloneDeep, isArray} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
 import {NgClass} from "@angular/common";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -87,14 +87,15 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   @ViewChild(MatTree) tree!: MatTree<R>;
 
   readonly type = input.required<string>();
-  readonly data = input.required<(E | R)[]>();
+  readonly data = input.required<E | R | (E | R)[]>();
 
   treeData = computed<R[]>(() => {
-    const data = this.data();
+    let data = this.data();
     const moleculeStoichiometry = this.stoichiometry();
     const moleculeView = this.moleculeView();
     const highlight = this.highlight();
-    if (!data || data.length === 0) return [];
+    if (!data || isArray(data) && data.length === 0) return [];
+    if (!isArray(data)) data = [data]
     if (data[0].stoichiometry) return data.map((r, index) => ({
       ...r,
       element: {...r.element, composedOf: r.element.composedOf || []},
@@ -123,7 +124,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
     // Initial tree data
     effect(() => {
-      if (this.data().length > 0) {
+      if (this.treeData().length > 0) {
         this.initialData = cloneDeep(this.treeData());
         this.dataSource.data = this.treeData();
       }
@@ -223,7 +224,11 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       // Check the condition to determine which method to call
       // Protein
       if (!this.isNestedView(selectedNode)) {
-        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request, {fetchIncomingRelationships: false, summariseReferenceEntity: false, includeDisease: true}).pipe(map(result => result as unknown as E));
+        return this.dataStateService.fetchEnhancedData<SelectableObject>(param.request, {
+          fetchIncomingRelationships: false,
+          summariseReferenceEntity: false,
+          includeDisease: true
+        }).pipe(map(result => result as unknown as E));
       } else {
         // PE -> Complex and Set
         return this.inDepth(param.request, 1) // This is from user interaction on the tree itself, so the depth is always 1
