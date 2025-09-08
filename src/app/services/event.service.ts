@@ -103,9 +103,9 @@ export class EventService {
   }
 
 
-  fetchEventAncestors(stId: string): Observable<Event[][]> {
+  fetchEventAncestors(stId: string): Observable<Pathway[][]> {
     let url = `${this._ANCESTORS}${stId}/ancestors`;
-    return this.http.get<Event[][]>(url).pipe(map(ancestorsOptions => ancestorsOptions.map(ancestorsOption => ancestorsOption.reverse())))
+    return this.http.get<Pathway[][]>(url).pipe(map(ancestorsOptions => ancestorsOptions.map(ancestorsOption => ancestorsOption.reverse())))
   }
 
   loadEventData(event: Event) {
@@ -265,8 +265,9 @@ export class EventService {
   }
 
   private updatePathwayIdIfSelectedReactionAbsentInCurrent(selectedReaction: Event, diagramId: string | undefined, allVisibleTreeNodes: Event[], tree: MatTree<Event, string>, hitReactions: number[]): void {
-    const isInDiagram = selectedReaction.ancestors?.some(ancestor => ancestor.stId === diagramId || ancestor.stId === this.diagramPathway?.normalPathway?.stId);
-    if (diagramId && !isInDiagram) {
+    const reactionDiagramStId = [...selectedReaction.ancestors].reverse().find(ancestor => isPathway(ancestor) && ancestor.hasDiagram)?.stId;
+    const isReactionInCurrentDiagram =  diagramId === reactionDiagramStId || this.diagramPathway?.normalPathway?.stId === reactionDiagramStId;
+    if (!isReactionInCurrentDiagram) {
       diagramId = this.getPathwayWithDiagram(selectedReaction)?.stId;
       if (diagramId) {
         this.state.pathwayId.set(diagramId);
@@ -605,30 +606,37 @@ export class EventService {
     }
   }
 
-  getFinalAncestor(ancestors: Event[][], pathIds?: string[]): Event[] {
+  getFinalAncestor(ancestors: Pathway[][], pathIds?: string[]): Event[] {
     pathIds = pathIds || this.state.path();
     let finalAncestor: Event[];
     // When path is given through URL, this link is from Location in PWB on detail page
     if (pathIds && ancestors.length > 1) {
-      finalAncestor = this.findMatchingAncestor(ancestors, pathIds);
+      finalAncestor = this.findBestAncestors(ancestors, pathIds);
     } else {
       // Take the first ancestor if no path is given
       finalAncestor = ancestors[0];
     }
     return finalAncestor;
   }
+    private findBestAncestors(lineages: Pathway[][], path: string[]): Pathway[] {
+    if (!lineages) return [];
+    if (lineages.length === 1) return lineages[0];
 
-  findMatchingAncestor(ancestors: Event[][], pathIds: string[]): Event[] {
-    for (const ancestorArray of ancestors) {
-      const allIdsFromAncestor = ancestorArray.map(event => event.stId);
-      // Check if pathIds are in the current ancestor array
-      const containsAll = pathIds.every(id => allIdsFromAncestor.includes(id));
-      if (containsAll) {
-        return ancestorArray;
+    const idealIds = new Set(path);
+    let bestAncestors: Pathway[] = lineages[0];
+    let bestAncestorsScore = this.getAncestorsMatchingScore(lineages[0], idealIds);
+    for (const ancestors of lineages.slice(1)) {
+      const score = this.getAncestorsMatchingScore(ancestors, idealIds);
+      if (score > bestAncestorsScore) {
+        bestAncestors = ancestors;
+        bestAncestorsScore = score;
       }
     }
-    // Use first ancestor if returns null
-    return ancestors[0];
+    return bestAncestors;
+  }
+
+  private getAncestorsMatchingScore(ancestors: Pathway[], path: Set<string>) {
+    return ancestors.reduce((score, ancestor) => path.has(ancestor.stId) ? score + 1 : score,0)
   }
 
 

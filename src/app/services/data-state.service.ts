@@ -220,11 +220,7 @@ export class DataStateService {
   }
 
   private getAncestorsMatchingScore(ancestors: Pathway[], path: Set<string>) {
-    let score = 0;
-    for (const ancestor of ancestors) {
-      if (path.has(ancestor.stId)) score++;
-    }
-    return score;
+    return ancestors.reduce((score, ancestor) => path.has(ancestor.stId) ? score + 1 : score,0)
   }
 
 
