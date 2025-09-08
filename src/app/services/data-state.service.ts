@@ -56,8 +56,8 @@ export class DataStateService {
   })
 
   private _ancestors = rxResource({
-    request: () => this.state.pathwayId(),
-    loader: (params) => this.fetchAncestors(params.request)
+    request: () => ({id: this.state.pathwayId(), path: this.state.path()}),
+    loader: (params) => this.fetchAncestors(params.request.id, params.request.path)
   })
 
   private _selectedElement = rxResource({
@@ -183,16 +183,16 @@ export class DataStateService {
     }).pipe(map(this.flattenReferences))
   }
 
-  fetchAncestors(stId: string | null): Observable<Pathway[]> {
+  fetchAncestors(stId: string | undefined, path: string[]): Observable<Pathway[]> {
     let url = `${CONTENT_SERVICE}/data/event/${stId}/ancestors`;
-    if (stId === null) return of();
+    if (stId === undefined) return of();
     return this.http.get<Pathway[][]>(url, {
       params: {
         includeRef: true,
         view: 'nested-aggregated'
       }
     }).pipe(
-      map(ancestors => ancestors.flatMap(a => a.reverse())),
+      map(lineages => this.findBestAncestors(lineages, path).reverse()),
       map(this.flattenReferences))
   }
 
@@ -201,5 +201,31 @@ export class DataStateService {
     const resolvedResponse = deserializer.deserialize<T>(response as JSOGObject);
     return resolvedResponse as T;
   }
+
+  private findBestAncestors(lineages: Pathway[][], path: string[]): Pathway[] {
+    if (!lineages) return [];
+    if (lineages.length === 1) return lineages[0];
+
+    const idealIds = new Set(path);
+    let bestAncestors: Pathway[] = lineages[0];
+    let bestAncestorsScore = this.getAncestorsMatchingScore(lineages[0], idealIds);
+    for (const ancestors of lineages.slice(1)) {
+      const score = this.getAncestorsMatchingScore(ancestors, idealIds);
+      if (score > bestAncestorsScore) {
+        bestAncestors = ancestors;
+        bestAncestorsScore = score;
+      }
+    }
+    return bestAncestors;
+  }
+
+  private getAncestorsMatchingScore(ancestors: Pathway[], path: Set<string>) {
+    let score = 0;
+    for (const ancestor of ancestors) {
+      if (path.has(ancestor.stId)) score++;
+    }
+    return score;
+  }
+
 
 }
