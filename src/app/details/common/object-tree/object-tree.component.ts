@@ -45,6 +45,7 @@ import {ExtractCompartmentPipe} from "../../../pipes/extract-compartment.pipe";
 import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../../model/graph/species.model";
 import {ObjectTreeDetailsComponent} from "./object-details/object-tree-details.component";
+import {CONTENT_DETAIL} from "../../../../environments/environment";
 
 type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
 
@@ -593,7 +594,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       return element.url
     }
     // Not proteins/chemical or molecule, linking to details page
-    return `/content/detail/${element.stId}`;
+    return `${CONTENT_DETAIL}/${element.stId}`;
   }
 
   getDisplayName(node: R, element: E): string {
