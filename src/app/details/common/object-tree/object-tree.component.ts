@@ -582,7 +582,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   onSelectClick(event: MouseEvent, node: E) {
     event.stopPropagation();
     if (!node.stId) return;
-    if (isPathway(node)) {
+    if (isPathway(node) && node.hasDiagram) {
       this.urlState.pathwayId.set(node.stId);
       this.urlState.select.set(null);
     } else {
@@ -592,7 +592,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   selectTooltip(node: E) {
     const id = node.stId || node.dbId;
-    const action = isPathway(node) ? 'Navigate to' : 'Select ';
+    const action = isPathway(node) && node.hasDiagram ? 'Navigate to' : 'Select ';
     return `${action} ${id}`;
   }
 
