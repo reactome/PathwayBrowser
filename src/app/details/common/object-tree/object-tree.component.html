@@ -79,8 +79,7 @@
 
         <div class="select-container">
           <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-          <button mat-icon-button class="select button" (click)="onSelectClick($event, element)"
-                  [matTooltip]="'Select ' + (element.stId || element.dbId) ">
+          <button mat-icon-button class="select button" (click)="onSelectClick($event, element)" [matTooltip]="selectTooltip(element)">
             <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
           </button>
         </div>

@@ -13,7 +13,7 @@ import {
   isChemical,
   isEvent,
   isEWAS,
-  isMolecule,
+  isMolecule, isPathway,
   isRefEntity,
   isReferenceSummary,
   isRLE,
@@ -579,14 +579,21 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   }
 
 
-  protected readonly isEvent = isEvent;
-  protected readonly Array = Array;
-
-
   onSelectClick(event: MouseEvent, node: E) {
     event.stopPropagation();
     if (!node.stId) return;
-    this.urlState.select.set(node.stId);
+    if (isPathway(node)) {
+      this.urlState.pathwayId.set(node.stId);
+      this.urlState.select.set(null);
+    } else {
+      this.urlState.select.set(node.stId);
+    }
+  }
+
+  selectTooltip(node: E) {
+    const id = node.stId || node.dbId;
+    const action = isPathway(node) ? 'Navigate to' : 'Select ';
+    return `${action} ${id}`;
   }
 
 
@@ -618,7 +625,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   getCompartments(element: E): string[] {
 
     if (this.moleculeView()) return [];
-    if (!this.isEvent(element)) {
+    if (!isEvent(element)) {
       const comp = this.extractCompartmentPipe.transform(element.displayName);
       return comp ? [comp] : [];
     } else {
