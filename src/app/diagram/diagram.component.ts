@@ -36,7 +36,7 @@ import {UrlStateService} from "../services/url-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
-import {isDefined, isPathwayWithDiagram} from "../services/utils";
+import {isDefined, isPathwayWithDiagram, isReferenceEntityStId} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
 import {ActivatedRoute, Router} from "@angular/router";
 import {InteractorsComponent} from "../interactors/interactors.component";
@@ -580,7 +580,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   select(tokens: (string | number), cy: cytoscape.Core): cytoscape.CollectionArgument {
     cy.elements(':selected').unselect();
-    let selected = this.getElements([tokens], cy);
+    const includeContainers = typeof tokens === 'string' && isReferenceEntityStId(tokens);
+    let selected = this.getElements([tokens], cy, includeContainers);
     selected.select();
     if ("connectedNodes" in selected) {
       selected = selected.add(selected.connectedNodes());
@@ -595,7 +596,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         duration: 1000,
         easing: 'ease-in-out',
       }, {
-        complete: ()=>  {
+        complete: () => {
           running = false;
         }
       });
