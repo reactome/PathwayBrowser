@@ -444,8 +444,8 @@ export class DiagramService {
           let html = undefined;
           let width = scale(item.prop.width);
           let height = scale(item.prop.height);
-          let preferredId = unitId || idToGraphNodes.get(item.id)!.identifier;
-          let chebiStructure = chebiMapping.get(preferredId)
+          let preferredId = unitId || idToGraphNodes.get(item.id)?.identifier;
+          let chebiStructure =  preferredId ? chebiMapping.get(preferredId) : undefined
           if (classes.some(clazz => clazz === 'Protein')) {
             html = this.getStructureVideoHtml({...item, type: 'Protein'}, width, height, preferredId);
           }
