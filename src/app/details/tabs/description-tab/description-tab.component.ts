@@ -34,6 +34,7 @@ import {MarkerReference} from "../../../model/graph/control-reference/marker-ref
 import {camelCase, isArray} from "lodash";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {UrlStateService} from "../../../services/url-state.service";
+import {CONTENT_DETAIL} from "../../../../environments/environment";
 
 
 @Component({
@@ -366,4 +367,5 @@ export class DescriptionTabComponent {
   }
 
 
+  protected readonly CONTENT_DETAIL = CONTENT_DETAIL;
 }
