@@ -444,7 +444,9 @@ export class DiagramService {
           let html = undefined;
           let width = scale(item.prop.width);
           let height = scale(item.prop.height);
-          let preferredId = unitId || idToGraphNodes.get(item.id)?.identifier;
+          const graphData = idToGraphNodes.get(item.id);
+          if (!graphData) console.error("Missing graph data for node: ", item.id, ". Potential reason could be a wrong normal pathway for a disease")
+          let preferredId = unitId || graphData?.identifier;
           let chebiStructure =  preferredId ? chebiMapping.get(preferredId) : undefined
           if (classes.some(clazz => clazz === 'Protein')) {
             html = this.getStructureVideoHtml({...item, type: 'Protein'}, width, height, preferredId);
@@ -461,7 +463,7 @@ export class DiagramService {
                 displayName: item.displayName.replace(/([/,:;-])/g, "$1\u200b"),
                 height: height,
                 width: width,
-                graph: idToGraphNodes.get(item.id),
+                graph: graphData,
                 acc: preferredId,
                 html,
                 chebiStructure,
