@@ -59,7 +59,8 @@ export const DataKeys = {
   ORGAN:'organ',
   TISSUE_LAYER:'tissueLayer',
   IDENTIFIER: 'identifier',
-  NORMAL_PATHWAY: "normalPathway"
+  NORMAL_PATHWAY: "normalPathway",
+  DISEASE_PATHWAYS: "diseasePathways"
 
 
 } as const;
@@ -106,7 +107,8 @@ export const Labels = {
   CANDIDATES: 'Candidates',
   MARKERS: 'Markers',
   BIOCHEMICAL_REACTION: 'Biochemical Reaction',
-  NORMAL_PATHWAY: "Normal pathway"
+  NORMAL_PATHWAY: "Normal pathway",
+  DISEASE_PATHWAYS: "Disease variants"
 } as const;
 
 export enum SchemaClasses {

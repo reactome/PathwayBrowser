@@ -278,6 +278,7 @@ export class DescriptionTabComponent {
     {key: DataKeys.CANDIDATE_OF, label: Labels.CANDIDATE_OF, hasDepthControl: true},
     {key: DataKeys.NORMAL_PATHWAY, label: Labels.NORMAL_PATHWAY, hasDepthControl: true, scope: 'event'},
     {key: DataKeys.EVENT_OF, label: Labels.EVENT_OF, hasDepthControl: true, scope: 'event'},
+    {key: DataKeys.DISEASE_PATHWAYS, label: Labels.DISEASE_PATHWAYS, hasDepthControl: true, scope: 'event'},
 
 
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true, template: this.inferencesTemplate$},
