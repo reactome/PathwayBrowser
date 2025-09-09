@@ -50,3 +50,4 @@ package-lock.json
 
 # Ignore Yarn lock file
 yarn.lock
+/src/assets/reacfoam/@carrotsearch/
