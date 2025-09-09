@@ -2,7 +2,7 @@
   "name": "pathway-browser",
   "version": "0.0.0",
   "scripts": {
-    "preinstall": "rm ./package-lock.json && node ./foamtree_version_control.js",
+    "prepare-env": "rm ./package-lock.json && node ./foamtree_version_control.js && npm install",
     "ng": "ng",
     "start": "ng serve",
     "start-with-deps": "run-p dev:* && wait-on dist/reactome-cytoscape-style/assets/index.scss && sleep 2 && ng serve",
@@ -31,7 +31,7 @@
     "@angular/platform-browser": "^19.2.14",
     "@angular/platform-browser-dynamic": "^19.2.14",
     "@angular/router": "^19.2.14",
-    "@carrotsearch/foamtree": "file:./src/assets/reacfoam/@carrotsearch/foamtree",
+    "@carrotsearch/foamtree": "^3.5.6",
     "@lottiefiles/dotlottie-web": "^0.49.0",
     "@ngneat/until-destroy": "^10.0.0",
     "@ngrx/component": "^19.2.1",
