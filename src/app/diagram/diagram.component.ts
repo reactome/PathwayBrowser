@@ -854,7 +854,10 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   private _loadAnalysisFn: ((analysisIndex: number) => void) | undefined
 
   updateStyle() {
-    this.cy ? setTimeout(() => this.reactomeStyle?.update(this.cy), 5) : null;
+    this.cy ? setTimeout(() => {
+      this.reactomeStyle?.update(this.cy);
+      this.thumbnailImg.set(this.cy.png({full: true, maxHeight: 240}))
+    }, 5) : null;
     this.cyCompare ? setTimeout(() => this.reactomeStyle?.update(this.cyCompare), 5) : null;
     this.legend ? setTimeout(() => this.reactomeStyle?.update(this.legend), 5) : null;
   }
