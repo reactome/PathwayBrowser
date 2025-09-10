@@ -100,14 +100,13 @@ export class DownloadTabComponent {
   formats: DownloadFormat[] = Object.values(DownloadFormat) as DownloadFormat[];
 
   diagramItems = computed<DiagramItem[]>(() => {
-    const hasEHLD = this.ehld.hasEHLD();
     const filteredFormats = this.formats.filter(format => {
-      return (hasEHLD || format !== DownloadFormat.SVG) && (allowGif || format !== DownloadFormat.GIF);
       const allowGif = this.analysis.samples().length > 1;
+      return (allowGif || format !== DownloadFormat.GIF);
     });
 
     return filteredFormats.map(format => {
-      const isExportable = [DownloadFormat.SVG, DownloadFormat.PPTX, DownloadFormat.GIF].includes(format);
+      const isExportable = [DownloadFormat.PPTX, DownloadFormat.GIF].includes(format);
       if (isExportable) {
         return {
           format: format,

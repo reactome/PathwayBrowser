@@ -8,6 +8,7 @@ import legend from "../../assets/json/legend.json"
 import {array} from "vectorious";
 
 import cytoscape from "cytoscape";
+import svg from 'cytoscape-svg';
 import cytoscapeFcose, {FcoseLayoutOptions} from "cytoscape-fcose";
 import {CONTENT_SERVICE, DOWNLOAD, environment} from "../../environments/environment";
 import NodeDefinition = Reactome.Types.NodeDefinition;
@@ -16,6 +17,7 @@ import EdgeTypeDefinition = Reactome.Types.EdgeTypeDefinition;
 import {isDefined} from "./utils";
 
 cytoscape.use(cytoscapeFcose)
+cytoscape.use(svg)
 
 
 type RelativePosition = { distances: number[], weights: number[] };

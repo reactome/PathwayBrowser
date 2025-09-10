@@ -46,7 +46,6 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 import {DarkService} from "../services/dark.service";
 import {DownloadFormat, DownloadService} from "../services/download.service";
-import {Pathway} from "../model/graph/event/pathway.model";
 import {DataStateService} from "../services/data-state.service";
 
 
@@ -130,13 +129,23 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   }
 
-  export(format: string) {
+  export(format: DownloadFormat) {
     const options: cytoscape.ExportOptions = {
       full: true,
       ...(format === DownloadFormat.JPEG ? {quality: 0.9} : {})
     }
     const a = document.createElement('a');
-    a.href = format === DownloadFormat.PNG ? this.cy.png(options) : this.cy.jpg(options);
+    switch (format) {
+      case DownloadFormat.PNG:
+        a.href = this.cy.png(options);
+        break;
+      case DownloadFormat.JPEG:
+        a.href = this.cy.jpg(options);
+        break;
+      case DownloadFormat.SVG:
+        a.href = this.cy.svg(options);
+        break;
+    }
     a.download = `${this.pathwayId()}.${format}`;
     a.click();
     a.remove();
