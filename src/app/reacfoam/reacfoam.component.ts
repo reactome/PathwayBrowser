@@ -248,7 +248,7 @@ export class ReacfoamComponent implements OnDestroy {
               values.labelColor = this.reacfoam.surfaceColor().hex()
             } else if (
               !fdr || fdr > this.state.significance()
-              && this.analysis.type() !== 'GSA_REGULATION' // Skip FDR filtering for GSA as we want to display the non-significant up/down regulation too
+              // && this.analysis.type() !== 'GSA_REGULATION' // Skip FDR filtering for GSA as we want to display the non-significant up/down regulation too
             ) {
               values.groupColor = notFoundColor;
             } else {
