@@ -36,7 +36,7 @@ export class ExpressionTagComponent {
 
   fdr = input<number>(0)
   isFDR = input<boolean>(false)
-  isSignificant = computed(() => ((this.isFDR() && this.value()) || this.fdr()) < this.state.significance())
+  isSignificant = computed(() => ((this.isFDR() && this.value()) || this.fdr()) <= this.state.significance())
 
   isRegulation = input<boolean>(false)
 

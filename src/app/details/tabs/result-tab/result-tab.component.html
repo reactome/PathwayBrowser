@@ -26,7 +26,8 @@
   </div>
   <div class="found-section">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows [trackBy]="trackBy"
-           matSort matSortActive="entities-fdr" matSortDirection="asc" matSortDisableClear
+           matSort [matSortActive]="currentSort().active" [matSortDirection]="currentSort().direction"
+           matSortDisableClear
            (matSortChange)="currentSort.set($event)"
            id="result-table">
       <ng-container matColumnDef="name">
@@ -238,14 +239,17 @@
       Diseases
     </mat-checkbox>
   </button>
-  <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="fdrFilterActive()">
-    <label (click)="$event.stopPropagation()">
-      FDR
-      <mat-slider min="0" [max]="fdrValues.length - 1" step="1" discrete showTickMarks [displayWith]="fdrLabel">
-        <input matSliderThumb [(value)]="fdrIndex">
-      </mat-slider>
-    </label>
-  </div>
+  @if (analysis.hasPValues()) {
+    <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="fdrFilterActive()">
+      <label (click)="$event.stopPropagation()">
+        FDR
+        <mat-slider min="0" [max]="fdrValues.length - 1" step="1" discrete showTickMarks [displayWith]="fdrLabel">
+          <input matSliderThumb [(value)]="fdrIndex">
+        </mat-slider>
+      </label>
+    </div>
+  }
+
   <div mat-menu-item class="slider-container" [class.filter-active]="sizeFilterActive()">
     <label (click)="$event.stopPropagation()">
       Size

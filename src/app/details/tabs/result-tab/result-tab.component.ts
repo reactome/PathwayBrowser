@@ -81,6 +81,8 @@ export class ResultTabComponent {
   minExpression = computed(() => this.hasExpression() ? Math.floor(this.analysis.result()!.expression.min) : 0)
   maxExpression = computed(() => this.hasExpression() ? Math.ceil(this.analysis.result()!.expression.max) : 1)
 
+  pValuesColumnIds = computed(() => this.analysis.hasPValues() ? ['entities-pValue', 'entities-fdr'] : [])
+
   expressionColumnNames = computed(() => this.analysis.result()?.expression?.columnNames || []);
 
   expressionColumnIds = computed(() => this.expressionColumnNames().map((_, i) => `entities-exp-${i}`));
@@ -89,8 +91,8 @@ export class ResultTabComponent {
     'name',
     'expand-entities',
     'entities-found', 'entities-total',
+    ...this.pValuesColumnIds(),
     // 'entities-ratio',
-    'entities-pValue', 'entities-fdr',
     ...this.expressionColumnIds(),
     'reactions-found', 'reactions-total',
     // 'reactions-ratio',
@@ -113,7 +115,14 @@ export class ResultTabComponent {
     })
   });
 
-  currentSort = signal<Sort>({active: 'entities-fdr', direction: 'desc'})
+  currentSort = linkedSignal<Sort>(() => this.analysis.hasPValues() ?
+    {
+      active: 'entities-fdr',
+      direction: 'desc'
+    } : {
+      active: `entities-exp-${this.analysis.sampleIndex()}`,
+      direction: 'desc'
+    })
 
   fdrValues = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
   filterFDR = linkedSignal(() => this.state.fdrFilter() !== undefined ? this.state.fdrFilter()! : 1)
@@ -215,6 +224,9 @@ export class ResultTabComponent {
     });
     effect(() => this.dataSource.data = this.filteredData());
     effect(() => this.currentSort() && this.paginator().firstPage());
+    effect(() => {
+      if (this.currentSort()) setTimeout(() => this.dataSource.sort = this.sort())
+    })
     effect(() => {
       const stId = this.data.selectedPathwayStId();
       if (!stId) return;

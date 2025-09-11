@@ -231,6 +231,7 @@ export class AnalysisService {
 
   summary = computed(() => this.result()?.summary)
   hasInteractors = computed(() => this.summary()?.interactors === true)
+  hasPValues = computed(() => this.result()?.summary?.type !== 'GSVA')
   type = computed(() => this.summary()?.type as Analysis.Type | undefined)
   species = computed(() => this.speciesService.allShortenSpecies()?.find(species => species.dbId === this.result()?.summary?.species))
   isGSARegulation = computed(() => this.type() === 'GSA_REGULATION');
@@ -300,6 +301,8 @@ export class AnalysisService {
       } else if (result.summary.type === 'SPECIES_COMPARISON') {
         validGroups.add('sequential')
       }
+
+      this.state.significance.set(result.summary.type !== 'GSVA' ? 0.05 : 1)
 
       if (this.state.palette()) {
         const isValidPalette = [...validGroups.values()].some(validGroup =>

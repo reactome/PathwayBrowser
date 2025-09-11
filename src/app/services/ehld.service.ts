@@ -191,7 +191,7 @@ export class EhldService {
       if (child &&
         !child.id.startsWith(this.overlay) &&
         !child.classList.contains(this.analysisInfoId)
-      ) child.style.filter = `saturate(${(pathway?.entities.fdr || 1) < this.state.significance() ? 1 : 0})`;
+      ) child.style.filter = `saturate(${(pathway?.entities.fdr || 1) <= this.state.significance() ? 1 : 0})`;
     }
 
     if (overlayElement) {
@@ -212,7 +212,7 @@ export class EhldService {
       this.addInnerStroke(container, this.analysis.palette().scale(exp).hex(), 2);
 
       container.style.fill = `url(#${this.pattern}${stId}-exp)`;
-      container.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
+      container.style.opacity = entities.fdr <= this.state.significance() ? '1' : '0.5';
       container.style.backdropFilter = 'blur(5px)';
 
       const text = overlayElement.getElementsByTagName('text')[0];
@@ -328,11 +328,12 @@ export class EhldService {
       this.addInnerStroke(container, this.analysis.fdrPalette().scale(entities.fdr).hex(), 2);
 
       container.style.fill = `url(#${this.pattern}${analysisPathway.stId}-fdr)`;
-      container.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
+      container.style.opacity = entities.fdr <= this.state.significance() ? '1' : '0.5';
 
       const textInfoElement = analysisInfoElement.getElementsByTagName('text')[0];
+      textInfoElement.innerHTML = `Hit: ${entities.found}/${entities.total}`;
       // "1.23E4";
-      textInfoElement.innerHTML = `Hit: ${entities.found}/${entities.total} - FDR: ${entities.fdr.toExponential(2).replace('e', 'E')}`;
+      if (this.analysis.hasPValues()) textInfoElement.innerHTML += ` - FDR: ${entities.fdr.toExponential(2).replace('e', 'E')}`;
       textInfoElement.removeAttribute("transform");
       textInfoElement.classList.add('analysis-text');
 
