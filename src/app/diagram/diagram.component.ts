@@ -553,10 +553,10 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               }
             });
           }
-        } else if (token.includes(":")) { // ReferenceEntity stId
+        } else if (token.includes(":") && !token.startsWith('class')) { // ReferenceEntity stId
           elements = elements.or(`[graph.standardIdentifier="${token}"]`);
           if ((includeContainers || elements.length === 0) && this.leafIdToParentIds.has(token)) this.leafIdToParentIds.get(token)!.forEach(parent => elements = elements.or(`[graph.stId="${parent}"]`))
-        } else {
+        } else { // work with class ➡️ [class:Molecule!drug]
           const matchArray = token.match(this.classRegex);
           if (matchArray) {
             const [_, clazz, drug] = matchArray;
@@ -1015,7 +1015,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   legend2state = this.reactomeEvents$.pipe(
     filter((e) => e.detail.cy === this.legend),
     filter(() => !this._ignore),
-    distinctUntilChanged((previous, next) => next.detail.element.id() === previous.detail.element.id()),
+    distinctUntilChanged((previous, next) => next.detail.element.id() === previous.detail.element.id() && next.type === previous.type),
   ).subscribe((e) => {
     const event = e as ReactomeEvent;
     const classes = event.detail.element.classes();
