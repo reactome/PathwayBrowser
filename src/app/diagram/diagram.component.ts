@@ -48,6 +48,7 @@ import {DarkService} from "../services/dark.service";
 import {DownloadFormat, DownloadService} from "../services/download.service";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {DataStateService} from "../services/data-state.service";
+import {SchemaClasses} from "../constants/constants";
 
 
 const INIT_RX = 2;
@@ -974,9 +975,15 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     filter((e) => e.detail.cy !== this.legend),
   ).subscribe(event => {
     const classes = event.detail.element.classes();
-    let matchingElement: cytoscape.NodeCollection | cytoscape.EdgeCollection = this.legend.elements(`.${classes[0]}`);
+    const firstClassToMatch = classes[0];
 
-    if (event.detail.type === 'PhysicalEntity') {
+    // Only get the first matched item in the classes, this help to filter out the polymer when hovering on a molecule
+    let matchingElement: cytoscape.NodeCollection | cytoscape.EdgeCollection = this.legend.elements(`.${firstClassToMatch}`).filter(ele => {
+      let classes = ele.classes();
+      return Array.isArray(classes) && classes[0] === firstClassToMatch;
+    })
+
+    if (event.detail.type === SchemaClasses.PE) {
       if (classes.includes('drug')) matchingElement = matchingElement.nodes('.drug')
       else matchingElement = matchingElement.not('.drug')
     } else if (event.detail.type === 'reaction') {

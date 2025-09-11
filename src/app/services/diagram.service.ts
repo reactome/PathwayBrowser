@@ -14,6 +14,7 @@ import NodeDefinition = Reactome.Types.NodeDefinition;
 import ReactionDefinition = Reactome.Types.ReactionDefinition;
 import EdgeTypeDefinition = Reactome.Types.EdgeTypeDefinition;
 import {isDefined} from "./utils";
+import {SchemaClasses} from "../constants/constants";
 
 cytoscape.use(cytoscapeFcose)
 
@@ -413,11 +414,11 @@ export class DiagramService {
         const entityNodes: cytoscape.NodeDefinition[] = diagram?.nodes.flatMap(item => {
           let classes = [...this.nodeTypeMap.get(item.renderableClass) || item.renderableClass.toLowerCase()];
           let unitId = undefined;
-          if (item.schemaClass === "Polymer") {
+          if (item.schemaClass === SchemaClasses.POLYMER) {
             const polymerGraphNode = dbIdToGraphNode.get(item.reactomeId)!;
             const unitGraph = dbIdToGraphNode.get(polymerGraphNode.children[0])!;
             const unitClass = this.nodeTypeMap.get(unitGraph.schemaClass) || this.nodeTypeMap.get(this.schemaClassToNodeTypeMap.get(unitGraph.schemaClass === 'EntityWithAccessionedSequence' ? unitGraph.referenceType : unitGraph.schemaClass)!) || ['GenomeEncodedEntity', 'PhysicalEntity'];
-            classes = [...unitClass, "Polymer"]
+            classes = [SchemaClasses.POLYMER, ...unitClass]
             unitId = unitGraph.identifier;
           }
           let replacedBy: string | undefined;
