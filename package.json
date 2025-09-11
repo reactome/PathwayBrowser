@@ -15,8 +15,8 @@
     "watch": "ng build --watch --configuration development",
     "page": "ng build --base-href=/PathwayBrowser/ --configuration github; ng deploy --no-build",
     "deploy-dev": "ng build --configuration=development --base-href=/beta/PathwayBrowser/ && rsync --chown=www-data:reactome --chmod=775 -rpIgoDvhP dist/pathway-browser/browser/ dev:site/new-pwb --delete",
-    "deploy-release": "ng build --configuration=release --base-href=/beta/PathwayBrowser/ && rsync --chown=www-data:reactome --chmod=775 -rpIgoDvhP dist/pathway-browser/browser/ dev:site/new-pwb --delete",
-    "deploy-production": "ng build --configuration=production --base-href=/beta/PathwayBrowser/ && rsync --chown=www-data:reactome --chmod=775 -rpIgoDvhP dist/pathway-browser/browser/ dev:site/new-pwb --delete",
+    "deploy-release": "ng build --configuration=release --base-href=/beta/PathwayBrowser/ && rsync --chown=www-data:reactome --chmod=775 -rpIgoDvhP dist/pathway-browser/browser/ release:site/new-pwb --delete",
+    "deploy-production": "ng build --configuration=production --base-href=/beta/PathwayBrowser/ && rsync --chown=www-data:reactome --chmod=775 -rpIgoDvhP dist/pathway-browser/browser/ prod:site/new-pwb --delete",
     "test": "ng test"
   },
   "private": true,
