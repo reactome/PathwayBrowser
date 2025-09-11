@@ -195,8 +195,8 @@ export class EhldService {
     }
 
     if (overlayElement) {
-      const rect = overlayElement.getElementsByTagName('rect')[0]
-      if (!rect) return;
+      let container: SVGRectElement | SVGPathElement | null = overlayElement.querySelector('rect') || overlayElement.querySelector('path');
+      if (!container) return;
 
       const entities = pathway?.entities || {fdr: 1, found: 0, total: 1, exp: undefined};
       const currentExp = entities.exp?.[this.analysis.sampleIndex()];
@@ -208,11 +208,12 @@ export class EhldService {
       ]
       this.createPattern(stId, exps, regionElement, 'exp');
 
-      this.addInnerStroke(rect, this.analysis.palette().scale(exp).hex(), 2);
 
-      rect.style.fill = `url(#${this.pattern}${stId}-exp)`;
-      rect.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
-      rect.style.backdropFilter = 'blur(5px)';
+      this.addInnerStroke(container, this.analysis.palette().scale(exp).hex(), 2);
+
+      container.style.fill = `url(#${this.pattern}${stId}-exp)`;
+      container.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
+      container.style.backdropFilter = 'blur(5px)';
 
       const text = overlayElement.getElementsByTagName('text')[0];
       text?.classList.add('title-text');
@@ -220,20 +221,54 @@ export class EhldService {
   }
 
 
-  private addInnerStroke(rect: SVGRectElement, color: string, strokeWidth = 2) {
-    const hs = strokeWidth / 2;
-    const strokeRect = rect.cloneNode() as SVGRectElement;
-    strokeRect.classList.add('inner-stroke')
-    strokeRect.style.fill = 'none';
-    strokeRect.style.filter = 'none';
-    strokeRect.style.stroke = color;
-    strokeRect.style.strokeWidth = strokeWidth + '';
-    strokeRect.style.x = rect.x.baseVal.value + hs + '';
-    strokeRect.style.y = rect.y.baseVal.value + hs + '';
-    strokeRect.style.width = rect.width.baseVal.value - strokeWidth + '';
-    strokeRect.style.height = rect.height.baseVal.value - strokeWidth + '';
-    strokeRect.style.rx = rect.rx.baseVal.value - hs + '';
-    rect.after(strokeRect)
+  private addInnerStroke(element: SVGRectElement | SVGPathElement | null, color: string, strokeWidth = 2) {
+    if (!element) return;
+    if (element.tagName === 'rect') {
+      const original = element as SVGRectElement;
+      const hs = strokeWidth / 2;
+      const strokeRect = element.cloneNode() as SVGRectElement;
+      strokeRect.classList.add('inner-stroke')
+      strokeRect.style.fill = 'none';
+      strokeRect.style.filter = 'none';
+      strokeRect.style.stroke = color;
+      strokeRect.style.strokeWidth = strokeWidth + '';
+      strokeRect.style.x = original.x.baseVal.value + hs + '';
+      strokeRect.style.y = original.y.baseVal.value + hs + '';
+      strokeRect.style.width = original.width.baseVal.value - strokeWidth + '';
+      strokeRect.style.height = original.height.baseVal.value - strokeWidth + '';
+      strokeRect.style.rx = original.rx.baseVal.value - hs + '';
+      element.after(strokeRect)
+    } else if (element.tagName === 'path') {
+      const path = element as SVGPathElement;
+
+      // Ensure the path has an id (so <use> can reference it)
+      if (!path.id) path.id = `path-${Math.random().toString(36).slice(2, 11)}`;
+
+      const maskId = `mask-${Math.random().toString(36).slice(2, 11)}`;
+
+      // Create mask *inline* (not in <defs>)
+      const mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
+      mask.setAttribute("id", maskId);
+
+      const useEl = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      useEl.setAttributeNS("http://www.w3.org/1999/xlink", "href", `#${path.id}`);
+      useEl.setAttribute("fill", "white");
+
+      mask.appendChild(useEl);
+
+      // Insert mask right after the original path
+      path.after(mask);
+
+      // Create stroke path
+      const strokePath = path.cloneNode(true) as SVGPathElement;
+      strokePath.setAttribute("fill", "none");
+      strokePath.setAttribute("stroke", color);
+      strokePath.setAttribute("stroke-width", (strokeWidth * 2).toString());
+      strokePath.setAttribute("mask", `url(#${maskId})`);
+
+      mask.after(strokePath);
+    }
+
   }
 
   createPattern(stId: string, values: [number | undefined, number] [], regionElement: SVGGElement, type: 'fdr' | 'exp') {
@@ -271,27 +306,29 @@ export class EhldService {
   }
 
   showAnalysisInfo(regionElement: SVGGElement, analysisPathway: Analysis.Pathway | undefined) {
-    if (!analysisPathway)  return;
+    if (!analysisPathway) return;
     const analysisInfoElement = regionElement.querySelector(`g[id^="${this.analysisInfoId}"]`) as SVGGElement;
 
     if (analysisInfoElement) {
       // Make it visible
       analysisInfoElement.classList.add(`${this.analysisInfoContainer}`);
 
-      const entities = analysisPathway.entities ;
+      const entities = analysisPathway.entities;
       this.createPattern(analysisPathway.stId, [
         [entities.fdr, entities.found],
         [undefined, entities.total - entities.found]
       ], regionElement, "fdr")
 
-      const rect = analysisInfoElement.getElementsByTagName('rect')[0];
+      let container: SVGRectElement | SVGPathElement | null = analysisInfoElement.querySelector('rect');
+      if (!container) container = analysisInfoElement.querySelector('path');
+      if (!container) return;
 
-      rect.classList.forEach(token => rect.classList.remove(token));
+      container.classList.forEach(token => container.classList.remove(token));
 
-      this.addInnerStroke(rect, this.analysis.fdrPalette().scale(entities.fdr).hex(), 2);
+      this.addInnerStroke(container, this.analysis.fdrPalette().scale(entities.fdr).hex(), 2);
 
-      rect.style.fill = `url(#${this.pattern}${analysisPathway.stId}-fdr)`;
-      rect.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
+      container.style.fill = `url(#${this.pattern}${analysisPathway.stId}-fdr)`;
+      container.style.opacity = entities.fdr < this.state.significance() ? '1' : '0.5';
 
       const textInfoElement = analysisInfoElement.getElementsByTagName('text')[0];
       // "1.23E4";
@@ -321,7 +358,7 @@ export class EhldService {
     })
   }
 
-  clearExistingPatterns( svg: SVGElement | null) {
+  clearExistingPatterns(svg: SVGElement | null) {
     if (!svg) return;
     const defs = svg.querySelector('defs') || svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'defs'));
 
