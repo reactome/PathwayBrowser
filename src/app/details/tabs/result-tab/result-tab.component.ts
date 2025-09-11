@@ -118,7 +118,7 @@ export class ResultTabComponent {
   currentSort = linkedSignal<Sort>(() => this.analysis.hasPValues() ?
     {
       active: 'entities-fdr',
-      direction: 'desc'
+      direction: 'asc'
     } : {
       active: `entities-exp-${this.analysis.sampleIndex()}`,
       direction: 'desc'
