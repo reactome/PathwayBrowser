@@ -153,7 +153,7 @@
               [value]="pathway.entities.exp[i]"
               [fdr]="pathway.entities.fdr"
               [scientificFormat]="analysis.expressionScientificFormat()"
-              [isGSA]="analysis.isGSA()"/>
+              [isRegulation]="analysis.isGSARegulation()"/>
           </td>
         </ng-container>>
       }
@@ -255,7 +255,7 @@
       </mat-slider>
     </label>
   </div>
-  @if (hasExpression() && !analysis.isGSA()) {
+  @if (hasExpression() && !analysis.isGSARegulation()) {
     <div mat-menu-item class="slider-container expression"
          [class.filter-active]="expressionFilterActive()"
          [style.--gradient]="analysis.palette().horizontalGradient"
@@ -272,7 +272,7 @@
       </label>
     </div>
   }
-  @if (analysis.isGSA()) {
+  @if (analysis.isGSARegulation()) {
     <button mat-menu-item [matMenuTriggerFor]="gsaMenu" [class.filter-active]="gsaFilterActive()">{{ state.sample() }}
     </button>
   }
@@ -320,7 +320,7 @@
                     [checked]="gsaOption.value"
                     (change)="onToggleGsaFilter($event)"
                     (click)="$event.stopPropagation()" class="no-wrap">
-        <cr-expression-tag [value]="gsaOption.exp" [scientificFormat]="false" [isGSA]="true"></cr-expression-tag>
+        <cr-expression-tag [value]="gsaOption.exp" [scientificFormat]="false" [isRegulation]="true"></cr-expression-tag>
         {{ gsaOption.label }}
       </mat-checkbox>
     </div>

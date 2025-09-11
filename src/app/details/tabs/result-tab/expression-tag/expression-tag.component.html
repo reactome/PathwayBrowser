@@ -1,5 +1,5 @@
-<span class="value-tag" [class.scientific]="scientificFormat()" [class.gsa]="isGSA()" [style]="style()">
-  @if (isGSA()) {
+<span class="value-tag" [class.scientific]="scientificFormat()" [class.gsa]="isRegulation()" [style]="style()">
+  @if (isRegulation()) {
     @let label = gsaValueToLabel.get(value())!;
     <mat-icon fontSet="symbols" [matTooltip]="label.tooltip" >{{ label.text }}</mat-icon>
   } @else {

@@ -142,6 +142,7 @@ export class AnalysisService {
 
   typeToDefaultPalette = new Map<Analysis.Type, PaletteName>([
     ['GSA_REGULATION', 'ancient'],
+    ['GSVA', 'Viridis'],
     ['EXPRESSION', 'Viridis'],
     ['OVERREPRESENTATION', 'primary'],
     ['SPECIES_COMPARISON', 'primary'],
@@ -231,8 +232,9 @@ export class AnalysisService {
   summary = computed(() => this.result()?.summary)
   hasInteractors = computed(() => this.summary()?.interactors === true)
   type = computed(() => this.summary()?.type as Analysis.Type | undefined)
-  species =computed(() => this.speciesService.allShortenSpecies()?.find(species => species.dbId === this.result()?.summary?.species))
-  isGSA = computed(() => this.type() === 'GSA_REGULATION');
+  species = computed(() => this.speciesService.allShortenSpecies()?.find(species => species.dbId === this.result()?.summary?.species))
+  isGSARegulation = computed(() => this.type() === 'GSA_REGULATION');
+  isGSA = computed(() => this.type() === 'GSA_REGULATION' || this.type() === 'GSVA');
   gsaReportsRequired = signal(false);
   gsaReports = signal<Report[] | undefined>(undefined);
 
@@ -286,6 +288,9 @@ export class AnalysisService {
       const validGroups: Set<PaletteGroup> = new Set();
       if (result.summary.type === 'GSA_REGULATION') {
         validGroups.add('diverging')
+      } else if (result.summary.type === 'GSVA') {
+        validGroups.add('sequential')
+        validGroups.add('continuous')
       } else if (result.summary.type === 'EXPRESSION') {
         // validGroups.add('diverging')
         validGroups.add('sequential')
