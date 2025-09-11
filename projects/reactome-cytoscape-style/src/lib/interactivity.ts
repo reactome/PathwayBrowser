@@ -401,6 +401,7 @@ export class Interactivity {
 
   initZoom(cy: cytoscape.Core) {
     const shadows = cy.edges('[?pathway]');
+    const shadowEdges = cy.edges('[?color]');
     const shadowLabels = cy.nodes('.Shadow');
     const trivial = cy.elements('.trivial');
     this.updateProteins();
@@ -415,6 +416,9 @@ export class Interactivity {
 
 
     this.onZoom.shadow = () => {
+      // Exit early if shadows aren't visible and the edges don't have the shadow class
+      if (shadowEdges.length === 0) return;
+
       const zoomLevel = cy.zoom();
       const z = zoomLevel * 100;
       const shadowLabelOpacity = this.interpolate(z, extract(this.properties.shadow.labelOpacity).map(v => this.p(...v))) / 100;

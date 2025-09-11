@@ -646,10 +646,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   }
 
   flagElements(toFlag: cytoscape.CollectionArgument, cy: cytoscape.Core): cytoscape.CollectionArgument {
-    const shadowNodes = cy.nodes('.Shadow');
-    const shadowEdges = cy.edges('[?color]');
-    const trivials = cy.elements('.trivial');
-
     if (toFlag.nonempty()) {
       cy.batch(() => {
         this.setSubPathwayVisibility(false, cy);
@@ -683,6 +679,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     } else {
       shadowNodes.style({opacity: 0})
       shadowEdges.removeClass('shadow')
+      //todo: This zoom handler is still being triggered and it adds a black underlay color to the edges.
+      // this cy.off() method needs the exact same function references that's used in cy.on()?
+      // Exit early if shadows aren't visible in onZoom event for temporary fix
       cy.off('zoom', cy.data('reactome').interactivity.onZoom.shadow)
       trivials.style({opacity: 1})
       cy.edges().style({'underlay-opacity': 0})
