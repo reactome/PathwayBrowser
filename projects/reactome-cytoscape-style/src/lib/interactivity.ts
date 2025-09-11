@@ -401,7 +401,6 @@ export class Interactivity {
 
   initZoom(cy: cytoscape.Core) {
     const shadows = cy.edges('[?pathway]');
-    const shadowEdges = cy.edges('[?color]');
     const shadowLabels = cy.nodes('.Shadow');
     const trivial = cy.elements('.trivial');
     this.updateProteins();
@@ -416,14 +415,18 @@ export class Interactivity {
 
 
     this.onZoom.shadow = () => {
-      // Exit early if shadows aren't visible and the edges don't have the shadow class
-      if (shadowEdges.length === 0) return;
 
       const zoomLevel = cy.zoom();
       const z = zoomLevel * 100;
       const shadowLabelOpacity = this.interpolate(z, extract(this.properties.shadow.labelOpacity).map(v => this.p(...v))) / 100;
       const trivialOpacity = this.interpolate(z, extract(this.properties.trivial.opacity).map(v => this.p(...v))) / 100;
-      const shadowOpacity = this.interpolate(z, extract(this.properties.shadow.opacity).map(v => this.p(...v))) / 100;
+      let shadowOpacity = this.interpolate(z, extract(this.properties.shadow.opacity).map(v => this.p(...v))) / 100;
+
+      // A dirty fix for removing shadowEdges color when no shadow color is defined, color black is assigned to the edges after removing shadow class
+      if (shadows.style('underlay-color') === "rgb(0,0,0)") {
+        shadowOpacity = 0;
+      }
+
       shadows.style({
         'underlay-opacity': shadowOpacity
       });

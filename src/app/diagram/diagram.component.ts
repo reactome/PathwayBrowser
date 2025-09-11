@@ -682,7 +682,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       shadowEdges.removeClass('shadow')
       //todo: This zoom handler is still being triggered and it adds a black underlay color to the edges.
       // this cy.off() method needs the exact same function references that's used in cy.on()?
-      // Exit early if shadows aren't visible in onZoom event for temporary fix
+      // Give opacity 0 for temporary fix in zoom handler
       cy.off('zoom', cy.data('reactome').interactivity.onZoom.shadow)
       trivials.style({opacity: 1})
       cy.edges().style({'underlay-opacity': 0})
