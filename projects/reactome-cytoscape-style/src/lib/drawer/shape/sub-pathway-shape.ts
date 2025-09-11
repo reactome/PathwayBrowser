@@ -9,6 +9,7 @@ export const subPathway: DrawerProvider = (properties, {width, height, disease})
   const stroke = !disease ?
     extract(properties.pathway.stroke) :
     extract(properties.global.negativeContrast);
+  const fill = extract(properties.pathway.fill)
 
   const halfHeight = height / 2;
   const oR = halfHeight;
@@ -50,13 +51,15 @@ export const subPathway: DrawerProvider = (properties, {width, height, disease})
     },
     flag: {
       "background-image": `
-<rect width="${width + 2 * thick}" height="${height}" rx="${oR + thick}" ry="${oR}" fill="${flag}"/>
-`,
+<rect width="${width + 2 * thick}" height="${height + 2 * thick}" rx="${oR}" ry="${oR}" fill="${flag}"/>
+<rect x="${thick}" y="${thick}" width="${width}" height="${height}" rx="${oR}" ry="${oR}" fill="${fill}"/>`,
       "background-position-x": -thick,
+      "background-position-y": -thick,
       "bounds-expansion": 2 * thick,
       "background-clip": "none",
       "background-image-containment": "over",
       "background-width": width + 2 * thick,
+      "background-height": height + 2 * thick,
     },
     analysis: {
       "background-image": `<rect class="gradient" x="${thick}" y="${thick}" width="${width - 2 * thick}" height="${height - 2 * thick}" rx="${(height - 2 * thick) / 2}"/>`,
