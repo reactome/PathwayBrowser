@@ -1,6 +1,6 @@
 <!--ToDO investigate virtual scroll instead of pagination: https://material.angular.dev/cdk/scrolling/overview -->
 <div class="container" #container>
-  <div class="header" >
+  <div class="header">
     {{ analysisType() }}
     analysis results
     @if (analysis.summary()?.sampleName) {
@@ -38,10 +38,12 @@
           </button>
         </th>
         <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
-          <mat-icon class='icon' [class.ehld]="!pathway.llp"
-                    [matTooltip]="pathway.llp ? 'Pathway' : 'Pathway with an enhanced diagram '"
-                    [svgIcon]="pathway.llp ? 'pathway' : 'pathway-ehld'"></mat-icon>
-          {{ pathway.name }}
+          <span class="pathway-name">
+                      <mat-icon class='icon' [class.ehld]="!pathway.llp"
+                                [matTooltip]="pathway.llp ? 'Pathway' : 'Pathway with an enhanced diagram '"
+                                [svgIcon]="pathway.llp ? 'pathway' : 'pathway-ehld'"></mat-icon>
+            <span [matTooltip]="pathway.name">{{ pathway.name }}</span>
+          </span>
         </td>
       </ng-container>
 

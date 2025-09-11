@@ -17,7 +17,18 @@
     }
   }
 }
-
+.pathway-name {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  max-width: 20cqw;
+  white-space: nowrap;
+  display: block;
+  overflow: clip;
+  text-overflow: ellipsis;
+}
 .icon {
   width: 18px;
   height: 18px;
@@ -71,14 +82,6 @@
 
 }
 
-td.mat-column-name {
-  text-wrap: balance;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-}
 
 .selected-expression {
   text-decoration: underline;
