@@ -12,6 +12,7 @@ export const subPathway: DrawerProvider = (properties, {width, height, disease})
   const fill = extract(properties.pathway.fill)
 
   const halfHeight = height / 2;
+  const ht = thick / 2;
   const oR = halfHeight;
   const iR = halfHeight - thick;
   const oRx = Math.min(oR, width / 2)
@@ -51,15 +52,16 @@ export const subPathway: DrawerProvider = (properties, {width, height, disease})
     },
     flag: {
       "background-image": `
-<rect width="${width + 2 * thick}" height="${height + 2 * thick}" rx="${oR}" ry="${oR}" fill="${flag}"/>
-<rect x="${thick}" y="${thick}" width="${width}" height="${height}" rx="${oR}" ry="${oR}" fill="${fill}"/>`,
+      <rect width="${width + 2 * thick}" height="${height}" rx="${oR + thick}" ry="${oR}" fill="${flag}"/>
+      <rect x="${1.5*thick}" y="${ht}" width="${width -  thick}" height="${height - thick}" rx="${oR}" fill="${fill}" stroke="${stroke}" stroke-width="${thick}"/>
+      `,
       "background-position-x": -thick,
-      "background-position-y": -thick,
+      // "background-position-y": -thick,
       "bounds-expansion": 2 * thick,
       "background-clip": "none",
       "background-image-containment": "over",
       "background-width": width + 2 * thick,
-      "background-height": height + 2 * thick,
+      "background-height": height ,
     },
     analysis: {
       "background-image": `<rect class="gradient" x="${thick}" y="${thick}" width="${width - 2 * thick}" height="${height - 2 * thick}" rx="${(height - 2 * thick) / 2}"/>`,
