@@ -123,8 +123,11 @@ export class ReacfoamComponent implements OnDestroy {
     // For now, add exposure at end of relaxation, useful upon resizing reset. to be removed when alternative solution found for stable layout
     onRelaxationStep: (relaxationProgress, relaxationComplete, relaxationTimeout) => {
       this.relaxing.set(true)
+      this.foamTree().set("groupLabelMinFontSize", 20);
       if ((relaxationTimeout || relaxationComplete)) {
         this.relaxing.set(false)
+        this.foamTree().set("groupLabelMinFontSize", 3);
+        this.foamTree().redraw()
         if (this.correctedSelectedId()) {
           setTimeout(() => {
             this.foamTree().expose({groups: this.correctedSelectedId(), keepPrevious: false})
