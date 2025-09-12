@@ -265,11 +265,11 @@ export class ReacfoamComponent implements OnDestroy {
 
           } else { // No analysis
             if (this.dark.isDark()) {
-              values.groupColor = props.group.familyColor.brighten(depth * 0.2).saturate(depth * 0.2).hex();
-              values.labelColor = props.group.familyColor.brighten(3.5).saturate(3).hex();
+              values.groupColor = props.group.familyColor().brighten(depth * 0.15).saturate(depth * 0.15).hex();
+              values.labelColor = props.group.familyColor().brighten(3).saturate(2).hex();
             } else {
-              values.groupColor = props.group.familyColor.darken(depth * 0.15).saturate(depth * 0.3).hex();
-              values.labelColor = props.group.familyColor.darken(4).saturate(5).hex();
+              values.groupColor = props.group.familyColor().darken(depth * 0.1).saturate(depth * 0.3).hex();
+              values.labelColor = props.group.familyColor().darken(4).saturate(5).hex();
             }
             // values.groupColor =  props.group.depthColor.hex();
             // values.labelColor = 'auto'

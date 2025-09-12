@@ -85,7 +85,7 @@ export interface PathwayGroup extends FoamTree.DataObject {
   weight: number,
   family: string,
   llp: boolean,
-  familyColor: chroma.Color
+  familyColor: Signal<chroma.Color>
   depth: number
   flag?: boolean
   expressions?: number[]
@@ -168,22 +168,16 @@ export class ReacfoamService {
   })
 
   familyColorMap = computed(() => {
-    console.log('signal familyColorMap')
-    this.dark.isDark(); // Compute on dark update
-    if (!this.layoutMap.value()) return new Map<string, chroma.Color>()
+    if (!this.layoutMap.value()) return new Map<string, Signal<chroma.Color>>()
     const layoutMap = this.layoutMap.value()!;
-    const familyColorMap = new Map([...layoutMap.values()].map(tlp => [tlp.family, chroma('blue')]))
-    const dH = 360 / familyColorMap.size + 1;
+    const families = [...new Set([...layoutMap.values()].map(tlp => tlp.family))];
+    const dH = 360 / families.length ;
     const offset = 0;
 
-    [...familyColorMap.keys()].forEach((family, i) => {
-      const color = this.dark.isDark() ?
-        chroma.oklch(0.01, 0.03, (offset + dH * i) % 360) :
-        chroma.oklch(0.98, 0.05, (offset + dH * i) % 360);
-      familyColorMap.set(family, color);
-    })
-
-    return familyColorMap
+    return new Map(families.map((family, i) => [family, computed(() => this.dark.isDark() ?
+      chroma.oklch(0.2, 0.1, (offset + dH * i) % 360) :
+      chroma.oklch(0.95, 0.05, (offset + dH * i) % 360))
+    ]))
   })
 
   flagColor = computed(() => {
@@ -225,7 +219,7 @@ export class ReacfoamService {
   } : this.mergedFilters())
 
   dataAndIdResolver: Signal<{ data: PathwayGroup[], idResolver: Map<string, string> } | undefined> = computed(() => {
-    this.dark.isDark();  // Compute on dark update
+    // this.dark.isDark();  // Compute on dark update
     this.filters(); // Compute on filters update
     if (!this.mergedData()) return;
     const {layoutMap, events} = this.mergedData()!
@@ -244,7 +238,7 @@ export class ReacfoamService {
     const layoutNode = layoutMap.get(humanStId) || layoutMap.get(event.stId);
 
     const family = parentFamily || layoutNode?.family || 'Unknown family'; // Unknown family with M. tuberculosis
-    const familyColor = this.familyColorMap().get(family) || this.surfaceColor(); // Unknown family with M. tuberculosis
+    const familyColor = this.familyColorMap().get(family) || this.surfaceColor; // Unknown family with M. tuberculosis
 
     const id = this.buildId(event.stId, path)!; // If no path or wrong path given, will use first occurrence of stId
     if (!stIdToFirstId.has(event.stId)) stIdToFirstId.set(event.stId, id);
@@ -276,7 +270,7 @@ export class ReacfoamService {
       disease: isDisease,
       weight: event.totalEntity,
       initialPosition: layoutNode,
-      familyColor: familyColor,
+      familyColor,
       family,
       depth,
       path,
