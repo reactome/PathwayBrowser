@@ -84,6 +84,7 @@ export class SpeciesService {
   }
 
   private getOrthologousMap(identifiers: string[], speciesDbId: number): Observable<OrthologousMap> {
+    if (identifiers.length === 0) return of(new Map());
     const url = `${this._ORTHOLOGIES}${speciesDbId}`;
     return this.http.post<{ [p: string]: SelectableObject }>(
       url,
