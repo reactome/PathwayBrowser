@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use "../../../common/flag-button/flag-button.customise" as flag-button;
 
 th {
   top: calc(var(--header-row-height) + var(--row-height)) !important;
@@ -41,4 +42,15 @@ td.mat-column-name {
 
 .intact-icon {
   color: var(--interactor-fill);
+}
+
+.found-entity {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mini-flag {
+  @include flag-button.configure-flag-button(20px, 24px, 0.75);
+  cursor: pointer;
 }

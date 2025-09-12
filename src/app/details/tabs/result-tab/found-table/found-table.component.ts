@@ -107,12 +107,19 @@ export class FoundTableComponent {
 
   expandedColumns = computed(() => this.pathwayFoundEntities.value() ? [
     'id',
-    'flag',
     ...(this.analysis.hasInteractors() ? ['interactors'] : []),
     ...this.resourceColumnIds(),
     ...this.expressionColumnIds()
   ] : [])
 
+  resourceToIdentifiersPrefix = new Map<string, string>([
+    ['UNIPROT', 'uniprot'],
+    ['ENSEMBL', 'ensembl'],
+    ['MIRBASE', 'mirbase'],
+    ['CHEBI', 'chebi'],
+    ['IUPHAR', 'iuphar.ligand'],
+    ['NCBI_NUCLEOTIDE', 'nucleotide']
+  ])
 
 }
 

@@ -10,13 +10,6 @@
     </td>
   </ng-container>
 
-  <ng-container matColumnDef="flag">
-    <th mat-header-cell *matHeaderCellDef>Flag</th>
-    <td mat-cell *matCellDef="let found, dataSource: dataSource">
-      <cr-flag-button [id]="found.id"/>
-    </td>
-  </ng-container>
-
   <ng-container matColumnDef="interactors">
     <th mat-header-cell *matHeaderCellDef mat-sort-header class="interactor">
       Interactor match
@@ -36,6 +29,7 @@
 
   @for (resource of resources(); track resource; ) {
     @let resourceColumn = resourceColumnIds()[$index];
+    @let prefix = resourceToIdentifiersPrefix.get(resource)!;
     <ng-container [matColumnDef]="resourceColumn">
       <th mat-header-cell *matHeaderCellDef mat-sort-header class="curated">
         {{ resource | titlecase }} entities
@@ -43,7 +37,8 @@
       <td mat-cell *matCellDef="let found, dataSource: dataSource" class="resource-match">
         <div class="found-entity matching">
           @for (match of found.entities[resource]; track match; ) {
-            <span [class.curated]="!found.interactors">{{ match }}</span>
+            <cr-flag-button class="mini-flag" #flag [id]="prefix + ':' + match" />
+            <span [class.curated]="!found.interactors" (click)="flag.toggle()">{{ match }}</span>
             @if (!$last) {
               &
             }
