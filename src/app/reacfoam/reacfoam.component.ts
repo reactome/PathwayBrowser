@@ -47,13 +47,13 @@ export class ReacfoamComponent implements OnDestroy {
     wireframePixelRatio: window.devicePixelRatio || 1,
     exposeDuration: 500,
     // Lower groupMinDiameter to fit as many groups as possible
-    groupMinDiameter: 1,
+    groupMinDiameter: 0.5,
     // Set a simple fading animation. Animated rollouts are very expensive for large hierarchies
     rolloutDuration: 0,
     pullbackDuration: 0,
     // Lower the border radius a bit to fit more groups
     groupBorderWidth: 2,
-    groupInsetWidth: 8,
+    groupInsetWidth: 4,
     groupBorderRadius: 0.4,
     groupBorderWidthScaling: 0.5,
     groupStrokeWidth: 1.5,
