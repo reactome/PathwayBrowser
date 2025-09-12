@@ -56,7 +56,6 @@ export const subPathway: DrawerProvider = (properties, {width, height, disease})
       <rect x="${1.5*thick}" y="${ht}" width="${width -  thick}" height="${height - thick}" rx="${oR}" fill="${fill}" stroke="${stroke}" stroke-width="${thick}"/>
       `,
       "background-position-x": -thick,
-      // "background-position-y": -thick,
       "bounds-expansion": 2 * thick,
       "background-clip": "none",
       "background-image-containment": "over",

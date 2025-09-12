@@ -207,6 +207,7 @@ export class Interactivity {
         const url = e.target.data(prop);
         if (url) window.open(url);
       })
+      .on('tap', '.Compartment', () => cy.elements().unselect() )
 
     // .on('tap', e => {
     //   const openClass = 'opened';
