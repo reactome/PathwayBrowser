@@ -201,8 +201,8 @@ export class AnalysisService {
       resource: this.state.resourceFilter(),
       species: this.state.speciesFilter()
     }),
-    loader: ({request}) => {
-      console.log("Loading ", request)
+    loader: ({request, previous}) => {
+      console.log("Loading ", request, previous)
       return request.token ?
         this.loadAnalysis(request.token, {
           resource: request.resource || undefined,
@@ -223,6 +223,8 @@ export class AnalysisService {
       );
     }
   })
+
+  isLoading = linkedSignal(() => (this.result()?.summary?.token || null) !== this.state.analysis())
 
   pathwayStIdToData = computed(() => new Map<string, Analysis.Pathway>(this.result()?.pathways?.map(p => [p.stId, p])))
 
@@ -325,17 +327,6 @@ export class AnalysisService {
 
       this.paletteGroups.forEach(group => group.valid = validGroups.has(group.name))
     });
-
-    // This is for having a permanent analysis link when providing example dataset name for instance in the NAR 2026 paper
-    // https://reactome.org/beta/PathwayBrowser/R-HSA-3359467?example=metabolomics
-    effect(() => {
-      const example = this.state.example();
-      if (example) {
-        this.loadDefaultExample(example).subscribe(() => {
-          this.state.example.set(null);
-        });
-      }
-    });
   }
 
   loadDefaultExample(name: string): Observable<Analysis.Result> {
@@ -363,6 +354,7 @@ export class AnalysisService {
   }
 
   analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+    this.isLoading.set(true)
     return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/${params?.projectToHuman ? 'projection' : ''}`, data, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
@@ -372,6 +364,7 @@ export class AnalysisService {
   }
 
   analyseSpecies(species: Species, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+    this.isLoading.set(true)
     return this.http.get<Analysis.Result>(`${environment.host}/AnalysisService/species/homoSapiens/${species.dbId}`, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
@@ -381,6 +374,7 @@ export class AnalysisService {
   }
 
   analyseFromUrl(url: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+    this.isLoading.set(true)
     return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/url${params?.projectToHuman ? '/projection' : ''}`, url, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),

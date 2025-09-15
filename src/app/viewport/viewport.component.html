@@ -54,37 +54,41 @@
           <div class="top-left">
 
             <div class="analysis-button-group">
-              <button (click)="dropdown.set(dropdown() ? null : 'analysis')" mat-ripple class="primary">
+              <button (click)="dropdown.set(dropdown() ? null : 'analysis')" mat-ripple class="primary" [class.loading]="analysisLoading()">
                 <mat-icon>query_stats</mat-icon>
                 Analyze
+                @if (analysisLoading()) {
+                  <mat-spinner [diameter]="18"></mat-spinner>
+                }
               </button>
+
               @if (hasMultipleProfile()) {
                 <div class="profile-controls" [@appear]>
 
                   <!-- TODO find a CSS based way to link the label width to buttons -->
-                  <div class="label" [style.max-width.px]="buttons.clientWidth">
+                  <div class="label">
                     {{ analysis.sampleIndex() + 1 }}/{{ analysis.samples().length }} : {{ state.sample() }}
                   </div>
-                  <div class="buttons" #buttons>
-                    <button mat-ripple class="primary" [@appear]
+                  <div class="buttons">
+                    <button mat-ripple class="primary"
                             matTooltip="Previous sample"
                             (click)="previousProfile()"
                             [disabled]="isFirstProfile()">
                       <mat-icon>skip_previous</mat-icon>
                     </button>
-                    <button mat-ripple class="primary" [@appear]
+                    <button mat-ripple class="primary"
                             (click)="toggleIterate()"
                             [matTooltip]=" interval ? 'Pause samples' : 'Play samples'"
                     >
                       <mat-icon [fontIcon]="interval ? 'pause' : 'play_arrow'"></mat-icon>
                     </button>
-                    <button mat-ripple class="primary" [@appear]
+                    <button mat-ripple class="primary"
                             matTooltip="Next sample"
                             (click)="nextProfile()"
                             [disabled]="isLastProfile()">
                       <mat-icon>skip_next</mat-icon>
                     </button>
-                    <button mat-ripple class="primary" [@appear]
+                    <button mat-ripple class="primary"
                             matTooltip="Set sample display duration"
                             [matMenuTriggerFor]="speed">
                       <mat-icon>speed</mat-icon>

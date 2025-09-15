@@ -28,6 +28,8 @@ import {Pathway} from "../model/graph/event/pathway.model";
 import {animate, state, style, transition, trigger} from "@angular/animations";
 import {drop} from "lodash";
 import {CitationService} from "../services/citation.service";
+import {of} from "rxjs";
+import {rxResource} from "@angular/core/rxjs-interop";
 
 
 const DETAIL_MIN_HEIGHT = 0;
@@ -43,8 +45,8 @@ const DROPDOWN_DURATION = 500;
   animations: [
     trigger('appear', [
       transition(':enter', [
-        style({width: '0', padding: '0'}),
-        animate('1000ms ease-in-out', style({width: '*'})),
+        style({width: '0'}),
+        animate('1000ms ease-in-out', style({width: '*'}))
       ]),
       transition(':leave', [
         animate('1000ms ease-in-out', style({
@@ -118,6 +120,13 @@ export class ViewportComponent implements AfterViewInit {
 
   currentInteractorResource = this.interactorService.currentResource;
 
+  exampleAnalysis = rxResource({
+    request: this.state.example,
+    loader: ({request}) => request ? this.analysis.loadDefaultExample(request) : of()
+  })
+
+  analysisLoading = computed(() => this.exampleAnalysis.isLoading() || this.analysis.isLoading())
+
 
   visibility = {
     species: false,
@@ -153,11 +162,13 @@ export class ViewportComponent implements AfterViewInit {
     });
     effect(() => this.dataState.currentPathway() && this.eventService.setDiagramPathway(this.dataState.currentPathway()!));
     effect(() => this.sizeObserver.observe(this.content().nativeElement));
+    effect(() => {
+      if (this.exampleAnalysis.value()) this.state.example.set(null)
+    });
     // effect(() => this.dropdown() === null && this.detailVisible.set(true));
   }
 
   ngAfterViewInit(): void {
-
     this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--on')?.querySelector('path')?.setAttribute('d', this.moon);
     this.darkToggle()._switchElement.nativeElement?.querySelector('.mdc-switch__icon--off')?.querySelector('path')?.setAttribute('d', this.sun);
   }
