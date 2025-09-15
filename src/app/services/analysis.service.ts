@@ -331,7 +331,7 @@ export class AnalysisService {
 
   loadDefaultExample(name: string): Observable<Analysis.Result> {
     return this.http.get(`assets/data/analysis-examples/${name}.tsv`, {responseType: 'text'}).pipe(
-      switchMap(example => this.analyse(example))
+      switchMap(example => this.analyse(example, {projectToHuman: true})),
     )
   }
 
