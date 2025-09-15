@@ -86,7 +86,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
     private darkService: DarkService,
   ) {
     effect(async () => {
-      if (!this.interactorsIllustrationCanvas()) return;
+      if (!this.interactorsIllustrationCanvas() || this.interactorsIllustrationLottie !== undefined) return;
       this.interactorsIllustrationLottie = await this.lottieService.buildLottie({
         renderConfig: {
           autoResize: true,
@@ -100,7 +100,7 @@ export class QualitativeAnalysisComponent implements AfterViewInit {
 
     });
     effect(async () => {
-      if (!this.lottieCanvas()) return;
+      if (!this.lottieCanvas() || this.lottieEnd !== undefined) return;
       console.log('Building lottie')
       this.lottieEnd = await this.lottieService.buildLottie({
         renderConfig: {
