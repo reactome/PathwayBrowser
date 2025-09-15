@@ -45,12 +45,12 @@ const DROPDOWN_DURATION = 500;
   animations: [
     trigger('appear', [
       transition(':enter', [
-        style({width: '0'}),
-        animate('1000ms ease-in-out', style({width: '*'}))
+        style({width: '0', padding: '0'}),
+        animate('1000ms ease-in-out', style({width: '*', padding: '*'}))
       ]),
       transition(':leave', [
         animate('1000ms ease-in-out', style({
-          width: '0'
+          width: '0', padding: '0'
         })),
       ])
     ]),
