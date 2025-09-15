@@ -22,6 +22,7 @@ import {DataStateService} from "../services/data-state.service";
 import {isRLE} from "../services/utils";
 import {SpeciesService} from "../services/species.service";
 import {firstValueFrom} from "rxjs";
+import chroma from "chroma-js";
 
 
 @Component({
@@ -87,7 +88,7 @@ export class ReacfoamComponent implements OnDestroy {
     finalToWireframeFadeDuration: 0,
     fadeDuration: 0,
     wireframeToFinalFadeDuration: 0,
-    groupLabelColorThreshold: 1 - 0.179,
+    groupLabelColorThreshold: 0.8,
     relaxationMaxDuration: 4000,
     relaxationQualityThreshold: 0.5,
 
@@ -241,7 +242,6 @@ export class ReacfoamComponent implements OnDestroy {
           // }
 
           if (this.analysis.result()) { // Analysis
-            values.labelColor = 'auto';
             const fdr = props.group.fdr;
 
             const notFoundColor = this.reacfoam.surfaceColor().hex();
@@ -265,6 +265,8 @@ export class ReacfoamComponent implements OnDestroy {
                 }
               }
             }
+
+            values.labelColor = chroma(values.groupColor).get('oklch.l') > 0.70 ? 'black' : 'white';
 
           } else { // No analysis
             if (this.dark.isDark()) {
