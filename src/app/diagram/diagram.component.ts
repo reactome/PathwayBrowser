@@ -999,18 +999,26 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   diagramSelect2state = this.reactomeEvents$.pipe(
     filter((e) => e.detail.cy !== this.legend && e.type === ReactomeEventTypes.select),
-    delay(0), // Requirre for reaction to have time to select the reaction node
+    // filter(e => e.detail.cy !== this.cy),
+    delay(5), // allow for unselect to be processed before select when clicking on an already selected element
     distinctUntilChanged((previous, next) => next.detail.reactomeId === previous.detail.reactomeId),
   ).subscribe(e => {
       let elements: cytoscape.NodeSingular = e.detail.element;
-      if (e.detail.type === 'reaction') {
-        elements = e.detail.cy.elements('node.reaction:selected')
-      }
       const reactomeIds = elements.map(el => el.data('graph.stId'));
       this.selecting = true
       this.state.select.set(reactomeIds[0]);
     }
   );
+
+  diagramUnselect2state = this.reactomeEvents$.pipe(
+    filter((e) => e.detail.cy !== this.legend && e.type === ReactomeEventTypes.unselect),
+    distinctUntilChanged((previous, next) => next.detail.reactomeId === previous.detail.reactomeId),
+  ).subscribe(e => {
+    if (this.state.select() === e.detail.element.data('graph.stId')) {
+      console.log('Unselect', e.detail.reactomeId)
+      this.state.select.set(null)
+    }
+  })
 
   legend2state = this.reactomeEvents$.pipe(
     filter((e) => e.detail.cy === this.legend),
