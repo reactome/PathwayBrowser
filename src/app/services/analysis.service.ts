@@ -331,7 +331,7 @@ export class AnalysisService {
 
   loadDefaultExample(name: string): Observable<Analysis.Result> {
     return this.http.get(`assets/data/analysis-examples/${name}.tsv`, {responseType: 'text'}).pipe(
-      switchMap(example => this.analyse(example, {projectToHuman: true})),
+      switchMap(example => this.analyse(example, {projectToHuman: true}, false)),
     )
   }
 
@@ -353,32 +353,32 @@ export class AnalysisService {
     this.clearFilters();
   }
 
-  analyse(data: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+  analyse(data: string, params?: Partial<Analysis.Parameters>, clearFilters = true): Observable<Analysis.Result> {
     this.isLoading.set(true)
     return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/${params?.projectToHuman ? 'projection' : ''}`, data, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
-      tap(result => this.clearFilters()),
+      tap(result => clearFilters && this.clearFilters()),
       tap(result => this.state.analysis.set(result.summary.token)),
     )
   }
 
-  analyseSpecies(species: Species, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+  analyseSpecies(species: Species, params?: Partial<Analysis.Parameters>, clearFilters = true): Observable<Analysis.Result> {
     this.isLoading.set(true)
     return this.http.get<Analysis.Result>(`${environment.host}/AnalysisService/species/homoSapiens/${species.dbId}`, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
-      tap(result => this.clearFilters()),
+      tap(result => clearFilters && this.clearFilters()),
       tap(result => this.state.analysis.set(result.summary.token)),
     )
   }
 
-  analyseFromUrl(url: string, params?: Partial<Analysis.Parameters>): Observable<Analysis.Result> {
+  analyseFromUrl(url: string, params?: Partial<Analysis.Parameters>, clearFilters = true): Observable<Analysis.Result> {
     this.isLoading.set(true)
     return this.http.post<Analysis.Result>(`${environment.host}/AnalysisService/identifiers/url${params?.projectToHuman ? '/projection' : ''}`, url, {params}).pipe(
       tap(result => this.result.set(result)),
       tap(result => this.resultResource.set(result)),
-      tap(result => this.clearFilters()),
+      tap(result => clearFilters && this.clearFilters()),
       tap(result => this.state.analysis.set(result.summary.token)),
     );
   }
