@@ -326,6 +326,21 @@ export class AnalysisService {
       this.paletteGroups.forEach(group => group.valid = validGroups.has(group.name))
     });
 
+    // This is for having a permanent analysis link when providing example dataset name for instance in the NAR 2026 paper
+    // https://reactome.org/beta/PathwayBrowser/R-HSA-3359467?example=metabolomics
+    effect(() => {
+      const example = this.state.example();
+      if (example) {
+        this.loadDefaultExample(example).subscribe();
+        this.state.example.set(null);
+      }
+    });
+  }
+
+  loadDefaultExample(name: string): Observable<Analysis.Result> {
+    return this.http.get(`assets/data/analysis-examples/${name}.tsv`, {responseType: 'text'}).pipe(
+      switchMap(example => this.analyse(example))
+    )
   }
 
   private clearFilters() {

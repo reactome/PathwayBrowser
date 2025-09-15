@@ -57,6 +57,7 @@ export class UrlStateService implements State {
     fdrFilter: urlParam<number | undefined>(undefined, "number"),
     gsaFilter: urlParam<number[]>([], "number"),
     summariseDisease: urlParam<boolean | undefined>(undefined, "boolean"),
+    example: urlParam<string | null>(null, "string"),
   };
 
   public readonly select = this.values.select
@@ -80,6 +81,7 @@ export class UrlStateService implements State {
   public readonly fdrFilter = this.values.fdrFilter
   public readonly gsaFilter = this.values.gsaFilter
   public readonly summariseDisease = this.values.summariseDisease
+  public readonly example = this.values.example
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 
