@@ -331,8 +331,9 @@ export class AnalysisService {
     effect(() => {
       const example = this.state.example();
       if (example) {
-        this.loadDefaultExample(example).subscribe();
-        this.state.example.set(null);
+        this.loadDefaultExample(example).subscribe(() => {
+          this.state.example.set(null);
+        });
       }
     });
   }
