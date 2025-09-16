@@ -212,6 +212,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
   reactomeStyleCompare!: Style;
   legend!: cytoscape.Core;
   cys: cytoscape.Core[] = [];
+  reactomeStyles: Style[] = []
 
   leafIdToParentIds = new Map<string, string[]>();
 
@@ -367,6 +368,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
           layout: {name: "preset"},
         });
         this.cys[0] = this.cy;
+        this.reactomeStyles[0] = this.reactomeStyle;
         this.reactomeStyle.bindToCytoscape(this.cy);
 
         this.leafIdToParentIds.clear();
@@ -378,8 +380,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
             parents.push(node.data('graph.stId'));
           })
         })
-
-        console.log(this.leafIdToParentIds)
 
         this.cy.on('zoom', () => this.controlZoom.set(this.zoomToControlTransform(this.cy.zoom())));
 
@@ -510,7 +510,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         style: this.reactomeStyle?.getStyleSheet(),
         layout: {name: "preset"},
       });
-      this.cys[1] = this.cyCompare;
 
 
       this.cyCompare.elements('[?isFadeOut]').remove();
@@ -524,6 +523,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       this.reactomeStyleCompare?.bindToCytoscape(this.cyCompare);
       this.cyCompare.minZoom(this.cy!.minZoom())
       this.cyCompare.maxZoom(this.cy!.maxZoom())
+
+      this.cys[1] = this.cyCompare;
+      this.reactomeStyles[1] = this.reactomeStyleCompare;
 
       setTimeout(() => {
         this.syncViewports(this.cy!, container, this.cyCompare, compareContainer)
@@ -776,7 +778,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     if (!overrideIgnore) this.syncing = false;
   };
 
-
   private loadAnalysis(token: string | null) {
     const diagramId = this.pathwayId();
     if (!token || !diagramId) {
@@ -794,17 +795,17 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
           })
         })
       });
-      this.reactomeStyle?.loadAnalysis(this.cy, this.analysis.palette().scale);
+      this.reactomeStyles.forEach(style => style.loadAnalysis(style.cy!, this.analysis.palette().scale));
       return
     }
 
     forkJoin({
-      entities: this.analysis.foundEntities(diagramId, token),
+      entities: this.analysis.foundEntities(this.data.currentPathway()?.normalPathway?.stId || diagramId, token),
       pathways: this.analysis.pathwaysResults(this.cy?.nodes('.Pathway').map(p => p.data('reactomeId')) || [], token),
-    }).subscribe(({entities, pathways}) => {
+      result: this.analysis.result$.pipe(filter(isDefined), take(1)),
+    }).subscribe(({entities, pathways, result}) => {
 
       this._loadAnalysisFn = (analysisIndex) => {
-        console.log('loading index', analysisIndex)
         let analysisEntityMap = new Map<string, number>(entities.entities.flatMap(entity =>
           entity.mapsTo
             .flatMap(diagramEntity => diagramEntity.ids)
@@ -812,8 +813,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         )
 
         let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
-        const includeInteractors = !!this.analysis.result()?.summary?.interactors;
+        const includeInteractors = result.summary.interactors;
 
+        console.log('Include interactors: ', includeInteractors)
         this.cys.forEach(cy => {
           cy.batch(() => {
             const style: Style = cy.data('reactome');
@@ -829,7 +831,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
                     occurence.data('exp', [undefined])
                   }
                 } else {
-                  occurence.data('exp', undefined)
+                  occurence.removeData('exp')
                 }
               });
 
@@ -863,7 +865,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
               'text-outline-width': extract(style.properties.shadow.fontPadding) / 2
             })
 
-            this.reactomeStyle.loadAnalysis(cy, this.analysis.palette().scale);
+            this.reactomeStyles.forEach(style => style.loadAnalysis(style.cy!, this.analysis.palette().scale));
           })
         })
       }

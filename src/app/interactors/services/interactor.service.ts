@@ -141,6 +141,7 @@ export class InteractorService {
             const occurrenceNode = cy?.add({
               data: {
                 ...entityNode.data(),
+                exp: undefined,
                 id: id,
                 displayName: interactorEntity.count,
                 entity: entityNode,
