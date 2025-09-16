@@ -304,3 +304,7 @@ export function extractFromSpace(input: string, getBeforeSpace: boolean = false)
   }
 }
 
+export function average(numbers: number[]): number {
+  return numbers.reduce((a, b) => a + b, 0) / numbers.length;
+}
+

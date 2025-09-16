@@ -193,16 +193,28 @@ export class Style {
         }
       },
       {
+        selector: 'node.InteractorOccurrences[?exp]',
+        css: {
+          "background-color": (node) => {
+            const exp = node.data('exp') as number[];
+            console.log(node.data(), exp)
+            return exp !== undefined ? this.currentPalette(exp[0]).hex() : this.pm('analysis', 'notFound', c => c)()
+          },
+          "border-width": this.p('global', 'thickness'),
+          "border-color": this.p('interactor', 'fill'),
+        }
+      },
+      {
         selector: 'node.InteractorOccurrences.hover',
         css: {
-          "border-width": this.pm('global', 'thickness', t => t * 1),
+          "border-width": this.p('global', 'thickness'),
           "border-color": this.p('global', 'hoverNode'),
         }
       },
       {
         selector: 'node.InteractorOccurrences.select',
         css: {
-          "border-width": this.pm('global', 'thickness', t => t * 1),
+          "border-width": this.p('global', 'thickness'),
           "border-color": this.p('global', 'selectNode'),
         }
       },

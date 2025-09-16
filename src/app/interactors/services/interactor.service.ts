@@ -213,6 +213,12 @@ export class InteractorService {
         data: {
           ...targetNode.data(),
           id: id,
+          graph: {
+            ...targetNode.data('graph'),
+            leaves: undefined,
+            identifier: interactor.acc,
+          },
+          exp: undefined,
           displayName: displayName.replace(/([/,:;-])/g, "$1\u200b"),
           html: this.diagramService.getStructureVideoHtml({
             id,

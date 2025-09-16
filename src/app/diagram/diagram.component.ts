@@ -36,7 +36,7 @@ import {UrlStateService} from "../services/url-state.service";
 import {UntilDestroy} from "@ngneat/until-destroy";
 import {AnalysisService} from "../services/analysis.service";
 import {Graph} from "../model/graph.model";
-import {isDefined, isPathwayWithDiagram, isReferenceEntityStId} from "../services/utils";
+import {average, isDefined, isPathwayWithDiagram, isReferenceEntityStId} from "../services/utils";
 import {Analysis} from "../model/analysis.model";
 import {ActivatedRoute, Router} from "@angular/router";
 import {InteractorsComponent} from "../interactors/interactors.component";
@@ -49,6 +49,7 @@ import {DownloadFormat, DownloadService} from "../services/download.service";
 import {Pathway} from "../model/graph/event/pathway.model";
 import {DataStateService} from "../services/data-state.service";
 import {SchemaClasses} from "../constants/constants";
+import {Interactor} from "../interactors/model/interactor.model";
 
 
 const INIT_RX = 2;
@@ -809,17 +810,35 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         )
 
         let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
+        const includeInteractors = !!this.analysis.result()?.summary?.interactors;
 
         this.cys.forEach(cy => {
           cy.batch(() => {
             const style: Style = cy.data('reactome');
 
+            cy.nodes('.InteractorOccurrences')
+              .forEach(occurence => {
+                if (includeInteractors) {
+                  const interactors: Interactor[] = occurence.data('interactors');
+                  const exps = interactors.map(i => analysisEntityMap.get(i.acc)).filter(isDefined);
+                  if (interactors && exps.length > 0) {
+                    occurence.data('exp', [average(exps)])
+                  } else {
+                    occurence.data('exp', [undefined])
+                  }
+                } else {
+                  occurence.data('exp', undefined)
+                }
+              });
+
+
             cy.nodes('.PhysicalEntity').forEach(node => {
+              if (node.hasClass('Interactor') && !includeInteractors) return; // Avoid coloring interactors when analysis does not include them
+
               const leaves: Graph.Node[] = node.data('graph.leaves') || [node.data('graph')];
               const exp = leaves
                 ?.map(leaf => analysisEntityMap.get(leaf.identifier))
                 ?.sort((a, b) => a !== undefined ? (b !== undefined ? a - b : -1) : 1);
-
               // if (hasExpression) exp = exp.map(e => e !== undefined ? 1 - e : undefined);
               node.data('exp', exp);
             })
@@ -969,6 +988,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         if (this.comparing) {
           this.initialiseReplaceElements();
         }
+
+        if (this._loadAnalysisFn) this._loadAnalysisFn(this.analysis.sampleIndex());
       }
     );
 
