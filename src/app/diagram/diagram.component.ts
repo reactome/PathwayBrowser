@@ -400,7 +400,9 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
           ? new Map(shadowNodes.map(node => [node.data('reactomeId'), node.data('color')]))
           : undefined);
 
-        this.thumbnailImg.set(this.cy.png({full: true, maxHeight: 240}))
+        setTimeout(() => {
+          this.thumbnailImg.set(this.cy.png({full: true, maxHeight: 240}))
+        }, 5)
         this.cy.on('viewport', () => {
           this.zoomLevel.set(this.cy.zoom());
           this.viewportPosition.set({...this.cy.pan()});
