@@ -9,9 +9,13 @@
 
   <div id="cytoscape" #cytoscape></div>
   <div id="disease-container" class="drag-container" #compareContainer [style.display]="comparing ? 'flex': 'none'">
-    <div id="handle-limits" (mouseup)="dragEnd()" (mouseleave)="dragEnd()"
-         (mousemove)="dragMove($event, compareContainer, container)" [class.active]="compareDragging">
-      <span id="disease-handle" class="drag-handle" (mousedown)="dragStart()"></span>
+    <div id="handle-limits"
+         (mouseup)="dragEnd()" (mouseleave)="dragEnd()"
+         (touchend)="dragEnd()" (touchcancel)="dragEnd()"
+         (mousemove)="dragMove($event, compareContainer, container)"
+         (touchmove)="dragMove($event, compareContainer, container)"
+         [class.active]="compareDragging">
+      <span id="disease-handle" class="drag-handle" (mousedown)="dragStart()" (touchstart)="dragStart()" ></span>
     </div>
 
     <div id="cytoscape-compare" #cytoscapeCompare class="drag-content"></div>

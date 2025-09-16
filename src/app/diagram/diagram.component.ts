@@ -872,9 +872,10 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     this.compareDragging = false;
   }
 
-  dragMove($event: MouseEvent, compareContainer: HTMLDivElement, container: HTMLDivElement) {
+  dragMove($event: MouseEvent | TouchEvent, compareContainer: HTMLDivElement, container: HTMLDivElement) {
     if (!this.compareDragging) return;
-    compareContainer.style['left'] = $event.x - container.getBoundingClientRect().x + 'px';
+    const x = $event instanceof TouchEvent ? $event.touches[0].clientX : $event.x;
+    compareContainer.style['left'] = x - container.getBoundingClientRect().x + 'px';
     this.cyCompare.resize()
     this.syncViewports(this.cy!, this.cytoscapeContainer!.nativeElement, this.cyCompare!, this.compareContainer!.nativeElement);
   }
