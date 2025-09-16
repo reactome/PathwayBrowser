@@ -1,5 +1,5 @@
 import {computed, effect, Injectable, linkedSignal, signal, WritableSignal} from '@angular/core';
-import {catchError, Observable, of, switchMap, tap} from "rxjs";
+import {catchError, EMPTY, Observable, of, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {Analysis} from "../model/analysis.model";
@@ -12,10 +12,10 @@ import {DataStateService} from "./data-state.service";
 import {Params} from "@angular/router";
 import {cleanObject} from "../reacfoam/reacfoam.service";
 import {isDefined, shouldBeScientificFormat} from "./utils";
-import NotFoundIdentifier = Analysis.NotFoundIdentifier;
 import {Report} from "reactome-gsa-form/lib/model/report-status.model";
 import {Species} from "../model/graph/species.model";
 import {SpeciesService} from "./species.service";
+import NotFoundIdentifier = Analysis.NotFoundIdentifier;
 
 export interface Pagination extends Params {
   page: number,
@@ -208,7 +208,7 @@ export class AnalysisService {
           resource: request.resource || undefined,
           species: request.species.join(',')
         }) :
-        of(undefined)
+        EMPTY
     }
   });
 
