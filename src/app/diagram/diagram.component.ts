@@ -815,7 +815,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
         let analysisPathwayMap = new Map<number, Analysis.Pathway['entities']>(pathways.map(p => [p.dbId, p.entities]));
         const includeInteractors = result.summary.interactors;
 
-        console.log('Include interactors: ', includeInteractors)
         this.cys.forEach(cy => {
           cy.batch(() => {
             const style: Style = cy.data('reactome');
