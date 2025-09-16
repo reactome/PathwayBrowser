@@ -1,12 +1,13 @@
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Params, Router} from "@angular/router";
-import {catchError, combineLatestWith, filter, firstValueFrom, map, of, switchMap} from "rxjs";
+import {catchError, filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
 import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {PaletteName} from "./analysis.service";
 import {Analysis} from "../model/analysis.model";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 
 const FRAGMENT_PATTERN = /\/(?<id>R-[A-Z]{3}-\d+)?&?(?<params>.*)/;
@@ -85,8 +86,10 @@ export class UrlStateService implements State {
 
   public readonly pathwayId = signal<string | undefined>(undefined);
 
+  section = toSignal(this.route.fragment)
 
-  constructor(route: ActivatedRoute, private router: Router, private http: HttpClient) {
+
+  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),

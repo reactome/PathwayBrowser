@@ -62,7 +62,6 @@ export class DescriptionTabComponent {
 
   readonly obj = input.required<SelectableObject>();
   readonly analysisResult = input<Analysis.Result>();
-  readonly section = toSignal(this.route.fragment);
 
   static referenceTypeToNameSuffix = new Map<string, string>([
       ["ReferenceMolecule", ""],
@@ -316,11 +315,13 @@ export class DescriptionTabComponent {
               public state: UrlStateService
   ) {
     effect(() => {
-      !!this.section() && document.getElementById(this.section()!)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'start'
-      });
+      !!this.state.section() && this.obj() && setTimeout(() => {
+        document.getElementById(this.state.section()!)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'start'
+        });
+      }, 500) // leave some time for sections to render
     });
     effect(() => console.log("selected object", this.obj()))
   }

@@ -19,7 +19,9 @@ export class DetailsComponent {
   hasDetail = computed(() => (this.dataState.hasDetail()))
 
   selectedTabIndex = linkedSignal<number>(
-    () => this.hasResult() ? 2 : // Has results => results tab
+    () =>
+      this.state.section() ? 0 : // // Has detail section ==> detail tab
+      this.hasResult() ? 2 : // Has results => results tab
       this.hasDetail() ? 0 : // Has detail ==> detail tab
         4 // Nothing ==> Info tab
   )
@@ -28,7 +30,7 @@ export class DetailsComponent {
   constructor(
     protected analysis: AnalysisService,
     public dataState: DataStateService,
-    public state: UrlStateService) {
+    public state: UrlStateService,) {
   }
 
 }
