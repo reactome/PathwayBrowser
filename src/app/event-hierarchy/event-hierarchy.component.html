@@ -9,7 +9,7 @@
     <nav class="breadcrumb">
       <div class="gradient-holder-left"></div>
 
-      @for (breadcrumb of breadcrumbs; track breadcrumb; let last = $last) {
+      @for (breadcrumb of breadcrumbs; track breadcrumb.dbId; let last = $last) {
         <!--        <span class="gutter">></span>-->
         @if (!last) {
           <a class="breadcrumb-item" queryParamsHandling="preserve" [routerLink]="['/PathwayBrowser', this.pathwayId()]"
