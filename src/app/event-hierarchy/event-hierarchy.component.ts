@@ -297,13 +297,11 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   private loadEvents(treeEvent: Event) {
     // Collapse all events when selecting any tlps
-    if (treeEvent.schemaClass === this._TOP) {
-      //this.tree.collapseAll();
-    }
+    // if (treeEvent.schemaClass === this._TOP) {
+    //   this.tree.collapseAll();
+    // }
 
     treeEvent.isSelected = true;
-    this.clearAllSelectedEvents(this.treeDataSource.data);
-    this.selectAllParents(treeEvent, this.treeDataSource.data);
 
     if (isPathway(treeEvent)) {
       this.eventService.loadEventData(treeEvent);
