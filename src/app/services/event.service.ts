@@ -428,6 +428,7 @@ export class EventService {
 
 
     //this.lastMatchedEvent = null; // Reset at start
+    this._breadcrumbPath = []
 
     return from(ancestors).pipe(
       concatMap((ancestor, index) => {
