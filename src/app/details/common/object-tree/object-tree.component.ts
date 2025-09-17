@@ -119,7 +119,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   constructor(private iconService: IconService,
               private entity: EntityService,
               private dataStateService: DataStateService,
-              private urlState: UrlStateService,
+              private state: UrlStateService,
               private extractCompartmentPipe: ExtractCompartmentPipe,
   ) {
 
@@ -582,20 +582,23 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   onSelectClick(event: MouseEvent, node: E) {
     event.stopPropagation();
     if (!node.stId) return;
-    if (isPathway(node) && node.hasDiagram) {
-      this.urlState.pathwayId.set(node.stId);
-      this.urlState.select.set(null);
+    if (this.requireNavigate(node)) {
+      this.state.pathwayId.set(node.stId);
+      this.state.select.set(null);
     } else {
-      this.urlState.select.set(node.stId);
+      this.state.select.set(node.stId);
     }
   }
 
   selectTooltip(node: E) {
     const id = node.stId || node.dbId;
-    const action = isPathway(node) && node.hasDiagram ? 'Navigate to' : 'Select ';
+    const action = this.requireNavigate(node) ? 'Navigate to' : 'Select ';
     return `${action} ${id}`;
   }
 
+  private requireNavigate(node: E) {
+    return isPathway(node) && (node.hasDiagram || !this.state.pathwayId()?.includes(node.species[0]?.abbreviation));
+  }
 
   getUrl(element: E): string {
     if (isReferenceSummary(element)) return element.url;
