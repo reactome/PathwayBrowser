@@ -3,7 +3,7 @@ import {ActivatedRoute, NavigationEnd, Params, Router} from "@angular/router";
 import {catchError, filter, firstValueFrom, map, of, switchMap} from "rxjs";
 import {isArray, isNumber} from "lodash";
 import {HttpClient} from "@angular/common/http";
-import {CONTENT_SERVICE, environment} from "../../environments/environment";
+import {CONTENT_SERVICE} from "../../environments/environment";
 import {PaletteName} from "./analysis.service";
 import {Analysis} from "../model/analysis.model";
 import {UntilDestroy, untilDestroyed} from "@ngneat/until-destroy";
@@ -184,7 +184,7 @@ export class UrlStateService implements State {
         queryParams[key] = isArray(paramValue) ? paramValue.join(';') : paramValue;
       }
       console.log('Updating URL from state', queryParams)
-      this.router.navigate([], {queryParams, preserveFragment: true});
+      this.router.navigate(this.pathwayId() ? [this.pathwayId()] : [], {queryParams, preserveFragment: true});
     });
   }
 
