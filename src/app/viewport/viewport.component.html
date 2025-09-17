@@ -153,7 +153,7 @@
               <a href="/" id="main">
                 <mat-icon [svgIcon]="'logo'"></mat-icon>
               </a>
-              <span class="version">v{{ general.version$ | async }}</span>
+              <span class="version">v{{ general.version.value() }}</span>
             </div>
           </div>
         </div>

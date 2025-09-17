@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {catchError, filter, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
+import {catchError, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Diagram, Edge, Node, NodeConnector, Position, Prop, Rectangle} from "../model/diagram.model";
 import {Graph} from "../model/graph.model";
@@ -9,12 +9,13 @@ import {array} from "vectorious";
 
 import cytoscape from "cytoscape";
 import cytoscapeFcose, {FcoseLayoutOptions} from "cytoscape-fcose";
-import {CONTENT_SERVICE, DOWNLOAD, environment} from "../../environments/environment";
+import {CONTENT_SERVICE, environment} from "../../environments/environment";
+import {isDefined} from "./utils";
+import {SchemaClasses} from "../constants/constants";
+import {GeneralService} from "./general.service";
 import NodeDefinition = Reactome.Types.NodeDefinition;
 import ReactionDefinition = Reactome.Types.ReactionDefinition;
 import EdgeTypeDefinition = Reactome.Types.EdgeTypeDefinition;
-import {isDefined} from "./utils";
-import {SchemaClasses} from "../constants/constants";
 
 cytoscape.use(cytoscapeFcose)
 
@@ -74,7 +75,7 @@ export class DiagramService {
   extraLine: Map<string, Position> = new Map<string, Position>();
   reverseExtraLine: Map<string, Position> = new Map<string, Position>();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private general: GeneralService) {
   }
 
   nodeTypeMap = new Map<string, NodeDefinition>([
@@ -203,16 +204,16 @@ export class DiagramService {
 
   public getDiagram(id: number | string): Observable<cytoscape.ElementsDefinition> {
     return forkJoin({
-      diagram: this.http.get<Diagram>(`${DOWNLOAD}/diagram/${id}.json`),
-      graph: this.http.get<Graph.Data>(`${DOWNLOAD}/diagram/${id}.graph.json`)
+      diagram: this.http.get<Diagram>(`${this.general.download()}/diagram/${id}.json`),
+      graph: this.http.get<Graph.Data>(`${this.general.download()}/diagram/${id}.graph.json`)
     }).pipe(
       tap(({diagram, graph}) => console.log('Original diagram:', diagram, 'Original graph', graph)),
       switchMap(({diagram, graph}) => {
         if (diagram.forNormalDraw !== undefined && !diagram.forNormalDraw) {
           return this.getNormalPathway(diagram.stableId).pipe(
             switchMap(normalPathwayId => forkJoin({
-              normalDiagram: this.http.get<Diagram>(`${DOWNLOAD}/diagram/${normalPathwayId}.json`),
-              normalGraph: this.http.get<Graph.Data>(`${DOWNLOAD}/diagram/${normalPathwayId}.graph.json`)
+              normalDiagram: this.http.get<Diagram>(`${this.general.download()}/diagram/${normalPathwayId}.json`),
+              normalGraph: this.http.get<Graph.Data>(`${this.general.download()}/diagram/${normalPathwayId}.graph.json`)
             })),
             tap(({
                    normalGraph,
@@ -448,7 +449,7 @@ export class DiagramService {
           const graphData = idToGraphNodes.get(item.id);
           if (!graphData) console.error("Missing graph data for node: ", item.id, ". Potential reason could be a wrong normal pathway for a disease")
           let preferredId = unitId || graphData?.identifier;
-          let chebiStructure =  preferredId ? chebiMapping.get(preferredId) : undefined
+          let chebiStructure = preferredId ? chebiMapping.get(preferredId) : undefined
           if (classes.some(clazz => clazz === 'Protein')) {
             html = this.getStructureVideoHtml({...item, type: 'Protein'}, width, height, preferredId);
           }
@@ -849,7 +850,7 @@ export class DiagramService {
   }
 
   getEHLDSvg(id: number | string): Observable<string> {
-    return this.http.get(`${DOWNLOAD}/ehld/${id}.svg`, {responseType: 'text'});
+    return this.http.get(`${this.general.download()}/ehld/${id}.svg`, {responseType: 'text'});
   }
 }
 

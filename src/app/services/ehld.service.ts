@@ -1,12 +1,12 @@
 import {computed, ElementRef, Injectable} from '@angular/core';
 import {Observable} from "rxjs";
-import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Analysis} from "../model/analysis.model";
 import {isArray} from "lodash";
 import {AnalysisService} from "./analysis.service";
 import {DataStateService} from "./data-state.service";
 import {UrlStateService} from "./url-state.service";
+import {GeneralService} from "./general.service";
 
 export interface LegendItem {
   name: string;
@@ -52,11 +52,11 @@ export class EhldService {
     }
   ];
 
-  constructor(private http: HttpClient, private analysis: AnalysisService, private data: DataStateService, private state: UrlStateService) {
+  constructor(private http: HttpClient, private analysis: AnalysisService, private data: DataStateService, private state: UrlStateService, private general: GeneralService) {
   }
 
   getSVGData(id: string): Observable<string> {
-    return this.http.get(`${environment.host}/download/current/ehld/${id}.svg`, {responseType: 'text'})
+    return this.http.get(`${this.general.download()}/ehld/${id}.svg`, {responseType: 'text'})
   }
 
   // Hover an element
