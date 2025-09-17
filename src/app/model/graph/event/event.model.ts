@@ -7,9 +7,10 @@ import {Relationship} from "../relationship.model";
 import HasCompartment = Relationship.HasCompartment;
 import {Species} from "../species.model";
 import {Disease} from "../external-ontology/disease.model";
+import {InDepth} from "../in-depth.model";
 
 
-export interface Event extends DatabaseObject {
+export interface Event extends DatabaseObject, InDepth {
   stId: string;
   authored: InstanceEdit[];
   reviewed: InstanceEdit[];

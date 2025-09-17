@@ -6,9 +6,10 @@ import {Relationship} from "../relationship.model";
 import {DatabaseIdentifier} from "../database-identifier.model";
 import {Disease} from "../external-ontology/disease.model";
 import {MarkerReference} from "../control-reference/marker-reference.model";
+import {InDepth} from "../in-depth.model";
 
 
-export interface PhysicalEntity extends DatabaseObject {
+export interface PhysicalEntity extends DatabaseObject, InDepth {
   stId: string
   definition: string;
   compartment: Relationship.HasCompartment[];

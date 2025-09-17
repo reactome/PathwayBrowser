@@ -13,7 +13,8 @@ import {
   isChemical,
   isEvent,
   isEWAS,
-  isMolecule, isPathway,
+  isMolecule,
+  isPathway,
   isRefEntity,
   isReferenceSummary,
   isRLE,
@@ -73,7 +74,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   hasDepthControl = input<boolean>(false);
   depthIndex = model<number | undefined>();
   depthChangeSource = model<'controller' | 'tree' | undefined>(undefined);
-  treeLength = model<number | undefined>(undefined);
   scope = input<'entity' | 'event'>('entity');
 
   moleculeView = input<boolean>(false);
@@ -82,13 +82,12 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   _selectedTreeNode = signal<E | undefined>(undefined);
   selectedTreeNode = computed(() => this._selectedTreeNode());
-  fullTreeCache: R[] = [];
   initialData: R[] = [];
 
   @ViewChild(MatTree) tree!: MatTree<R>;
 
   readonly type = input.required<string>();
-  readonly data = input.required<E | R | (E | R)[]>();
+  readonly data = input.required<(R | E)[] | E | R>();
 
   treeData = computed<R[]>(() => {
     let data = this.data();
@@ -160,16 +159,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
     });
 
-    // Fetch full tree to get maxLevel when fist load
-    effect(() => {
-
-      const fullTree = this._fullTreeSource.value();
-      if (!fullTree || fullTree.length === 0) return;
-      const maxLevel = this.getTreeDepth(fullTree, 0);
-      this.treeLength.set(maxLevel);
-      this.fullTreeCache = fullTree;
-    });
-
   }
 
   _treeSource = rxResource({
@@ -187,30 +176,12 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
         return of(this.dataSource.data);
       }
 
-      // Use cached tree data when depth is the tree length
-      if (depth === this.treeLength()) {
-        return of(this.fullTreeCache);
-      }
-
       const depthInQuery = depth - 1; // Ignore the default depth 1
       const results = [...this.treeData()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
 
       return forkJoin(results).pipe();
     }
   });
-
-  // Get max level when first load
-  _fullTreeSource = rxResource({
-    request: () => (this.treeData()),
-    loader: (params) => {
-      if (this.hasDepthControl()) {
-        const nodeResults = params.request.map((node) => this.fetchTreeAtDepth(node, -1));
-        return forkJoin(nodeResults);
-      }
-
-      return of(this.treeData());
-    }
-  })
 
 
   inDepth(id: string | number, depth: number): Observable<E> {
