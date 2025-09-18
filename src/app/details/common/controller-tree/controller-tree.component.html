@@ -1,23 +1,23 @@
 <div id="component-container">
   <div class="controllers">
-    <div class="depth-controller">
+    <div class="depth-controller" gaCategory="depth-controller">
       @if (depthControl()) {
         <button mat-icon-button class="arrow" [disabled]="depthIndex() === 1" (click)="firstPage()"
-                matTooltip="Collapse all">
+                matTooltip="Collapse all" gaEvent gaAction="collapse-all">
           <mat-icon fontSet="symbols">vertical_align_top</mat-icon>
         </button>
         <button mat-icon-button class="arrow" [disabled]="depthIndex() === 1" (click)="previousPage()"
-                matTooltip="Collapse one">
+                matTooltip="Collapse one" gaEvent gaAction="collapse-one" [gaValue]="depthIndex()">
           <mat-icon fontSet="symbols" class="flipped">step_into</mat-icon>
         </button>
         <span class="counter">{{ depthIndex() }}</span>
 
         <button mat-icon-button class="arrow" [disabled]="depthIndex() === maxDepth()" (click)="nextPage()"
-                matTooltip="Expand one">
+                matTooltip="Expand one" gaEvent gaAction="expand-one" [gaValue]="depthIndex()">
           <mat-icon fontSet="symbols">step_into</mat-icon>
         </button>
         <button mat-icon-button class="arrow" [disabled]="depthIndex() === maxDepth()" (click)="lastPage()"
-                matTooltip="Expand all">
+                matTooltip="Expand all" gaEvent gaAction="expand-all">
           <mat-icon fontSet="symbols">vertical_align_bottom</mat-icon>
         </button>
       }

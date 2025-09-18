@@ -164,15 +164,11 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     request: () => ({depth: this.depthIndex()}),
     loader: ({request}) => {
       // Skip updating the tree when index changes is from the tree
-      if (this.depthChangeSource() === 'tree') {
-        return of(this.dataSource.data);
-      }
+      if (this.depthChangeSource() === 'tree') return of(this.dataSource.data);
 
       const depth = request.depth;
 
-      if (!depth) {
-        return of(this.dataSource.data);
-      }
+      if (!depth) return of(this.dataSource.data);
 
       const depthInQuery = depth - 1; // Ignore the default depth 1
       const results = [...this.treeData()].map((node) => this.fetchTreeAtDepth(node, depthInQuery).pipe(
