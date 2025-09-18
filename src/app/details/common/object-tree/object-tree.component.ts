@@ -151,7 +151,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       if (index && index > 1 && source == 'controller') {
         const treeData = this._treeSource.value();
         if (treeData && treeData.length > 0) {
-          this.dataSource.data = [];
           this.dataSource.data = treeData;
           // tree.expandAll() will expand all tree nodes include protein
           this.expandNestedTreeNodes(treeData);
@@ -164,7 +163,6 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   _treeSource = rxResource({
     request: () => ({depth: this.depthIndex()}),
     loader: ({request}) => {
-
       // Skip updating the tree when index changes is from the tree
       if (this.depthChangeSource() === 'tree') {
         return of(this.dataSource.data);
@@ -177,9 +175,11 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
       }
 
       const depthInQuery = depth - 1; // Ignore the default depth 1
-      const results = [...this.treeData()].map((node) => this.fetchTreeAtDepth(node, depthInQuery));
+      const results = [...this.treeData()].map((node) => this.fetchTreeAtDepth(node, depthInQuery).pipe(
+        map(result => this.updateTree(this.dataSource.data, result.element)!)
+      ));
 
-      return forkJoin(results).pipe();
+      return forkJoin(results)
     }
   });
 
