@@ -270,11 +270,11 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     }
   }
 
-  fetchTreeAtDepth(node: R, depth: number) {
+  fetchTreeAtDepth(node: R, depth: number): Observable<R> {
     const element = node.element as E;
     const id = element.stId || element.dbId;
 
-    if (!this.isNestedView(element)) {
+    if (!this.isNestedView(element) || depth === 0) {
       // Return node with composedOf when element is protein
       const normalElement = {
         ...element,
