@@ -3,9 +3,9 @@ import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
 import {rxResource, toObservable} from "@angular/core/rxjs-interop";
-import {HttpClient} from "@angular/common/http";
-import {CONTENT_SERVICE, environment} from "../../../environments/environment";
-import {BehaviorSubject, catchError, Observable, of, Subscription, switchMap, take} from "rxjs";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {CONTENT_SERVICE} from "../../../environments/environment";
+import {BehaviorSubject, catchError, Observable, of, Subscription, switchMap, take, tap} from "rxjs";
 import {animate, sequence, state, style, transition, trigger} from "@angular/animations";
 import {SpeciesService} from "../../services/species.service";
 import {UrlStateService} from "../../services/url-state.service";
@@ -16,9 +16,8 @@ import {IconService} from "../../services/icon.service";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {FlagButtonComponent} from "../../details/common/flag-button/flag-button.component";
-import Entry = Search.Entry;
 import {ShadowScrollComponent} from "../../shared/shadow-scroll/shadow-scroll.component";
-import * as path from "node:path";
+import Entry = Search.Entry;
 
 const MIN_SUGGEST_LENGTH = 2;
 const AVAILABLE_IN_HEIGHT = 20;
@@ -100,7 +99,6 @@ export class SearchComponent {
 
   searchText = signal('');
   hasFocus = signal<boolean>(false);
-  open = signal(false);
 
   inputBox = viewChild.required<ElementRef<HTMLDivElement>>('inputBox');
   query = viewChild.required<ElementRef<HTMLInputElement>>('query');
@@ -124,6 +122,9 @@ export class SearchComponent {
 
   resultsScroll = viewChild<CdkVirtualScrollViewport>('resultScroll')
   resultPathways = viewChild<ShadowScrollComponent>('resultPathways')
+
+  hasSearchedWithNoResult = signal<boolean>(false);
+  searchErrorMessage = signal<string>('');
 
 
   constructor(
@@ -201,9 +202,11 @@ export class SearchComponent {
   }
 
   clear($event: Event) {
-    this.searchText.set('')
+    this.searchText.set('');
     this.searchParams.set(undefined);
-    this.hasFocus.set(false)
+    this.hasFocus.set(false);
+    this.hasSearchedWithNoResult.set(false);
+    this.searchErrorMessage.set('');
     $event.preventDefault();
     $event.stopPropagation();
   }
@@ -225,8 +228,12 @@ export class SearchComponent {
 
   scopes: Record<Scope, SearchDataSource> = {
     local: new SearchDataSource(this.searchParams$,
-      (page, pageSize, params) => params.diagram && params.query.length > 0 ?
-        this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/diagram/${params.diagram}`, {
+      (page, pageSize, params) => {
+        if (params.diagram && params.query.length === 0) {
+          this.hasSearchedWithNoResult.set(false);
+          return of(Search.EMPTY_RESULTS);
+        }
+        return this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/diagram/${params.diagram}`, {
           params: {
             ...params,
             start: page * pageSize,
@@ -234,12 +241,23 @@ export class SearchComponent {
             includeInteractors: false,
             scope: 'REFERENCE_ENTITY'
           } as Search.Paginated<Search.Params>
-        })
-        : of(Search.EMPTY_RESULTS)
+        }).pipe(
+          catchError((error: HttpErrorResponse) => {
+            return this.handleSearchError(error);
+          }),
+          tap((result) => {
+            this.setNoSearchResult(result);
+          })
+        )
+      }
     ),
     global: new SearchDataSource(this.searchParams$,
-      (page, pageSize, params) => params.query.length > 0 ?
-        this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/fireworks/`, {
+      (page, pageSize, params) => {
+        if (params.query.length === 0) {
+          this.hasSearchedWithNoResult.set(false);
+          return of(Search.EMPTY_RESULTS);
+        }
+        return this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/fireworks/`, {
           params: {
             ...params,
             start: page * pageSize,
@@ -247,8 +265,15 @@ export class SearchComponent {
             includeInteractors: false,
             scope: 'REFERENCE_ENTITY'
           } as Search.Paginated<Search.Params>
-        })
-        : of(Search.EMPTY_RESULTS)
+        }).pipe(
+          catchError((error: HttpErrorResponse) => {
+            return this.handleSearchError(error);
+          }),
+          tap((result) => {
+            this.setNoSearchResult(result);
+          })
+        )
+      }
     )
   }
 
@@ -302,6 +327,23 @@ export class SearchComponent {
   toggleSelection(entry: Entry | undefined) {
     if (entry) this.selectedResult.update(current => current === entry ? undefined : entry)
     this.state.select.set(this.selectedResult()?.stId || null)
+  }
+
+  handleSearchError(error: HttpErrorResponse) {
+    if (error.status === 404) {
+      this.hasSearchedWithNoResult.set(true);
+      const message = error.error?.messages?.[0] || 'No entries found';
+      this.searchErrorMessage.set(message);
+      return of(Search.EMPTY_RESULTS);
+    }
+    return of(Search.EMPTY_RESULTS);
+  }
+
+  setNoSearchResult(results: Search.Result) {
+    if (results.found > 0) {
+      this.hasSearchedWithNoResult.set(false);
+      this.searchErrorMessage.set('');
+    }
   }
 }
 
