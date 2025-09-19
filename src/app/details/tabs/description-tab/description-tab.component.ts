@@ -335,7 +335,7 @@ export class DescriptionTabComponent {
           block: 'start',
           inline: 'start'
         });
-      }, 500) // leave some time for sections to render
+      })
     });
     effect(() => console.log("selected object", this.obj()))
   }

@@ -16,14 +16,17 @@ const FRAGMENT_PATTERN = /\/(?<id>R-[A-Z]{3}-\d+)?&?(?<params>.*)/;
 export type UrlParam<T> = WritableSignal<T> & {
   otherTokens?: string[],
   initialValue: T,
-  type: 'number' | 'boolean' | 'string' | 'id'
+  type: 'number' | 'boolean' | 'string' | 'id',
+  otherTransform?: (value: T) => T,
+  set?: (value: T) => void,
 };
 
-export function urlParam<T>(initialValue: T, type: UrlParam<T>['type'], otherTokens?: string[]): UrlParam<T> {
+export function urlParam<T>(initialValue: T, type: UrlParam<T>['type'], otherTokens?: string[], otherTransform?: (value: T) => T): UrlParam<T> {
   const writableSignal = signal<T>(initialValue, {equal: (a, b) => JSON.stringify(a) === JSON.stringify(b)}) as UrlParam<T>;
   writableSignal.otherTokens = otherTokens;
   writableSignal.initialValue = initialValue;
   writableSignal.type = type;
+  writableSignal.otherTransform = otherTransform;
   return writableSignal;
 }
 
@@ -36,6 +39,17 @@ type State = UrlStateService['values']
 })
 export class UrlStateService implements State {
 
+  private readonly tabsCompatibility: [string | null, string][] = [
+    ['ST', 'details'],
+    [null, 'details'],
+    ['MT', 'molecule'],
+    ['AN', 'results'],
+    ['EX', 'expression'],
+    ['DT', 'download'],
+  ];
+  readonly oldToNewTab = new Map(this.tabsCompatibility);
+  readonly newToOldTab = new Map(this.tabsCompatibility.map(([newTab, oldTab]) => [oldTab, newTab]));
+
   readonly values = {
     select: urlParam<string | null>(null, "id", ['SEL']),
     flag: urlParam<string[]>([], "id", ['FLG'],),
@@ -43,6 +57,7 @@ export class UrlStateService implements State {
     flagInteractors: urlParam<boolean>(false, "boolean", ['FLGINT']),
     overlay: urlParam<string | null>(null, "string"),
     analysis: urlParam<string | null>(null, "string", ['ANALYSIS']),
+    tab: urlParam<string | null>(null, "string", ['DTAB'], tab => this.oldToNewTab.get(tab)!),
     significance: urlParam<number>(0.05, "number"),
     sample: urlParam<string | null>(null, "string"),
     palette: urlParam<PaletteName | null>(null, "string"),
@@ -67,6 +82,7 @@ export class UrlStateService implements State {
   public readonly flagInteractors = this.values.flagInteractors
   public readonly overlay = this.values.overlay
   public readonly analysis = this.values.analysis
+  public readonly tab = this.values.tab
   public readonly significance = this.values.significance
   public readonly sample = this.values.sample
   public readonly palette = this.values.palette
@@ -145,6 +161,7 @@ export class UrlStateService implements State {
           const initialValue = param.initialValue;
           let value = params[token];
           if (value === undefined || value === null) param.set(value);
+          if (param.otherTransform && token !== mainToken) value = param.otherTransform(value);
           else {
             if (isArray(initialValue)) {
               let values: any[] = value.split(';');
