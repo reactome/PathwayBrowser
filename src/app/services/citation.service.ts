@@ -97,21 +97,18 @@ export class CitationService {
   }
 
   openDialog() {
-    const citation = this.citationData.value();
     this.currentCitationId.set(this.updatedCitationId());
-    const id = this.currentCitationId();
-    if (citation && id) {
-      const dialogRef = this.dialog.open(CitationComponent, {
-        data: {
-          content: this.citationData.value,
-          id: this.currentCitationId,
-          downloadItems: this.currentCitationExportURLS
-        },
-        enterAnimationDuration: '450ms',
-        exitAnimationDuration: '450ms',
-      });
-      dialogRef.afterClosed();
-    }
+    const dialogRef = this.dialog.open(CitationComponent, {
+      data: {
+        content: this.citationData.value,
+        id: this.currentCitationId,
+        downloadItems: this.currentCitationExportURLS
+      },
+      enterAnimationDuration: '450ms',
+      exitAnimationDuration: '450ms',
+    });
+    dialogRef.afterClosed();
+
   }
 
   getExportUrls(id: string) {
