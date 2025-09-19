@@ -16,7 +16,17 @@ export class ControllerTreeComponent<E extends DatabaseObject & InDepth, R exten
 
   readonly type = input.required<string>();
   readonly depthControl = input.required<boolean>();
-  readonly data = input.required<R[]>();
+  readonly data = input.required<R[], (E | R)[]>({
+    transform: data => data.map((e, i) => e.element
+      ? e as R
+      : {
+        type: this.type(),
+        stoichiometry: 1,
+        order: i,
+        element: e,
+        index: i
+      } as R)
+  });
   readonly scope = input<'entity' | 'event'>('entity');
   readonly disableNavigation = input<boolean>(false);
 
