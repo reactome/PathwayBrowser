@@ -144,12 +144,15 @@
           </div>
 
           <div class="top-right">
-            <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle
+            <a [href]="formerPathwayBrowserURL()" target="_blank" mat-icon-button class="quote" matTooltip="Open former Pathway Browser">
+              <mat-icon fontSet="symbols">history</mat-icon>
+            </a>
+            <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle [matTooltip]="dark.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
                               id="dark-toggle"></mat-slide-toggle>
-            <button mat-icon-button [color]="'primary'" class="quote" (click)="openCitationDialog()">
+            <button mat-icon-button class="quote" (click)="openCitationDialog()" matTooltip="Cite us">
               <mat-icon [svgIcon]="'format-quote'"></mat-icon>
             </button>
-            <div class="logo">
+            <div class="logo" matTooltip="Go to the main page">
               <a href="/" id="main">
                 <mat-icon [svgIcon]="'logo'"></mat-icon>
               </a>
