@@ -247,7 +247,7 @@ export class ViewportComponent implements AfterViewInit {
 
   formerPathwayBrowserURL = computed(() => {
     let url = `${environment.host}/PathwayBrowser/#/`;
-    if (this.state.pathwayId()) url += this.state.pathwayId();
+    if (this.state.pathwayId() || this.state.select()) url += (this.state.pathwayId() || this.state.select()) ;
     if (this.state.select()) url += `&SEL=${this.state.select()}`;
     if (this.state.analysis()) url += `&ANALYSIS=${this.state.analysis()}`;
     if (this.state.path().length > 0) url += `&PATH=${this.state.path().join(',')}`;
