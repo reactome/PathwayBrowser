@@ -7,12 +7,12 @@ import {
   isDefinedAndNotEmpty,
   isPhysicalEntity,
   isReferenceSequence,
-  isReferenceSummary
+  isReferenceSummary,
+  isRLE
 } from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
-import {ActivatedRoute} from "@angular/router";
-import {rxResource, toSignal} from "@angular/core/rxjs-interop";
+import {rxResource} from "@angular/core/rxjs-interop";
 import {InstanceEdit} from "../../../model/graph/instance-edit.model";
 import {LiteratureReference} from "../../../model/graph/publication/literature-reference.model";
 import {SelectableObject} from "../../../services/event.service";
@@ -32,9 +32,10 @@ import {
 } from "../../../model/graph/physical-entity/entity-with-accessioned-sequence.model";
 import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
 import {camelCase, isArray} from "lodash";
-import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {UrlStateService} from "../../../services/url-state.service";
 import {CONTENT_DETAIL} from "../../../../environments/environment";
+import {SpeciesService} from "../../../services/species.service";
+import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 
 @Component({
@@ -166,6 +167,14 @@ export class DescriptionTabComponent {
 
   hasRhea = computed(() => ["RHEA", "Rhea"].includes(this.crossReference()[0]?.databaseName));
 
+  // Disable the navigation control for inferred event when there is no associated pathway
+  // https://reactome.org/beta/PathwayBrowser/R-HSA-9931510?select=R-HSA-9909400&path=R-HSA-9909396#inferredFrom
+  inferenceNavigationVisibility = computed(() => {
+    const isHuman = this.species.currentSpecies().taxId === this.species.defaultSpecies.taxId;
+    const isInferred = this.obj().isInferred;
+    return isHuman && isRLE(this.obj()) && isInferred;
+  })
+
   overview$ = viewChild<HTMLDivElement>('overview');
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
   referenceTemplate$ = viewChild.required<TemplateRef<any>>('referenceTemplate');
@@ -196,6 +205,7 @@ export class DescriptionTabComponent {
     scope?: 'entity' | 'event',
     template?: Signal<TemplateRef<any>>,
     isPresent?: Signal<boolean>,
+    disableNavigation?: Signal<boolean>
   }[] = [
     {
       key: DataKeys.OVERVIEW,
@@ -281,7 +291,11 @@ export class DescriptionTabComponent {
 
 
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true, template: this.inferencesTemplate$},
-    {key: DataKeys.INFERRED_FROM, label: Labels.INFERRED_FROM},
+    {
+      key: DataKeys.INFERRED_FROM,
+      label: Labels.INFERRED_FROM,
+      disableNavigation: computed(() => this.inferenceNavigationVisibility())
+    },
     {
       key: DataKeys.OTHER_FORMS,
       label: Labels.OTHER_FORMS,
@@ -309,10 +323,10 @@ export class DescriptionTabComponent {
 
 
   constructor(private iconService: IconService,
-              private route: ActivatedRoute,
               private entity: EntityService,
               private interactorService: InteractorService,
-              public state: UrlStateService
+              public state: UrlStateService,
+              private species: SpeciesService
   ) {
     effect(() => {
       !!this.state.section() && this.obj() && setTimeout(() => {

@@ -18,6 +18,7 @@ export class ControllerTreeComponent<E extends DatabaseObject & InDepth, R exten
   readonly depthControl = input.required<boolean>();
   readonly data = input.required<R[]>();
   readonly scope = input<'entity' | 'event'>('entity');
+  readonly disableNavigation = input<boolean>(false);
 
   readonly pageSize = input(30);
 

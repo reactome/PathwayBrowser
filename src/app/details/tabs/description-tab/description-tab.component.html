@@ -53,7 +53,8 @@
         }
         @if (!element.manual) {
           <cr-controller-tree [type]="element.key" [data]="obj()[element.key]"
-                              [depthControl]="element.hasDepthControl ?? false" [scope]="element.scope || 'entity'"/>
+                              [depthControl]="element.hasDepthControl ?? false" [scope]="element.scope || 'entity'"
+                              [disableNavigation]="element.disableNavigation?.() ?? false"/>
         } @else if (element.template) {
           <ng-container *ngTemplateOutlet="element.template!()"></ng-container>
         }

@@ -77,19 +77,22 @@
           </span>
         }
 
-        <div class="select-container">
-          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
-          <button mat-icon-button class="select button" (click)="onSelectClick($event, element)" [matTooltip]="selectTooltip(element)">
-            <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
-          </button>
-        </div>
+        @if (!disableNavigation()) {
+          <div class="select-container">
+            <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+            <button mat-icon-button class="select button" (click)="onSelectClick($event, element)" [matTooltip]="selectTooltip(element)">
+              <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
+            </button>
+          </div>
 
-        <div class="goTo-container">
-          <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()"
-             [matTooltip]="'Open origin of ' + (element.stId || element.dbId)">
-            <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
-          </a>
-        </div>
+          <div class="goTo-container">
+            <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()"
+               [matTooltip]="'Open origin of ' + (element.stId || element.dbId)">
+              <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
+            </a>
+          </div>
+        }
+
       </div>
     </div>
 

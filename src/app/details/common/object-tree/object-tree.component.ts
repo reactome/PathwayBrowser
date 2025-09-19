@@ -75,6 +75,7 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   depthIndex = model<number | undefined>();
   depthChangeSource = model<'controller' | 'tree' | undefined>(undefined);
   scope = input<'entity' | 'event'>('entity');
+  disableNavigation = input<boolean>(false);
 
   moleculeView = input<boolean>(false);
   stoichiometry = input<number>();
