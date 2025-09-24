@@ -2,7 +2,6 @@ import {ChangeDetectionStrategy, Component, computed, input} from '@angular/core
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
 import {SelectableObject} from "../../../../services/event.service";
 import {DatabaseIdentifier} from "../../../../model/graph/database-identifier.model";
-import {StructureViewerComponent} from "../../../tabs/molecule-tab/structure-viewer/structure-viewer.component";
 import {MatDivider} from "@angular/material/divider";
 import {
   DescriptionOverviewComponent
@@ -12,6 +11,7 @@ import {CrossReferencesComponent} from "../../cross-references/cross-references.
 import {isRefEntity} from "../../../../services/utils";
 import {MoleculeType} from "../../../tabs/molecule-tab/molecule-tab.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {NoticeInfoComponent} from "../../notice-info/notice-info.component";
 
 @Component({
   selector: 'cr-object-tree-details',
@@ -20,7 +20,8 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     DescriptionOverviewComponent,
     ExternalReferenceComponent,
     CrossReferencesComponent,
-    MatProgressSpinner
+    MatProgressSpinner,
+    NoticeInfoComponent
   ],
   templateUrl: './object-tree-details.component.html',
   styleUrl: './object-tree-details.component.scss',

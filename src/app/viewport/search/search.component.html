@@ -14,7 +14,7 @@
     <input type="text" placeholder="Search protein, gene, pathway, reaction" [(ngModel)]="searchText" #query
            (keydown)="hasFocus.set(true)">
   </div>
-  @if (scopes[currentScopeName()].found()) {
+  @if (scopes[currentScopeName()].found() || hasSearchedWithNoResult()) {
     <button mat-icon-button (click)="clear($event)">
       <mat-icon fontSet="symbols">close</mat-icon>
     </button>
@@ -33,11 +33,12 @@
 </div>
 
 
-@if (scopes.global.found()) {
+@if (scopes.global.found() || hasSearchedWithNoResult()) {
   <div class="results" @results>
     @if (collapsed() !== 'collapsed') {
       <div class="collapsable" @collapsable>
         <div class="scope-container">
+          @if (scopes.global.found() > 0 || hasSearchedWithNoResult()) {
           @if (state.pathwayId() && scopes.local.found()) {
             <div class="scope" [class.selected]="currentScopeName() === 'local'"
                  (click)="currentScopeName.set('local')">
@@ -52,18 +53,30 @@
             <span>All pathways</span>
             <span class="count" [class.active]="currentScopeName() === 'global'">{{ scopes.global.found() }}</span>
           </div>
-        </div>
-        <div class="facets">
-          @for (facet of currentScope().facets(); track facet.name) {
-            <div class="facet" [class.active]="check.checked" (click)="check.toggle()">
-              <mat-checkbox [value]="facet.name" #check (click)="$event.stopPropagation()"
-                            [checked]="typeFilter().includes(facet.name)"
-                            (change)="toggleTypeFacet(facet.name)">{{ facet.name }}
-              </mat-checkbox>
-              <span class="count" [class.active]="check.checked">{{ facet.count }}</span>
-            </div>
           }
         </div>
+
+        @if (currentScope().facets().length > 0) {
+          <div class="facets">
+            @for (facet of currentScope().facets(); track facet.name) {
+              <div class="facet" [class.active]="check.checked" (click)="check.toggle()">
+                <mat-checkbox [value]="facet.name" #check (click)="$event.stopPropagation()"
+                              [checked]="typeFilter().includes(facet.name)"
+                              (change)="toggleTypeFacet(facet.name)">{{ facet.name }}
+                </mat-checkbox>
+                <span class="count" [class.active]="check.checked">{{ facet.count }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (hasSearchedWithNoResult()) {
+          <div class="no-result-message">
+            <mat-icon class="no-results-icon">search_off</mat-icon>
+            <p>{{ searchErrorMessage() }}</p>
+          </div>
+        }
+
         <div class="results-content">
           <cdk-virtual-scroll-viewport [style.height.px]="resultHeight()" #resultScroll class="scroller"
                                        [itemSize]="entryHeight()"

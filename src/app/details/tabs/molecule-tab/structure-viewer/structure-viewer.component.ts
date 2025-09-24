@@ -21,6 +21,7 @@ import {HttpClient} from "@angular/common/http";
 import {SafePipe} from "../../../../pipes/safe.pipe";
 import {SelectableObject} from "../../../../services/event.service";
 import {MoleculeType} from "../molecule-tab.component";
+import {NoticeInfoComponent} from "../../../common/notice-info/notice-info.component";
 
 export interface StructureEntry {
   pdb_id: string;
@@ -56,7 +57,8 @@ declare const PDBeMolstarPlugin: any;
     MatSelect,
     MatOptgroup,
     MatOption,
-    SafePipe
+    SafePipe,
+    NoticeInfoComponent
   ],
   styleUrl: './structure-viewer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -140,7 +142,8 @@ export class StructureViewerComponent {
     }
   })
 
-  hasAnyStructure = computed(() => this.chebiStructureSVGData.hasValue() || !!this.proteinStructureData()?.length)
+  hasAnyStructure = computed(() => this.chebiStructureSVGData.hasValue() || !!this.proteinStructureData()?.length);
+  isChebiLoading = computed(() => this.chebiStructureId.isLoading() || this.chebiStructureSVGData.isLoading());
 
   bgColor = computed(() => {
     this.dark.isDark(); // Compute on dark update

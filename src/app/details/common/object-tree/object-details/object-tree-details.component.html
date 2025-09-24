@@ -25,7 +25,6 @@
     <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
     <!-- only provide this info for RNA/DNA which is Entity from backend on molecule tab -->
   } @else if (isMoleculeView() && moleculeType() === MoleculeType.ENTITY) {
-    <p class="padding">No further information is available. Click the arrow icon in the top right to view more
-      details.</p>
+    <cr-notice-info />
   }
 </div>
