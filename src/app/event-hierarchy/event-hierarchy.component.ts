@@ -35,7 +35,10 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   private _SCROLL_SPEED = 50; // pixels per second
   private _ICON_PADDING = 16;
+  private _ICON_MARGIN = 8 - 4; // Right margin + Left margin
   private _GRADIENT_WIDTH = 10;
+  private _EXPAND_ICON_MARGIN = 8;
+  private _NAME_TAG_PADDING = 8;
   private _ignore = false; // ignore the changes from the tree
   private _isInitialLoad = true; // skip the first load
   private _TOP = 'TopLevelPathway'
@@ -408,22 +411,18 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   }
 
   adjustWidth(node: HTMLElement) {
-    const left = node.querySelector('.left') as HTMLElement;
-    const hasEvents = left.children.length > 1;
-    this.calculateAndSetWidth(node, hasEvents)
-
+    this.calculateAndSetWidth(node)
   }
 
-  getLeftDivElWidth(node: HTMLElement, event: Event) {
-    const hasEvents = this.eventService.eventHasChild(event);
-    return this.calculateAndSetWidth(node, hasEvents);
+  getLeftDivElWidth(node: HTMLElement) {
+    return this.calculateAndSetWidth(node);
   }
 
 
-  private calculateAndSetWidth(node: HTMLElement, hasEvents: boolean): number {
+  private calculateAndSetWidth(node: HTMLElement): number {
     const right = node.querySelector('.right') as HTMLElement;
     const parentWidth = node.clientWidth; // inner width of mat tree node in pixels
-    const rightWidth = hasEvents ? right.offsetWidth : right.offsetWidth + this._GRADIENT_WIDTH; // 10 is the width of the gradient
+    const rightWidth = right.offsetWidth;
     return parentWidth - rightWidth;
     // return 0;
   }
@@ -441,7 +440,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
 
   onNameHover($event: MouseEvent, event: Event) {
     const targetParentNode = ($event.target as HTMLElement).closest('.tree-node') as HTMLElement;
-    const leftDivWidth = this.getLeftDivElWidth(targetParentNode, event);
+    const leftDivWidth = this.getLeftDivElWidth(targetParentNode);
     const nameElement = $event.target as HTMLElement;
     const contentWidth = this.calculateContentWidth(nameElement, event);
     // Allow animation if this element has been scrolling before
@@ -453,10 +452,13 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+
   private calculateContentWidth(targetElement: HTMLElement, event: Event): number {
-    const iconWidth = this.eventIcon?.nativeElement.getBoundingClientRect().width || 18 + this._ICON_PADDING; // width and padding
-    const treeControlButtonWidth = this.treeControlButton?.nativeElement.getBoundingClientRect().width || 24;
-    const baseWidth = targetElement.offsetWidth + iconWidth;
+    const iconWidth = this.eventIcon?.nativeElement.getBoundingClientRect().width || 18 + this._ICON_PADDING + this._ICON_MARGIN; // width and padding
+    const treeControlButtonWidth = this.treeControlButton?.nativeElement.getBoundingClientRect().width || 20 + this._EXPAND_ICON_MARGIN;
+    const baseWidth = targetElement.offsetWidth + iconWidth + this._GRADIENT_WIDTH + 2 * this._NAME_TAG_PADDING;
+    console.log(targetElement)
+
     return this.eventService.eventHasChild(event) ? baseWidth + treeControlButtonWidth : baseWidth;
   }
 
