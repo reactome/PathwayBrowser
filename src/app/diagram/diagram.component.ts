@@ -681,7 +681,6 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       shadowNodes.style({opacity: 1})
       trivials.style({opacity: 1})
       shadowEdges.addClass('shadow')
-      console.log(shadowEdges)
       cy.on('zoom', cy.data('reactome').interactivity.onZoom.shadow)
       cy.data('reactome').interactivity.onZoom.shadow()
     } else {
