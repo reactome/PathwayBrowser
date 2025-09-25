@@ -1,7 +1,7 @@
 import {Component, computed, input, linkedSignal, Signal, signal} from '@angular/core';
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {PageEvent} from "@angular/material/paginator";
-import {max} from "lodash";
+import {isArray, max} from "lodash";
 import {InDepth} from "../../../model/graph/in-depth.model";
 import {Relationship} from "../../../model/graph/relationship.model";
 
@@ -16,17 +16,16 @@ export class ControllerTreeComponent<E extends DatabaseObject & InDepth, R exten
 
   readonly type = input.required<string>();
   readonly depthControl = input.required<boolean>();
-  readonly data = input.required<R[], (E | R)[]>({
-    transform: data => data.map((e, i) => e.element
-      ? e as R
-      : {
-        type: this.type(),
-        stoichiometry: 1,
-        order: i,
-        element: e,
-        index: i
-      } as R)
-  });
+  readonly data = input.required<R[], (E | R)[] | E | R>({
+    transform: data =>
+      !isArray(data)
+        ? data.element ? [data as R] : [this.elementToRelationship(data as E)]
+        : data.map((e, i) => e.element
+          ? e as R
+          : this.elementToRelationship(e as E, i)
+        )
+  })
+
   readonly scope = input<'entity' | 'event'>('entity');
   readonly disableNavigation = input<boolean>(false);
 
@@ -70,5 +69,15 @@ export class ControllerTreeComponent<E extends DatabaseObject & InDepth, R exten
   lastPage() {
     this.depthChangeSource.set('controller');
     this.depthIndex.set(this.maxDepth());
+  }
+
+  elementToRelationship(element: E, i = 0): R {
+    return {
+      type: this.type(),
+      stoichiometry: 1,
+      order: i,
+      element: element,
+      index: i
+    } as R;
   }
 }
