@@ -7,7 +7,7 @@
      (keydown.-)="zoomOut()"
 >
 
-  <div id="cytoscape" #cytoscape></div>
+  <div id="cytoscape" #cytoscape [class.pointer]="hovering()"></div>
   <div id="disease-container" class="drag-container" #compareContainer [style.display]="comparing ? 'flex': 'none'">
     <div id="handle-limits"
          (mouseup)="dragEnd()" (mouseleave)="dragEnd()"
@@ -18,7 +18,7 @@
       <span id="disease-handle" class="drag-handle" (mousedown)="dragStart()" (touchstart)="dragStart()" ></span>
     </div>
 
-    <div id="cytoscape-compare" #cytoscapeCompare class="drag-content"></div>
+    <div id="cytoscape-compare" #cytoscapeCompare class="drag-content" [class.pointer]="hovering()"></div>
   </div>
 
   @let legendWidth = ratio  * container.clientHeight;

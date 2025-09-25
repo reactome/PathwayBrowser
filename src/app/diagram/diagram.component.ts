@@ -216,6 +216,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   leafIdToParentIds = new Map<string, string[]>();
 
+  hovering = signal(false)
   selecting = false // Avoid zooming in diagram when selection came from in diagram
   flagging = false // Avoid flagging in diagram when flagging came from in diagram
 
@@ -700,9 +701,11 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     switch (event.type) {
       case ReactomeEventTypes.hover:
         affectedElements.addClass('hover');
+        this.hovering.set(true)
         break;
       case ReactomeEventTypes.leave:
         affectedElements.removeClass('hover');
+        this.hovering.set(false);
         break;
       case ReactomeEventTypes.select:
         affectedElements.select();
