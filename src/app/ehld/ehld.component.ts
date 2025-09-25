@@ -18,6 +18,7 @@ import {isDefined} from "../services/utils";
 import {Style} from "reactome-cytoscape-style";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {DataStateService} from "../services/data-state.service";
+import {Point} from "@angular/cdk/drag-drop";
 
 
 @Component({
@@ -67,7 +68,15 @@ export class EhldComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.style = new Style(this.ehldContainer().nativeElement);
+  }
 
+  legendPosition = signal<Point>({x:0, y:0});
+  animateLegend = signal(false);
+
+  toggleLegend(legendWidth: number) {
+    this.animateLegend.set(true);
+    this.legendPosition().x <= -legendWidth + 5 ? this.legendPosition.set({x: 0, y: 0}) : this.legendPosition.set({x: -legendWidth, y: 0})
+    setTimeout(() => this.animateLegend.set(false), 500)
   }
 
   // Example of zooming: https://stackblitz.com/edit/svg-pan-zoom?file=src%2Fapp%2Fapp.component.html,src%2Fapp%2Fapp.component.ts,src%2Fapp%2Fapp.module.ts

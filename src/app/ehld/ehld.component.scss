@@ -31,6 +31,9 @@
     left: calc(var(--legend-width) - var(--border-width));
     pointer-events: all;
     height: 100%;
+    &.animated-legend {
+      transition: 0.5s ease-out;
+    }
   }
   .legend-handlers-wrapper {
     position: relative;
