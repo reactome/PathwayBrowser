@@ -46,10 +46,10 @@ import {Event as EventModel} from "../model/graph/event/event.model";
 
 import {DarkService} from "../services/dark.service";
 import {DownloadFormat, DownloadService} from "../services/download.service";
-import {Pathway} from "../model/graph/event/pathway.model";
 import {DataStateService} from "../services/data-state.service";
 import {SchemaClasses} from "../constants/constants";
 import {Interactor} from "../interactors/model/interactor.model";
+import {Point} from "@angular/cdk/drag-drop";
 
 
 const INIT_RX = 2;
@@ -902,6 +902,8 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     this.syncViewports(this.cy!, this.cytoscapeContainer!.nativeElement, this.cyCompare!, this.compareContainer!.nativeElement);
   }
 
+  legendPosition = signal<Point>({x:0, y:0});
+  animateLegend = signal(false);
   updateLegend() {
     this.legend.resize()
     this.legend.panningEnabled(true)
@@ -910,6 +912,14 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
     this.legend.panningEnabled(false)
     this.legend.zoomingEnabled(false)
   }
+
+  toggleLegend(legendWidth: number) {
+    this.animateLegend.set(true);
+    this.legendPosition().x <= -legendWidth + 5 ? this.legendPosition.set({x: 0, y: 0}) : this.legendPosition.set({x: -legendWidth, y: 0})
+    this.updateLegend()
+    setTimeout(() => this.animateLegend.set(false), 500)
+  }
+
 
   // ----- Event Syncing -----
   private _reactomeEvents$: Subject<ReactomeEvent> = new Subject<ReactomeEvent>();

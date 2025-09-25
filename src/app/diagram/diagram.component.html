@@ -21,14 +21,15 @@
     <div id="cytoscape-compare" #cytoscapeCompare class="drag-content"></div>
   </div>
 
-  <div id="legend-boundary" [style.--legend-width.px]="ratio  * container.clientHeight">
+  @let legendWidth = ratio  * container.clientHeight;
+  <div id="legend-boundary" [style.--legend-width.px]="legendWidth">
 
     <div cdkDrag cdkDragLockAxis="x" cdkDragBoundary="#legend-boundary" id="legend-container"
-         (cdkDragMoved)="updateLegend()"
+         (cdkDragMoved)="updateLegend()" [cdkDragFreeDragPosition]="legendPosition()" [class.animated-legend]="animateLegend()"
          [style.height.px]="container.clientHeight">
       <div class="legend-handlers-wrapper">
         <div class="legend-handlers" [class.has-analysis]="analysis.result()" [style.--handle-height.px]="handle.clientHeight">
-          <button id="legend-handle" cdkDragHandle #handle>LEGEND</button>
+          <button id="legend-handle" cdkDragHandle #handle (click)="toggleLegend(legendWidth)">LEGEND</button>
           @if (analysis.result()) {
             <div class="analysis-legend">
               <cr-analysis-legend></cr-analysis-legend>
