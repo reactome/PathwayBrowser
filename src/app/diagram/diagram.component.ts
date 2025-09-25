@@ -665,6 +665,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       cy.batch(() => {
         this.setSubPathwayVisibility(true, cy);
         cy.elements().removeClass('flag');
+        cy.edges('![?color]').style({'underlay-opacity': 0})
       })
 
       return cy.collection()
@@ -680,6 +681,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       shadowNodes.style({opacity: 1})
       trivials.style({opacity: 1})
       shadowEdges.addClass('shadow')
+      console.log(shadowEdges)
       cy.on('zoom', cy.data('reactome').interactivity.onZoom.shadow)
       cy.data('reactome').interactivity.onZoom.shadow()
     } else {
