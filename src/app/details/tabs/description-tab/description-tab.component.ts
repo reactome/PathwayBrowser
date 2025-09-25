@@ -285,9 +285,11 @@ export class DescriptionTabComponent {
     {key: DataKeys.COMPONENT_OF, label: Labels.COMPONENT_OF, hasDepthControl: true},
     {key: DataKeys.MEMBER_OF, label: Labels.MEMBER_OF, hasDepthControl: true},
     {key: DataKeys.CANDIDATE_OF, label: Labels.CANDIDATE_OF, hasDepthControl: true},
+    {key: DataKeys.NORMAL_REACTION, label: Labels.NORMAL_REACTION, hasDepthControl: true, scope: 'event'},
     {key: DataKeys.NORMAL_PATHWAY, label: Labels.NORMAL_PATHWAY, hasDepthControl: true, scope: 'event'},
     {key: DataKeys.EVENT_OF, label: Labels.EVENT_OF, hasDepthControl: true, scope: 'event'},
     {key: DataKeys.DISEASE_PATHWAYS, label: Labels.DISEASE_PATHWAYS, hasDepthControl: true, scope: 'event'},
+    {key: DataKeys.DISEASE_REACTIONS, label: Labels.DISEASE_REACTIONS, hasDepthControl: true, scope: 'event'},
 
 
     {key: DataKeys.INFERRED_TO, label: Labels.INFERENCES, manual: true, template: this.inferencesTemplate$},
