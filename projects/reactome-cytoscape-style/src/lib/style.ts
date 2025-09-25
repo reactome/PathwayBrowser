@@ -113,6 +113,7 @@ export class Style {
         css: {
           'label': 'data(displayName)',
           "font-size": this.p('shadow', 'fontSize'),
+          "events": 'no',
           "background-opacity": 0,
           "shape": "rectangle",
           "text-valign": "center",
