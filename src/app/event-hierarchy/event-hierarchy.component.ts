@@ -457,8 +457,6 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     const iconWidth = this.eventIcon?.nativeElement.getBoundingClientRect().width || 18 + this._ICON_PADDING + this._ICON_MARGIN; // width and padding
     const treeControlButtonWidth = this.treeControlButton?.nativeElement.getBoundingClientRect().width || 20 + this._EXPAND_ICON_MARGIN;
     const baseWidth = targetElement.offsetWidth + iconWidth + this._GRADIENT_WIDTH + 2 * this._NAME_TAG_PADDING;
-    console.log(targetElement)
-
     return this.eventService.eventHasChild(event) ? baseWidth + treeControlButtonWidth : baseWidth;
   }
 
