@@ -9,7 +9,7 @@ if (fs.existsSync(overridePath)) {
   pkg.dependencies["@carrotsearch/foamtree"] = `file:./src/assets/reacfoam/@carrotsearch/foamtree`;
 } else {
   console.log("ℹ️ No override found, using registry foamtree");
-  pkg.dependencies["@carrotsearch/foamtree"] = "^3.5.6";
+  pkg.dependencies["@carrotsearch/foamtree"] = "^3.5.7";
 }
 
 fs.writeFileSync(

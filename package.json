@@ -61,6 +61,7 @@
     "svg-pan-zoom": "^3.6.1",
     "tslib": "^2.3.0",
     "vectorious": "^6.1.12",
+    "svgcanvas": "^2.6.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

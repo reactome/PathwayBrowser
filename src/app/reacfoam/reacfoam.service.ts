@@ -195,6 +195,16 @@ export class ReacfoamService {
     return chroma(extract(this.style.properties.global.onSurface))
   })
 
+  primaryColor = computed(() => {
+    this.dark.isDark(); // Compute on dark update
+    return chroma(extract(this.style.properties.global.primary))
+  })
+
+  onPrimaryColor = computed(() => {
+    this.dark.isDark(); // Compute on dark update
+    return chroma(extract(this.style.properties.global.onPrimary))
+  })
+
   mergedFilters = computed(() => ({
     excludeGrouping: this.state.includeGrouping() === false,
     excludeDiseases: this.state.includeDisease() === false,

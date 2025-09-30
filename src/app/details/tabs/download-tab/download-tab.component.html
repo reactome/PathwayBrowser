@@ -43,13 +43,14 @@
   @if (!hasDetail() || (!hasDetail() && hasResult())) {
     <h3 class="category">Reacfoam - Voronoi Treemap</h3>
     <div class="container reacfoam">
-      @for (format of formats; track format) {
-        @if ([DownloadFormat.PNG, DownloadFormat.JPEG].includes(format)) {
-          <cr-download-button (click)="onReacfoamDownload(format)"
-                              [label]="format.toUpperCase()"
-                              [icon]="'image'">
-          </cr-download-button>
-        }
+      @if (analysis.samples().length > 1) {
+        <cr-download-button (click)="onReacfoamAnimatedDownload()" label="Animated SVG" icon="slow_motion_video"/>
+      }
+
+      @for (format of reacfoamFormats; track format) {
+        <cr-download-button (click)="onReacfoamDownload(format)"
+                            [label]="format.toUpperCase()"
+                            icon="image"/>
       }
     </div>
   }
