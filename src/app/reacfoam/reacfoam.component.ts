@@ -374,8 +374,8 @@ export class ReacfoamComponent implements OnDestroy {
           this.state.sample.set(initSample);
           const compressedStyle = compressFrameStyles(idToSampleStyle);
 
-          const frameDuration = 2;
-          const transitionTime = 0.2;
+          const frameDuration = options.timePerFrame;
+          const transitionTime = options.transitionTime;
 
           compressedStyle.forEach((diffs, id) => {
             css += generateSteppedKeyframes(id, diffs, samples.length, frameDuration, transitionTime);
