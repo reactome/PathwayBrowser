@@ -181,18 +181,22 @@ export class EhldService {
     return null;
   }
 
-
-  createOverlay(stId: string, pathway: Analysis.Pathway | undefined, regionElement: SVGGElement) {
-    const targetId = `${this.overlay}${stId}`;
-    const overlayElement = regionElement.querySelector(`#${targetId}`);
-
+  saturateRegion(regionElement: SVGGElement, setSaturation: boolean, pathway?: Analysis.Pathway | undefined,) {
+    const filter = setSaturation ? `saturate(${(pathway?.entities.fdr || 1) <= this.state.significance() ? 1 : 0})` : '';
     for (let i = 0; i < regionElement.childElementCount; i++) {
       const child = regionElement.children.item(i) as SVGElement | null;
       if (child &&
         !child.id.startsWith(this.overlay) &&
         !child.classList.contains(this.analysisInfoId)
-      ) child.style.filter = `saturate(${(pathway?.entities.fdr || 1) <= this.state.significance() ? 1 : 0})`;
+      ) child.style.filter = filter;
     }
+  }
+
+  createOverlay(stId: string, pathway: Analysis.Pathway | undefined, regionElement: SVGGElement) {
+    const targetId = `${this.overlay}${stId}`;
+    const overlayElement = regionElement.querySelector(`#${targetId}`);
+
+    this.saturateRegion(regionElement, true, pathway);
 
     if (overlayElement) {
       let container: SVGRectElement | SVGPathElement | null = overlayElement.querySelector('rect') || overlayElement.querySelector('path');
@@ -352,9 +356,15 @@ export class EhldService {
       element.querySelectorAll('rect.inner-stroke').forEach(stroke => stroke.remove())
       const targetId = `${this.overlay}${stId}`;
       const overlayElement = element.querySelector(`#${targetId}`);
+      const regionElement = regionElementsMap.get(stId);
+      // Clear overlay element
       if (overlayElement) {
         const rect = overlayElement.getElementsByTagName('rect')[0];
         if (rect) rect.removeAttribute("style")
+      }
+      // Clear region element
+      if (regionElement) {
+        this.saturateRegion(regionElement, false);
       }
     })
   }
