@@ -33,6 +33,7 @@ export class EhldComponent implements AfterViewInit {
 
   ehldContainer = viewChild.required<ElementRef<HTMLDivElement>>('ehld');
   readonly pathwayId = model.required<string>();
+  hovering = signal(false)
 
   readonly svgData = rxResource({
     request: () => ({id: this.pathwayId()}),
@@ -106,12 +107,14 @@ export class EhldComponent implements AfterViewInit {
       element.addEventListener('mouseover', () => {
         if (element !== this.selectedElement()) {
           this.ehldService.applyShadow(element, this.flaggedElements());
+          this.hovering.set(true);
         }
       })
 
       element.addEventListener('mouseout', () => {
         if (element !== this.selectedElement()) {
           this.ehldService.removeShadow(element, this.flaggedElements());
+          this.hovering.set(false);
         }
       })
 

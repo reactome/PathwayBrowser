@@ -1,5 +1,5 @@
 <div class="variables" #container>
-  <div id="ehld" #ehld></div>
+  <div id="ehld" #ehld [class.pointer]="hovering()"></div>
 
   @let legendWidth = ratio  * container.clientHeight;
   <div id="legend-boundary" [style.--legend-width.px]="legendWidth">
