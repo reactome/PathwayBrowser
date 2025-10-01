@@ -4,7 +4,7 @@ import {
   effect,
   ElementRef,
   linkedSignal,
-  OnDestroy,
+  OnDestroy, output,
   signal,
   Signal,
   untracked,
@@ -17,12 +17,17 @@ import {DarkService} from "../services/dark.service";
 import {UrlStateService} from "../services/url-state.service";
 import {AnalysisService} from "../services/analysis.service";
 import {AnalysisLegendComponent} from "../legend/analysis-legend/analysis-legend.component";
-import {DownloadFormat, DownloadService} from "../services/download.service";
+import {defaultDownloadOptions, DownloadFormat, DownloadService} from "../services/download.service";
 import {DataStateService} from "../services/data-state.service";
 import {isRLE} from "../services/utils";
 import {SpeciesService} from "../services/species.service";
 import {firstValueFrom} from "rxjs";
+import {Context} from "svgcanvas";
 import chroma from "chroma-js";
+import {width} from "reactome-table";
+import {MatDialog} from "@angular/material/dialog";
+import {BlockingLoaderComponent} from "./blocking-loader/blocking-loader.component";
+import {SvgExporterService} from "./svg-exporter.service";
 
 
 @Component({
@@ -188,7 +193,9 @@ export class ReacfoamComponent implements OnDestroy {
     private species: SpeciesService,
     private dark: DarkService,
     private router: Router,
-    private download: DownloadService) {
+    private download: DownloadService,
+    private svgExporter: SvgExporterService,
+    private dialog: MatDialog,) {
     effect(() => { // Initialise
       this.reacfoam.data(); // Set data whenever it is updated
       // if (!untracked(this.relaxing)) // Avoid errors happening when setting data while relaxing
@@ -288,34 +295,48 @@ export class ReacfoamComponent implements OnDestroy {
 
         }
       })
-      this.foamTree().redraw()
+      this.foamTree().redraw();
+      this.currentSample = this.state.sample() || undefined;
     });
 
-    effect(() => {
+    effect(async () => {
       const request = this.download.downloadRequest();
+      let options = request?.options || defaultDownloadOptions;
+      options = {...defaultDownloadOptions, ...options};
+      if (!request) return;
+      const loader = this.dialog.open(BlockingLoaderComponent, {disableClose: true, width: '150px', height: '150px'});
       if (request && this.download.isFoamtreeFormat(request.format)) {
         const params: FoamTree.ImageFormat = {
           format: this.download.toFoamtreeType(request.format),
           ...(request.format === DownloadFormat.JPEG ? {quality: 0.9} : {})
         }
-        this.export(params);
+        this.exportRaster(request.format, params);
+        this.download.resetDownload();
+      } else if (request?.format === DownloadFormat.SVG) {
+        this.export(await this.svgExporter.exportReacfoam(this, options), request.format, 'reacfoam');
         this.download.resetDownload();
       }
+      loader.close();
     });
   }
+
+  currentSample?: string;
 
   ngOnDestroy(): void {
     this.sizeObserver.disconnect();
   }
 
-  export(params: FoamTree.ImageFormat) {
+  exportRaster(format: DownloadFormat, params: FoamTree.ImageFormat) {
+    return this.export(this.foamTree().get('imageData', params), format, 'reacfoam');
+  }
+
+  export(data: string, format: DownloadFormat, name = 'reacfoam') {
     const a = document.createElement('a');
-    a.href = this.foamTree().get('imageData', params)
-    a.download = `reacfoam.${params.format.split('/')[1]}`;
+    a.href = data
+    a.download = `${name}.${format}`;
     a.click();
     a.remove();
   }
-
 }
 
 function throttle<Args extends any[]>(func: (...args: Args) => void, delay: number): (...args: Args) => void {

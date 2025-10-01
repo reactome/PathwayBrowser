@@ -12,6 +12,9 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {EhldService} from "../../../services/ehld.service";
 import {DownloadFormat, DownloadService, DownloadTarget} from "../../../services/download.service";
 import {DownloadButtonComponent} from "./download-button/download-button.component";
+import {MatDialog} from "@angular/material/dialog";
+import {AnimatedDownloadFormComponent} from "./animated-download-form/animated-download-form.component";
+import {format} from "canvas-to-svg/dist/helpers";
 
 
 type PathwayItem = {
@@ -98,6 +101,7 @@ export class DownloadTabComponent {
 
 
   formats: DownloadFormat[] = Object.values(DownloadFormat) as DownloadFormat[];
+  reacfoamFormats = [DownloadFormat.SVG, DownloadFormat.PNG, DownloadFormat.JPEG];
 
   diagramItems = computed<DiagramItem[]>(() => {
     const hasEHLD = this.ehld.hasEHLD();
@@ -199,9 +203,10 @@ export class DownloadTabComponent {
   constructor(private state: UrlStateService,
               private http: HttpClient,
               private dataState: DataStateService,
-              private analysis: AnalysisService,
+              public analysis: AnalysisService,
               private download: DownloadService,
-              public ehld: EhldService,) {
+              public ehld: EhldService,
+              private dialog: MatDialog,) {
   }
 
   getGsaIcon(name: string) {
@@ -232,9 +237,17 @@ export class DownloadTabComponent {
     this.download.requestDownload(DownloadTarget.REACFOAM, format);
   }
 
+  onReacfoamAnimatedDownload() {
+    const matDialogRef = this.dialog.open(AnimatedDownloadFormComponent);
+    matDialogRef.afterClosed().subscribe(options => {
+      if (options) {
+        this.download.requestDownload(DownloadTarget.REACFOAM, DownloadFormat.SVG, options);
+      }
+    })
+  }
+
   onDiagramDownload(format: DownloadFormat) {
     this.download.requestDownload(DownloadTarget.DIAGRAM, format);
   }
 
-  protected readonly DownloadFormat = DownloadFormat;
 }

@@ -1,4 +1,5 @@
 import {Injectable, signal} from '@angular/core';
+import {trace} from "vectorious";
 
 
 export enum DownloadTarget {
@@ -19,12 +20,28 @@ export const IMAGES_FORMAT = {
   JPEG: DownloadFormat.JPEG
 } as const;
 
+export interface DownloadOptions {
+  animate: boolean,
+  includeLegend: boolean,
+  includeTimeline: boolean,
+  timePerFrame: number,
+  transitionTime: number,
+}
+
+export const defaultDownloadOptions : DownloadOptions= {
+  animate: false,
+  includeLegend: true,
+  includeTimeline: true,
+  timePerFrame: 2,
+  transitionTime: 0.1,
+}
 
 export type ImageType = typeof IMAGES_FORMAT[keyof typeof IMAGES_FORMAT];
 
 export type DownloadRequest = {
   target: DownloadTarget.DIAGRAM | DownloadTarget.REACFOAM;
   format: DownloadFormat;
+  options?: DownloadOptions;
 } | null
 
 @Injectable({
@@ -34,8 +51,8 @@ export class DownloadService {
 
   readonly downloadRequest = signal<DownloadRequest>(null)
 
-  requestDownload(target: DownloadTarget, format: DownloadFormat) {
-    this.downloadRequest.set({target, format})
+  requestDownload(target: DownloadTarget, format: DownloadFormat, options?: DownloadOptions) {
+    this.downloadRequest.set({target, format, options: options || defaultDownloadOptions})
   }
 
   resetDownload() {

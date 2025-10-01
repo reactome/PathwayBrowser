@@ -440,6 +440,15 @@ declare module "@carrotsearch/foamtree" {
     attach(groups: FoamTree.MultipleGroupSelector, maxLevels: number): number
 
     /**
+     * Draws the entire visualization to the canvas context you provide.
+     *
+     * The main use case for this method is exporting the visualization to the SVG format. To do this, provide a canvas context implementation, such as svgcanvas, which converts all canvas draw calls to the corresponding SVG shapes.
+     *
+     * The following code performs the SVG export based on the svgcanvas library.
+     */
+    drawTo(ctx: any): void
+
+    /**
      * Stops all running animations and removes all HTML event listeners registered by FoamTree.
      * If you are repeatedly instantiating and disposing of FoamTree instances on the same page, make sure you call the
      * dispose method when appropriate.

@@ -2415,7 +2415,7 @@ declare module "@carrotsearch/foamtree" {
       /**
        * To retrieve the full geometry information, including coordinates of the polygon's vertices, pass true as the third parameter of the get method:
        */
-      geometry: ParametrizedOption<[IndividualGroupSelector, boolean], GeometryObject<D>>
+      geometry: ParametrizedOption<[GroupSelector, boolean], GeometryObject<D>>
 
       /**
        * Returns information about the state of the group. The returned object contains the following properties:
@@ -2491,10 +2491,11 @@ declare module "@carrotsearch/foamtree" {
       parameters: Parameters
       return: Return
     }
+    type Prefixes<T extends any[]> = T extends [...infer Rest, infer Last] ? Prefixes<Rest> | T : T;
 
     export type ReadOnlyOption = keyof ReadOnlyOptions<DataObject>;
     export type ReadOnlyOptionValue<O extends ReadOnlyOption, D extends DataObject> = ReadOnlyOptions<D>[O]['return'];
-    export type ReadOnlyOptionParameters<O extends ReadOnlyOption, D extends DataObject> = ReadOnlyOptions<D>[O]['parameters'];
+    export type ReadOnlyOptionParameters<O extends ReadOnlyOption, D extends DataObject> = Prefixes<ReadOnlyOptions<D>[O]['parameters']>;
 
     export interface InteractionOptions<D extends DataObject> {
       /**

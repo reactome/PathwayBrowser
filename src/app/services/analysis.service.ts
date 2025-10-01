@@ -77,18 +77,56 @@ export class PaletteSummary {
   }
 
 
-  getGradient(direction: 'top' | 'bottom' | 'left' | 'right') {
+  getCssGradient(direction: 'top' | 'bottom' | 'left' | 'right') {
     return this.n === -1 ?
       `linear-gradient(to ${direction} in oklab, ${this.colors.join(', ')})` :
       `linear-gradient(to ${direction} in oklab, ${this.scale.colors(this.n).map((c, i) => `${c} ${i / this.n * 100}%, ${c} ${(i + 1) / this.n * 100}%`).join(', ')})`
   }
 
   get verticalGradient(): string {
-    return this.getGradient('top')
+    return this.getCssGradient('top')
   }
 
   get horizontalGradient(): string {
-    return this.getGradient('right')
+    return this.getCssGradient('right')
+  }
+
+  getSvgGradient(id: string, direction: 'top' | 'bottom' | 'left' | 'right') {
+    // Map direction to SVG coords
+    const dirMap: Record<typeof direction, [string, string, string, string]> = {
+      top:    ["0%", "100%", "0%", "0%"],   // bottom → top
+      bottom: ["0%", "0%", "0%", "100%"],   // top → bottom
+      left:   ["100%", "0%", "0%", "0%"],   // right → left
+      right:  ["0%", "0%", "100%", "0%"]    // left → right
+    };
+
+    const [x1, y1, x2, y2] = dirMap[direction];
+
+    let stops: string;
+
+    if (this.n === -1) {
+      // Simple gradient: evenly spaced stops
+      stops = this.colors.map((c, i) => {
+        const offset = (i / (this.colors.length - 1)) * 100;
+        return `<stop offset="${offset}%" stop-color="${c}" />`;
+      }).join("\n");
+    } else {
+      // Quantized gradient: each color has a "band"
+      stops = this.scale.colors(this.n).map((c: string, i: number) => {
+        const start = (i / this.n) * 100;
+        const end   = ((i + 1) / this.n) * 100;
+        return `
+        <stop offset="${start}%" stop-color="${c}" />
+        <stop offset="${end}%" stop-color="${c}" />
+      `;
+      }).join("\n");
+    }
+
+    return `
+    <linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+      ${stops}
+    </linearGradient>
+  `;
   }
 
   get colors() {
