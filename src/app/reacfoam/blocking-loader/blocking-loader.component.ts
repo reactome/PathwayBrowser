@@ -6,7 +6,6 @@ import {MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
   selector: 'cr-blocking-loader',
   imports: [
     MatProgressSpinner,
-    MatDialogTitle,
     MatDialogContent
   ],
   templateUrl: './blocking-loader.component.html',
