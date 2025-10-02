@@ -89,14 +89,15 @@ export class SvgExporterService {
       await this.waitFor(() => !untracked(reacfoam.relaxing), 50);
       foamtree.drawTo(ctx);
       svg = ctx.getSvg();
-      const title = this.generateTitle([this.state.sample() || 'FDR'], {x: 0, y: height, height: decorationSize, width: width});
-      css += title.css;
-      const titleGroup = this.addElementToSVG('title', title.elements, svg!);
-      const bbox = this.measureGroup(titleGroup, width, height, css);
-      paddingBottom = bbox.height;
-      paddingLeft = Math.max(-bbox.x + this.style.sw, 0);
-      paddingRight = Math.max(bbox.width - paddingLeft - width + this.style.sw, 0);
-
+      if (untracked(this.analysis.result)) { // Add title only on analysis
+        const title = this.generateTitle([this.state.sample() || 'FDR'], {x: 0, y: height, height: decorationSize, width: width});
+        css += title.css;
+        const titleGroup = this.addElementToSVG('title', title.elements, svg!);
+        const bbox = this.measureGroup(titleGroup, width, height, css);
+        paddingBottom = bbox.height;
+        paddingLeft = Math.max(-bbox.x + this.style.sw, 0);
+        paddingRight = Math.max(bbox.width - paddingLeft - width + this.style.sw, 0);
+      }
     } else {
 
       const initSample = untracked(this.state.sample);
