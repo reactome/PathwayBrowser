@@ -1,5 +1,6 @@
-import {Injectable, signal} from '@angular/core';
+import {effect, Injectable, signal} from '@angular/core';
 import {Figure} from "../../../../model/graph/figure.model";
+import {DataStateService} from "../../../../services/data-state.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,5 +14,9 @@ export class FigureService {
   }
 
 
-  constructor() { }
+  constructor(private data: DataStateService) {
+    effect(() => {
+      this.data.selectedElement() && this.expanded.set(undefined); // reset expanded when element changes
+    });
+  }
 }
