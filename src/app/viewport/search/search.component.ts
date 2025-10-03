@@ -123,9 +123,10 @@ export class SearchComponent {
   resultsScroll = viewChild<CdkVirtualScrollViewport>('resultScroll')
   resultPathways = viewChild<ShadowScrollComponent>('resultPathways')
 
-  hasSearchedWithNoResult = signal<boolean>(false);
+  localHasNoResult = signal<boolean>(false);
+  globalHasNoResult = signal<boolean>(false);
   searchErrorMessage = signal<string>('');
-
+  searchedNoResult = computed(() => this.localHasNoResult() && this.globalHasNoResult());
 
   constructor(
     private http: HttpClient,
@@ -205,7 +206,8 @@ export class SearchComponent {
     this.searchText.set('');
     this.searchParams.set(undefined);
     this.hasFocus.set(false);
-    this.hasSearchedWithNoResult.set(false);
+    this.localHasNoResult.set(false);
+    this.globalHasNoResult.set(false);
     this.searchErrorMessage.set('');
     $event.preventDefault();
     $event.stopPropagation();
@@ -230,7 +232,7 @@ export class SearchComponent {
     local: new SearchDataSource(this.searchParams$,
       (page, pageSize, params) => {
         if (params.diagram && params.query.length === 0) {
-          this.hasSearchedWithNoResult.set(false);
+          this.localHasNoResult.set(false);
           return of(Search.EMPTY_RESULTS);
         }
         return this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/diagram/${params.diagram}`, {
@@ -243,10 +245,10 @@ export class SearchComponent {
           } as Search.Paginated<Search.Params>
         }).pipe(
           catchError((error: HttpErrorResponse) => {
-            return this.handleSearchError(error);
+            return this.handleSearchError('local', error);
           }),
           tap((result) => {
-            this.setNoSearchResult(result);
+            this.setNoSearchResult('local', result);
           })
         )
       }
@@ -254,7 +256,7 @@ export class SearchComponent {
     global: new SearchDataSource(this.searchParams$,
       (page, pageSize, params) => {
         if (params.query.length === 0) {
-          this.hasSearchedWithNoResult.set(false);
+          this.globalHasNoResult.set(false);
           return of(Search.EMPTY_RESULTS);
         }
         return this.http.get<Search.Result>(`${CONTENT_SERVICE}/search/fireworks/`, {
@@ -267,10 +269,10 @@ export class SearchComponent {
           } as Search.Paginated<Search.Params>
         }).pipe(
           catchError((error: HttpErrorResponse) => {
-            return this.handleSearchError(error);
+            return this.handleSearchError('global', error);
           }),
           tap((result) => {
-            this.setNoSearchResult(result);
+            this.setNoSearchResult('global', result);
           })
         )
       }
@@ -329,19 +331,22 @@ export class SearchComponent {
     this.state.select.set(this.selectedResult()?.stId || null)
   }
 
-  handleSearchError(error: HttpErrorResponse) {
+  handleSearchError(scope: Scope, error: HttpErrorResponse) {
     if (error.status === 404) {
-      this.hasSearchedWithNoResult.set(true);
       const message = error.error?.messages?.[0] || 'No entries found';
       this.searchErrorMessage.set(message);
+
+      if (scope === 'local') this.localHasNoResult.set(true);
+      if (scope === 'global') this.globalHasNoResult.set(true);
       return of(Search.EMPTY_RESULTS);
     }
     return of(Search.EMPTY_RESULTS);
   }
 
-  setNoSearchResult(results: Search.Result) {
+  setNoSearchResult(scope: Scope, results: Search.Result) {
     if (results.found > 0) {
-      this.hasSearchedWithNoResult.set(false);
+      if (scope === 'local') this.localHasNoResult.set(false);
+      if (scope === 'global') this.globalHasNoResult.set(false);
       this.searchErrorMessage.set('');
     }
   }

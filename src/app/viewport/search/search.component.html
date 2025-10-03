@@ -14,7 +14,7 @@
     <input type="text" placeholder="Search protein, gene, pathway, reaction" [(ngModel)]="searchText" #query
            (keydown)="hasFocus.set(true)">
   </div>
-  @if (scopes[currentScopeName()].found() || hasSearchedWithNoResult()) {
+  @if (scopes[currentScopeName()].found() || searchedNoResult()) {
     <button mat-icon-button (click)="clear($event)">
       <mat-icon fontSet="symbols">close</mat-icon>
     </button>
@@ -33,12 +33,12 @@
 </div>
 
 
-@if (scopes.global.found() || hasSearchedWithNoResult()) {
+@if (scopes.global.found() || searchedNoResult()) {
   <div class="results" @results>
     @if (collapsed() !== 'collapsed') {
       <div class="collapsable" @collapsable>
         <div class="scope-container">
-          @if (scopes.global.found() > 0 || hasSearchedWithNoResult()) {
+          @if (scopes.global.found() > 0 || searchedNoResult()) {
           @if (state.pathwayId() && scopes.local.found()) {
             <div class="scope" [class.selected]="currentScopeName() === 'local'"
                  (click)="currentScopeName.set('local')">
@@ -70,7 +70,7 @@
           </div>
         }
 
-        @if (hasSearchedWithNoResult()) {
+        @if (searchedNoResult()) {
           <div class="no-result-message">
             <mat-icon class="no-results-icon">search_off</mat-icon>
             <p>{{ searchErrorMessage() }}</p>
