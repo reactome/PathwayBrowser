@@ -5,7 +5,7 @@ import {
   getProperty,
   groupAndSortBy,
   isDefined,
-  isDefinedAndNotEmpty,
+  isDefinedAndNotEmpty, isPathway,
   isPhysicalEntity,
   isReferenceSequence,
   isReferenceSummary,
@@ -53,7 +53,8 @@ export class DescriptionTabComponent {
     request: () => this.referenceEntity()?.identifier,
     loader: (param) => param.request ? this.iconService.fetchIcon(param.request) : of(null)
   })
-  readonly figures = computed(() => this.obj().figure || []);
+
+  readonly figures = computed(() => (this.obj().figure || []).filter(f => !f.url.includes('ehld')));
   readonly hasIllustration = computed(() => this.figures().length > 0 || this.icon.hasValue());
   expandedFigure = signal<Figure | undefined>(undefined);
 
