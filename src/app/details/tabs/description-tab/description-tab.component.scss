@@ -13,7 +13,8 @@
   display: grid;
   align-items: start;
   grid-template-columns: repeat(var(--columns), 1fr);
-  padding-right: 20px;
+  scrollbar-gutter: stable;
+  padding-right: 7px;
 
   --gap: 20px;
   --half-gap: calc(var(--gap) / 2);
@@ -54,6 +55,7 @@
   width: 100%;
   height: 48px;
   border-bottom: 2px solid var(--primary);
+  margin-bottom: 11px; // Match the divider half height - divider thickness
   flex-shrink: 0;
 
 
@@ -159,7 +161,7 @@
 
 .update-layout {
   flex-direction: row;
-  gap: 0;
+  gap: var(--gap);
 }
 
 .icon-container {
@@ -173,7 +175,8 @@
   width: var(--column-width);
   height: var(--icon-height);
 
-  border: 1px solid #CAC4D0;
+  border: 1px solid var(--outline-variant);
+  box-shadow: inset 0 0 5px var(--outline);
   border-radius: 16px;
 
 
@@ -183,6 +186,19 @@
     display: flex;
     justify-content: center;
     align-items: stretch;
+    object-fit: contain;
+  }
+  &.expanded {
+    .icon {
+      opacity: 0.3;
+    }
+  }
+}
+
+.figure {
+  cursor: zoom-in;
+  &.expanded {
+    cursor: zoom-out;
   }
 }
 
@@ -350,4 +366,37 @@
     selected-focus-handle-color: var(--error-container),
     selected-hover-handle-color: var(--error-container),
   ));
+}
+
+.summation {
+  margin-top: -6px; // appear as part of the description-overview
+  .composition-container {
+    border-left: 2px solid var(--primary);
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    font: var(--mat-sys-body-medium);
+    color: var(--on-surface);
+    white-space: normal;
+    text-align: justify;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    .italic {
+      font-style: italic;
+      display: contents;
+    }
+
+    .summation-refs-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+
+
+
 }
