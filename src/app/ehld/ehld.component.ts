@@ -5,7 +5,7 @@ import {
   effect,
   ElementRef,
   linkedSignal,
-  model,
+  model, OnDestroy,
   signal,
   viewChild
 } from '@angular/core';
@@ -29,7 +29,7 @@ import {Point} from "@angular/cdk/drag-drop";
 })
 
 @UntilDestroy()
-export class EhldComponent implements AfterViewInit {
+export class EhldComponent implements AfterViewInit, OnDestroy {
 
   ehldContainer = viewChild.required<ElementRef<HTMLDivElement>>('ehld');
   readonly pathwayId = model.required<string>();
@@ -47,8 +47,12 @@ export class EhldComponent implements AfterViewInit {
   subpathwayStIds = computed(() => [...this.stIdToSVGGElement().keys()])
   selectedElement = linkedSignal(() => this.state.select() ? this.stIdToSVGGElement().get(this.state.select()!) : undefined);
   flaggedElements = computed(() => this.data.flagIdentifiers().map(stId => this.stIdToSVGGElement().get(stId)).filter(isDefined));
-  panZoom?: SvgPanZoom.Instance;
+  panZoomInstance?: SvgPanZoom.Instance;
   legendItems: LegendGroup[] = [...this.ehldService.legendItems];
+  resizeObserver!: ResizeObserver;
+
+  private initialZoom = 1;
+  private initialPan = {x: 0, y: 0};
 
   constructor(private ehldService: EhldService,
               public analysis: AnalysisService,
@@ -69,14 +73,24 @@ export class EhldComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.style = new Style(this.ehldContainer().nativeElement);
+
+    this.resizeObserver = new ResizeObserver(() => {
+      if (!this.panZoomInstance) return;
+      this.handleResize();
+    })
+
+    this.resizeObserver.observe(this.ehldContainer().nativeElement)
   }
 
-  legendPosition = signal<Point>({x:0, y:0});
+  legendPosition = signal<Point>({x: 0, y: 0});
   animateLegend = signal(false);
 
   toggleLegend(legendWidth: number) {
     this.animateLegend.set(true);
-    this.legendPosition().x <= -legendWidth + 5 ? this.legendPosition.set({x: 0, y: 0}) : this.legendPosition.set({x: -legendWidth, y: 0})
+    this.legendPosition().x <= -legendWidth + 5 ? this.legendPosition.set({
+      x: 0,
+      y: 0
+    }) : this.legendPosition.set({x: -legendWidth, y: 0})
     setTimeout(() => this.animateLegend.set(false), 500)
   }
 
@@ -91,12 +105,19 @@ export class EhldComponent implements AfterViewInit {
       });
       svgElement.setAttribute('width', '100%');
       svgElement.setAttribute('height', '100%');
-      this.panZoom = SvgPanZoom(svgElement, {
+      this.panZoomInstance = SvgPanZoom(svgElement, {
         zoomEnabled: true,
         controlIconsEnabled: false,
-        maxZoom: 1000,
-        dblClickZoomEnabled: false
+        dblClickZoomEnabled: false,
+        panEnabled: true,
+        fit: true,
+        center: true,
+        minZoom: 1,
+        maxZoom: 100
       });
+      // initial default state
+      this.initialZoom = this.panZoomInstance.getZoom();
+      this.initialPan = this.panZoomInstance.getPan();
     }
   }
 
@@ -177,4 +198,41 @@ export class EhldComponent implements AfterViewInit {
       });
     }
   }
+
+  private handleResize() {
+    if (!this.panZoomInstance) return;
+
+    const rect = this.ehldContainer().nativeElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return; // skip updates if container width or height is 0.
+
+    const zoom = this.panZoomInstance.getZoom();
+    const pan = this.panZoomInstance.getPan();
+    // detect if user has zoomed or panned
+    const isDefaultView =
+      Math.abs(zoom - this.initialZoom) < 0.01 &&
+      Math.abs(pan.x - this.initialPan.x) < 1 &&
+      Math.abs(pan.y - this.initialPan.y) < 1;
+    // detect if user is zoomed all the way in
+    const isZoomOut = Math.abs(zoom - 1) < 0.01;
+
+    // only fit & center if user hasn’t interacted or zoom all the way in
+    if (isDefaultView || isZoomOut) {
+      this.panZoomInstance.resize();
+      this.panZoomInstance.fit();
+      this.panZoomInstance.center();
+
+      this.initialZoom = this.panZoomInstance.getZoom();
+      this.initialPan = this.panZoomInstance.getPan();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    if (this.panZoomInstance) {
+      this.panZoomInstance.destroy();
+    }
+  }
+
 }
