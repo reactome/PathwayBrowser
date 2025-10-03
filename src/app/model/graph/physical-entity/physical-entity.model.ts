@@ -7,9 +7,10 @@ import {DatabaseIdentifier} from "../database-identifier.model";
 import {Disease} from "../external-ontology/disease.model";
 import {MarkerReference} from "../control-reference/marker-reference.model";
 import {InDepth} from "../in-depth.model";
+import {HasFigure} from "../figure.model";
 
 
-export interface PhysicalEntity extends DatabaseObject, InDepth {
+export interface PhysicalEntity extends DatabaseObject, InDepth, HasFigure {
   stId: string
   definition: string;
   compartment: Relationship.HasCompartment[];

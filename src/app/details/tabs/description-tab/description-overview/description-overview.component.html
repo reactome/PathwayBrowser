@@ -117,21 +117,5 @@
         </div>
       </div>
     }
-    @if (summations()) {
-      <div class="row">
-        <div class="label">Summation</div>
-        <div class="value flex-grow">
-          @for (summation of summations(); track $index) {
-            <div [innerHTML]="summation.text | includeRef: allRefs()" [class.columns]="summation.text.length > 500"></div>
-            <!--Display summation refs if is available-->
-            @if (summation.literatureReference && summation.literatureReference.length > 0) {
-              <div class="summation-refs-container">
-                <cr-refs-tree [referenceHolder]=summation></cr-refs-tree>
-              </div>
-            }
-          }
-        </div>
-      </div>
-    }
   </div>
 }

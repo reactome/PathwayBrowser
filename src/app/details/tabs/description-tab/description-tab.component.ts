@@ -4,6 +4,7 @@ import {IconService} from "../../../services/icon.service";
 import {
   getProperty,
   groupAndSortBy,
+  isDefined,
   isDefinedAndNotEmpty,
   isPhysicalEntity,
   isReferenceSequence,
@@ -33,8 +34,10 @@ import {
 import {MarkerReference} from "../../../model/graph/control-reference/marker-reference.model";
 import {camelCase, isArray} from "lodash";
 import {UrlStateService} from "../../../services/url-state.service";
-import {CONTENT_DETAIL} from "../../../../environments/environment";
+import {CONTENT_DETAIL, environment} from "../../../../environments/environment";
 import {SpeciesService} from "../../../services/species.service";
+import {Summation} from "../../../model/graph/summation.model";
+import {Figure} from "../../../model/graph/figure.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 
@@ -50,6 +53,9 @@ export class DescriptionTabComponent {
     request: () => this.referenceEntity()?.identifier,
     loader: (param) => param.request ? this.iconService.fetchIcon(param.request) : of(null)
   })
+  readonly figures = computed(() => this.obj().figure || []);
+  readonly hasIllustration = computed(() => this.figures().length > 0 || this.icon.hasValue());
+  expandedFigure = signal<Figure | undefined>(undefined);
 
   _otherForms = rxResource({
     request: () => isPhysicalEntity(this.obj()) && !isReferenceSummary(this.obj()) && this.referenceEntity() && this.obj().stId,
@@ -99,6 +105,14 @@ export class DescriptionTabComponent {
   readonly symbol = computed(() => this.getSymbol(this.obj()));
   readonly literatureRefs: Signal<LiteratureReference[]> = computed(() => getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE));
   readonly groupedReferences = computed(() => groupAndSortBy(this.literatureRefs(), ref => ref.year, (key1, key2) => key2 - key1));
+
+  readonly summations: Signal<Summation[]> = computed(() => getProperty(this.obj(), DataKeys.SUMMATION));
+  readonly allRefs = computed(() => {
+    const literatureRefs = this.literatureRefs();
+    const summation = getProperty(this.obj(), DataKeys.SUMMATION) as Summation[];
+    return [...literatureRefs || [], ...summation.flatMap((s) => s.literatureReference as LiteratureReference[]).filter(isDefined) || []]
+  });
+
 
   referenceEntity: Signal<ReferenceEntity> = computed(() => getProperty(this.obj(), DataKeys.REFERENCE_ENTITY));
 
@@ -384,6 +398,11 @@ export class DescriptionTabComponent {
     }
   }
 
+  toggleFigureExpansion(figure: Figure) {
+    this.expandedFigure.update(prev => prev === figure ? undefined : figure);
+  }
+
 
   protected readonly CONTENT_DETAIL = CONTENT_DETAIL;
+  protected readonly environment = environment;
 }

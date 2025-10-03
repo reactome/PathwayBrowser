@@ -8,9 +8,10 @@ import HasCompartment = Relationship.HasCompartment;
 import {Species} from "../species.model";
 import {Disease} from "../external-ontology/disease.model";
 import {InDepth} from "../in-depth.model";
+import {HasFigure} from "../figure.model";
 
 
-export interface Event extends DatabaseObject, InDepth {
+export interface Event extends DatabaseObject, InDepth, HasFigure {
   stId: string;
   authored: InstanceEdit[];
   reviewed: InstanceEdit[];

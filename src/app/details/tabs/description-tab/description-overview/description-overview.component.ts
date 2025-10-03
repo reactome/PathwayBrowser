@@ -1,19 +1,16 @@
 import {Component, computed, input, Signal} from '@angular/core';
 import {DatabaseObject} from "../../../../model/graph/database-object.model";
-import {getProperty, isDefined} from "../../../../services/utils";
+import {getProperty} from "../../../../services/utils";
 import {Anatomy} from "../../../../model/graph/external-ontology/anatomy.model";
 import {ReviewStatus} from "../../../../model/graph/review-status.model";
-import {Summation} from '../../../../model/graph/summation.model';
 import {DataKeys} from "../../../../constants/constants";
 import {Relationship} from "../../../../model/graph/relationship.model";
 import {Disease} from "../../../../model/graph/external-ontology/disease.model";
 import {CellType} from "../../../../model/graph/external-ontology/cell-type.model";
-import HasCompartment = Relationship.HasCompartment;
-import { TitleCasePipe } from "@angular/common";
+import {TitleCasePipe} from "@angular/common";
 import {OntologyTermComponent} from "../../../common/ontology-term/ontology-term.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {IncludeRefPipe} from "../../../../pipes/include-ref.pipe";
-import {RefsTreeComponent} from "../../../common/refs-tree/refs-tree.component";
+import HasCompartment = Relationship.HasCompartment;
 
 
 @Component({
@@ -23,8 +20,6 @@ import {RefsTreeComponent} from "../../../common/refs-tree/refs-tree.component";
     TitleCasePipe,
     OntologyTermComponent,
     MatProgressSpinner,
-    IncludeRefPipe,
-    RefsTreeComponent
 ],
   styleUrl: './description-overview.component.scss'
 })
@@ -33,12 +28,6 @@ export class DescriptionOverviewComponent {
   readonly obj = input.required<DatabaseObject>();
   readonly showSpecies = input<boolean>(true);
 
-  readonly allRefs = computed(() => {
-    const literatureRefs = getProperty(this.obj(), DataKeys.LITERATURE_REFERENCE);
-    const summation = getProperty(this.obj(), DataKeys.SUMMATION);
-    return [...literatureRefs || [], ...summation.flatMap((s: Summation) => s.literatureReference).filter(isDefined) || []]
-  });
-
   readonly category: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.CATEGORY));
   readonly className: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.CLASS_NAME));
   readonly speciesName: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.SPECIES_NAME));
@@ -46,7 +35,6 @@ export class DescriptionOverviewComponent {
   readonly name: Signal<string> = computed(() => getProperty(this.obj(), DataKeys.NAME) || [getProperty(this.obj(), DataKeys.DISPLAY_NAME)]);
   readonly tissue: Signal<Anatomy> = computed(() => getProperty(this.obj(), DataKeys.TISSUE));
   readonly reviewStatus: Signal<ReviewStatus> = computed(() => getProperty(this.obj(), DataKeys.REVIEW_STATUS));
-  readonly summations: Signal<Summation[]> = computed(() => getProperty(this.obj(), DataKeys.SUMMATION));
   readonly disease: Signal<Disease[]> = computed(() => getProperty(this.obj(), DataKeys.DISEASE));
   readonly cellType: Signal<CellType[]> = computed(() => getProperty(this.obj(), DataKeys.CELL_TYPE));
   readonly organ: Signal<Anatomy> = computed(()=>getProperty(this.obj(), DataKeys.ORGAN));

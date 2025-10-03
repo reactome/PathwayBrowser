@@ -76,15 +76,46 @@
 
 <ng-template #overviewTemplate>
   <!-- Overview -->
-  <div class="overview" #overview [class.update-layout]="!icon.isLoading() && icon.value()"
-       [style.--icon-height.px]="overview$()?.clientHeight">
+  <div class="overview" #overview [class.update-layout]="hasIllustration()"
+       [style.--icon-height.px]="overview?.clientHeight">
     <cr-description-overview [obj]="obj()" [showSpecies]="true"></cr-description-overview>
     @if (!icon.isLoading() && icon.value()) {
       <div class="icon-container">
         <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
       </div>
     }
+    @for (figure of figures(); track figure.url) {
+      @let expanded = expandedFigure() === figure;
+      <div class="icon-container figure" (click)="toggleFigureExpansion(figure)" [class.expanded]="expanded">
+        <img class="icon" [src]="environment.host + figure.url" [alt]="figure.displayName">
+      </div>
+    }
   </div>
+
+  @if (expandedFigure(); as figure) {
+    <div class="row summation">
+      <div class="label-container">Figure</div>
+      <div class="composition-container flex-grow">
+        <img class="icon figure expanded" [src]="environment.host + figure.url" [alt]="figure.displayName" (click)="toggleFigureExpansion(figure)">
+      </div>
+    </div>
+  }
+  @if (summations()) {
+    <div class="row summation">
+      <div class="label-container">Summation</div>
+      <div class="composition-container flex-grow">
+        @for (summation of summations(); track $index) {
+          <div [innerHTML]="summation.text | includeRef: allRefs()" [class.columns]="summation.text.length > 500"></div>
+          <!--Display summation refs if is available-->
+          @if (summation.literatureReference && summation.literatureReference.length > 0) {
+            <div class="summation-refs-container">
+              <cr-refs-tree [referenceHolder]=summation></cr-refs-tree>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
 </ng-template>
 
 <!-- xRefs -->
