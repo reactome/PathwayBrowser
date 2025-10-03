@@ -39,6 +39,7 @@ import {SpeciesService} from "../../../services/species.service";
 import {Summation} from "../../../model/graph/summation.model";
 import {Figure} from "../../../model/graph/figure.model";
 import HasModifiedResidue = Relationship.HasModifiedResidue;
+import {FigureService} from "./figure/figure.service";
 
 
 @Component({
@@ -56,7 +57,6 @@ export class DescriptionTabComponent {
 
   readonly figures = computed(() => (this.obj().figure || []).filter(f => !f.url.includes('ehld')));
   readonly hasIllustration = computed(() => this.figures().length > 0 || this.icon.hasValue());
-  expandedFigure = signal<Figure | undefined>(undefined);
 
   _otherForms = rxResource({
     request: () => isPhysicalEntity(this.obj()) && !isReferenceSummary(this.obj()) && this.referenceEntity() && this.obj().stId,
@@ -341,6 +341,7 @@ export class DescriptionTabComponent {
 
   constructor(private iconService: IconService,
               private entity: EntityService,
+              public figure: FigureService,
               private interactorService: InteractorService,
               public state: UrlStateService,
               private species: SpeciesService
@@ -398,11 +399,6 @@ export class DescriptionTabComponent {
         return obj[key] !== undefined && obj[key];
     }
   }
-
-  toggleFigureExpansion(figure: Figure) {
-    this.expandedFigure.update(prev => prev === figure ? undefined : figure);
-  }
-
 
   protected readonly CONTENT_DETAIL = CONTENT_DETAIL;
   protected readonly environment = environment;

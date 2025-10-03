@@ -30,6 +30,8 @@ import {CitationService} from "../services/citation.service";
 import {of} from "rxjs";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {environment} from "../../environments/environment";
+import {FigureService} from "../details/tabs/description-tab/figure/figure.service";
+import {IOutputData} from "angular-split";
 
 
 const DETAIL_MIN_HEIGHT = 0;
@@ -108,6 +110,7 @@ export class ViewportComponent implements AfterViewInit {
 
   detailMinSize = computed(() => DETAIL_MIN_HEIGHT * 100 / this.contentHeight())
   // Use bellow when fixed layout solution found
+  detailDraggedSize = signal(20)
   detailShare = signal(20)
   detailVisible = signal(true)
   // detailShare = computed(() => 20)
@@ -139,6 +142,7 @@ export class ViewportComponent implements AfterViewInit {
 
   constructor(public speciesService: SpeciesService,
               private interactorService: InteractorService,
+              private figure: FigureService,
               public analysis: AnalysisService,
               public dark: DarkService,
               public eventService: EventService,
@@ -147,9 +151,10 @@ export class ViewportComponent implements AfterViewInit {
               public dataState: DataStateService,
               public citation: CitationService,
   ) {
+    effect(() => this.detailShare.set(this.figure.expanded() ? 100 : this.detailDraggedSize()));
     effect(() => {
       if (this.dropdown() === null) {
-        this.detailShare.set(20);
+        this.detailShare.set(this.detailDraggedSize());
         this.detailVisible.set(true);
       } else {
         setTimeout(() => {
@@ -275,5 +280,9 @@ export class ViewportComponent implements AfterViewInit {
 
     return url;
   })
+
+  onViewDetailDragEnd($event: IOutputData) {
+    this.detailDraggedSize.set($event.sizes[1] as number)
+  }
 }
 

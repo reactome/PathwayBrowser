@@ -161,7 +161,7 @@
           </div>
         </div>
         <div class="content" #content>
-          <as-split direction="vertical" gutterSize="4" useTransition="true">
+          <as-split direction="vertical" gutterSize="4" useTransition="true" (dragEnd)="onViewDetailDragEnd($event)">
             <as-split-area [size]="viewShare()" id="view" class="hide-overflow" #view>
               @if (pathwayId()) {
                 @if (loadingPathwayData()) {

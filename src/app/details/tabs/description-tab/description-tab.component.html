@@ -84,19 +84,19 @@
         <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
       </div>
     }
-    @for (figure of figures(); track figure.url) {
-      @let expanded = expandedFigure() === figure;
-      <div class="icon-container figure" (click)="toggleFigureExpansion(figure)" [class.expanded]="expanded">
-        <img class="icon" [src]="environment.host + figure.url" [alt]="figure.displayName">
+    @for (f of figures(); track f.url) {
+      @let expanded = figure.expanded() === f;
+      <div class="icon-container figure" (click)="figure.toggle(f)" [class.expanded]="expanded">
+        <img class="icon" [src]="environment.host + f.url" [alt]="f.displayName">
       </div>
     }
   </div>
 
-  @if (expandedFigure(); as figure) {
+  @if (figure.expanded(); as f) {
     <div class="row summation">
       <div class="label-container">Figure</div>
       <div class="composition-container flex-grow">
-        <img class="icon figure expanded" [src]="environment.host + figure.url" [alt]="figure.displayName" (click)="toggleFigureExpansion(figure)">
+        <img class="icon figure expanded" [src]="environment.host + f.url" [alt]="f.displayName" (click)="figure.toggle(f)">
       </div>
     </div>
   }
