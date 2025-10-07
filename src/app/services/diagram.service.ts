@@ -185,21 +185,16 @@ export class DiagramService {
 
   public getCHEBIStructure(ids: Set<string>): Map<string, Promise<string | undefined>> {
     const chebiIds = [...ids];
-    const request$ = this.http.post<Record<string, any>>(`https://www.ebi.ac.uk/chebi/backend/api/public/compounds/`, {chebi_ids: chebiIds}).pipe(
-      shareReplay(1) // ensures all subscribers share the same request
-    );
+
     return new Map<string, Promise<string | undefined>>(chebiIds.map(id => [
       id,
-      firstValueFrom(request$.pipe(
-        map(response => response[id]?.data?.default_structure?.id),
-        switchMap(id => isDefined(id) ? this.loadStructureSvg(id) : of(undefined)),
-        catchError(err => of(undefined))
-      ))
+      this.loadStructureSvg(parseInt(id))
     ]));
   }
 
-  public loadStructureSvg(id: number): Observable<string> {
-    return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}/`, {responseType: "text"})
+  public async loadStructureSvg(id: number): Promise<string> {
+    return fetch(`https://www.ebi.ac.uk/chebi/backend/api/public/compound/${id}/structure/`, {
+    }).then(r => r.text())
   }
 
   public getDiagram(id: number | string): Observable<cytoscape.ElementsDefinition> {

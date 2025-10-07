@@ -108,23 +108,17 @@ export class StructureViewerComponent {
   });
 
 
-  chebiStructureId = rxResource({
-    request: this.chebiIdentifier,
-    loader: (params) => this.getChebiStructureId(params.request).pipe(
-      catchError(err => EMPTY)
-    )
-  });
-
   chebiStructureSVGData = rxResource({
-    request: this.chebiStructureId.value,
+    request: this.chebiIdentifier,
     loader: ({request}) => {
       const id = request;
       if (!id) return EMPTY;
-      return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/structure/${id}`, {responseType: 'text'}).pipe(
+      return this.http.get(`https://www.ebi.ac.uk/chebi/backend/api/public/compound/${id}/structure/`, {responseType: 'text'}).pipe(
         catchError(err => EMPTY)
       )
     }
   })
+  isChebiLoading = computed(() => this.chebiStructureSVGData.isLoading());
 
   bestPdbStructure = rxResource({
     request: () => this.obj().identifier,
@@ -143,7 +137,6 @@ export class StructureViewerComponent {
   })
 
   hasAnyStructure = computed(() => this.chebiStructureSVGData.hasValue() || !!this.proteinStructureData()?.length);
-  isChebiLoading = computed(() => this.chebiStructureId.isLoading() || this.chebiStructureSVGData.isLoading());
 
   bgColor = computed(() => {
     this.dark.isDark(); // Compute on dark update
@@ -160,16 +153,6 @@ export class StructureViewerComponent {
       }
     });
   }
-
-
-  getChebiStructureId(entryId: string | undefined): Observable<string | undefined> {
-    if (!entryId) return of(undefined);
-    const url = `https://www.ebi.ac.uk/chebi/backend/api/public/compound/${entryId}`
-    return this.http.get<any>(url).pipe(
-      map(res => res.default_structure.id)
-    );
-  }
-
 
   getProteinStructure() {
 
