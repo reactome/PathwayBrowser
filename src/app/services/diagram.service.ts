@@ -192,9 +192,10 @@ export class DiagramService {
     ]));
   }
 
-  public async loadStructureSvg(id: number): Promise<string> {
+  public async loadStructureSvg(id: number): Promise<string | undefined> {
     return fetch(`https://www.ebi.ac.uk/chebi/backend/api/public/compound/${id}/structure/`, {
-    }).then(r => r.text())
+    }).then(r => r.ok ? r.text() : undefined)
+      .catch(err => undefined)
   }
 
   public getDiagram(id: number | string): Observable<cytoscape.ElementsDefinition> {
