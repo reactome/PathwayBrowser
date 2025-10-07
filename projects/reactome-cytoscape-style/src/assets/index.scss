@@ -17,8 +17,7 @@
       width: 100%;
 
       path {
-        //stroke-width: 0.3px !important; // OKay-ish when no vector scaling
-        //stroke-width: 1.5 !important;
+        stroke-miterlimit: 0!important;
       }
     }
   }
