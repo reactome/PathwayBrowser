@@ -40,6 +40,52 @@ interface BestStructure {
   [key: string]: StructureEntry[];
 }
 
+interface AlphaFoldSummary {
+  uniprot_entry: {
+    ac: string,
+    id: string,
+    uniprot_checksum: string,
+    sequence_length: number,
+    segment_start: number,
+    segment_end: number
+  }
+
+  structures: {
+    summary: {
+      model_identifier: string,
+      model_category: string,
+      model_url: string,
+      model_format: string,
+      model_type?: null,
+      model_page_url: string,
+      provider: string,
+      number_of_conformers?: number,
+      ensemble_sample_url?: string,
+      ensemble_sample_format?: string,
+      created: Date,
+      sequence_identity: number,
+      uniprot_start: number,
+      uniprot_end: number,
+      coverage: number,
+      experimental_method?: string,
+      resolution?: string,
+      confidence_type?: string,
+      confidence_version?: number,
+      confidence_avg_local_score: number,
+      oligomeric_state?: string,
+      preferred_assembly_id?: string,
+      entities: {
+        entity_type: string,
+        entity_poly_type: string,
+        identifier: string,
+        identifier_category: string,
+        description: string,
+        chain_ids: string[]
+      }[]
+    }
+  }[]
+}
+
 export enum Source {
   ALPHA_FOLD = "AlphaFold",
   PDB = "PDB"
@@ -136,6 +182,17 @@ export class StructureViewerComponent {
     }
   })
 
+  alphafoldSummary = rxResource({
+    request: () => this.obj().identifier,
+    loader: ({request}) => {
+      if (!this.isProtein()) return EMPTY;
+      const id = request;
+      return this.http.get<AlphaFoldSummary>(`https://alphafold.ebi.ac.uk/api/uniprot/summary/${id}.json`)
+    }
+  })
+
+  alphafoldUrl = computed(() => this.alphafoldSummary.value()?.structures?.[0]?.summary?.model_url || `https://alphafold.ebi.ac.uk/files/${this.alphaFoldEntryId()}-model_v6.cif`)
+
   hasAnyStructure = computed(() => this.chebiStructureSVGData.hasValue() || !!this.proteinStructureData()?.length);
 
   bgColor = computed(() => {
@@ -177,7 +234,7 @@ export class StructureViewerComponent {
 
     const alphaFoldOptions = {
       customData: {
-        url: `https://alphafold.ebi.ac.uk/files/${selected}-model_v1.cif`,
+        url: this.alphafoldUrl(),
         format: 'cif',
       },
       alphafoldView: true,
@@ -186,7 +243,7 @@ export class StructureViewerComponent {
 
     // If only alfaFold data is available, check if the structure is available
     if (this.alphaFoldEntryId()) {
-      fetch(`https://alphafold.ebi.ac.uk/files/${this.alphaFoldEntryId()}-model_v1.cif`, {method: 'HEAD'})
+      fetch(this.alphafoldUrl(), {method: 'HEAD'})
         .then(e => !e.ok && this.alphaFoldEntryId.set(null));
     }
 
