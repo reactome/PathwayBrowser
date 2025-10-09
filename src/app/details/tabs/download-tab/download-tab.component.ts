@@ -249,6 +249,15 @@ export class DownloadTabComponent {
     })
   }
 
+  onEHLDAnimatedDownload() {
+    const matDialogRef = this.dialog.open(AnimatedDownloadFormComponent);
+    matDialogRef.afterClosed().subscribe(options => {
+      if (options) {
+        this.download.requestDownload(DownloadTarget.DIAGRAM, DownloadFormat.SVG, options);
+      }
+    })
+  }
+
   onDiagramDownload(format: DownloadFormat) {
     this.download.requestDownload(DownloadTarget.DIAGRAM, format);
   }

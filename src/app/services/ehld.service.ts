@@ -7,6 +7,7 @@ import {AnalysisService} from "./analysis.service";
 import {DataStateService} from "./data-state.service";
 import {UrlStateService} from "./url-state.service";
 import {GeneralService} from "./general.service";
+import {DownloadFormat, DownloadService} from "./download.service";
 
 export interface LegendItem {
   name: string;
@@ -26,6 +27,7 @@ export interface LegendGroup {
 export class EhldService {
 
   hasEHLD = computed(() => this.data.currentPathway()?.hasEHLD);
+  select = computed(() => this.state.select());
 
   overlay = "OVERLAY-";
   analysisInfoId = "ANALINFO";
@@ -52,7 +54,12 @@ export class EhldService {
     }
   ];
 
-  constructor(private http: HttpClient, private analysis: AnalysisService, private data: DataStateService, private state: UrlStateService, private general: GeneralService) {
+  constructor(private http: HttpClient,
+              private analysis: AnalysisService,
+              private data: DataStateService,
+              private state: UrlStateService,
+              private general: GeneralService,
+              private download: DownloadService) {
   }
 
   getSVGData(id: string): Observable<string> {

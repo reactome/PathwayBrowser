@@ -1,10 +1,12 @@
 import {computed, Injectable, untracked} from '@angular/core';
 import {AnalysisService} from "../services/analysis.service";
-import {DownloadOptions, DownloadService} from "../services/download.service";
+import {DownloadOptions} from "../services/download.service";
 import {Context} from "svgcanvas";
 import {ReacfoamService} from "./reacfoam.service";
 import {ReacfoamComponent} from "./reacfoam.component";
 import {UrlStateService} from "../services/url-state.service";
+import {EhldComponent} from "../ehld/ehld.component";
+import {EhldService} from "../services/ehld.service";
 
 namespace SvgDecoration {
   export interface Style {
@@ -34,37 +36,30 @@ type FrameDiff = {
   style: Partial<Record<string, string>>;
 }
 
+type Padding = { left: number; right: number; top: number; bottom: number };
+
 @Injectable({
   providedIn: 'root'
 })
 export class SvgExporterService {
 
-  constructor(private analysis: AnalysisService, private reacfoam: ReacfoamService, private state: UrlStateService) {
+  constructor(private analysis: AnalysisService,
+              private reacfoam: ReacfoamService,
+              private state: UrlStateService,
+              private ehld:EhldService) {
   }
 
   style!: SvgDecoration.Style;
   options!: DownloadOptions & { halfTransition: number, totalTime: number };
-  download = new DownloadService();
+
 
   hasExpressionFilter = computed(() => this.state.minExpressionFilter() !== undefined || this.state.maxExpressionFilter() !== undefined || this.state.gsaFilter().length > 1)
   isReacfoamLayoutChanging = computed(() => this.state.filterViewMode() !== 'overview' && this.hasExpressionFilter());
+  select = computed(()=> this.state.select());
 
   async exportReacfoam(reacfoam: ReacfoamComponent, options: DownloadOptions): Promise<string> {
-    this.options = {
-      ...options,
-      halfTransition: options.transitionTime / 2,
-      totalTime: this.analysis.samples().length * options.timePerFrame
-    };
-    const decorationSize = 25;
-    this.style = {
-      surface: this.reacfoam.surfaceColor().hex(),
-      onSurface: this.reacfoam.onSurfaceColor().hex(),
-      primary: this.reacfoam.primaryColor().hex(),
-      onPrimary: this.reacfoam.onPrimaryColor().hex(),
-      sw: decorationSize / 18,
-      decorationSize
-    };
 
+    const {decorationSize} = this.initExport(options);
     const foamtree = untracked(reacfoam.foamTree)
     const geometry = foamtree.get("geometry", foamtree.get('dataObject'));
 
@@ -82,22 +77,16 @@ export class SvgExporterService {
 
     let svg: SVGSVGElement | undefined;
     let css = ''
-    let [paddingLeft, paddingRight, paddingTop, paddingBottom] = [0, 0, 0, 0];
+    let padding: Padding = {left: 0, right: 0, top: 0, bottom: 0};
 
     const samples = untracked(this.analysis.samples);
     if (samples.length === 0 || !options.animate) {
       await this.waitFor(() => !untracked(reacfoam.relaxing), 50);
       foamtree.drawTo(ctx);
       svg = ctx.getSvg();
-      if (untracked(this.analysis.result)) { // Add title only on analysis
-        const title = this.generateTitle([this.state.sample() || 'FDR'], {x: 0, y: height, height: decorationSize, width: width});
-        css += title.css;
-        const titleGroup = this.addElementToSVG('title', title.elements, svg!);
-        const bbox = this.measureGroup(titleGroup, width, height, css);
-        paddingBottom = bbox.height;
-        paddingLeft = Math.max(-bbox.x + this.style.sw, 0);
-        paddingRight = Math.max(bbox.width - paddingLeft - width + this.style.sw, 0);
-      }
+      const result = this.addStaticTitle(svg, width, height, decorationSize, css);
+      css = result.css;
+      padding = result.padding;
     } else {
 
       const initSample = untracked(this.state.sample);
@@ -144,54 +133,103 @@ export class SvgExporterService {
         });
       }
 
-      const timelineHeight = decorationSize * 3 / 2;
-      const title =
-        options.includeTimeline
-          ? this.generateTimeline(samples, {x: 0, y: height, height: timelineHeight, width: width})
-          : this.generateTitle(samples, {x: 0, y: height, height: decorationSize, width: width});
-      css += title.css;
-      const titleGroup = this.addElementToSVG('title-group', title.elements, svg!);
-
-      // Add space for labels
-      const bbox = this.measureGroup(titleGroup, width, height, css);
-      paddingBottom = bbox.height;
-      paddingLeft = Math.max(-bbox.x + this.style.sw, 0);
-      paddingRight = Math.max(bbox.width - paddingLeft - width + this.style.sw, 0);
+      const result = this.addTitle(svg, width, height, options, css);
+      css = result.css;
+      padding = result.padding;
     }
 
 
     foamtree.set("groupLabelMinFontSize", groupLabelMinFontSize);
     foamtree.set("groupMinDiameter", groupMinDiameter);
 
-    if (this.analysis.result() && options.includeLegend) {
-      const legend = this.generateAnalysisLegend({
-        x: width,
-        y: 0,
-        width: decorationSize,
-        height: height
-      })
-      css += legend.css;
-      const legendElement = this.addElementToSVG('legend-group', legend.elements, svg!);
-      paddingRight = Math.max(paddingRight, this.measureGroup(legendElement, width, height, css).width + 2 * this.style.sw);
+    const result = this.addLegend(svg, width, height, decorationSize, css, padding, options);
+    css = result.css;
+    padding = result.padding;
+    return this.finalizeSVG(svg, width, height, padding, css);
+  }
+
+
+
+  async exportEHLD(ehld: EhldComponent, options: DownloadOptions): Promise<string> {
+
+    const {decorationSize} = this.initExport(options);
+    const initialSvg = document.querySelector('#ehld svg') as SVGSVGElement;
+
+    this.ehld.getInlineStyles(initialSvg, this.select());
+
+    let width = initialSvg.getBoundingClientRect().width;
+    let height = initialSvg.getBoundingClientRect().height;
+    let svg: SVGSVGElement | undefined;
+    let css = ''
+    let padding: Padding = {left: 0, right: 0, top: 0, bottom: 0};
+    const samples = untracked(this.analysis.samples);
+
+    if (samples.length === 0 || !options.animate) {
+      svg = initialSvg.cloneNode(true) as SVGSVGElement;
+      const result = this.addStaticTitle(svg, width, height, decorationSize, css);
+      css = result.css;
+      padding = result.padding;
+    } else {
+
+      const initSample = untracked(this.state.sample);
+      const idToSampleStyle = new Map<string, { fill?: string, stroke?: string }[]>();
+      const patternIdToContent = new Map<string, string[]>();
+
+      for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex++) {
+        const sample = samples[sampleIndex];
+        this.state.sample.set(sample);
+        await this.waitFor(() => ehld.currentSample === sample, 500);
+
+        const currentSvg = document.querySelector('#ehld svg') as SVGSVGElement;
+        this.ehld.getInlineStyles(currentSvg, this.select());
+
+        // collect all <pattern> and overlays
+        this.collectPatternContents(currentSvg, sampleIndex, patternIdToContent);
+        this.collectOverlayStyles(currentSvg, sampleIndex, idToSampleStyle);
+
+      }
+      // Restore the original options.
+      this.state.sample.set(initSample);
+
+      svg = document.querySelector('#ehld svg')?.cloneNode(true) as SVGSVGElement;
+      const animationDuration = `${this.options.totalTime}s`;
+      let defs = svg!.querySelector('defs');
+      if (!defs) {
+        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svg.prepend(defs);
+      }
+
+      // build animation
+      patternIdToContent.forEach((patterns, patternId) => {
+        const uniquePatterns = [...new Set(patterns)];
+        if (uniquePatterns.length <= 1) return;
+
+        // Get the original pattern to copy attributes
+        const originalPattern = svg!.querySelector(`pattern[id="${patternId}"]`) as SVGPatternElement;
+        if (!originalPattern) return;
+        const contentToIndexId = this.createVersionedPatterns(originalPattern, uniquePatterns, defs);
+        const keyframeName = `kf_${this.sanitizeId(patternId)}`;
+        const patternKeyframes = this.generatePatternKeyframes(
+          patternId,
+          patterns.map(content => contentToIndexId.get(content)!)
+        );
+        css += patternKeyframes;
+        // find all overlay rects that use this pattern and apply animation
+        this.applyPatternAnimation(svg, patternId, keyframeName, animationDuration);
+      });
+
+      const result = this.addTitle(svg, width, height, options, css);
+      css = result.css;
+      padding = result.padding;
     }
 
-
-    const animStyle = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-    animStyle.setAttribute('data-generated', 'true');
-    animStyle.textContent = css; // your generated CSS
-    svg!.prepend(animStyle);
-
-    console.table({paddingLeft, paddingRight, paddingTop, paddingBottom, width, height})
-    svg!.setAttribute('viewBox', `${-paddingLeft} ${-paddingTop} ${width + paddingLeft + paddingRight} ${height + paddingTop + paddingBottom}`);
-    svg!.removeAttribute('width')
-    svg!.removeAttribute('height')
-    svg!.style.background = this.reacfoam.surfaceColor().hex();
-
-    // // Get the serialized SVG representation of the visualization.
-    await this.embedFontInSvg(svg!, 'https://fonts.gstatic.com/s/roboto/v49/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBHMdazQ.woff2');
-    const blob = new Blob([new XMLSerializer().serializeToString(svg!)], {type: "image/svg+xml;charset=utf-8"});
-    return URL.createObjectURL(blob);
+    const result = this.addLegend(svg, width, height, decorationSize, css, padding, options);
+    css = result.css;
+    padding = result.padding;
+    return this.finalizeSVG(svg, width, height, padding, css);
   }
+
+
 
   private waitFor(checker: () => boolean, interval = 50): Promise<void> {
     return new Promise((resolve) => {
@@ -288,6 +326,22 @@ export class SvgExporterService {
 
     return keyframes
   }
+
+
+  private generatePatternKeyframes(patternId: string, versionIds: string[]): string {
+    if (versionIds.length === 0) return '';
+    const keyframeName = `kf_${this.sanitizeId(patternId)}`;
+    let keyframes = `@keyframes ${keyframeName} {\n`;
+
+    versionIds.forEach((versionId, i) => {
+      const {start, stop} = this.calcTransitionTime(i);
+      keyframes += `  ${start}% { fill: url(#${versionId}); }\n`;
+      keyframes += `  ${stop}% { fill: url(#${versionId}); }\n`;
+    });
+    keyframes += `}\n\n`;
+    return keyframes;
+  }
+
 
   private generateCompressedKeyframes(
     id: string,
@@ -525,5 +579,185 @@ export class SvgExporterService {
     return bbox;
   }
 
+  private collectPatternContents(svg: SVGSVGElement, sampleIndex: number, map: Map<string, string[]>) {
+    svg.querySelectorAll('defs pattern').forEach(p => {
+      const id = p.id;
+      if (!id) return;
+      const list = map.get(id) || [];
+      list[sampleIndex] = p.innerHTML;
+      map.set(id, list);
+    });
+  }
+
+  private collectOverlayStyles(svg: SVGSVGElement, sampleIndex: number, map: Map<string, { fill?: string }[]>) {
+    const overlays = svg.querySelectorAll('g[id^="OVERLAY-"] rect, .analysis-info-container rect') as NodeListOf<SVGSVGElement>;
+    overlays.forEach(rect => {
+      const overlayId = rect.parentElement?.id;
+      if (!overlayId) return;
+      const list = map.get(overlayId) || [];
+      list[sampleIndex] = {fill: rect.style.fill};
+      map.set(overlayId, list);
+    });
+  }
+
+  private createVersionedPatterns(
+    basePattern: SVGPatternElement,
+    contents: string[],
+    defs: SVGDefsElement
+  ): Map<string, string> {
+    const map = new Map<string, string>();
+    contents.forEach((content, i) => {
+      const id = `${basePattern.id}-s${i}`;
+      map.set(content, id);
+
+      const newPattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+      newPattern.setAttribute('id', id);
+
+      Array.from(basePattern.attributes).forEach(attr => {
+        if (attr.name !== 'id') newPattern.setAttribute(attr.name, attr.value);
+      });
+      newPattern.innerHTML = content;
+      defs.appendChild(newPattern);
+    });
+    return map;
+  }
+
+  private applyPatternAnimation(
+    svg: SVGSVGElement | undefined,
+    patternId: string,
+    keyframeName: string,
+    duration: string
+  ) {
+    if(!svg) return;
+    const rects = svg.querySelectorAll('g[id^="OVERLAY-"] rect, .analysis-info-container rect') as NodeListOf<SVGSVGElement>;
+    rects.forEach(rect => {
+      const fillAttr = rect.getAttribute('fill');
+      const styleAttr = rect.getAttribute('style') || '';
+      const usesPattern = fillAttr === `url(#${patternId})` || styleAttr.includes(`#${patternId}`);
+      if (!usesPattern) return;
+
+      const existing = rect.style.animation;
+      const newAnim = `${keyframeName} ${duration} linear infinite`;
+      rect.style.animation = existing ? `${existing}, ${newAnim}` : newAnim;
+    });
+  }
+
+  private initExport(options: DownloadOptions){
+    this.options = {
+      ...options,
+      halfTransition: options.transitionTime / 2,
+      totalTime: this.analysis.samples().length * options.timePerFrame
+    };
+    const decorationSize = 25;
+    this.style = {
+      surface: this.reacfoam.surfaceColor().hex(),
+      onSurface: this.reacfoam.onSurfaceColor().hex(),
+      primary: this.reacfoam.primaryColor().hex(),
+      onPrimary: this.reacfoam.onPrimaryColor().hex(),
+      sw: decorationSize / 18,
+      decorationSize
+    };
+
+    return {decorationSize}
+  }
+
+  private  async finalizeSVG(svg: SVGSVGElement | undefined,
+                             width: number,
+                             height: number,
+                             padding: Padding,
+                             css:string) {
+    const {left, right, top, bottom} = padding;
+
+    const animStyle = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    animStyle.setAttribute('data-generated', 'true');
+    animStyle.textContent = css; // your generated CSS
+    svg!.prepend(animStyle);
+
+    svg!.setAttribute('viewBox', `${-left} ${-top} ${width + left + right} ${height + top + bottom}`);
+    svg!.removeAttribute('width')
+    svg!.removeAttribute('height')
+    svg!.style.background = this.reacfoam.surfaceColor().hex();
+
+    // // Get the serialized SVG representation of the visualization.
+    await this.embedFontInSvg(svg!, 'https://fonts.gstatic.com/s/roboto/v49/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBHMdazQ.woff2');
+    const blob = new Blob([new XMLSerializer().serializeToString(svg!)], {type: "image/svg+xml;charset=utf-8"});
+    return URL.createObjectURL(blob);
+  }
+
+  private addStaticTitle(svg: SVGSVGElement,
+                         width: number,
+                         height: number,
+                         decorationSize: number,
+                         existingCSS = '') {
+
+    let css = existingCSS
+    const padding: Padding = {left: 0, right: 0, top: 0, bottom: 0};
+    if (untracked(this.analysis.result)) { // Add title only on analysis
+      const title = this.generateTitle([this.state.sample() || 'FDR'], {
+        x: 0,
+        y: height,
+        height: decorationSize,
+        width: width
+      });
+      css += title.css;
+      const titleGroup = this.addElementToSVG('title', title.elements, svg!);
+      const bbox = this.measureGroup(titleGroup, width, height, css);
+      padding.bottom = bbox.height;
+      padding.left = Math.max(-bbox.x + this.style.sw, 0);
+      padding.right = Math.max(bbox.width - padding.left - width + this.style.sw, 0);
+    }
+    return {css, padding};
+  }
+
+  private addLegend(svg: SVGSVGElement | undefined,
+                    width: number,
+                    height: number,
+                    decorationSize: number,
+                    exsitingCSS = '',
+                    existingPadding: Padding,
+                    options: DownloadOptions) {
+    let css = exsitingCSS
+    const padding = {...existingPadding};
+    if (this.analysis.result() && options.includeLegend) {
+      const legend = this.generateAnalysisLegend({
+        x: width,
+        y: 0,
+        width: decorationSize,
+        height: height
+      })
+      css += legend.css;
+      const legendElement = this.addElementToSVG('legend-group', legend.elements, svg!);
+      padding.right = Math.max(padding.right, this.measureGroup(legendElement, width, height, css).width + 2 * this.style.sw);
+    }
+    return {css, padding}
+  }
+
+
+  private addTitle(svg: SVGSVGElement | undefined,
+                   width: number,
+                   height: number,
+                   options: DownloadOptions,
+                   existingCSS = '') {
+    let css = existingCSS;
+    const padding: Padding = {left: 0, right: 0, top: 0, bottom: 0};
+
+    const decorationSize = this.style.decorationSize;
+    const samples = untracked(this.analysis.samples);
+
+    const timelineHeight = decorationSize * 3 / 2;
+    const title =
+      options.includeTimeline
+        ? this.generateTimeline(samples, {x: 0, y: height, height: timelineHeight, width: width})
+        : this.generateTitle(samples, {x: 0, y: height, height: decorationSize, width: width});
+    css += title.css;
+    const titleGroup = this.addElementToSVG('title-group', title.elements, svg!);
+
+    // Add space for labels
+    const bbox = this.measureGroup(titleGroup, width, height, css);
+    padding.bottom = bbox.height;
+    padding.left = Math.max(-bbox.x + this.style.sw, 0);
+    padding.right = Math.max(bbox.width - padding.left - width + this.style.sw, 0);
+    return {css, padding};
+  }
 }
 
