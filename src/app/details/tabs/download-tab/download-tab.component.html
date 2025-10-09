@@ -27,6 +27,9 @@
   @if (pathwayId()) {
     <h3 class="category">Pathway Diagram</h3>
     <div class="container diagram">
+      @if (hasEHLD() && analysis.samples().length > 1) {
+        <cr-download-button (click)="onEHLDAnimatedDownload()" label="Animated SVG" icon="slow_motion_video"/>
+      }
       @for (item of diagramItems(); track item) {
         <cr-download-button
           [url]="item.url?.()"

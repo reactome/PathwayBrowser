@@ -1,5 +1,5 @@
 import {Injectable, signal} from '@angular/core';
-import {trace} from "vectorious";
+
 
 
 export enum DownloadTarget {
@@ -62,12 +62,20 @@ export class DownloadService {
   constructor() {
   }
 
-  isFoamtreeFormat(format: DownloadFormat): format is ImageType {
+  isRasterFormat(format: DownloadFormat): format is ImageType {
     return format === DownloadFormat.PNG || format === DownloadFormat.JPEG;
   }
 
   toFoamtreeType(format: ImageType) {
     return `image/${format}` as 'image/png' | 'image/jpeg';
+  }
+
+  export(data: string, format: DownloadFormat, name = 'reacfoam') {
+    const a = document.createElement('a');
+    a.href = data
+    a.download = `${name}.${format}`;
+    a.click();
+    a.remove();
   }
 
 }

@@ -387,4 +387,92 @@ export class EhldService {
     })
   }
 
+
+  downloadImage(format: DownloadFormat) {
+    const container = document.getElementById('ehld');
+    if (!container) return;
+    const svg = container.querySelector('svg') as SVGSVGElement;
+    this.getInlineStyles(svg,this.select());
+    // serialize the SVG
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+
+    const viewBoxWidth = svg.getBoundingClientRect().width;
+    const viewBoxHeight = svg.getBoundingClientRect().height;
+    // change to desired output size
+    const scale = 3
+    const width = viewBoxWidth * scale;
+    const height = viewBoxHeight * scale;
+    const canvas = document.createElement('canvas');
+    canvas.width = width
+    canvas.height = height
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(scale, scale);
+
+    if (format === DownloadFormat.JPEG) {
+      ctx.fillStyle = '#ffffff'; // white background
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      const mimeType = format === DownloadFormat.PNG ? 'image/png' : 'image/jpeg';
+      const dataURL = canvas.toDataURL(mimeType, 1.0);
+      const currentEHLD = this.data.currentPathway()?.stId;
+      this.download.export(dataURL, format,`${currentEHLD}`);
+    };
+
+    img.src = url;
+  }
+
+  // Collect computed style for analysis info
+  getInlineStyles(svg: SVGSVGElement, select: string | null) {
+    this.getAnalysisInfoStyle(svg);
+    this.applyDynamicFilters(svg, select);
+  }
+
+  // collect filter for a selected pathway when exporting EHLD
+  private applyDynamicFilters(svg: SVGSVGElement,select:string | null) {
+    if(!select) return;
+
+    const id = `REGION-${select}`;
+    const selectedElement = svg.querySelector(`#${id}`) as HTMLElement;
+
+    const computedStyle = getComputedStyle(selectedElement);
+    const filter  = computedStyle.filter || computedStyle.getPropertyValue('filter');
+
+    const existingStyle = selectedElement.getAttribute('style') || '';
+    const finalStyle = existingStyle.includes('filter') ? existingStyle.replace(/filter:[^;]+;/, `filter:${filter}`):`${existingStyle};filter:${filter};`;
+    selectedElement.setAttribute('style', `${finalStyle}`);
+  }
+
+ // collect computed style for analysis-info
+  getAnalysisInfoStyle(svg: SVGSVGElement){
+    const analysisContainerClass = '.analysis-info-container';
+    const analysisTextClass = '.analysis-text';
+    // Get one representative element for each class
+    const container = svg.querySelector(`${analysisContainerClass}`) as HTMLElement;
+    const text = svg.querySelector(`${analysisTextClass}`) as HTMLElement;
+    if (!container || !text) return svg;
+    // grab computed styles
+    const containerStyle = getComputedStyle(container);
+    const textStyle = getComputedStyle(text);
+
+    const containerStyleString = Array.from(containerStyle).map(
+      key => `${key}:${containerStyle.getPropertyValue(key)};`
+    ).join('');
+
+    const textStyleString = Array.from(textStyle).map(
+      key => `${key}:${textStyle.getPropertyValue(key)};`
+    ).join('');
+    // apply to all elements of that class
+    svg.querySelectorAll(`${analysisContainerClass}`).forEach(el => el.setAttribute('style', containerStyleString));
+    svg.querySelectorAll(`${analysisTextClass}`).forEach(el => el.setAttribute('style', textStyleString));
+
+    return svg;
+  }
 }

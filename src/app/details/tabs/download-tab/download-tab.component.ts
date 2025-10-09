@@ -14,7 +14,7 @@ import {DownloadFormat, DownloadService, DownloadTarget} from "../../../services
 import {DownloadButtonComponent} from "./download-button/download-button.component";
 import {MatDialog} from "@angular/material/dialog";
 import {AnimatedDownloadFormComponent} from "./animated-download-form/animated-download-form.component";
-import {format} from "canvas-to-svg/dist/helpers";
+
 
 
 type PathwayItem = {
@@ -81,6 +81,7 @@ export class DownloadTabComponent {
 
   hasResult = computed(() => !!(this.analysis.result()));
   hasDetail = computed(() => (this.dataState.hasDetail()));
+  hasEHLD = computed( ()=> this.ehld.hasEHLD());
 
   hasDownload = computed(() => {
     if (this.hasResult()) return true;
@@ -104,30 +105,32 @@ export class DownloadTabComponent {
   reacfoamFormats = [DownloadFormat.SVG, DownloadFormat.PNG, DownloadFormat.JPEG];
 
   diagramItems = computed<DiagramItem[]>(() => {
-    const hasEHLD = this.ehld.hasEHLD();
-    const filteredFormats = this.formats.filter(format => {
-      const allowGif = this.analysis.samples().length > 1;
-      return (hasEHLD || format !== DownloadFormat.SVG) && (allowGif || format !== DownloadFormat.GIF);
-    });
+    return this.hasEHLD() ? this.getDiagramItems(true) : this.getDiagramItems(false);
+  });
 
-    return filteredFormats.map(format => {
-      const isExportable = [DownloadFormat.SVG, DownloadFormat.PPTX, DownloadFormat.GIF].includes(format);
+  getDiagramItems(isEHLD: boolean) {
+    const formats = isEHLD ? this.reacfoamFormats : this.formats.filter(f => f !== DownloadFormat.SVG);
+
+    return formats.map(format => {
+      const hasAnalysis = isEHLD && !this.hasResult() ? format : false;
+      const isExportable = isEHLD ? hasAnalysis : [DownloadFormat.PPTX, DownloadFormat.GIF].includes(format);
+      // server side
       if (isExportable) {
         return {
-          format: format,
+          format,
           url: signal(this.getExportUrl(format)),
           icon: 'image',
           download: true
-        }
+        };
       }
-      // png and jpeg for new style diagram, svg is on its way...
+      // client side
       return {
-        format: format,
+        format,
         icon: 'image',
         method: () => this.onDiagramDownload(format)
-      }
+      };
     });
-  })
+  }
 
 
   pathwayItems: PathwayItem[] = [

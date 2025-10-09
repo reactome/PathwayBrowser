@@ -4,7 +4,7 @@ import {
   effect,
   ElementRef,
   linkedSignal,
-  OnDestroy, output,
+  OnDestroy,
   signal,
   Signal,
   untracked,
@@ -22,9 +22,7 @@ import {DataStateService} from "../services/data-state.service";
 import {isRLE} from "../services/utils";
 import {SpeciesService} from "../services/species.service";
 import {firstValueFrom} from "rxjs";
-import {Context} from "svgcanvas";
 import chroma from "chroma-js";
-import {width} from "reactome-table";
 import {MatDialog} from "@angular/material/dialog";
 import {BlockingLoaderComponent} from "./blocking-loader/blocking-loader.component";
 import {SvgExporterService} from "./svg-exporter.service";
@@ -305,7 +303,7 @@ export class ReacfoamComponent implements OnDestroy {
       options = {...defaultDownloadOptions, ...options};
       if (!request) return;
       const loader = this.dialog.open(BlockingLoaderComponent, {disableClose: true, width: '150px', height: '150px'});
-      if (request && this.download.isFoamtreeFormat(request.format)) {
+      if (request && this.download.isRasterFormat(request.format)) {
         const params: FoamTree.ImageFormat = {
           format: this.download.toFoamtreeType(request.format),
           ...(request.format === DownloadFormat.JPEG ? {quality: 0.9} : {})
@@ -313,7 +311,7 @@ export class ReacfoamComponent implements OnDestroy {
         this.exportRaster(request.format, params);
         this.download.resetDownload();
       } else if (request?.format === DownloadFormat.SVG) {
-        this.export(await this.svgExporter.exportReacfoam(this, options), request.format, 'reacfoam');
+        this.download.export(await this.svgExporter.exportReacfoam(this, options), request.format, 'reacfoam');
         this.download.resetDownload();
       }
       loader.close();
@@ -327,16 +325,9 @@ export class ReacfoamComponent implements OnDestroy {
   }
 
   exportRaster(format: DownloadFormat, params: FoamTree.ImageFormat) {
-    return this.export(this.foamTree().get('imageData', params), format, 'reacfoam');
+    return this.download.export(this.foamTree().get('imageData', params), format, 'reacfoam');
   }
 
-  export(data: string, format: DownloadFormat, name = 'reacfoam') {
-    const a = document.createElement('a');
-    a.href = data
-    a.download = `${name}.${format}`;
-    a.click();
-    a.remove();
-  }
 }
 
 function throttle<Args extends any[]>(func: (...args: Args) => void, delay: number): (...args: Args) => void {

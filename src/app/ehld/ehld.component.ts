@@ -5,7 +5,8 @@ import {
   effect,
   ElementRef,
   linkedSignal,
-  model, OnDestroy,
+  model,
+  OnDestroy,
   signal,
   viewChild
 } from '@angular/core';
@@ -19,6 +20,8 @@ import {Style} from "reactome-cytoscape-style";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {DataStateService} from "../services/data-state.service";
 import {Point} from "@angular/cdk/drag-drop";
+import {defaultDownloadOptions, DownloadFormat, DownloadService} from "../services/download.service";
+import {SvgExporterService} from "../reacfoam/svg-exporter.service";
 
 
 @Component({
@@ -53,11 +56,14 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
 
   private initialZoom = 1;
   private initialPan = {x: 0, y: 0};
+  currentSample?: string;
 
   constructor(private ehldService: EhldService,
               public analysis: AnalysisService,
               public state: UrlStateService,
-              private data: DataStateService) {
+              private data: DataStateService,
+              private download: DownloadService,
+              private svgExporter: SvgExporterService) {
     effect(() => this.selectedElement() && this.ehldService.applyOutline(this.selectedElement()!, this.flaggedElements()));
     effect(() => this.flaggedElements().forEach(g => this.ehldService.applyFlagOutline(g)));
     effect(() => {
@@ -68,7 +74,22 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
         this.initializePanAndZoom();
       }
     });
-    effect(() => this.loadAnalysis());
+    effect(() =>  {
+      this.loadAnalysis();
+      this.currentSample = this.state.sample() || undefined;
+    });
+
+    effect(async () => {
+      const request = this.download.downloadRequest();
+      let options = request?.options || defaultDownloadOptions;
+      if (request && this.download.isRasterFormat(request.format)) {
+        this.ehldService.downloadImage(request.format);
+        this.download.resetDownload();
+      } else if (request?.format === DownloadFormat.SVG) {
+        this.download.export(await this.svgExporter.exportEHLD(this, options), request.format, this.pathwayId());
+        this.download.resetDownload();
+      }
+    })
   }
 
   ngAfterViewInit(): void {
