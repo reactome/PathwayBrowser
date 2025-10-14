@@ -56,6 +56,7 @@ export class DescriptionTabComponent {
 
   readonly figures = computed(() => (this.obj().figure || []).filter(f => !f.url.includes('ehld')));
   readonly hasIllustration = computed(() => this.figures().length > 0 || this.icon.hasValue());
+  currentIcon = this.iconService.currentIcon;
 
   _otherForms = rxResource({
     request: () => isPhysicalEntity(this.obj()) && !isReferenceSummary(this.obj()) && this.referenceEntity() && this.obj().stId,
