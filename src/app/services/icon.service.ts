@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 import {map, Observable, of, switchMap} from "rxjs";
-import {SearchResult} from "../model/search-results.model";
 import {CONTENT_SERVICE, environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {isExactlyCellLineagePath, isEWAS, isRLE} from "./utils";
+import {isExactlyCellLineagePath, isRLE} from "./utils";
 import {DatabaseObject} from "../model/graph/database-object.model";
 import {SchemaClasses} from "../constants/constants";
+import {Search} from "../viewport/search/search.component";
 
 
 @Injectable({

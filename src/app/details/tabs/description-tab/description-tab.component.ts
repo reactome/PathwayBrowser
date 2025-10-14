@@ -5,7 +5,7 @@ import {
   getProperty,
   groupAndSortBy,
   isDefined,
-  isDefinedAndNotEmpty, isPathway,
+  isDefinedAndNotEmpty,
   isPhysicalEntity,
   isReferenceSequence,
   isReferenceSummary,
@@ -37,9 +37,8 @@ import {UrlStateService} from "../../../services/url-state.service";
 import {CONTENT_DETAIL, environment} from "../../../../environments/environment";
 import {SpeciesService} from "../../../services/species.service";
 import {Summation} from "../../../model/graph/summation.model";
-import {Figure} from "../../../model/graph/figure.model";
-import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {FigureService} from "./figure/figure.service";
+import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 
 @Component({
