@@ -56,8 +56,10 @@ type DiagramItem = {
 export class DownloadTabComponent {
 
   newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
-  newtUrl = computed(() => `https://web.newteditor.org/?URL=${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
-
+  newtUrl = computed(() => {
+    const reactomeUrl = encodeURI(`${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`);
+    return `https://web.newteditor.org/?URL=${reactomeUrl}`;
+  });
   pathwayId = this.state.pathwayId as WritableSignal<string>;
   selectedElement = this.dataState.selectedElement;
 
