@@ -443,8 +443,8 @@ export class EhldService {
   }
 
   // collect filter for a selected pathway when exporting EHLD
-  private applyDynamicFilters(svg: SVGSVGElement,select:string | null) {
-    if(!select) return;
+  private applyDynamicFilters(svg: SVGSVGElement, select: string | null) {
+    if (!select || !select.startsWith('R-')) return;
 
     const id = `REGION-${select}`;
     const selectedElement = svg.querySelector(`#${id}`) as HTMLElement;
