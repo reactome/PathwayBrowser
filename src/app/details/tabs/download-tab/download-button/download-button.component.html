@@ -5,9 +5,17 @@
    [matTooltip]="tooltip()"
    (click)="onClick($event)">
 
-  @if (icon()) {
-    <mat-icon fontSet="symbols">{{ icon() }}</mat-icon>
+
+
+  @if (icon(); as icon) {
+    <mat-icon
+      [svgIcon]="icon.svg ? icon.id : ''"
+      [fontSet]="!icon.svg ? 'symbols' : ''"
+    >
+      @if (!icon.svg) { {{ icon.id }} }
+    </mat-icon>
   }
+
   <span>{{ label() }}</span>
 </a>
 

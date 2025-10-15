@@ -159,7 +159,7 @@ export class IconService {
     {name: 'select', tooltip: 'Select', route: 'select'},
     {name: 'local-scope', tooltip: 'Current Pathway', route: 'local-scope'},
     {name: 'global-scope', tooltip: 'All Pathways', route: 'global-scope'},
-
+    {name: 'newt', tooltip: 'Newt SBGN editor ', route: 'newt'},
 
   ];
 

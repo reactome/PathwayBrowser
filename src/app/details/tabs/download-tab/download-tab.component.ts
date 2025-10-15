@@ -5,13 +5,11 @@ import {DataStateService} from "../../../services/data-state.service";
 import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
 import {ANALYSIS_SERVICE, CONTENT_SERVICE, RESTFUL_API} from "../../../../environments/environment";
-import {toSignal} from "@angular/core/rxjs-interop";
-import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {EhldService} from "../../../services/ehld.service";
 import {DownloadFormat, DownloadService, DownloadTarget} from "../../../services/download.service";
-import {DownloadButtonComponent} from "./download-button/download-button.component";
+import {DownloadButtonComponent, Icon} from "./download-button/download-button.component";
 import {MatDialog} from "@angular/material/dialog";
 import {AnimatedDownloadFormComponent} from "./animated-download-form/animated-download-form.component";
 
@@ -20,19 +18,20 @@ type PathwayItem = {
   name: string;
   url: Signal<string>;
   fileName?: Signal<string> | undefined;
+  icon?: Icon
 }
 
 type AnaLysisItem = {
   title: string;
   description?: string;
   url: Signal<string>;
-  icon: string;
+  icon: Icon;
   isShown: Signal<boolean>;
 }
 
 type DiagramItem = {
   format: string;
-  icon?: string;
+  icon?: Icon;
   url?: Signal<string>;
   method?: () => void
   hasEHLD?: Signal<boolean>
@@ -43,7 +42,6 @@ type DiagramItem = {
 @Component({
   selector: 'cr-download-tab',
   imports: [
-    SafePipe,
     MatTooltip,
     MatProgressSpinner,
     DownloadButtonComponent,
@@ -53,8 +51,6 @@ type DiagramItem = {
   styleUrl: './download-tab.component.scss'
 })
 export class DownloadTabComponent {
-
-  newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
   newtUrl = computed(() => {
     const reactomeUrl = new URL(`${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`, window.location.origin).href
     return `https://web.newteditor.org/?URL=${reactomeUrl}`;
@@ -120,14 +116,14 @@ export class DownloadTabComponent {
         return {
           format,
           url: signal(this.getExportUrl(format)),
-          icon: 'image',
+          icon: {id:'image'},
           download: true
         };
       }
       // client side
       return {
         format,
-        icon: 'image',
+        icon: {id:'image'},
         method: () => this.onDiagramDownload(format)
       };
     });
@@ -160,6 +156,11 @@ export class DownloadTabComponent {
         const analysisUrl = `${CONTENT_SERVICE}/exporter/document/event/${this.finalEventId()}.pdf?token=${this.token()}`;
         return this.hasResult() ? analysisUrl : url
       }),
+    },
+    {
+      name: 'Newt',
+      url: this.newtUrl,
+      icon: {id:'newt', svg: true}
     }
   ]
 
@@ -168,7 +169,7 @@ export class DownloadTabComponent {
       title: 'CSV Result',
       description: 'Download the pathway analysis results in CSV format for selected resource',
       url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/pathways/${this.currentAnalysisResource()}/result.csv`),
-      icon: 'table',
+      icon: {id:'table'},
       isShown: computed(() => !this.analysis.isGSA())
     },
 
@@ -176,7 +177,7 @@ export class DownloadTabComponent {
       title: 'JSON Result',
       description: 'Download a compressed file containing the complete analysis results in JSON format fot all resources',
       url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/result.json.gz`),
-      icon: 'data_object',
+      icon: {id:'data_object'},
       isShown: signal(true)
     },
 
@@ -184,7 +185,7 @@ export class DownloadTabComponent {
       title: 'PDF Result',
       description: 'Download a detailed report with the most significant pathway analysis results in PDF format',
       url: computed(() => `${ANALYSIS_SERVICE}/report/${this.token()}/${this.currentAnalysisSpecies()}/report.pdf`),
-      icon: 'docs',
+      icon: {id:'docs'},
       isShown: computed(() => !this.analysis.isGSA())
     },
 
@@ -192,7 +193,7 @@ export class DownloadTabComponent {
       title: 'Identifier Mapping CSV',
       description: 'Download the identifier mappings between the submitted data and the selected resource in CSV format',
       url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/entities/found/${this.currentAnalysisResource()}/mapping.csv`),
-      icon: 'table',
+      icon: {id:'table'},
       isShown: signal(true)
     },
 
@@ -200,7 +201,7 @@ export class DownloadTabComponent {
       title: 'Not Found Identifiers CSV',
       description: 'Download a CSV file containing those identifiers from the submitted sample that we were not mapped',
       url: computed(() => `${ANALYSIS_SERVICE}/download/${this.token()}/entities/notfound/not_found.csv`),
-      icon: 'table',
+      icon: {id:'table'},
       isShown: signal(true)
     }]
 
@@ -213,16 +214,16 @@ export class DownloadTabComponent {
               private dialog: MatDialog,) {
   }
 
-  getGsaIcon(name: string) {
+  getGsaIcon(name: string): Icon | undefined {
     switch (name) {
       case 'MS Excel Report (xlsx)':
-        return 'table';
+        return {id:'table'};
       case 'PDF Report':
-        return 'docs';
+        return {id:'docs'};
       case 'R Script':
-        return 'code_blocks';
+        return {id:'code_blocks'};
       default:
-        return '';
+        return ;
     }
   }
 

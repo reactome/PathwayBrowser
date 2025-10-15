@@ -3,6 +3,8 @@ import {MatAnchor} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
 
+export type Icon = { id: string, svg?: boolean };
+
 @Component({
   selector: 'cr-download-button',
   imports: [
@@ -18,7 +20,8 @@ export class DownloadButtonComponent {
 
   url = input<string>();
   download = input<string | boolean>();
-  icon = input<string>();
+  icon = input<Icon>();
+
   label = input<string>();
   tooltip = input<string>();
   openInNewTab = input<string>('_blank');

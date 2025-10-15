@@ -14,11 +14,7 @@
 
   @if (finalPathwayName()) {
     <div class="header ">
-      <span>Download {{ finalPathwayName() }} {{ finalEventId() }}</span>
-      <a [href]=newtUrl() target="_blank">
-        <div class="newtIcon" [matTooltip]="'view SBGN in NEWT editor'"
-             [innerHTML]="newtIcon()  | safe:'html':true"></div>
-      </a>
+      <span>Downloads of "{{ finalPathwayName() }}"</span>
     </div>
   }
 
@@ -28,7 +24,8 @@
     <h3 class="category">Pathway Diagram</h3>
     <div class="container diagram">
       @if (hasEHLD() && analysis.samples().length > 1) {
-        <cr-download-button (click)="onEHLDAnimatedDownload()" label="Animated SVG" icon="slow_motion_video"/>
+        <cr-download-button (click)="onEHLDAnimatedDownload()" label="Animated SVG"
+                            [icon]="{id:'slow_motion_video'}"/>
       }
       @for (item of diagramItems(); track item) {
         <cr-download-button
@@ -47,13 +44,14 @@
     <h3 class="category">Reacfoam - Voronoi Treemap</h3>
     <div class="container reacfoam">
       @if (analysis.samples().length > 1) {
-        <cr-download-button (click)="onReacfoamAnimatedDownload()" label="Animated SVG" icon="slow_motion_video"/>
+        <cr-download-button (click)="onReacfoamAnimatedDownload()" label="Animated SVG"
+                            [icon]="{id:'slow_motion_video'}"/>
       }
 
       @for (format of reacfoamFormats; track format) {
         <cr-download-button (click)="onReacfoamDownload(format)"
                             [label]="format.toUpperCase()"
-                            icon="image"/>
+                            [icon]="{id:'image'}"/>
       }
     </div>
   }
@@ -66,7 +64,9 @@
       @for (item of pathwayItems; track item) {
         <cr-download-button [url]="item.url()"
                             [download]="item.fileName ? item.fileName(): true"
-                            [label]="item.name">
+                            [label]="item.name"
+                            [icon]="item.icon"
+        >
         </cr-download-button>
       }
     </div>
