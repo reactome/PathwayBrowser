@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
   host: "../..", // For go back from /beta/PathwayBrowser
+  absoluteHost: "https://reactome.org",
   s3: "https://download.reactome.org",
   gsaServer: "production",
   gtagId: "G-EDHZ92GXZP"

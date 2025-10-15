@@ -4,7 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {DataStateService} from "../../../services/data-state.service";
 import {isPathway} from "../../../services/utils";
 import {AnalysisService} from "../../../services/analysis.service";
-import {ANALYSIS_SERVICE, CONTENT_SERVICE, RESTFUL_API} from "../../../../environments/environment";
+import {ANALYSIS_SERVICE, CONTENT_SERVICE, environment, RESTFUL_API} from "../../../../environments/environment";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {SafePipe} from "../../../pipes/safe.pipe";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -56,7 +56,7 @@ type DiagramItem = {
 export class DownloadTabComponent {
 
   newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
-  newtUrl = computed(() => `https://web.newteditor.org/?URL=${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
+  newtUrl = computed(() => `https://web.newteditor.org/?URL=${environment.absoluteHost}/ContentService/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`)
 
   pathwayId = this.state.pathwayId as WritableSignal<string>;
   selectedElement = this.dataState.selectedElement;

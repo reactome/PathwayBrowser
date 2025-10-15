@@ -3,12 +3,6 @@
   display: flex;
   background: var(--tertiary-contrast-3);
 
-  .newtIcon {
-    width: 18px;
-    display: flex;
-    color: var(--tertiary-contrast-3);
-  }
-
   ::ng-deep .mdc-button__label {
     display: flex;
     flex-direction: row;
