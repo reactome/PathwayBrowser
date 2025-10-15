@@ -99,6 +99,7 @@ import {
   provideGoogleAnalytics,
   provideGoogleAnalyticsRouter
 } from "@hakimio/ngx-google-analytics";
+import {IconComponent} from "./details/tabs/description-tab/icon/icon.component";
 
 @NgModule({
   declarations: [
@@ -202,6 +203,7 @@ import {
     RheaComponent,
     PassiveDirective,
     MatPaginator,
+    IconComponent
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

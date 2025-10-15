@@ -427,7 +427,7 @@ export class SearchDataSource extends DataSource<Search.Entry | undefined> {
 }
 
 
-namespace Search {
+export namespace Search {
   export const EMPTY_RESULTS = {found: 0, facets: [], entries: []} as Search.Result;
 
   export interface Params extends Record<string, any> {
@@ -464,10 +464,44 @@ namespace Search {
     count: number;
   }
 
+  // firework and diagram
   export interface Result {
     entries: Entry[];
     facets: Facet[];
     found: number
+  }
+
+// Add a sub-namespace for Icon-specific results
+  export namespace Icon {
+
+    export interface Entry {
+      stId: string;
+      dbId: string;
+      id: string;
+      name: string;
+      type: string;
+      exactType: string;
+      species: string[];
+      summation: string;
+      isDisease: boolean;
+      hasEHLD?: boolean;
+      hasReferenceEntity: boolean;
+      disease: boolean
+    }
+
+    export interface EntryResult {
+      entries: Entry[];
+      typeName: string;
+      entriesCount: number;
+      rowCount: number;
+    }
+
+    export interface Result {
+      results: EntryResult[];
+      rowCount: number;
+      numberOfGroups: number;
+      numberOfMatches: number;
+    }
   }
 }
 

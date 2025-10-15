@@ -1,0 +1,3 @@
+<a [href]="`${CONTENT_DETAIL}/${icon().stId}`" target="_blank" [matTooltip]="`Open origin of icon ${icon().name}`">
+  <div [innerHTML]="iconSVG()! | safe: 'html' : true"></div>
+</a>

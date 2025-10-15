@@ -79,9 +79,9 @@
   <div class="overview" #overview [class.update-layout]="hasIllustration()"
        [style.--icon-height.px]="overview?.clientHeight">
     <cr-description-overview [obj]="obj()" [showSpecies]="true"></cr-description-overview>
-    @if (!icon.isLoading() && icon.value()) {
+    @if (!icon.isLoading() && icon.value() && currentIcon()) {
       <div class="icon-container">
-        <div class="icon" [innerHTML]="icon.value()! | safe: 'html' : true"></div>
+        <cr-icon [iconSVG]="icon.value()!" [icon]="currentIcon()!"/>
       </div>
     }
     @for (f of figures(); track f.url) {
