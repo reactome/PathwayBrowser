@@ -3,6 +3,10 @@
 
 .download-container {
   padding: 0 5px 0 20px;
+  scrollbar-gutter: stable;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
 
   .category {
     padding: 0 2px;
