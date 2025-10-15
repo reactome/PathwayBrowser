@@ -16,7 +16,6 @@ import {MatDialog} from "@angular/material/dialog";
 import {AnimatedDownloadFormComponent} from "./animated-download-form/animated-download-form.component";
 
 
-
 type PathwayItem = {
   name: string;
   url: Signal<string>;
@@ -57,7 +56,7 @@ export class DownloadTabComponent {
 
   newtIcon = toSignal(this.http.get('assets/icons/download/newt.svg', {responseType: 'text'}), {initialValue: ''});
   newtUrl = computed(() => {
-    const reactomeUrl = encodeURI(`${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`);
+    const reactomeUrl = new URL(`${CONTENT_SERVICE}/exporter/event/${this.finalEventId()}.sbgn&inferNestingOnLoad=true&mapColorScheme=opposed_red_blue&fitLabelsToNodes=true`, window.location.origin).href
     return `https://web.newteditor.org/?URL=${reactomeUrl}`;
   });
   pathwayId = this.state.pathwayId as WritableSignal<string>;
@@ -83,7 +82,7 @@ export class DownloadTabComponent {
 
   hasResult = computed(() => !!(this.analysis.result()));
   hasDetail = computed(() => (this.dataState.hasDetail()));
-  hasEHLD = computed( ()=> this.ehld.hasEHLD());
+  hasEHLD = computed(() => this.ehld.hasEHLD());
 
   hasDownload = computed(() => {
     if (this.hasResult()) return true;
