@@ -51,14 +51,14 @@
   justify-content: space-between;
   padding: 0 8px 0 20px;
 
+  button,.mat-mdc-outlined-button {
+    background: var(--surface);
+  }
+
   .top-left {
     flex: 0;
     display: flex;
     gap: 20px;
-
-    button {
-      background: var(--surface);
-    }
   }
 
   .title {
@@ -100,9 +100,9 @@
     }
 
     .quote {
-      background: light-dark(var(--surface), var(--primary));
+      background: var(--surface);
       @include mat.icon-button-overrides((
-        icon-color: light-dark(var(--primary), var(--surface)),
+        icon-color: var(--primary),
         state-layer-size: 36px,
       ));
 
@@ -401,6 +401,36 @@
   background: var(--surface);
   z-index: 999;
   overflow: hidden;
+}
+
+.feedback {
+  color: var(--warn);
+  font-variation-settings: 'FILL' 1;
+  margin-left: -12px;
+
+  @include mat.button-overrides((
+    outlined-label-text-color: var(--warn),
+    outlined-outline-width: 0
+  ));
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.version-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.beta {
+  font: var(--mat-sys-label-small);
+  color: var(--warn);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0 5px 0 4px;
+  font-style: italic;
 }
 
 

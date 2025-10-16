@@ -52,7 +52,7 @@
     "cytoscape-layers": "^3.0.0",
     "ng-table-virtual-scroll": "^1.6.1",
     "ngx-custom-material-file-input": "^19.0.0",
-    "ngx-reactome-style": "^0.0.19",
+    "ngx-reactome-style": "^0.0.20",
     "reactome-cytoscape-style": "^0.0.2",
     "ngx-ui-tour-md-menu": "^14.0.1",
     "reactome-gsa-form": "^19.1.0",

@@ -144,8 +144,12 @@
           </div>
 
           <div class="top-right">
-            <a [href]="formerPathwayBrowserURL()" mat-icon-button class="quote" matTooltip="Open former Pathway Browser">
+            <a [href]="formerPathwayBrowserURL()" mat-icon-button class="quote warn" matTooltip="Open former Pathway Browser">
               <mat-icon fontSet="symbols">history</mat-icon>
+            </a>
+            <a href="https://forms.gle/3238xqbShhF8t9BQA" target="_blank" mat-stroked-button class="feedback warn" matTooltip="Send feedback for the beta version">
+              <mat-icon fontSet="symbols" iconPositionEnd>feedback</mat-icon>
+              Feedback
             </a>
             <mat-slide-toggle color="primary" [(ngModel)]="dark.isDark" #darkToggle [matTooltip]="dark.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
                               id="dark-toggle"></mat-slide-toggle>
@@ -156,7 +160,11 @@
               <a href="/" id="main">
                 <mat-icon [svgIcon]="'logo'"></mat-icon>
               </a>
-              <span class="version">v{{ general.version.value() }}</span>
+              <div class="version-container">
+                <span class="version">v{{ general.version.value() }}</span>
+                <span class="beta">beta</span>
+              </div>
+
             </div>
           </div>
         </div>
