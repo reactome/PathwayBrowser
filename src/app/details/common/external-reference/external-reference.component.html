@@ -1,7 +1,7 @@
 <div class="element-container">
   @for (property of externalRef(); track property.label) {
     <!--skip external reference when asked -->
-    @if (!(property.label === 'External Reference' && !displayReference())) {
+    @if (!(property.label === Labels.EXTERNAL_REFERENCE && !displayReference())) {
       <div class="row">
         <div class="label-container">{{ property.label || ''  | titlecase }}</div>
         <div class="composition-container"
@@ -12,7 +12,7 @@
               <a [href]="item.url" target="_blank"> {{ item.databaseName }}:{{ item.identifier }}</a>
             </span>
             }
-          } @else if (property.label === 'External Reference') {
+          } @else if (property.label === Labels.EXTERNAL_REFERENCE) {
             <span class="external-reference-container">
               <a [href]="referenceEntity().url" target="_blank">{{ referenceEntity().displayName }}</a>
               @if (!data.selectIsSummary()) {

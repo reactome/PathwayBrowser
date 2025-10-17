@@ -11,6 +11,7 @@ import {MatIcon} from "@angular/material/icon";
 import {UrlStateService} from "../../../services/url-state.service";
 import {MatTooltip} from "@angular/material/tooltip";
 import {DataStateService} from "../../../services/data-state.service";
+import {Labels} from "../../../constants/constants";
 
 @Component({
   selector: 'cr-external-reference',
@@ -53,4 +54,6 @@ export class ExternalReferenceComponent {
   onSelect() {
     this.state.select.set(this.referenceEntity().stId!)
   }
+
+  protected readonly Labels = Labels;
 }
