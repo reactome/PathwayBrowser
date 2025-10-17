@@ -21,10 +21,13 @@
 
   <!-- Cross References -->
   @if (xRefs().length > 0) {
-    <mat-divider/>
+    @if (hasStructure()) {
+      <mat-divider/>
+    }
     <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
-    <!-- only provide this info for RNA/DNA which is Entity from backend on molecule tab -->
-  } @else if (isMoleculeView() && moleculeType() === MoleculeType.ENTITY) {
-    <cr-notice-info />
+  }
+
+  @if (displayNotice()) {
+    <cr-notice-info/>
   }
 </div>

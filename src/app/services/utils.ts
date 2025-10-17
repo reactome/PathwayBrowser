@@ -194,7 +194,7 @@ export function isReferenceMolecule(obj: DatabaseObject): obj is ReferenceMolecu
 
 const referenceSequenceClasses: Set<string> = new Set([SchemaClasses.REFERENCE_SEQUENCE, SchemaClasses.REFERENCE_DNA_SEQUENCE, SchemaClasses.REFERENCE_DNA_SEQUENCE, SchemaClasses.REFERENCE_GENE_PRODUCT, SchemaClasses.REFERENCE_ISOFORM]);
 
-export function isReferenceSequence(obj: DatabaseObject): obj is ReferenceSequence {
+export function isReferenceSequence(obj: DatabaseObject | ReferenceEntity): obj is ReferenceSequence {
   return referenceSequenceClasses.has(obj.schemaClass);
 }
 
