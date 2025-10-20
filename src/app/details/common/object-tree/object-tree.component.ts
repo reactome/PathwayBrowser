@@ -351,7 +351,8 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
   static nonNestedClasses: Set<string> = new Set([
     SchemaClasses.EWAS,
     SchemaClasses.SIMPLE_ENTITY,
-    SchemaClasses.CHEMICAL_DRUG
+    SchemaClasses.CHEMICAL_DRUG,
+    SchemaClasses.OTHER_ENTITY
   ])
 
   isNestedView(selectedNode: E | undefined): boolean {
