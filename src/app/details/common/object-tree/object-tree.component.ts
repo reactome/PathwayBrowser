@@ -345,7 +345,8 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     SchemaClasses.EWAS,
     SchemaClasses.SIMPLE_ENTITY,
     SchemaClasses.CHEMICAL_DRUG,
-    SchemaClasses.OTHER_ENTITY
+    SchemaClasses.OTHER_ENTITY,
+    SchemaClasses.GENOME_ENCODED_ENTITY
   ])
 
   isNestedView(selectedNode: E | undefined): boolean {
