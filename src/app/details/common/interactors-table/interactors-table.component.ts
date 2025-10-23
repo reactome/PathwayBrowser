@@ -1,5 +1,6 @@
 import {Component, computed, input} from '@angular/core';
 import {CustomInteraction} from "../../../interactors/model/interactor.model";
+import {CONTENT_QUERY} from "../../../../environments/environment";
 
 
 @Component({
@@ -27,4 +28,6 @@ export class InteractorsTableComponent {
 
   // displayedColumns: string[] = Object.keys(this.interactors()[0] || {});
   displayedColumns = ['geneName', 'identifier', 'speciesName', 'entitiesCount', 'evidenceCount', 'score'];
+
+  protected readonly CONTENT_QUERY = CONTENT_QUERY;
 }
