@@ -25,7 +25,7 @@
       <mat-header-cell *matHeaderCellDef>Reactome Entities</mat-header-cell>
       <mat-cell *matCellDef="let element">
         <a mat-button class="entity-button"
-           [href]="'content/query?q='+ element.identifier +'&types=Protein&cluster=false'"
+           [href]="`${CONTENT_QUERY}?q=${element.identifier}&species=Homo+sapiens&types=Protein&cluster=true`"
            [class.disabled]="element.entitiesCount === 0">
           {{ element.entitiesCount }}
           <mat-icon iconPositionEnd class="search-icon" svgIcon='search'></mat-icon>

@@ -25,8 +25,7 @@ import {
   MatTree,
   MatTreeNestedDataSource,
   MatTreeNodeDef,
-  MatTreeNodeOutlet,
-  MatTreeNodeToggle
+  MatTreeNodeOutlet
 } from "@angular/material/tree";
 import {rxResource} from "@angular/core/rxjs-interop";
 import {forkJoin, map, Observable, of} from "rxjs";
@@ -60,7 +59,6 @@ type Connector = { type: string, shape: 'L' | 'I' | 'T' } | null;
     MatTooltip,
     MatIcon,
     MatTreeNodeOutlet,
-    MatTreeNodeToggle,
     MatIconButton,
     MatTreeNodeDef,
     ObjectTreeDetailsComponent,
@@ -238,19 +236,14 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
 
   // Fetch children data when user click to expand, no need to send API call when tree node already exists
   loadChildren(node: R) {
+    // manually toggle the expand and collapse behaviour, the matTreeNodeToggle conflicts with the dynamic highlight css class
+    this.tree.toggle(node);
 
-    const isExpanded = this.tree.isExpanded(node);
-
-    // Expand
-    if (isExpanded) {
-      const alreadyLoaded = node.element.isLoaded;
-      const hasNoChildren = alreadyLoaded && node.element.composedOf?.length === 0; // For nested entity which already exists but no children data
-      if (!alreadyLoaded || hasNoChildren) {
-        // No children data — sending API call to fetch children data
-        this._selectedTreeNode.set(node.element);
-      } else {
-        console.log('Children already loaded — skipping API call');
-      }
+    const alreadyLoaded = node.element.isLoaded;
+    const hasNoChildren = alreadyLoaded && node.element.composedOf?.length === 0; // For nested entity which already exists but no children data
+    if (!alreadyLoaded || hasNoChildren) {
+      // No children data — sending API call to fetch children data
+      this._selectedTreeNode.set(node.element);
     }
 
 
@@ -352,7 +345,8 @@ export class ObjectTreeComponent<E extends DatabaseObject, R extends Relationshi
     SchemaClasses.EWAS,
     SchemaClasses.SIMPLE_ENTITY,
     SchemaClasses.CHEMICAL_DRUG,
-    SchemaClasses.OTHER_ENTITY
+    SchemaClasses.OTHER_ENTITY,
+    SchemaClasses.GENOME_ENCODED_ENTITY
   ])
 
   isNestedView(selectedNode: E | undefined): boolean {

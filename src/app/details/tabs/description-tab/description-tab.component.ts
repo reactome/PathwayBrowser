@@ -353,7 +353,7 @@ export class DescriptionTabComponent {
           block: 'start',
           inline: 'start'
         });
-      })
+      }, 100)
     });
     effect(() => console.log("selected object", this.obj()))
   }

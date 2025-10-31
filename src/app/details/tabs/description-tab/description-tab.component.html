@@ -161,7 +161,7 @@
         <div class="label-container">{{ item.key }}</div>
         <div class="composition-container">
           @for (pe of item.value; let i = $index; track pe.dbId) {
-            <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+            <a [href]="`${CONTENT_DETAIL}/${pe.stId}`">{{ pe.name[0] }}</a>
             <!-- Add separator except for last item -->
             @if (i < item.value.length - 1) {
               <span class="margin-right">,</span>
@@ -181,7 +181,7 @@
         <div class="label-container">{{ item.key }}</div>
         <div class="composition-container">
           @for (pe of item.value; let i = $index; track pe.dbId) {
-            <a [href]="'/content/detail/' + pe.stId" target="_blank">{{ pe.name[0] }}</a>
+            <a [href]="`${CONTENT_DETAIL}/${pe.stId}`">{{ pe.name[0] }}</a>
             <!-- Add separator except for last item -->
             @if (i < item.value.length - 1) {
               <span class="margin-right">,</span>
@@ -249,7 +249,7 @@
           @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
             <div class="authorship-item">
               @for (author of ie.author; let i = $index; track author.dbId) {
-                <a [href]="'/content/detail/' + author.dbId" target="_blank"
+                <a [href]="`${CONTENT_DETAIL}/${author.dbId}`"
                    [ngClass]="{'margin-right': !author.orcidId}">
                   {{ author.firstname }} {{ author.surname }}
                 </a>

@@ -14,3 +14,4 @@ export const RESTFUL_API = `${environment.host}/ReactomeRESTfulAPI/RESTfulWS`;
 export const DOWNLOAD = `${environment.host}/download/current`;
 export const OVERLAYS = `${environment.host}/overlays`;
 export const CONTENT_DETAIL = `${environment.host}/content/detail`;
+export const CONTENT_QUERY = `${environment.host}/content/query`;
