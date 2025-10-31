@@ -22,6 +22,7 @@ import {DataStateService} from "../services/data-state.service";
 import {Point} from "@angular/cdk/drag-drop";
 import {defaultDownloadOptions, DownloadFormat, DownloadService} from "../services/download.service";
 import {SvgExporterService} from "../reacfoam/svg-exporter.service";
+import {map} from "rxjs";
 
 
 @Component({
@@ -40,7 +41,12 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
 
   readonly svgData = rxResource({
     request: () => ({id: this.pathwayId()}),
-    loader: params => this.ehldService.getSVGData(params.request.id)
+    loader: params => this.ehldService.getSVGData(params.request.id).pipe(
+      map(data => data
+        .replaceAll('opacity="0.01"', 'opacity="0"')
+        .replaceAll('opacity: 0.01', 'opacity: 0')
+      )
+    )
   })
 
   style!: Style;
