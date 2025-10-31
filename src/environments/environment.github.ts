@@ -3,7 +3,8 @@ export const environment = {
   host: "https://dev.reactome.org",
   s3: "https://download.reactome.org",
   gsaServer: "dev",
-  gtagId: "G-96F1EYHQR3"
+  gtagId: "G-96F1EYHQR3",
+  preferS3: true,
 };
 
 export const CONTENT_SERVICE = `${environment.host}/ContentService`;

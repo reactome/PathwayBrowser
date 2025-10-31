@@ -15,5 +15,5 @@ export class GeneralService {
     loader: () => this.http.get<number>(`${CONTENT_SERVICE}/data/database/version`)
   })
 
-  download = computed(() => this.version.value() ? `${environment.s3}/${this.version.value()}` : DOWNLOAD)
+  download = computed(() => environment.preferS3 && this.version.value() ? `${environment.s3}/${this.version.value()}` : DOWNLOAD)
 }
