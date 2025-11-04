@@ -4,7 +4,6 @@ import {EntityService} from "../../../services/entity.service";
 import {isArray, isString} from "lodash";
 import {NgClass, TitleCasePipe} from "@angular/common";
 import {StructureViewerComponent} from "../../tabs/molecule-tab/structure-viewer/structure-viewer.component";
-import {MoleculeType} from "../../tabs/molecule-tab/molecule-tab.component";
 import {DatabaseIdentifier} from "../../../model/graph/database-identifier.model";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -12,6 +11,7 @@ import {UrlStateService} from "../../../services/url-state.service";
 import {MatTooltip} from "@angular/material/tooltip";
 import {DataStateService} from "../../../services/data-state.service";
 import {Labels} from "../../../constants/constants";
+import {StructureService} from "../../../services/structure.service";
 
 @Component({
   selector: 'cr-external-reference',
@@ -24,7 +24,7 @@ import {Labels} from "../../../constants/constants";
     MatIconButton,
     MatTooltip,
     NgClass,
-    StructureViewerComponent,
+    StructureViewerComponent
   ]
 })
 export class ExternalReferenceComponent {
@@ -42,10 +42,14 @@ export class ExternalReferenceComponent {
     const entity = this.referenceEntity();
     return entity ? entity.moleculeType : null;
   })
-  hasStructure = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL);
+
+  hasStructure = computed(() => this.structure.hasAnyStructure());
 
 
-  constructor(private entity: EntityService, private state: UrlStateService, public data: DataStateService ) {
+  constructor(private entity: EntityService,
+              private state: UrlStateService,
+              public data: DataStateService,
+              private structure: StructureService) {
   }
 
   protected readonly isString = isString;

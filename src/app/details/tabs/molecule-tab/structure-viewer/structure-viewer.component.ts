@@ -16,12 +16,13 @@ import {rxResource} from "@angular/core/rxjs-interop";
 import {extract, Style} from "reactome-cytoscape-style";
 import {DarkService} from "../../../../services/dark.service";
 import {ReferenceEntity} from "../../../../model/graph/reference-entity/reference-entity.model";
-import {catchError, EMPTY, map, Observable, of} from "rxjs";
+import {catchError, EMPTY, map} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {SafePipe} from "../../../../pipes/safe.pipe";
 import {SelectableObject} from "../../../../services/event.service";
 import {MoleculeType} from "../molecule-tab.component";
-import {NoticeInfoComponent} from "../../../common/notice-info/notice-info.component";
+import {StructureService} from "../../../../services/structure.service";
+
 
 export interface StructureEntry {
   pdb_id: string;
@@ -103,8 +104,7 @@ declare const PDBeMolstarPlugin: any;
     MatSelect,
     MatOptgroup,
     MatOption,
-    SafePipe,
-    NoticeInfoComponent
+    SafePipe
   ],
   styleUrl: './structure-viewer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -200,7 +200,9 @@ export class StructureViewerComponent {
     return extract(this.reactomeStyle.properties.global.surface);
   })
 
-  constructor(private dark: DarkService, private http: HttpClient) {
+  constructor(private dark: DarkService,
+              private http: HttpClient,
+              private structure: StructureService) {
     effect(() => {
       const [isProtein, isChemical] = [this.isProtein(), this.isChemical()]
       if (isProtein) {
@@ -208,6 +210,10 @@ export class StructureViewerComponent {
       } else if (isChemical) {
         this.chebiIdentifier.set(this.obj().identifier);
       }
+    });
+
+    effect(() => {
+      this.structure.hasAnyStructure.set(this.hasAnyStructure());
     });
   }
 

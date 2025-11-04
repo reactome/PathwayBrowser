@@ -27,7 +27,7 @@
     <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
   }
 
-  @if (displayNotice()) {
+  @if (displayNotice() && !isLoading()) {
     <cr-notice-info/>
   }
 </div>
