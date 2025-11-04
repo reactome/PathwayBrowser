@@ -348,7 +348,7 @@ export class EhldService {
       textInfoElement.removeAttribute("transform");
       textInfoElement.classList.add('analysis-text');
 
-      const rectBox = (analysisInfoElement.firstChild! as SVGGraphicsElement).getBBox();
+      const rectBox = (analysisInfoElement.querySelector('rect, path')! as SVGGraphicsElement).getBBox();
       const centerX = rectBox.x + rectBox.width / 2;
       const centerY = rectBox.y + rectBox.height / 2;
 

@@ -3,7 +3,9 @@ export const environment = {
   host: "../..", // For go back from /beta/PathwayBrowser
   s3: "https://download.reactome.org",
   gsaServer: "production",
-  gtagId: "G-EDHZ92GXZP"
+  gtagId: "G-EDHZ92GXZP",
+  preferS3: true,
+
 };
 
 export const CONTENT_SERVICE = `${environment.host}/ContentService`;
