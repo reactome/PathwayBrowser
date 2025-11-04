@@ -52,6 +52,7 @@
 
 .item {
   overflow: hidden; // Allows flex container to shrink properly in Firefox
+  word-break: break-word;
 }
 .external-reference-container {
   display: flex;
