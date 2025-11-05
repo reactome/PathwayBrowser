@@ -1,18 +1,6 @@
 import {Component, computed, effect, input, linkedSignal, signal, Signal, viewChild} from '@angular/core';
 import {MoleculeGroup} from "../molecule-tab.component";
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef, MatFooterRow,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow,
-  MatRowDef,
-  MatTable,
-  MatTableDataSource, MatTableModule
-} from "@angular/material/table";
+import {MatTable, MatTableModule} from "@angular/material/table";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatSort, MatSortHeader} from "@angular/material/sort";
@@ -57,7 +45,9 @@ export class MoleculeDownloadTableComponent {
 
   moleculeData = input.required<MoleculeGroup[]>();
   sort = viewChild.required(MatSort);
-  objId = input.required<string>();
+  objId = input.required<string | undefined>();
+
+  table = viewChild.required(MatTable);
 
   tableData = computed(() => {
     return this.moleculeData().flatMap(group =>
@@ -98,6 +88,8 @@ export class MoleculeDownloadTableComponent {
     );
   })
 
+  finalData = computed(() => this.filteredData() ?? this.tableData());
+
   maxWidths = computed(() => {
     const columns = this.displayedColumns()
     const maxData = new Map<string, string>(columns.map(column => [column, '']));
@@ -114,17 +106,14 @@ export class MoleculeDownloadTableComponent {
   constructor() {
 
     effect(() => {
-      this.dataSource.data = this.tableData();
-    });
-
-    effect(() => {
-      this.dataSource.data = this.filteredData();
+      this.dataSource.data = this.finalData();
+      this.table().renderRows();
     });
 
     effect(() => {
       this.dataSource.sort = this.sort();
+      this.table().renderRows();
     });
-
   }
 
   getExportData() {
