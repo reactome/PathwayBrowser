@@ -47,7 +47,9 @@ export class ObjectTreeDetailsComponent {
     return null;
   })
 
-  hasStructure = computed(() => this.structure.hasAnyStructure());
+  hasStructure = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL);
+
+  hasStructureData  = computed(() => this.structure.hasAnyStructure());
 
   constructor(private entity: EntityService,
               private structure: StructureService) {
@@ -65,7 +67,7 @@ export class ObjectTreeDetailsComponent {
     const hasOtherFields = otherKeys.some(key => referenceEntity[key]);
     const emptyExternalRef = onlyDisplayName && !hasOtherFields;
 
-    return this.isMoleculeView() && emptyExternalRef && this.xRefs().length === 0;
+    return this.isMoleculeView() && emptyExternalRef && this.xRefs().length === 0 && !this.hasStructureData();
   });
 
 

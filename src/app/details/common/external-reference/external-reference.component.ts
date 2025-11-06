@@ -12,6 +12,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {DataStateService} from "../../../services/data-state.service";
 import {Labels} from "../../../constants/constants";
 import {StructureService} from "../../../services/structure.service";
+import {MoleculeType} from "../../tabs/molecule-tab/molecule-tab.component";
 
 @Component({
   selector: 'cr-external-reference',
@@ -43,7 +44,7 @@ export class ExternalReferenceComponent {
     return entity ? entity.moleculeType : null;
   })
 
-  hasStructure = computed(() => this.structure.hasAnyStructure());
+  hasStructure = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL);
 
 
   constructor(private entity: EntityService,
