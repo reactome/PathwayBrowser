@@ -120,18 +120,24 @@ export class StructureViewerComponent {
   isChemical = computed(() => this.moleculeType() === MoleculeType.CHEMICAL);
   chebiIdentifier = signal<string | undefined>(undefined);
 
+  pdbIdentifiers = computed(() => this.getPDBIdentifiers(this.xRefs()));
+
 
   reactomeStyle: Style = new Style(document.body);
 
+
   alphaFoldEntryId = linkedSignal(() => {
-    if (this.isProtein()) {
+    if (!this.isProtein()) return null;
+    const summary = this.alphafoldSummary.value();
+    if (summary?.structures?.[0]?.summary?.model_url) {
       const id = this.obj().identifier;
       return `AF-${id}-F1`;
     }
     return null;
   });
 
-  selected = linkedSignal(() => this.alphaFoldEntryId())
+
+  selected = signal<string | null>(null);
 
   sourceLabel = computed(() => {
     return this.selected()?.startsWith("AF-") ? Source.ALPHA_FOLD : Source.PDB;
@@ -139,15 +145,13 @@ export class StructureViewerComponent {
 
   /** protein structure data from AlphaFold and PDB */
   proteinStructureData = computed(() => {
-
     if (!this.isProtein()) return null;
-
     const result = []
 
     const afId = this.alphaFoldEntryId();
     if (afId) result.push({source: Source.ALPHA_FOLD, identifiers: [afId]})
 
-    const pdbIdentifiers = this.getPDBIdentifiers(this.xRefs());
+    const pdbIdentifiers = this.pdbIdentifiers();
     if (pdbIdentifiers.length > 0) result.push({source: Source.PDB, identifiers: pdbIdentifiers})
 
     return result;
@@ -164,7 +168,11 @@ export class StructureViewerComponent {
       )
     }
   })
+
   isChebiLoading = computed(() => this.chebiStructureSVGData.isLoading());
+
+  isAlphafoldSummaryLoading = computed(() => this.alphafoldSummary.isLoading());
+
 
   bestPdbStructure = rxResource({
     request: () => this.obj().identifier,
@@ -214,6 +222,23 @@ export class StructureViewerComponent {
 
     effect(() => {
       this.structure.hasAnyStructure.set(this.hasAnyStructure());
+    });
+
+    effect(() => {
+      if (!this.isProtein()) {
+        this.selected.set(null);
+        return;
+      }
+
+      const afId = this.alphaFoldEntryId();
+      if (!this.isAlphafoldSummaryLoading()) {
+        if (afId) {
+          this.selected.set(afId);
+        } else {
+          // finished loading but no data → fallback to PDB
+          this.selected.set(this.pdbIdentifiers()?.[0] ?? null);
+        }
+      }
     });
   }
 
