@@ -2,23 +2,30 @@
   <div class="row">
     <div class="label-container">Structure</div>
     <div class="composition-container">
-      @if (isProtein()) {
-        <div class="selector-container">
-          <mat-form-field class="selector" subscriptSizing="dynamic">
-            <mat-label>{{ sourceLabel() }}</mat-label>
-            <mat-select [(value)]="selected">
-              @for (group of proteinStructureData(); track group) {
-                <mat-optgroup [label]="group.source">
-                  @for (id of group.identifiers; track id) {
-                    <mat-option [value]="id">{{ id }}</mat-option>
-                  }
-                </mat-optgroup>
-              }
-            </mat-select>
-          </mat-form-field>
+
+      @if (isAlphafoldSummaryLoading()) {
+        <div class="loading-container">
+          <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
+      } @else {
+        @if (isProtein()) {
+          <div class="selector-container">
+            <mat-form-field class="selector" subscriptSizing="dynamic">
+              <mat-label>{{ sourceLabel() }}</mat-label>
+              <mat-select [(value)]="selected">
+                @for (group of proteinStructureData(); track group) {
+                  <mat-optgroup [label]="group.source">
+                    @for (id of group.identifiers; track id) {
+                      <mat-option [value]="id">{{ id }}</mat-option>
+                    }
+                  </mat-optgroup>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        }
+        <div class="structure-container" #viewer [hidden]="!isProtein()"></div>
       }
-      <div class="structure-container" #viewer [hidden]="!isProtein()"></div>
 
       @if (chebiStructureSVGData.value() && isChemical()) {
         <div class="chebi-background" [innerHTML]="chebiStructureSVGData.value()! | safe:'html':true"></div>

@@ -134,6 +134,15 @@ p:first-child {
   filter: hue-rotate(180deg) invert(1);
 }
 
+// progress-spinner loading container
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+}
+
 body {
   --opacity: 0.08;
   --structure-opacity: [[130,0], [150,100]];

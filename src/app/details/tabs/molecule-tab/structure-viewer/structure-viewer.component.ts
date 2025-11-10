@@ -22,6 +22,7 @@ import {SafePipe} from "../../../../pipes/safe.pipe";
 import {SelectableObject} from "../../../../services/event.service";
 import {MoleculeType} from "../molecule-tab.component";
 import {StructureService} from "../../../../services/structure.service";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 
 export interface StructureEntry {
@@ -104,7 +105,8 @@ declare const PDBeMolstarPlugin: any;
     MatSelect,
     MatOptgroup,
     MatOption,
-    SafePipe
+    SafePipe,
+    MatProgressSpinner
   ],
   styleUrl: './structure-viewer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
