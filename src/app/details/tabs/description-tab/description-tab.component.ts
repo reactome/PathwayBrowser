@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, signal, Signal, TemplateRef, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, signal, Signal, TemplateRef, viewChild} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {
@@ -190,6 +190,10 @@ export class DescriptionTabComponent {
     return isHuman && isRLE(this.obj()) && isInferred;
   })
 
+  selectedKey = signal<string>(DataKeys.OVERVIEW);
+  detailsContainer = viewChild<ElementRef<HTMLElement>>('details');
+  private observer?: IntersectionObserver;
+
   overview$ = viewChild<HTMLDivElement>('overview');
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
   referenceTemplate$ = viewChild.required<TemplateRef<any>>('referenceTemplate');
@@ -346,16 +350,17 @@ export class DescriptionTabComponent {
               public state: UrlStateService,
               private species: SpeciesService
   ) {
+
     effect(() => {
-      !!this.state.section() && this.obj() && setTimeout(() => {
-        document.getElementById(this.state.section()!)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'start'
-        });
-      }, 100)
+      const section = this.state.section();
+      if (section) {
+        this.selectedKey.set(section);
+      }
     });
-    effect(() => console.log("selected object", this.obj()))
+
+    effect(() => {
+      this.observeAllSection();
+    })
   }
 
 
@@ -399,6 +404,66 @@ export class DescriptionTabComponent {
         return obj[key] !== undefined && obj[key];
     }
   }
+
+  private manualSelection = false;
+
+  selectItem(key: string): void {
+    
+    this.manualSelection = true;
+    this.selectedKey.set(key);
+
+    // scroll to the section
+    const el = document.getElementById(key);
+    el?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'start'
+    });
+
+    // allow observer updates again after scroll completes
+    setTimeout(() => {
+      this.manualSelection = false;
+    }, 1000);
+  }
+
+  // ideas -> https://levelup.gitconnected.com/building-a-html-table-of-contents-with-automatic-highlighting-7bf51ec4c972
+  private observeAllSection() {
+    // use IntersectionObserver to detect which section is visible
+    const options = {
+      root: this.detailsContainer()?.nativeElement,
+      rootMargin: '0px', // no offset
+      threshold: 0,  // trigger as soon as any pixel is visible
+    };
+
+    this.observer = new IntersectionObserver(entries => {
+
+      if (this.manualSelection) return;
+
+      // filtering visible elements
+      const visibles = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+      if (visibles.length > 0) {
+        const id = visibles[0].target.id;
+        if (id && id !== this.selectedKey()) {
+          this.selectedKey.set(id);
+        }
+      }
+    }, options);
+
+    // ensures DOM is ready before selecting sections and observe all TOC sections
+    queueMicrotask(() => {
+      this.elements.forEach(el => {
+        const section = document.getElementById(el.key);
+        if (section) this.observer!.observe(section);
+      });
+    });
+
+    // cleanup: Angular automatically calls this when the effect is disposed
+    return () => this.observer?.disconnect();
+  }
+
 
   protected readonly CONTENT_DETAIL = CONTENT_DETAIL;
   protected readonly environment = environment;

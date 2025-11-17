@@ -11,7 +11,7 @@
 </ng-template>
 
 
-<div id="details">
+<div id="details" #details>
   <div class="content">
     <!-- Header -->
     <div class="header" [id]=DataKeys.OVERVIEW>
@@ -64,9 +64,11 @@
   <div class="toc">
     @for (element of elements; track element) {
       @if (isTOCIncluded(element.key)) {
-        <a
-          [routerLink]="[]"
-          [fragment]="element.key" [queryParamsHandling]="'preserve'">
+        <a class="toc-item"
+           [class.selected]="selectedKey() == element.key"
+           [routerLink]="[]"
+           [fragment]="element.key" [queryParamsHandling]="'preserve'"
+           (click)="selectItem(element.key)">
           {{ element.label }}
         </a>
       }
