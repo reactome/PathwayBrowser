@@ -17,7 +17,9 @@
     <!-- Species Column -->
     <ng-container matColumnDef="speciesName">
       <mat-header-cell *matHeaderCellDef>Species</mat-header-cell>
-      <mat-cell *matCellDef="let element"><span>{{ element.speciesName }}</span></mat-cell>
+      <mat-cell *matCellDef="let element"
+                [matTooltip]="element.speciesName === 'Homo sapiens' ? '': element.speciesName">
+        <span>{{ element.speciesName }}</span></mat-cell>
     </ng-container>
 
     <!-- Entities Column -->
