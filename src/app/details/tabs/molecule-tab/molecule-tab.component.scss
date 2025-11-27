@@ -43,6 +43,16 @@
   // Sticky
   position: sticky;
   top: 10px;
+
+  .toc-item {
+    padding-right: 8px;
+    cursor: pointer;
+  }
+
+  .selected {
+    border-right: 4px solid var(--primary);
+    padding-right: 4px;
+  }
 }
 
 .spinner-container {

@@ -14,7 +14,6 @@ import {Relationship} from "../model/graph/relationship.model";
 import {ReferenceGroup} from "../model/graph/reference-entity/reference-group.model";
 import {ReplacedResidue} from "../model/graph/abstract-modified-residue/replaced-residue.model";
 import {FragmentModification} from "../model/graph/abstract-modified-residue/fragment-modification.model";
-import HasModifiedResidue = Relationship.HasModifiedResidue;
 import {ReferenceMolecule} from "../model/graph/reference-entity/reference-molecule.model";
 import {Publication} from "../model/graph/publication/publication.model";
 import {Book} from "../model/graph/publication/book.model";
@@ -24,6 +23,8 @@ import {SimpleEntity} from "../model/graph/physical-entity/simple-entity.model";
 import {SummaryEntity} from "../model/graph/physical-entity/summary-entity.model";
 import {ReferenceSequence} from "../model/graph/reference-entity/reference-sequence.model";
 import {ReferenceGeneProduct} from "../model/graph/reference-entity/reference-gene-product.model";
+import {WritableSignal} from "@angular/core";
+import HasModifiedResidue = Relationship.HasModifiedResidue;
 
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null
@@ -306,5 +307,50 @@ export function extractFromSpace(input: string, getBeforeSpace: boolean = false)
 
 export function average(numbers: number[]): number {
   return numbers.reduce((a, b) => a + b, 0) / numbers.length;
+}
+
+
+// ideas => https://levelup.gitconnected.com/building-a-html-table-of-contents-with-automatic-highlighting-7bf51ec4c972
+export function observeSections(
+  elementIds: string[],
+  selectedKey: WritableSignal<string>,
+  manualSelection: boolean,
+  includeDownload: boolean
+) {
+  const options = {
+    root: null,
+    rootMargin: '0px', // no offset
+    threshold: 0,  // trigger as soon as any pixel is visible
+  };
+  const observer = new IntersectionObserver(entries => {
+    if (manualSelection) return;
+    // filtering visible elements
+    const visibles = entries
+      .filter(e => e.isIntersecting)
+      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+    if (visibles.length > 0) {
+      const id = visibles[0].target.id;
+      if (id && id !== selectedKey()) {
+        selectedKey.set(id);
+      }
+    }
+  });
+
+  queueMicrotask(() => {
+    elementIds.forEach(id => {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    });
+
+    if (includeDownload) {
+      const downloadSection = document.getElementById('download');
+      if (downloadSection) {
+        observer.observe(downloadSection);
+      }
+    }
+  });
+  // return cleanup function
+  return () => observer.disconnect();
 }
 

@@ -26,13 +26,14 @@
 
     <div class="toc">
       @for (group of moleculeData() | sortByText: 'category'; track group.category) {
-        <a (click)="scrollTo(group.category)">
+        <a class='toc-item' (click)="scrollTo(group.category)"
+           [class.selected]="selectedKey() == sanitizeId(group.category)">
           {{ group.category }}
         </a>
       }
       @if (moleculeData().length > 0) {
         <!-- Add download link -->
-        <a (click)="scrollTo('download')">Download </a>
+        <a class='toc-item' (click)="scrollTo('download')" [class.selected]="selectedKey() == sanitizeId('download')">Download </a>
       }
     </div>
   </div>

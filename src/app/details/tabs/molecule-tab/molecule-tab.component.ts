@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, WritableSignal} from '@angular/core';
+import {Component, computed, effect, input, OnDestroy, signal, WritableSignal} from '@angular/core';
 import {Molecule, Participant, ParticipantService} from "../../../services/participant.service";
 import {EntityService} from "../../../services/entity.service";
 import {SelectableObject} from "../../../services/event.service";
@@ -9,7 +9,7 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from "@angular/material/expansion";
 import {MoleculeDownloadTableComponent} from "./molecule-download-table/molecule-download-table.component";
 import {UrlStateService} from "../../../services/url-state.service";
-import {isPathway} from "../../../services/utils";
+import {isPathway, observeSections} from "../../../services/utils";
 import {MoleculeGroupComponent} from "./molecule-group/molecule-group.component";
 
 
@@ -56,16 +56,17 @@ export enum MoleculeType {
   ],
   styleUrl: './molecule-tab.component.scss',
 })
-export class MoleculeTabComponent {
-
+export class MoleculeTabComponent implements OnDestroy {
 
   readonly selectableObject = input.required<SelectableObject>();
   pathwayId = this.state.pathwayId as WritableSignal<string>;
-
   // Get selected pathway id on Reacfoam view
   objStId = computed(() => this.pathwayId() ? this.pathwayId() : this.selectableObject()?.stId);
-
   hasNoMoleculeData = computed(() => !(this.state.select() || this.state.pathwayId()));
+
+  selectedKey = signal<string>('');
+  private manualSelection = false;
+  private observer?: () => void;
 
 
   constructor(private participant: ParticipantService,
@@ -78,6 +79,22 @@ export class MoleculeTabComponent {
         this.entity.loadRefEntities(selectableObjStId);
       }
     });
+
+    effect(() => {
+      if (this.moleculeData().length > 0) {
+        const id = this.sanitizeId(this.moleculeData()[0].category);
+        this.selectedKey.set(id)
+      }
+    });
+
+    effect(() => {
+      const ids = this.moleculeData().map(e => this.sanitizeId(e.category));
+      this.observer = observeSections(ids, this.selectedKey,this.manualSelection, true)
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.();
   }
 
   _pathwayParticipants = rxResource({
@@ -85,12 +102,9 @@ export class MoleculeTabComponent {
     loader: () => this.participant.getParticipants(this.objStId())
   });
 
-
   pathwayParticipants = this._pathwayParticipants.value
 
-
   moleculeData = computed(() => {
-
     let moleculeData: MoleculeGroup[] = [];
 
     const pathwayParticipants = this.pathwayParticipants();
@@ -110,9 +124,10 @@ export class MoleculeTabComponent {
         moleculeData = pathwayResults;
       }
     }
+
+    moleculeData.sort((a, b) => a.category.localeCompare(b.category));
     return moleculeData
   })
-
 
   getPathwayParticipants(pathwayParticipants: Participant[]) {
 
@@ -166,7 +181,10 @@ export class MoleculeTabComponent {
   }
 
   scrollTo(type: string) {
+    this.manualSelection = true;
     const id = this.sanitizeId(type);
+    this.selectedKey.set(id);
+
     const element = document.getElementById(`${id}`);
     if (element) {
       element.scrollIntoView({
@@ -174,6 +192,10 @@ export class MoleculeTabComponent {
         block: 'start',
         inline: 'start'
       })
+      // allow observer updates again after scroll completes
+      setTimeout(() => {
+        this.manualSelection = false;
+      }, 1000);
     }
   }
 

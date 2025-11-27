@@ -1,4 +1,14 @@
-import {Component, computed, effect, ElementRef, input, signal, Signal, TemplateRef, viewChild} from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  OnDestroy,
+  signal,
+  Signal,
+  TemplateRef,
+  viewChild
+} from '@angular/core';
 import {Analysis} from "../../../model/analysis.model";
 import {IconService} from "../../../services/icon.service";
 import {
@@ -9,7 +19,7 @@ import {
   isPhysicalEntity,
   isReferenceSequence,
   isReferenceSummary,
-  isRLE
+  isRLE, observeSections
 } from "../../../services/utils";
 import {DatabaseObject} from "../../../model/graph/database-object.model";
 import {ReferenceEntity} from "../../../model/graph/reference-entity/reference-entity.model";
@@ -47,7 +57,7 @@ import HasModifiedResidue = Relationship.HasModifiedResidue;
   styleUrl: './description-tab.component.scss',
   standalone: false
 })
-export class DescriptionTabComponent {
+export class DescriptionTabComponent implements OnDestroy {
 
   icon = rxResource({
     request: () => this.referenceEntity()?.identifier,
@@ -190,10 +200,6 @@ export class DescriptionTabComponent {
     return isHuman && isRLE(this.obj()) && isInferred;
   })
 
-  selectedKey = signal<string>(DataKeys.OVERVIEW);
-  detailsContainer = viewChild<ElementRef<HTMLElement>>('details');
-  private observer?: IntersectionObserver;
-
   overview$ = viewChild<HTMLDivElement>('overview');
   overviewTemplate$ = viewChild.required<TemplateRef<any>>('overviewTemplate');
   referenceTemplate$ = viewChild.required<TemplateRef<any>>('referenceTemplate');
@@ -213,6 +219,10 @@ export class DescriptionTabComponent {
 
   protected readonly Labels = Labels;
   protected readonly DataKeys = DataKeys;
+
+  selectedKey = signal<string>(DataKeys.OVERVIEW);
+  private manualSelection = false;
+  private observer?: () => void;
 
 
   //todo get divider label from here
@@ -359,10 +369,14 @@ export class DescriptionTabComponent {
     });
 
     effect(() => {
-      this.observeAllSection();
+      const ids = this.elements.map(e => e.key);
+      this.observer = observeSections(ids, this.selectedKey, this.manualSelection, false)
     })
   }
 
+  ngOnDestroy(): void {
+    this.observer?.();
+  }
 
   getSymbol(obj: DatabaseObject) {
     return this.iconService.getIconDetails(obj);
@@ -405,13 +419,10 @@ export class DescriptionTabComponent {
     }
   }
 
-  private manualSelection = false;
 
   selectItem(key: string): void {
-    
     this.manualSelection = true;
     this.selectedKey.set(key);
-
     // scroll to the section
     const el = document.getElementById(key);
     el?.scrollIntoView({
@@ -419,51 +430,11 @@ export class DescriptionTabComponent {
       block: 'start',
       inline: 'start'
     });
-
     // allow observer updates again after scroll completes
     setTimeout(() => {
       this.manualSelection = false;
     }, 1000);
   }
-
-  // ideas -> https://levelup.gitconnected.com/building-a-html-table-of-contents-with-automatic-highlighting-7bf51ec4c972
-  private observeAllSection() {
-    // use IntersectionObserver to detect which section is visible
-    const options = {
-      root: this.detailsContainer()?.nativeElement,
-      rootMargin: '0px', // no offset
-      threshold: 0,  // trigger as soon as any pixel is visible
-    };
-
-    this.observer = new IntersectionObserver(entries => {
-
-      if (this.manualSelection) return;
-
-      // filtering visible elements
-      const visibles = entries
-        .filter(e => e.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-      if (visibles.length > 0) {
-        const id = visibles[0].target.id;
-        if (id && id !== this.selectedKey()) {
-          this.selectedKey.set(id);
-        }
-      }
-    }, options);
-
-    // ensures DOM is ready before selecting sections and observe all TOC sections
-    queueMicrotask(() => {
-      this.elements.forEach(el => {
-        const section = document.getElementById(el.key);
-        if (section) this.observer!.observe(section);
-      });
-    });
-
-    // cleanup: Angular automatically calls this when the effect is disposed
-    return () => this.observer?.disconnect();
-  }
-
 
   protected readonly CONTENT_DETAIL = CONTENT_DETAIL;
   protected readonly environment = environment;
