@@ -59,6 +59,9 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
   panZoomInstance?: SvgPanZoom.Instance;
   legendItems: LegendGroup[] = [...this.ehldService.legendItems];
   resizeObserver!: ResizeObserver;
+  readonly controlZoom = signal<number>(0);
+  readonly controlMinZoom = signal<number>(1);
+  readonly controlMaxZoom = signal<number>(15);
 
   private initialZoom = 1;
   private initialPan = {x: 0, y: 0};
@@ -80,7 +83,7 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
         this.initializePanAndZoom();
       }
     });
-    effect(() =>  {
+    effect(() => {
       this.loadAnalysis();
       this.currentSample = this.state.sample() || undefined;
     });
@@ -139,8 +142,11 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
         panEnabled: true,
         fit: true,
         center: true,
-        minZoom: 1,
-        maxZoom: 100
+        minZoom: this.controlMinZoom(),
+        maxZoom: this.controlMaxZoom(),
+        onZoom: newScale => {
+          this.controlZoom.set(newScale)
+        },
       });
       // initial default state
       this.initialZoom = this.panZoomInstance.getZoom();
@@ -262,4 +268,21 @@ export class EhldComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  // needs Input event binding to react to mouse drag instead of mouse drop on slider
+  zoom(inputEvent: Event) {
+    const level = (inputEvent.target as HTMLInputElement).valueAsNumber
+    this.panZoomInstance?.zoom(level);
+  }
+
+  fitScreen() {
+    this.panZoomInstance?.resize();
+    this.panZoomInstance?.fit();
+    this.panZoomInstance?.center();
+  }
+
+  move(direction: 'up' | 'right' | 'down' | 'left', distance = 50) {
+    const x = direction === 'right' ? -distance : direction === 'left' ? distance : 0;
+    const y = direction === 'up' ? distance : direction === 'down' ? -distance : 0;
+    this.panZoomInstance?.panBy({x, y})
+  }
 }
