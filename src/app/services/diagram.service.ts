@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {catchError, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
+import {catchError, forkJoin, map, Observable, of, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Diagram, Edge, Node, NodeConnector, Position, Prop, Rectangle} from "../model/diagram.model";
 import {Graph} from "../model/graph.model";
@@ -10,7 +10,6 @@ import {array} from "vectorious";
 import cytoscape from "cytoscape";
 import cytoscapeFcose, {FcoseLayoutOptions} from "cytoscape-fcose";
 import {CONTENT_SERVICE, environment} from "../../environments/environment";
-import {isDefined} from "./utils";
 import {SchemaClasses} from "../constants/constants";
 import {GeneralService} from "./general.service";
 import NodeDefinition = Reactome.Types.NodeDefinition;
