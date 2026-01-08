@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, linkedSignal, signal, Signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, linkedSignal, OnDestroy, signal, Signal, viewChild} from '@angular/core';
 import {MoleculeGroup} from "../molecule-tab.component";
 import {MatTable, MatTableModule} from "@angular/material/table";
 import {MatCheckbox} from "@angular/material/checkbox";
@@ -9,7 +9,7 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatTooltip} from "@angular/material/tooltip";
 import {TableVirtualScrollDataSource, TableVirtualScrollModule} from "ng-table-virtual-scroll";
-import {ScrollingModule} from "@angular/cdk/scrolling";
+import {CdkVirtualScrollViewport, ScrollingModule} from "@angular/cdk/scrolling";
 
 
 type MoleculeRow = {
@@ -41,13 +41,16 @@ type MoleculeRow = {
   templateUrl: './molecule-download-table.component.html',
   styleUrl: './molecule-download-table.component.scss'
 })
-export class MoleculeDownloadTableComponent {
+export class MoleculeDownloadTableComponent implements OnDestroy {
 
   moleculeData = input.required<MoleculeGroup[]>();
   sort = viewChild.required(MatSort);
   objId = input.required<string | undefined>();
 
   table = viewChild.required(MatTable);
+  viewport = viewChild.required(CdkVirtualScrollViewport);
+
+  private resizeObserver = new ResizeObserver(() => this.viewport().checkViewportSize());
 
   tableData = computed(() => {
     return this.moleculeData().flatMap(group =>
@@ -114,6 +117,17 @@ export class MoleculeDownloadTableComponent {
       this.dataSource.sort = this.sort();
       this.table().renderRows();
     });
+
+    effect(() => {
+      const viewport = this.viewport();
+      if (viewport && viewport.elementRef) {
+        this.resizeObserver.observe(viewport.elementRef.nativeElement);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver.disconnect();
   }
 
   getExportData() {
