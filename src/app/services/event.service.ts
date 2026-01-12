@@ -109,6 +109,9 @@ export class EventService {
   }
 
   loadEventData(event: Event) {
+    event.isLoading = true;
+    this.setTreeData(this.treeData$.value);
+
     this.fetchEventChildren(event).pipe(
       switchMap(dbo => {
         // If hasDiagram is true, wait for the latest color map from subpathwaysColors$
@@ -132,6 +135,7 @@ export class EventService {
         );
       }),
     ).subscribe(({dbo: dbo, treeEvent, colors, hitReactions}) => {
+      treeEvent.isLoading = false;
       if (colors && colors.size > 0) {
         this.setSubtreeColors(treeEvent, colors);
       }

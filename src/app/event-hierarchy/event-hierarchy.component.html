@@ -180,8 +180,15 @@
         <!-- There is inline padding applied to this div using styles.
         This padding value depends on the mat-icon-button width.  -->
         <ul>
+          <!-- Show loading indicator -->
+          @if (node.isLoading) {
+            <div class="loading-container">
+              <mat-spinner diameter="16"></mat-spinner>
+              <span class="loading-text">Loading...</span>
+            </div>
+          }
           <!-- Show children only when expanded -->
-          @if (tree.isExpanded(node)) {
+          @if (tree.isExpanded(node) && !node.isLoading) {
             <div role="group" class="group">
               <ng-container matTreeNodeOutlet></ng-container>
             </div>

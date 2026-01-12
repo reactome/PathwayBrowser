@@ -30,6 +30,7 @@ export interface Event extends DatabaseObject, InDepth, HasFigure {
   // not from API endpoint but are needed in the tree view
   isSelected?: boolean;
   isHovered?: boolean;
+  isLoading?: boolean;
   ancestors: Event[];
   parent: Event;
   hit?: boolean;

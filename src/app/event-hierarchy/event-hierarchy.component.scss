@@ -483,3 +483,22 @@ ul {
 //.has-no-sibling {
 //   margin-left: 4px;
 //}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 0 8px 14px;
+  color: var(--on-surface-variant);
+
+  .loading-text {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  ::ng-deep mat-spinner {
+    --mdc-circular-progress-active-indicator-color: var(--primary);
+  }
+}
