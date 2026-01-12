@@ -873,7 +873,8 @@
       },
       "classes": [
         "catalysis",
-        "incoming"
+        "incoming",
+        "left-label"
       ]
     },
     {
@@ -890,7 +891,8 @@
       },
       "classes": [
         "positive-regulation",
-        "incoming"
+        "incoming",
+        "right-label"
       ]
     },
     {
@@ -907,7 +909,8 @@
       },
       "classes": [
         "negative-regulation",
-        "incoming"
+        "incoming",
+        "right-label"
       ]
     },
     {

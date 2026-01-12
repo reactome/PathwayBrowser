@@ -315,7 +315,6 @@ export class Interactivity {
     node.style({
       'font-size': baseFontSize,
       'text-margin-x': 0,
-      'text-max-width': "100%",
     })
     this.structureContainers = this.structureContainers.not(node);
   };
@@ -452,7 +451,6 @@ export class Interactivity {
         {
           'font-size': fontSize,
           'text-margin-x': (n: cytoscape.NodeSingular) => this.margin * n.data("width"),
-          'text-max-width': maxWidth + "%",
         })
 
       if (this.videoLayer) this.videoLayer.node.style.opacity = videoOpacity + '';

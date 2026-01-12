@@ -129,14 +129,6 @@ export class Style {
         css: {
           "color": 'data(color)',
         }
-      },
-      {
-        selector: 'node.drug',
-        css: {
-          "text-max-width": (node: cytoscape.NodeSingular) => (node.width() - 44) + 'px',
-          "text-margin-x": 4,
-          "font-style": "italic"
-        }
       }, {
         selector: 'node.PhysicalEntity, node.Pathway, node.Modification, node.Interactor',
         css: {
@@ -174,7 +166,14 @@ export class Style {
           'color': this.p('global', 'onPrimary'),
         }
       },
-
+      {
+        selector: 'node.drug',
+        css: {
+          "text-max-width": (node: cytoscape.NodeSingular) => (node.width() - 36 * 2) + 'px',
+          "text-margin-x": 4,
+          "font-style": "italic"
+        }
+      },
       {
         selector: 'node.InteractorOccurrences',
         css: {
@@ -446,6 +445,7 @@ export class Style {
           "font-weight": 400,
           "text-valign": "top",
           "text-margin-y": -5,
+          "font-size": this.p('font', 'size'),
         }
       }, {
         selector: 'node.reaction.hover',
@@ -546,6 +546,7 @@ export class Style {
           'source-arrow-width': '100%',
           // @ts-ignore
           'target-arrow-width': '100%',
+          'font-size': this.p('font', 'size')
         }
       }, {
         selector: 'edge.disease',
@@ -682,14 +683,24 @@ export class Style {
         selector: "edge[?sourceLabel]",
         css: {
           "source-label": "data(sourceLabel)",
-          "source-text-margin-y": -12,
+          "source-text-margin-y": -14,
           "font-weight": 400
+        }
+      }, {
+        selector: "edge.left-label",
+        css: {
+          "source-text-margin-x": 5
+        }
+      }, {
+        selector: "edge.right-label",
+        css: {
+          "source-text-margin-x": -5
         }
       }, {
         selector: "edge[?label]",
         css: {
           "label": "data(label)",
-          "text-margin-y": 12,
+          "text-margin-y": 14,
           "font-weight": 400
         }
       },
@@ -777,6 +788,7 @@ export class Style {
         selector: "node.Legend.Placeholder[?displayName]",
         css: {
           "label": "data(displayName)",
+          "font-size": this.p('font', 'size'),
           "font-weight": 400,
         }
       },
