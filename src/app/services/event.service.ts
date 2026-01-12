@@ -298,6 +298,7 @@ export class EventService {
       );
     } else {
       // Interacting pathway, not visible in the tree view
+      tree.collapseAll();
       this.clearAllSelectedEvents(treeNodes);
       return this.buildTreeWithSelectedEvent(event, diagramId, false, tree, hitReactions);
     }
