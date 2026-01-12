@@ -119,7 +119,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     }),
     untilDestroyed(this),
   ).subscribe(() => {
-    document.querySelector(`[st-id='${this.selectedIdFromUrl}']`)?.scrollIntoView({behavior: 'smooth'});
+    if (this.selectedIdFromUrl) this.scrollToSelection(this.selectedIdFromUrl);
   });
 
 
@@ -250,8 +250,10 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     ).subscribe({
       next: () => {
         // Give pathway id when idToUse is PEs
-        const element = document.querySelector(`[st-id='${idToUse}']`) || document.querySelector(`[st-id='${this.pathwayId}']`);
-        element?.scrollIntoView({behavior: 'smooth'});
+        const targetId = idToUse || this.pathwayId();
+        if (targetId) {
+          this.scrollToSelection(targetId);
+        }
       },
       error: (err: Error) => {
         console.error(err, err.stack)
@@ -483,6 +485,58 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
     this.scrollTimeout = setTimeout(() => {
       this.onScrollStop(nameElement);
     }, 500); // Debounce time
+  }
+
+  /**
+   * Intelligently scrolls to show the selected element(s) in the tree.
+   * Attempts to show the full selection context (all breadcrumbs) if it fits in viewport,
+   * otherwise prioritizes showing the target element.
+   */
+  private scrollToSelection(targetId: string): void {
+    const targetElement = document.querySelector(`[st-id='${targetId}']`);
+    if (!targetElement) return;
+
+    const fallbackScroll = () => targetElement.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+
+    // If no breadcrumbs or only one item, use simple scroll
+    if (!this.breadcrumbs || this.breadcrumbs.length <= 1) {
+      fallbackScroll();
+      return;
+    }
+
+    // Get breadcrumb elements
+    const firstBreadcrumb = document.querySelector(`[st-id='${this.breadcrumbs[0].stId}'] > .tree-node`);
+    const lastBreadcrumb = document.querySelector(`[st-id='${this.breadcrumbs[this.breadcrumbs.length - 1].stId}'] > .tree-node`);
+    const treeContainer = document.getElementById('events-container');
+
+    if (!firstBreadcrumb || !lastBreadcrumb || !treeContainer) {
+      fallbackScroll();
+      return;
+    }
+
+    // Calculate positions and visibility
+    const firstRect = firstBreadcrumb.getBoundingClientRect();
+    const lastRect = lastBreadcrumb.getBoundingClientRect();
+    const containerRect = treeContainer.getBoundingClientRect();
+
+    const isElementVisible = (rect: DOMRect) =>
+      rect.top >= containerRect.top && rect.bottom <= containerRect.bottom;
+
+    const firstIsVisible = isElementVisible(firstRect);
+    const lastIsVisible = isElementVisible(lastRect);
+    const selectionHeight = lastRect.bottom - firstRect.top;
+    const selectionFitsInViewport = selectionHeight <= containerRect.height;
+
+    // Decision logic
+    if (selectionFitsInViewport) {
+      // Full selection can fit - show it all if not already visible
+      if (!firstIsVisible || !lastIsVisible) {
+        firstBreadcrumb.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    } else {
+      // Selection too large - just ensure target is visible
+      targetElement.scrollIntoView({behavior: 'smooth', block: 'end'});
+    }
   }
 
 
