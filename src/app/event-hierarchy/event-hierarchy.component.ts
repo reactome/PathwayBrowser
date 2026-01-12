@@ -293,6 +293,7 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
   private handleSelectionFromTree(event: Event) {
     this.clearAllSelectedEvents(this.treeDataSource.data);
     this.selectAllParents(event, this.treeDataSource.data);
+    this.collapseNonAncestorBranches(event);
     this.loadEvents(event);
     this.updateBreadcrumbs(event);
     this.setDiagramId(event);
@@ -325,6 +326,24 @@ export class EventHierarchyComponent implements AfterViewInit, OnDestroy {
         this.selectAllParents(selectedEvent, event.events?.map(e => e.element));
       }
     });
+  }
+
+  private collapseNonAncestorBranches(selectedEvent: Event) {
+    const ancestorIds = new Set(selectedEvent.ancestors?.map(a => a.stId) || []);
+    ancestorIds.add(selectedEvent.stId);
+
+    const collapseRecursive = (events: Event[]) => {
+      events.forEach(event => {
+        if (!ancestorIds.has(event.stId) && this.tree.isExpanded(event)) {
+          this.tree.collapse(event);
+        }
+        if (isPathway(event) && event.events) {
+          collapseRecursive(event.events.map(e => e.element));
+        }
+      });
+    };
+
+    collapseRecursive(this.treeDataSource.data);
   }
 
   // todo: only clear selected tree event for better performance
