@@ -1,0 +1,353 @@
+@use '@angular/material' as mat;
+
+:host {
+  width: 100%;
+}
+
+.component-tree {
+  --gap: 4px;
+  --padding: 0px;
+  --connector-width: 24px;
+  --connector-height: 24px;
+  --max-width: 150px;
+
+  padding: var(--padding);
+
+  @include mat.tree-overrides((
+    node-text-weight: 400,
+    node-text-size:14px
+  ));
+}
+
+.component-tree-invisible {
+  display: none;
+}
+
+/*
+ * This padding sets alignment of the nested nodes.
+ */
+.component-tree .mat-nested-tree-node div[role=group] {
+  padding-left: 28px;
+}
+
+
+.mat-tree-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  cursor: pointer;
+  padding-left: var(--gap);
+  margin-left: calc(-1 * var(--gap));
+  padding-right: var(--padding);
+}
+
+.mat-tree-node:hover {
+  background: var(--surface2);
+  border-radius: 50px;
+}
+
+.highlight {
+  background-color: var(--primary-container);
+  border-radius: 50px;
+}
+
+.left {
+  display: flex;
+  flex: 0 1 auto; /* Default flex properties for left element */
+  align-items: center;
+  gap: 5px;
+  min-width: 200px;
+
+}
+
+
+.name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.right {
+  flex: 0 1 auto; /* Default flex properties for right element */
+  display: flex;
+  gap: 5px;
+
+  font-size: 12px;
+  line-height: 12px;
+  letter-spacing: 0.4px;
+}
+
+
+.mat-tree {
+  --mat-tree-node-min-height: 20px;
+}
+
+.toggle-icon-container {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  align-items: center;
+}
+
+.species {
+  padding: 0 8px;
+  background: var(--primary-container);
+  border-radius: 10px;
+  align-content: center;
+  color: var(--on-primary-container);
+  max-width: var(--max-width);
+}
+
+
+.shared-style {
+  padding: 0 8px;
+  background: var(--tertiary-container);
+  border-radius: 10px;
+  align-content: center;
+  color: var(--on-tertiary-container);
+}
+
+.compartment {
+  @extend .shared-style;
+  max-width: var(--max-width);
+}
+
+.molecule {
+  @extend .shared-style;
+}
+
+.goTo-container
+{
+  padding: 0;
+  gap: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50px;
+  background: var(--primary);
+
+  .custom-icon {
+    color: var(--on-primary);
+    display: flex;
+    padding: 4px;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+}
+
+.select.button {
+  background: var(--primary);
+  color: var(--on-primary);
+  --size: 20px;
+  --touch-size: 20px;
+  --icon-ratio: 0.8;
+
+  @include mat.icon-button-overrides((
+    state-layer-size: var(--size, 40px),
+    icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
+  ));
+
+  .mat-icon {
+    width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+  }
+
+}
+
+:host ::ng-deep .select.button .mat-mdc-button-touch-target{
+  width: var(--touch-size, 48px);
+  height: var(--touch-size, 48px);
+}
+
+
+.symbol-icon {
+  display: flex;
+  width: var(--connector-width);
+  height: var(--connector-height);
+  flex-shrink: 0;
+}
+
+
+/* Connector styles*/
+.mat-nested-tree-node {
+  position: relative;
+}
+
+.connector-container {
+  position: absolute;
+  top: 0;
+  height: var(--connector-height);
+  display: flex;
+
+  left: calc(-1 * (var(--connector-width) + var(--gap)) * var(--level, 1));
+  gap: var(--gap);
+
+}
+
+.connector {
+  width: var(--connector-width);
+  height: var(--connector-height);
+}
+
+.details-connector-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+
+  left: calc(-1 * (var(--connector-width) + var(--gap)) * var(--level, 1));
+  gap: var(--gap);
+
+  .connector:not(:last-child) {
+    width: var(--connector-width);
+    height: 100%
+  }
+
+}
+
+// Inline SVG data URIs for connector masks (ng-packagr doesn't resolve relative paths well)
+$solid-I: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0V24' stroke='currentColor' stroke-width='2'/%3E%3C/svg%3E";
+$solid-T: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0V24M 12 12h 12' stroke='currentColor' stroke-width='2'/%3E%3C/svg%3E";
+$solid-L: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0v6a 6 6 0 0 0 6 6h 6' stroke='currentColor' fill='none' stroke-width='2'/%3E%3C/svg%3E";
+$dashed-I: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0V24' stroke='currentColor' stroke-width='2' stroke-dasharray='2 4' stroke-linecap='round' stroke-dashoffset='1'/%3E%3C/svg%3E";
+$dashed-T: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0V24M 12 12h 12' stroke='currentColor' stroke-width='2' stroke-dasharray='2 4' stroke-linecap='round' stroke-dashoffset='1'/%3E%3C/svg%3E";
+$dashed-L: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0v6a 6 6 0 0 0 6 6h 6' stroke='currentColor' fill='none' stroke-width='2' stroke-dasharray='2 4' stroke-linecap='round' stroke-dashoffset='1'/%3E%3C/svg%3E";
+$mini-dashed-I: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0V24' stroke='currentColor' stroke-width='1' stroke-dasharray='2 4' stroke-linecap='butt' stroke-dashoffset='1'/%3E%3C/svg%3E";
+$mini-dashed-T: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0V24M 12 12h 12' stroke='currentColor' stroke-width='1' stroke-dasharray='2 4' stroke-linecap='butt' stroke-dashoffset='1'/%3E%3C/svg%3E";
+$mini-dashed-L: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 12 0v6a 6 6 0 0 0 6 6h 6' stroke='currentColor' fill='none' stroke-width='1' stroke-dasharray='2 4' stroke-linecap='butt' stroke-dashoffset='1'/%3E%3C/svg%3E";
+
+.connector[data-shape] {
+  background: var(--on-surface);
+
+  &.is {
+    background: var(--primary);
+  }
+
+  &[data-shape='I'] {
+    mask: url($solid-I);
+  }
+
+  &[data-shape='T'] {
+    mask: url($solid-T);
+  }
+
+  &[data-shape='L'] {
+    mask: url($solid-L);
+  }
+
+  &.member {
+    &[data-shape='I'] {
+      mask: url($dashed-I);
+    }
+
+    &[data-shape='T'] {
+      mask: url($dashed-T);
+    }
+
+    &[data-shape='L'] {
+      mask: url($dashed-L);
+    }
+  }
+
+  &.candidate {
+    &[data-shape='I'] {
+      mask: url($mini-dashed-I);
+    }
+
+    &[data-shape='T'] {
+      mask: url($mini-dashed-T);
+    }
+
+    &[data-shape='L'] {
+      mask: url($mini-dashed-L);
+    }
+  }
+}
+
+.dashedIConnector {
+  background-color: var(--on-surface);
+  mask: url($dashed-I);
+}
+
+.dashedTConnector {
+  background-color: var(--on-surface);
+  mask: url($dashed-T);
+}
+
+.dashedLConnector {
+  background-color: var(--on-surface);
+  mask: url($dashed-L);
+}
+
+.solidIConnector, {
+  background-color: var(--on-surface);
+  mask: url($solid-I);
+}
+
+.solidTConnector {
+  background-color: var(--on-surface);
+  mask: url($solid-T);
+
+}
+
+.solidLConnector {
+  background-color: var(--on-surface);
+  mask: url($solid-L);
+}
+
+.miniDashedIConnector, {
+  background-color: var(--on-surface);
+  mask: url($mini-dashed-I);
+
+}
+
+.miniDashedTConnector {
+  background-color: var(--on-surface);
+  mask: url($mini-dashed-T);
+
+}
+
+.miniDashedLConnector {
+  background-color: var(--on-surface);
+  mask: url($mini-dashed-L);
+}
+
+.otherConnector {
+  background-color: var(--primary);
+  mask: url($solid-L);
+}
+
+
+/* Divider styles */
+//.composition-container {
+//  @include mat.divider-overrides((
+//    color: var(--outline-variant),
+//    width: 2px
+//  ));
+//}
+
+
+
+
+
+/* Take full height of the parent to ensure branch line(connector) is working in Firefox and Safari*/
+.details-tree {
+  width: 100%;
+}
+
+.details-group {
+  display: flex;
+}
+
+.button {
+  @include mat.icon-button-overrides((
+    state-layer-size: 20px
+  ))
+}
+
+.highlight-tag {
+  padding: 4px 4px
+}

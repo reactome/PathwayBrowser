@@ -1,0 +1,485 @@
+@use "@angular/material" as mat;
+
+#hierarchy-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#breadcrumb-container {
+  background: var(--surface);
+  height: 34px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 10px 5px 0;
+
+  /* sticky div */
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  overflow-y: hidden;
+  white-space: nowrap;
+  --transparent-surface: oklch(from var(--surface) l c h / 0);
+
+
+  .breadcrumb {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 0 2px 7px;
+    width: 100%;
+    height: 24px;
+    overflow-x: scroll;
+    gap: 5px;
+    /* Hide the scrollbar for Internet Explorer, Edge and Firefox */
+    -ms-overflow-style: none; /* Internet Explorer and Edge */
+    scrollbar-width: none; /* Firefox */
+    /* Hide the scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    //.gutter {
+    //  display: flex;
+    //  flex-direction: row;
+    //  align-items: flex-start;
+    //  padding: 2px 0 0;
+    //  color: var(--primary);
+    //}
+
+    .breadcrumb-item {
+      color: var(--primary);
+      font-family: 'Roboto', sans-serif;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 16px;
+      padding: 2px 0 0;
+      text-decoration: none;
+
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 2px 0 0;
+      color: var(--primary);
+      gap: 5px;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .breadcrumb-item::before{
+      content: '>';
+      color: var(--primary);
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      //padding: 2px 0 0;
+    }
+
+    .breadcrumb-item:hover > span{
+      text-decoration: underline;
+      text-decoration-color: var(--primary);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+      text-decoration-skip-ink: none; // Force the underline to go through the character
+    }
+    .breadcrumb-item:hover::before {
+      text-decoration: none;
+    }
+  }
+
+  .gradient-holder-left {
+    position: absolute;
+    width: 10px;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(270deg, var(--surface) 0%, var(--transparent-surface) 100%);
+    transform: rotate(-180deg);
+    z-index: 1;
+
+  }
+
+  .gradient-holder-right {
+    position: absolute;
+    width: 10px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(270deg, var(--surface) 0%, var(--transparent-surface) 100%);
+  }
+}
+
+.icon-container {
+  width: 24px;
+  height: 24px;
+}
+
+.home-icon {
+  width: 18px;
+  height: 18px;
+  margin-left: 9px;
+  color: var(--primary);
+}
+
+
+#events-container {
+  overflow-y: scroll;
+  height: 100%;
+  overflow-x: hidden;
+  scrollbar-color: var(--primary) transparent;
+}
+
+
+.mat-tree {
+  background: var(--surface);
+  --mat-text-button-horizontal-padding: 5px;
+  --mat-text-button-with-icon-horizontal-padding: 8px;
+  --mat-tree-node-min-height: 20px;
+}
+
+
+.tree-invisible {
+  display: none;
+}
+
+.tree ul,
+.tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+  margin-right: 6px;
+}
+
+/*
+ * This padding sets alignment of the nested nodes.
+ */
+.tree .mat-nested-tree-node div[role=group] {
+  padding-left: 6px;
+}
+
+/*
+ * Padding for leaf nodes.
+ * Leaf nodes need to have padding so as to align with other non-leaf nodes
+ * under the same parent.
+ */
+.tree div[role=group] > .tree-node {
+  padding-left: 8px;
+}
+
+
+.tree-node {
+  height: 26px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* Items are positioned with space between them */
+  align-items: flex-start; /* Align items at the start of the cross axis (top in this case) */
+
+  &.child-less .left {
+    & > *:first-child {
+      margin-left: 4px;
+    }
+  }
+
+  .left {
+    display: flex;
+    overflow: hidden;
+    flex: 0 1 auto; /* Default flex properties for left element */
+
+    & > *:first-child {
+      margin-left: 8px;
+    }
+  }
+
+  .right {
+    z-index: 99;
+    position: relative;
+    flex: 0 1 auto; /* Default flex properties for right element */
+    height: 100%;
+    display: flex;
+    min-width: fit-content;
+  }
+}
+
+.leaf-node {
+  height: 24px;
+}
+
+.hit {
+  background: var(--primary-container);
+  color: var(--on-primary-container) !important;
+}
+
+.ehld {
+  color: var(--primary);
+}
+
+.selected {
+  background: var(--primary);
+  border-radius: 50px;;
+  color: var(--on-primary) !important;
+
+  .ehld {
+    color: var(--on-primary);
+  }
+}
+
+:host {
+  @include mat.button-overrides((
+    text-label-text-color: var(--on-surface),
+  ));
+}
+
+.custom-icon {
+  z-index: 1; // Ensure to display tooltip : https://github.com/angular/components/issues/28888
+  flex-shrink: 0; // Ensure the icon does not shrink
+}
+
+.button-size {
+  width: 20px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-size .mat-icon {
+  overflow: visible;
+}
+
+
+.font {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.25px;
+}
+
+.button {
+  height: 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 6px;
+  //gap: 5px;
+  border-radius: 50px;
+  color: var(--on-surface);
+  justify-content: flex-start;
+  width: 100%;
+  max-width: fit-content;
+}
+
+/*
+ * Branch line helper
+ */
+ul {
+  margin: 17px;
+  padding: 0;
+  border-left: 1px solid var(--outline-variant);
+}
+
+.group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/**
+   TAGS
+ */
+.tag-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  padding: 0 3px;
+  gap: 3px;
+  isolation: isolate;
+  margin: 0 auto;
+  width: 100%;
+  background: var(--surface);
+  --transparent-surface: oklch(from var(--surface) l c h / 0);
+
+
+  &:before {
+    content: '';
+    position: absolute;
+    width: 10px; // This valued is used to calculate left DIV width, remember to update it in the component adjustWidth method when you change it
+    left: -10px;
+    height: 100%;
+    background: linear-gradient(270deg, var(--surface) 0%, var(--transparent-surface) 100%);
+  }
+
+  .tag {
+    --diameter: 16px;
+    --padding: 4px;
+    background: var(--primary);
+    width: calc(var(--diameter) - 2 * var(--padding));
+    height: var(--diameter);
+    //max-width: var(--diameter);
+    max-height: var(--diameter);
+    border-radius: var(--diameter);
+    line-height: normal;
+    color: var(--on-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 var(--padding);
+    transition: 1s;
+
+    font-family: 'Roboto', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: center;
+    font-size: 11px;
+
+
+    .initial {
+    }
+
+    .body {
+      transition: 1s;
+      width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      visibility: hidden;
+      display: flex;
+    }
+
+    &:hover {
+      width: 100%;
+      max-width: max-content; /* Fix increasing width when hover between two tags*/
+
+      .body {
+        visibility: visible;
+        width: 100%;
+      }
+    }
+  }
+
+  .disease {
+    background: var(--error) !important;
+  }
+
+  .subpathway {
+    --diameter: 16px;
+    --padding: 4px;
+    width: calc(var(--diameter) - 2 * var(--padding));
+    height: var(--diameter);
+    max-height: var(--diameter);
+    border-radius: var(--diameter);
+    padding: 0 var(--padding);
+    opacity: 0.4;
+  }
+
+  .analysis{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0 4px;
+    gap: 10px;
+    background: var(--primary-container);
+    border-radius: 10px;
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+
+    .text{
+      font-family: 'Roboto', sans-serif;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.4px;
+      flex: none;
+      order: 0;
+      flex-grow: 0;
+      color: var(--on-primary-container);
+    }
+  }
+}
+
+.tag-font {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+}
+
+.tag.disease {
+  background: var(--error) !important;
+}
+
+/*
+ * Add hover to node button when hovering the tag
+ */
+.hovered {
+  background: var(--surface2);
+  border-radius: 50px;
+}
+
+
+/* Disable the hover for the mat tree expandable icon, the disableRipple doesn't work here */
+.no-hover-effect {
+  &.mat-mdc-icon-button {
+    ::ng-deep {
+      .mat-mdc-button-persistent-ripple, .mat-mdc-button-ripple {
+        display: none;
+      }
+    }
+  }
+}
+
+/*
+ * DisplayName
+ * Works with dynamic scrolling name when hovering
+ */
+.name-container {
+  overflow: hidden;
+}
+
+.name {
+  position: relative;
+  left: 0;
+  width: 100%;
+}
+
+
+.name.no-transition {
+  transition: none !important;
+  overflow-x: scroll;
+  white-space: nowrap;
+  left: 0 !important;
+
+  /* Hide the scrollbar for Internet Explorer, Edge and Firefox */
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  /* Hide the scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+::ng-deep .mat-mdc-button .mdc-button__label.add-overflowX {
+  overflow-x: scroll;
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+//.has-sibling {
+//  margin-left: 12px;
+//}
+
+//.has-no-sibling {
+//   margin-left: 4px;
+//}

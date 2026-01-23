@@ -1,0 +1,127 @@
+@use '@angular/material' as mat;
+
+.container {
+
+  .found-section {
+    position: relative;
+    table#result-table {
+      min-width: 0;
+      width: 100%;
+
+      ::ng-deep.mat-sort-header-content {
+        text-wrap: balance;
+      }
+    }
+  }
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: sub;
+  margin-right: 2px;
+
+  &.ehld {
+    color: var(--primary);
+  }
+}
+
+.row {
+  cursor: pointer;
+  scroll-margin-top: var(--scroll-margin-top);
+
+  &:hover {
+    background: var(--surface1);
+  }
+
+  &.selected {
+    background: var(--primary);
+    color: var(--on-primary);
+
+    &:hover {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+
+      .icon.ehld {
+        color: var(--on-primary-container);
+      }
+    }
+
+    .p-value,
+    .expression-value {
+      box-shadow: 0 0 0 2px var(--on-primary);
+    }
+
+    .icon.ehld {
+      color: var(--on-primary);
+    }
+  }
+
+}
+
+.expression-value {
+  padding: 4px 8px;
+  border-radius: 50px;
+  background: var(--background);
+  display: inline-flex;
+
+  &.gsa {
+    padding: 4px;
+  }
+}
+
+.p-value {
+  padding: 6px 8px 4px;
+  border-radius: 50px;
+}
+
+
+td.mat-column-name {
+  text-wrap: balance;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.selected-expression {
+  text-decoration: underline;
+}
+
+.stepper-controls {
+  position: sticky;
+  bottom: 2px;
+  width: fit-content;
+  right: 0;
+  margin: 20px auto;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 100px;
+  border: 1px solid var(--outline-variant);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+
+  *:first-child {
+    margin-left: 5px;
+  }
+
+  mat-paginator {
+    background: transparent;
+  }
+
+  mat-progress-spinner {
+    margin-left: 10px;
+  }
+
+  @include mat.paginator-overrides((
+    form-field-container-height: 20px,
+    form-field-container-vertical-padding: 2px,
+    container-size: 32px,
+  ));
+
+}

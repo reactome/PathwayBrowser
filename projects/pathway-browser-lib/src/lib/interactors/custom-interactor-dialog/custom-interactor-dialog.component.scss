@@ -1,0 +1,21 @@
+.margin {
+  margin: 0 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+}
+
+.spinner-color::ng-deep circle {
+    stroke: var(--on-primary) !important;
+}
+
+.file {
+  color: var(--on-surface);
+}

@@ -1,0 +1,33 @@
+<div class="details-content-container">
+
+  <!-- provide more details for the selectable object on details tab,overview,  externalRefs(including structure for protein and chemical), xRefs-->
+  @if (!isMoleculeView()) {
+    <cr-description-overview [obj]="obj()" [showSpecies]="false"></cr-description-overview>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+  }
+
+  <!-- External Reference -->
+  @if (refEntity()) {
+    @if (!isMoleculeView())  {
+      <mat-divider/>
+    }
+    <cr-external-reference [referenceEntity]=refEntity()! [xRefs]="xRefs()" [displayReference]="!isMoleculeView()"></cr-external-reference>
+  }
+
+  <!-- Cross References -->
+  @if (xRefs().length > 0) {
+    @if (hasStructure()) {
+      <mat-divider/>
+    }
+    <cr-cross-references [crossRefs]=xRefs()></cr-cross-references>
+  }
+
+  @if (displayNotice() && !isLoading()) {
+    <cr-notice-info/>
+  }
+</div>

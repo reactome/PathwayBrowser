@@ -1,0 +1,339 @@
+@use '@angular/material' as mat;
+
+:host {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 100%;
+  container: qualitative-analysis / size;
+
+  --mat-stepper-header-height: 48px;
+
+  ::ng-deep .mat-horizontal-content-container {
+    padding: 0 !important;
+  }
+}
+
+@container qualitative-analysis (height < 600px) {
+  .header {
+    display: none;
+
+    .description {
+    }
+  }
+}
+
+.header {
+  .title {
+    font: var(--mat-sys-title-medium);
+    color: var(--primary);
+  }
+
+  .description {
+    column-count: 2;
+    column-gap: 20px;
+    text-align: justify;
+    color: var(--on-surface);
+    font: var(--mat-sys-body-medium);
+  }
+
+}
+
+.stepper {
+  flex: 1 1 auto;
+
+  ::ng-deep {
+    .mat-horizontal-stepper-wrapper,
+    .mat-horizontal-content-container,
+    .mat-horizontal-stepper-content-current {
+      height: 100%;
+      color: var(--on-surface);
+    }
+
+    .mat-horizontal-stepper-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+  }
+}
+
+.data-input {
+  border: 1px solid var(--outline);
+  border-radius: 20px;
+  display: flex;
+  flex: 1 1 auto;
+
+  .data-table-column {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .space-filler {
+      flex: 1;
+      padding: 10px 0 0 10px;
+      position: relative;
+      display: flex;
+
+      reactome-table {
+        position: absolute;
+        inset: 10px 0 0 10px;
+
+        ::ng-deep {
+          .table-container {
+            height: 100%;
+
+            .drag-overlay {
+              //border-radius: 10px 0 0 0;
+              left: var(--sticky-offset-left, 0)
+            }
+
+            .cdk-virtual-scrollable {
+              height: 100% !important;
+            }
+
+            .virtual-placeholder {
+              td:first-child {
+                font-size: 0; // ignore max length of row indexes as not important
+              }
+            }
+
+            .spreadsheet {
+              //table-layout: fixed;
+              th.rows[y="0"] {
+                border-radius: 10px 0 0 0;
+                box-shadow: -5px -5px var(--surface); // Hides bellow rows when scrolling
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+    .table-controls {
+      display: flex;
+      flex-direction: row;
+      border-top: 1px solid var(--outline);
+
+      .file-input {
+        display: none;
+      }
+
+      > * {
+        flex: 1 1 1px;
+        border-radius: 0;
+
+        &:first-child {
+          border-radius: 0 0 0 20px;
+        }
+
+        &:not(:last-child) {
+          border-right: 1px solid var(--outline);
+        }
+      }
+    }
+  }
+
+  .data-example-column {
+    width: 25%;
+    border-left: 1px solid var(--outline);
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    box-sizing: border-box;
+    container-type: size; // important for @container size reaction
+    container-name: data-example-column;
+    background: var(--surface1);
+    border-radius: 0 20px 20px 0px;
+
+    .example-buttons {
+      display: grid;
+      flex-direction: column;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      width: 100%;
+
+      button {
+        width: 100%;
+
+        &:last-child {
+          margin-bottom: 4px;
+        }
+
+        ::ng-deep .mdc-button__label {
+          width: 100%;
+          text-wrap: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+    }
+
+    @container data-example-column (max-height: 600px) {
+      .example-buttons {
+        grid-template-columns: 1fr 1fr;
+        font: var(--mat-sys-label-medium);
+        overflow: auto;
+        align-items: center;
+
+        > :nth-last-child(1):nth-child(odd) {
+          grid-column: span 2;
+        }
+      }
+
+      .space-holder {
+        height: 0 !important;
+      }
+    }
+
+    .space-holder {
+      height: var(--mat-sys-title-large-line-height);
+    }
+  }
+}
+
+.stepper-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  > *:first-child {
+    width: 25%;
+  }
+
+  > *:last-child {
+    width: 25%;
+  }
+
+  .red {
+    color: var(--error);
+  }
+}
+
+// Options
+
+.options-wrapper {
+  flex: 1;
+  position: relative;
+
+  .options-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+
+    .card-checkbox {
+      border-radius: 20px;
+      transition: all 500ms ease-in-out;
+      border: 1px solid var(--outline);
+      background: var(--surface);
+      margin-bottom: 15px;
+      position: relative;
+
+      .card-content {
+        overflow: auto;
+        position: absolute;
+        inset: 12px;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        color: var(--on-surface);
+        justify-content: space-between;
+      }
+
+      &.checked {
+        box-shadow: inset 0 0 0 3px var(--primary);
+        background: var(--surface5);
+      }
+
+      .header {
+        .title {
+          text-align: center;
+          font: var(--mat-sys-headline-medium);
+          margin-bottom: 0;
+        }
+
+        .description {
+          column-count: 1;
+          font: var(--mat-sys-body-medium);
+          text-align: center;
+          margin: 0;
+        }
+      }
+
+
+      .illustration {
+        width: 100%;
+
+        * {
+          width: 100% !important;
+        }
+      }
+
+      .explanations {
+        .title {
+          color: var(--primary, #006782);
+          text-align: center;
+          font: var(--mat-sys-headline-small);
+          margin: 0;
+        }
+
+        p:not(.title) {
+          text-align: justify;
+          font: var(--mat-sys-body-medium);
+          margin-top: 0;
+        }
+      }
+
+      .selection-indicator {
+        --width: 25px;
+        border: 3px solid var(--outline);
+        border-radius: var(--width);
+        width: var(--width);
+        height: var(--width);
+        position: absolute;
+        bottom: calc(-1 * var(--width) / 2 - 2px);
+        left: calc(50% - var(--width) / 2);
+        transition: all 500ms ease-in-out;
+        background: var(--surface);
+        color: var(--on-primary);
+
+        &.checked {
+          background: var(--primary);
+          color: var(--on-primary);
+          border-color: var(--primary);
+        }
+      }
+    }
+  }
+}
+
+
+// Step 3 Loading
+.loader-container {
+  flex: 1;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  container: lottie / size;
+  width: 100%;
+
+  .loader {
+    --size: min(100cqh, 100cqw);
+    width: var(--size);
+    height: var(--size);
+    margin-right: 10%;
+  }
+}
+
+

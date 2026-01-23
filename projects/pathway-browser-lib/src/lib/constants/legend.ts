@@ -1,0 +1,957 @@
+export const legend = {
+  "nodes": [
+    {
+      "data": {
+        "id": "Label 1",
+        "displayName": "Molecules"
+      },
+      "classes": [
+        "Label",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": -20
+      }
+    },
+    {
+      "data": {
+        "id": "Gene",
+        "displayName": "Gene",
+        "height": 80,
+        "width": 220
+      },
+      "classes": [
+        "Gene",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 40
+      }
+    },
+    {
+      "data": {
+        "id": "Genome Encoded Entity",
+        "displayName": "Genome Encoded Entity",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "GenomeEncodedEntity",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 370,
+        "y": 50
+      }
+    },
+    {
+      "data": {
+        "id": "RNA",
+        "displayName": "RNA",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "RNA",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 130
+      }
+    },
+    {
+      "data": {
+        "id": "RNA-drug",
+        "displayName": "RNA Drug",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "RNA",
+        "PhysicalEntity",
+        "drug"
+      ],
+      "position": {
+        "x": 370,
+        "y": 130
+      }
+    },
+    {
+      "data": {
+        "id": "Protein",
+        "displayName": "Protein",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "Protein",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 210
+      }
+    },
+    {
+      "data": {
+        "id": "Protein-drug",
+        "displayName": "Protein Drug",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "Protein",
+        "PhysicalEntity",
+        "drug"
+      ],
+      "position": {
+        "x": 370,
+        "y": 210
+      }
+    },
+    {
+      "data": {
+        "id": "Molecule",
+        "displayName": "Molecule",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "Molecule",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 290
+      }
+    },
+    {
+      "data": {
+        "id": "Molecule-drug",
+        "displayName": "Molecule Drug",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "Molecule",
+        "PhysicalEntity",
+        "drug"
+      ],
+      "position": {
+        "x": 370,
+        "y": 290
+      }
+    },
+    {
+      "data": {
+        "id": "Complex",
+        "displayName": "Complex",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "Complex",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 370
+      }
+    },
+    {
+      "data": {
+        "id": "Complex-drug",
+        "displayName": "Complex Drug",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "Complex",
+        "PhysicalEntity",
+        "drug"
+      ],
+      "position": {
+        "x": 370,
+        "y": 370
+      }
+    },
+    {
+      "data": {
+        "id": "EntitySet",
+        "displayName": "Set",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "EntitySet",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 450
+      }
+    },
+    {
+      "data": {
+        "id": "EntitySet-drug",
+        "displayName": "Set Drug",
+        "height": 60,
+        "width": 220
+      },
+      "classes": [
+        "EntitySet",
+        "PhysicalEntity",
+        "drug"
+      ],
+      "position": {
+        "x": 370,
+        "y": 450
+      }
+    },
+    {
+      "data": {
+        "id": "Polymer",
+        "displayName": "Polymer",
+        "height": 60,
+        "width": 200
+      },
+      "classes": [
+        "Polymer",
+        "Molecule",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 360,
+        "y": 530
+      }
+    },
+    {
+      "data": {
+        "id": "Cell",
+        "displayName": "Cell",
+        "height": 80,
+        "width": 220
+      },
+      "classes": [
+        "Cell",
+        "PhysicalEntity"
+      ],
+      "position": {
+        "x": 130,
+        "y": 540
+      }
+    },
+
+    {
+      "data": {
+        "id": "SubPathway",
+        "displayName": "SubPathway",
+        "height": 80,
+        "width": 220
+      },
+      "classes": [
+        "SUB",
+        "Pathway"
+      ],
+      "position": {
+        "x": 130,
+        "y": 630
+      }
+    },
+    {
+      "data": {
+        "id": "interacting pathway",
+        "displayName": "Interacting Pathway",
+        "height": 80,
+        "width": 220
+      },
+      "classes": [
+        "Interacting",
+        "Pathway"
+      ],
+      "position": {
+        "x": 370,
+        "y": 630
+      }
+    },
+
+
+    {
+      "data": {
+        "id": "Label 2",
+        "displayName": "Reaction Types"
+      },
+      "classes": [
+        "Label",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 710
+      }
+    },
+    {
+      "data": {
+        "id": "a"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 780
+      }
+    },
+    {
+      "data": {
+        "id": "dissociation",
+        "displayName": "Dissociation"
+      },
+      "classes": [
+        "dissociation",
+        "reaction"
+      ],
+      "position": {
+        "x": 130,
+        "y": 780
+      }
+    },
+    {
+      "data": {
+        "id": "b"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 760
+      }
+    },
+    {
+      "data": {
+        "id": "c"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 800
+      }
+    },
+    {
+      "data": {
+        "id": "association",
+        "displayName": "Association"
+      },
+      "classes": [
+        "association",
+        "reaction"
+      ],
+      "position": {
+        "x": 370,
+        "y": 780
+      }
+    },
+    {
+      "data": {
+        "id": "d"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 780
+      }
+    },
+    {
+      "data": {
+        "id": "e"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 860
+      }
+    },
+    {
+      "data": {
+        "id": "transition",
+        "displayName": "Transition"
+      },
+      "classes": [
+        "transition",
+        "reaction"
+      ],
+      "position": {
+        "x": 130,
+        "y": 860
+      }
+    },
+    {
+      "data": {
+        "id": "f"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 860
+      }
+    },
+    {
+      "data": {
+        "id": "omitted",
+        "displayName": "Omitted"
+      },
+      "classes": [
+        "omitted",
+        "reaction"
+      ],
+      "position": {
+        "x": 370,
+        "y": 860
+      }
+    },
+    {
+      "data": {
+        "id": "g"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 860
+      }
+    },
+    {
+      "data": {
+        "id": "h"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 940
+      }
+    },
+    {
+      "data": {
+        "id": "uncertain-l",
+        "displayName": "Uncertain"
+      },
+      "classes": [
+        "Placeholder",
+        "reaction",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 936
+      }
+    },
+    {
+      "data": {
+        "id": "uncertain"
+      },
+      "classes": [
+        "uncertain",
+        "reaction"
+      ],
+      "position": {
+        "x": 250,
+        "y": 940
+      }
+    },
+    {
+      "data": {
+        "id": "i"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 940
+      }
+    },
+    {
+      "data": {
+        "id": "Label 3",
+        "displayName": "Reaction Attributes"
+      },
+      "classes": [
+        "Label",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 1000
+      }
+    },
+    {
+      "data": {
+        "id": "attr-catalysis"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 1040
+      }
+    },
+    {
+      "data": {
+        "id": "attr-reg+"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 1040
+      }
+    },
+    {
+      "data": {
+        "id": "attr-a"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 1080
+      }
+    },
+    {
+      "data": {
+        "id": "attr-b"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 1120
+      }
+    },
+    {
+      "data": {
+        "id": "attr-reaction"
+      },
+      "classes": [
+        "association",
+        "reaction"
+      ],
+      "position": {
+        "x": 250,
+        "y": 1100
+      }
+    },
+    {
+      "data": {
+        "id": "attr-c"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 1100
+      }
+    },
+    {
+      "data": {
+        "id": "attr-reg-"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 1165
+      }
+    },
+    {
+      "data": {
+        "id": "attr-s-l",
+        "displayName": "Stoichiometry",
+        "labelColor": "onSurface"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 73,
+        "y": 1170
+      }
+    },
+    {
+      "data": {
+        "id": "line-a"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 1205
+      }
+    },
+    {
+      "data": {
+        "id": "line-b"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 250,
+        "y": 1205
+      }
+    },
+    {
+      "data": {
+        "id": "line-c"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 1205
+      }
+    },
+    {
+      "data": {
+        "id": "line-d"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 15,
+        "y": 1245
+      }
+    },
+    {
+      "data": {
+        "id": "line-e"
+      },
+      "classes": [
+        "Placeholder",
+        "Legend"
+      ],
+      "position": {
+        "x": 485,
+        "y": 1245
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "source": "a",
+        "target": "dissociation"
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "dissociation",
+        "target": "b",
+        "weights": "0.270 0.523",
+        "distances": "5.535 -9.976",
+        "sourceEndpoint": "18 0",
+        "targetEndpoint": "-10 0"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "dissociation",
+        "target": "c",
+        "weights": "0.270 0.523",
+        "distances": "-5.535 9.976",
+        "sourceEndpoint": "18 0",
+        "targetEndpoint": "-10 0"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "b",
+        "target": "association",
+        "weights": "0.285 0.521",
+        "distances": "-5.82 9.777",
+        "sourceEndpoint": "10 0",
+        "targetEndpoint": "-10 0"
+      },
+      "classes": [
+        "consumption",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "c",
+        "target": "association",
+        "weights": "0.285 0.521",
+        "distances": "5.82 -9.777",
+        "sourceEndpoint": "10 0",
+        "targetEndpoint": "-10 0"
+      },
+      "classes": [
+        "consumption",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "association",
+        "target": "d"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "e",
+        "target": "transition"
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "transition",
+        "target": "f"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "f",
+        "target": "omitted"
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "omitted",
+        "target": "g"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "h",
+        "target": "uncertain"
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "uncertain",
+        "target": "i"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "attr-a",
+        "target": "attr-reaction",
+        "weights": "0.582 0.683",
+        "distances": "-11.686 6.357",
+        "sourceEndpoint": "10 0",
+        "targetEndpoint": "-12 0"
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "attr-b",
+        "target": "attr-reaction",
+        "weights": "0.582 0.683",
+        "distances": "11.686 -6.357",
+        "sourceEndpoint": "10 0",
+        "targetEndpoint": "-12 0",
+        "stoichiometry": 3,
+        "sourceOffset": 50
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "attr-reaction",
+        "target": "attr-c",
+        "sourceEndpoint": "12 0",
+        "targetEndpoint": "-10 0"
+      },
+      "classes": [
+        "production",
+        "outgoing"
+      ]
+    },
+    {
+      "data": {
+        "source": "attr-catalysis",
+        "target": "attr-reaction",
+        "weights": "0.754",
+        "distances": "-34.250",
+        "sourceEndpoint": "10 0",
+        "targetEndpoint": "-15.556 -15.556",
+        "sourceLabel": "Catalysis",
+        "sourceOffset": 30,
+        "labelColor": "positive"
+      },
+      "classes": [
+        "catalysis",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "attr-reg+",
+        "target": "attr-reaction",
+        "weights": "0.754",
+        "distances": "34.250",
+        "sourceEndpoint": "-10 0",
+        "targetEndpoint": "15.556 -15.556",
+        "sourceLabel": "Positive Regulation",
+        "sourceOffset": 70,
+        "labelColor": "positive"
+      },
+      "classes": [
+        "positive-regulation",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "attr-reg-",
+        "target": "attr-reaction",
+        "sourceEndpoint": "-10 0",
+        "targetEndpoint": "0 22",
+        "weights": "0.966",
+        "distances": "-41.287",
+        "sourceLabel": "Negative regulation",
+        "sourceOffset": 72,
+        "labelColor": "negative"
+      },
+      "classes": [
+        "negative-regulation",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "line-a",
+        "target": "line-b",
+        "sourceEndpoint": "12 0",
+        "targetEndpoint": "-12 0",
+        "label": "Wild Type"
+      },
+      "classes": [
+        "consumption",
+        "incoming"
+      ]
+    },
+    {
+      "data": {
+        "source": "line-b",
+        "target": "line-c",
+        "sourceEndpoint": "12 0",
+        "targetEndpoint": "-12 0",
+        "label": "Disease Associated",
+        "labelColor": "negative"
+      },
+      "classes": [
+        "consumption",
+        "incoming",
+        "disease"
+      ]
+    },
+    {
+      "data": {
+        "source": "line-d",
+        "target": "line-e",
+        "sourceEndpoint": "12 0",
+        "targetEndpoint": "-12 0",
+        "label": "Member of Set",
+        "labelColor": "onSurface"
+      },
+      "classes": [
+        "set-to-member"
+      ]
+    }
+  ],
+  "Reaction Types GeoGebra": "https://www.geogebra.org/calculator/bydd8bz5",
+  "Reaction Attributes GeoGebra": "https://www.geogebra.org/calculator/hgu6afmu"
+}

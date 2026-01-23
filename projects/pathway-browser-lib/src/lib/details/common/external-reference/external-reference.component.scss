@@ -1,0 +1,85 @@
+@use "@angular/material" as mat;
+
+:host {
+  width: 100%;
+}
+
+.element-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 8px;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  gap: 10px;
+  width: 100%;
+}
+
+
+.composition-container {
+  column-gap: 20px;
+  display: grid;
+  //grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+  align-items: center;
+  padding-left: 10px;
+  border-left: 2px solid var(--outline-variant);
+  flex: 1;
+
+  min-width: 0; // Allows flex container to shrink properly in Firefox
+
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+
+.column-item {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.item {
+  overflow: hidden; // Allows flex container to shrink properly in Firefox
+  word-break: break-word;
+}
+.external-reference-container {
+  display: flex;
+  gap: 8px;
+}
+
+.select.button {
+  background: var(--primary);
+  color: var(--on-primary);
+  --size: 20px;
+  --touch-size: 20px;
+  --icon-ratio: 0.8;
+
+  @include mat.icon-button-overrides((
+    state-layer-size: var(--size, 40px),
+    icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
+  ));
+
+  .mat-icon {
+    width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+  }
+
+}
+
+:host ::ng-deep .select.button .mat-mdc-button-touch-target{
+  width: var(--touch-size, 48px);
+  height: var(--touch-size, 48px);
+}

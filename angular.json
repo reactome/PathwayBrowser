@@ -230,6 +230,39 @@
           }
         }
       }
+    },
+    "pathway-browser-lib": {
+      "projectType": "library",
+      "root": "projects/pathway-browser-lib",
+      "sourceRoot": "projects/pathway-browser-lib/src",
+      "prefix": "pb",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/pathway-browser-lib/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/pathway-browser-lib/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/pathway-browser-lib/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/pathway-browser-lib/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {

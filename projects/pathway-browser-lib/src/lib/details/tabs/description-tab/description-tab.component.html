@@ -1,0 +1,283 @@
+<ng-template #dividerTemplate let-text>
+  <div class="divider-name">
+    <div class="line">
+      <mat-divider class="divider"></mat-divider>
+    </div>
+    <div class="text">{{ text }}</div>
+    <div class="line">
+      <mat-divider class="divider"></mat-divider>
+    </div>
+  </div>
+</ng-template>
+
+
+<div id="details" #details>
+  <div class="content">
+    <!-- Header -->
+    <div class="header" [id]=DataKeys.OVERVIEW>
+      <div class="label">
+        <mat-icon
+          class="custom-icon"
+          [matTooltip]="symbol().tooltip"
+          [svgIcon]="symbol().name">
+        </mat-icon>
+        <span class="name">
+            {{ name() }}
+          @if (isReferenceSummary()) {
+            · <i>summary</i>
+            <mat-slide-toggle class="disease" [(ngModel)]="state.summariseDisease">
+              Include disease data
+            </mat-slide-toggle>
+          }
+          </span>
+      </div>
+      <div class="details-button">
+        <a mat-button [href]="`${CONTENT_DETAIL}/${obj().stId}`" target="_blank">
+          <mat-icon class="custom-icon double-arrow" [svgIcon]="'double-arrow-right'"></mat-icon>
+          <span class="details-label"> Details page</span>
+        </a>
+      </div>
+    </div>
+    @for (element of elements; track element.key; let i = $index) {
+      @if (element.isPresent ? element.isPresent() : obj()[element.key]) {
+        <!-- Avoid overview label -->
+        @if (i > 0) {
+          <div class="divider-container" [id]="element.key">
+            <div class="divider-name-container">
+              <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: element.label }"></ng-container>
+            </div>
+            <div class="divider-line-container">
+              <mat-divider class="divider"></mat-divider>
+            </div>
+          </div>
+        }
+        @if (!element.manual) {
+          <cr-controller-tree [type]="element.key" [data]="obj()[element.key]"
+                              [depthControl]="element.hasDepthControl ?? false" [scope]="element.scope || 'entity'"
+                              [disableNavigation]="element.disableNavigation?.() ?? false"/>
+        } @else if (element.template) {
+          <ng-container *ngTemplateOutlet="element.template!()"></ng-container>
+        }
+      }
+    }
+  </div>
+  <div class="toc">
+    @for (element of elements; track element) {
+      @if (isTOCIncluded(element.key)) {
+        <a class="toc-item"
+           [class.selected]="selectedKey() == element.key"
+           [routerLink]="[]"
+           [fragment]="element.key" [queryParamsHandling]="'preserve'"
+           (click)="selectItem(element.key)">
+          {{ element.label }}
+        </a>
+      }
+    }
+  </div>
+</div>
+
+<ng-template #overviewTemplate>
+  <!-- Overview -->
+  <div class="overview" #overview [class.update-layout]="hasIllustration()"
+       [style.--icon-height.px]="overview?.clientHeight">
+    <cr-description-overview [obj]="obj()" [showSpecies]="true"></cr-description-overview>
+    @if (!icon.isLoading() && icon.value() && currentIcon()) {
+      <div class="icon-container">
+        <cr-icon [iconSVG]="icon.value()!" [icon]="currentIcon()!"/>
+      </div>
+    }
+    @for (f of figures(); track f.url) {
+      @let expanded = figure.expanded() === f;
+      <div class="icon-container figure" (click)="figure.toggle(f)" [class.expanded]="expanded">
+        <img class="icon" [src]="config.host + f.url" [alt]="f.displayName">
+      </div>
+    }
+  </div>
+
+  @if (figure.expanded(); as f) {
+    <div class="row summation">
+      <div class="label-container">Figure</div>
+      <div class="composition-container flex-grow">
+        <img class="icon figure expanded" [src]="config.host + f.url" [alt]="f.displayName" (click)="figure.toggle(f)">
+      </div>
+    </div>
+  }
+  @if (summations()) {
+    <div class="row summation">
+      <div class="label-container">Summation</div>
+      <div class="composition-container flex-grow">
+        @for (summation of summations(); track $index) {
+          <div [innerHTML]="summation.text | includeRef: allRefs()" [class.columns]="summation.text.length > 500"></div>
+          <!--Display summation refs if is available-->
+          @if (summation.literatureReference && summation.literatureReference.length > 0) {
+            <div class="summation-refs-container">
+              <cr-refs-tree [referenceHolder]=summation></cr-refs-tree>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</ng-template>
+
+<!-- xRefs -->
+<ng-template #crossReferencesTemplate>
+  <cr-cross-references [crossRefs]=crossReference()></cr-cross-references>
+</ng-template>
+
+<!-- rhea structure -->
+<ng-template #rheaTemplate>
+  <cr-rhea [crossRefs]=crossReference()></cr-rhea>
+</ng-template>
+
+<!-- Cell markers -->
+<ng-template #markerTemplate>
+  <div class="element-container">
+    <cr-cell-marker
+      [proteinMarkers]="proteinMarkers()"
+      [rnaMarkers]="rnaMarkers()"
+      [markerRefs]="markerReference()"/>
+  </div>
+</ng-template>
+
+
+<!-- External Reference -->
+<ng-template #referenceTemplate>
+  <cr-external-reference [referenceEntity]=referenceEntity() [xRefs]="crossReference()"></cr-external-reference>
+</ng-template>
+
+
+<!-- Modifications-->
+<ng-template #modificationsTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="modifications()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
+  </div>
+</ng-template>
+
+<!-- Other forms-->
+<ng-template #otherFormsTemplate>
+  <div class="element-container columns" [class.columns]="otherForms().size > 1 ? 'columns' : ''">
+    @for (item of otherForms()! |  keyvalue | sortByText :'key'; track item.key) {
+      <div class="row padding">
+        <div class="label-container">{{ item.key }}</div>
+        <div class="composition-container">
+          @for (pe of item.value; let i = $index; track pe.dbId) {
+            <a [href]="`${CONTENT_DETAIL}/${pe.stId}`">{{ pe.name[0] }}</a>
+            <!-- Add separator except for last item -->
+            @if (i < item.value.length - 1) {
+              <span class="margin-right">,</span>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<!-- Inferences(Inferred To)-->
+<ng-template #inferencesTemplate>
+  <div class="element-container columns">
+    @for (item of inferences()! | keyvalue | sortByText : 'key'; track item.key) {
+      <div class="row padding">
+        <div class="label-container">{{ item.key }}</div>
+        <div class="composition-container">
+          @for (pe of item.value; let i = $index; track pe.dbId) {
+            <a [href]="`${CONTENT_DETAIL}/${pe.stId}`">{{ pe.name[0] }}</a>
+            <!-- Add separator except for last item -->
+            @if (i < item.value.length - 1) {
+              <span class="margin-right">,</span>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<!-- Catalyst Activity-->
+<ng-template #catalystActivityTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="catalystActivity()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()"></cr-molecular-process>
+  </div>
+</ng-template>
+
+<ng-template #catalystActivitiesTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="catalystActivities()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
+  </div>
+</ng-template>
+
+<!-- Regulation-->
+<ng-template #regulationTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="regulations()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()" perspective="event"></cr-molecular-process>
+  </div>
+</ng-template>
+
+<ng-template #regulatesTemplate>
+  <div class="element-container">
+    <cr-molecular-process [entries]="regulates()" [catalystActivityReference]="catalystRef()"
+                          [regulationRefs]="regulationRefs()" perspective="entity"></cr-molecular-process>
+  </div>
+</ng-template>
+
+
+<!-- Literature References-->
+<ng-template #literatureRefsTemplate>
+  <div class="element-container">
+    @for (group of groupedReferences(); track group.key) {
+      <div class="row">
+        <div class="label-container">{{ group.key }}</div>
+        <div class="composition-container">
+          @for (ref of group.elements; track ref.dbId) {
+            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #authorsTemplate>
+  <div class="element-container">
+    @for (item of authorship(); track item) {
+      <div class="row">
+        <div class="label-container">{{ item.label }}</div>
+        <div class="composition-container flex-column">
+          @for (ie of item.data |sortByDate:'dataTime'; track ie.dbId) {
+            <div class="authorship-item">
+              @for (author of ie.author; let i = $index; track author.dbId) {
+                <a [href]="`${CONTENT_DETAIL}/${author.dbId}`"
+                   [ngClass]="{'margin-right': !author.orcidId}">
+                  {{ author.firstname }} {{ author.surname }}
+                </a>
+
+                @if (author.orcidId) {
+                  <a [href]="'https://orcid.org/' + author.orcidId" target="_blank">
+                    <mat-icon class="orcid-icon" [svgIcon]="'orcid'"></mat-icon>
+                  </a>
+                }
+                <!-- Add separator except for last item -->
+                @if (i < ie.author.length - 1) {
+                  <span class="margin-right">,</span>
+                }
+              }
+              - {{ ie.dateTime | authorshipDateFormat }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #interactorsTemplate>
+  <div class="element-container">
+    <cr-interactors-table [interactors]="interactors()!"></cr-interactors-table>
+  </div>
+</ng-template>
+

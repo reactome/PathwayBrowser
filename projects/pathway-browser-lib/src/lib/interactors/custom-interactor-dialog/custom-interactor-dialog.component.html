@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>Add a new resource</h2>
+<mat-dialog-content>
+  <form [formGroup]="resourceForm">
+    <div>
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput [formControl]="name" (blur)="updateErrorMessage()" required>
+        @if (resourceForm.get('name')?.invalid) {
+          <mat-error>{{ errorMessage }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <mat-tab-group (selectedTabChange)="onTabChange($event)">
+      <mat-tab label="Add your data" aria-labelledby="data">
+        <section>
+          <mat-radio-group (change)="onItemChange($event)">
+            @for (item of items; track item; let i = $index) {
+              <mat-radio-button class="margin" [value]="item.name"
+                [checked]='i===0'>{{ item.content }}
+              </mat-radio-button>
+            }
+          </mat-radio-group>
+        </section>
+
+        @if (selectedValue === 'form') {
+          <mat-form-field class="full-width">
+            <ngx-mat-file-input class="file" placeholder="Upload file" formControlName="form" (change)="onFileChange($event)">
+            </ngx-mat-file-input>
+            <mat-icon matSuffix>folder</mat-icon>
+            <mat-hint><strong>Upload a file stored locally on your computer.</strong></mat-hint>
+          </mat-form-field>
+        }
+
+        <!--        <span>Upload a file stored locally on your computer. Upload a file stored locally on your computer.</span>-->
+        <!--        <div *ngIf="label === 'File'" class="full-width">-->
+        <!--          <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>-->
+        <!--          <input hidden (change)="onFileSelected($event)" #fileInput type="file">-->
+        <!--          <span class="file-name">{{ selectedFile?.name }}</span>-->
+      <!--        </div>-->
+
+      @if (selectedValue === 'content') {
+        <mat-form-field class="full-width">
+          <mat-label>Copy & paste your data here</mat-label>
+          <textarea matInput formControlName="content"></textarea>
+          <mat-hint><strong>Copy and paste your data in columns.</strong></mat-hint>
+        </mat-form-field>
+      }
+
+      @if (selectedValue === 'url') {
+        <mat-form-field class="full-width">
+          <mat-label>URL</mat-label>
+          <input matInput formControlName='url'>
+          <mat-hint><strong>Upload a publicly accessible data though its URL.</strong></mat-hint>
+        </mat-form-field>
+      }
+
+    </mat-tab>
+    <mat-tab label="Add your PSICQUIC service" aria-labelledby="psicquic">
+      <mat-form-field class="full-width">
+        <mat-label>URL</mat-label>
+        <input matInput formControlName="psicquicUrl">
+        <mat-hint><strong>Add your custom PSICQUIC service through its URL.</strong></mat-hint>
+      </mat-form-field>
+    </mat-tab>
+  </mat-tab-group>
+  <mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" mat-dialog-close>Close</button>
+    <button mat-flat-button color="primary"
+      [disabled]="resourceForm.invalid && !resourceForm.get('name')?.invalid"
+      type="submit" (click)="submit()">
+      <div class="button-row">
+        Submit
+        @if (isDataLoading) {
+          <mat-spinner class="spinner-color" diameter="20"></mat-spinner>
+        }
+      </div>
+    </button>
+  </mat-dialog-actions>
+</form>
+</mat-dialog-content>

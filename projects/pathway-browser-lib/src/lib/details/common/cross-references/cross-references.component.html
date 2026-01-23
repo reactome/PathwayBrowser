@@ -1,0 +1,19 @@
+@if (crossReferences() && crossReferences().size > 0) {
+  <div class="element-container">
+    @for (ref of crossReferences() | keyvalue | sortByText :'key'; track ref) {
+      <div class="row">
+        <div class="label-container">{{ ref.key }}</div>
+        <div class="composition-container">
+          @for (item of ref.value; track item.dbId) {
+            <a [href]="item.url" target="_blank">{{ item.identifier }}</a>
+            @if (item !== ref.value[ref.value.length - 1]) {
+              <span class="margin-right">,</span>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+
+

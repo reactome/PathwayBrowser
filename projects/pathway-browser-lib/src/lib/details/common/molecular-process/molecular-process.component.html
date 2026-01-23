@@ -1,0 +1,201 @@
+<!--Sort by position if data is Modified Residue-->
+@let processedData = data()[0].isModification ? (data() | sortByDate: 'coordinate': false) : data();
+@for (item of processedData; track item) {
+  <div class="container">
+    @if (item.type) {
+      <div class="row">
+        <div class="label-container">Type</div>
+        <div class="composition-container">
+          <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+          <span>{{ item.type }}</span>
+        </div>
+      </div>
+    }
+
+
+    <!--ReplacedResidue / FragmentModification-->
+    @if (isReplacedResidue(item) || isFragmentModification(item)) {
+
+      <div class="row">
+        <div class="label-container">Type</div>
+        <div class="composition-container">
+          <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+          <span>{{ item.schemaClass | formatClassName }}</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label-container">Name</div>
+        <div class="composition-container">
+          <span>{{ item.displayName }}</span>
+        </div>
+      </div>
+
+      @if (item.psiMod) {
+        <div class="row">
+          <div class="label-container">PSI-MOD</div>
+          <div class="composition-container multiple">
+            @for (psiMod of item.psiMod; track psiMod.dbId) {
+              <div class="psiMod-container">
+                <cr-ontology-term [term]="psiMod"></cr-ontology-term>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Non ReplacedResidue / FragmentModification -->
+    @if (!isReplacedResidue(item) && !isFragmentModification(item)) {
+      @if (item.psiMod) {
+        <div class="row">
+          <div class="label-container">Type</div>
+          <div class="composition-container multiple">
+            @for (psiMod of item.psiMod; track psiMod.dbId) {
+              <div class="psiMod-container">
+                <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+                <cr-ontology-term [term]="psiMod"></cr-ontology-term>
+              </div>
+            }
+          </div>
+        </div>
+        <!--Use schemaClass as the Type if there is no psiMod and it is modified residue -->
+      } @else if (!item.psiMod && item.isModification) {
+        <div class="row">
+          <div class="label-container">Type</div>
+          <div class="composition-container">
+            <mat-icon class='custom-icon' [svgIcon]="getSymbol(item).name"></mat-icon>
+            <span>{{ item.schemaClass | formatClassName }}</span>
+          </div>
+        </div>
+      }
+    }
+
+
+    @if (item.coordinate) {
+      <div class="row">
+        <div class="label-container">Position</div>
+        <div class="composition-container">
+          <span>{{ item.coordinate }}</span>
+        </div>
+      </div>
+    }
+
+    @if (item.modification) {
+      <div class="row">
+        <div class="label-container">Modification</div>
+        <div class="composition-container">
+          @if (isReferenceGroup(item.modification) || isReferenceMolecule(item.modification)) {
+            <cr-ontology-term [term]="item.modification"></cr-ontology-term>
+          } @else if (isPhysicalEntity(item.modification)) {
+            <cr-object-tree [type]="'modification'" [data]="[item.modification]"></cr-object-tree>
+          }
+        </div>
+      </div>
+    }
+
+    @if (item.activity) {
+      <div class="row">
+        <div class="label-container">Activity</div>
+        <div class="composition-container">
+          <cr-ontology-term [term]="item.activity"></cr-ontology-term>
+        </div>
+      </div>
+    }
+
+    @if (item.activity && item.activity.ecNumber) {
+      <div class="row">
+        <div class="label-container">EC Number</div>
+        <div class="composition-container">
+          <span><a
+            [href]=" 'https://www.enzyme-database.org/query.php?ec=' + item.activity.ecNumber">{{ item.activity.ecNumber }}</a></span>
+        </div>
+      </div>
+    }
+
+    @if (item.go_BiologicalProcess) {
+      <div class="row">
+        <div class="label-container">Biological Process</div>
+        <div class="composition-container">
+          <cr-ontology-term [term]="item.go_BiologicalProcess"/>
+        </div>
+      </div>
+    }
+
+    @switch (perspective()) {
+      @case ('event') {
+        @if (item.activeUnit) {
+          <div class="row">
+            <div class="label-container">Active Unit</div>
+            <div class="composition-container tree-padding multiple">
+              @for (unit of item.activeUnit; track unit.dbId) {
+                <cr-object-tree [type]="'activeUnit'" [data]="[unit]"></cr-object-tree>
+              }
+
+            </div>
+          </div>
+        }
+
+        @if (item.regulator) {
+          <div class="row">
+            <div class="label-container">Regulator</div>
+            <div class="composition-container tree-padding">
+              <cr-object-tree [type]="'regulator'" [data]="[item.regulator]"></cr-object-tree>
+            </div>
+          </div>
+        }
+
+
+        @if (item.catalyst) {
+          <div class="row">
+            <div class="label-container">Catalyst</div>
+            <div class="composition-container tree-padding">
+              <cr-object-tree [type]="'catalyst'" [data]="[item.catalyst]"></cr-object-tree>
+            </div>
+          </div>
+        }
+      }
+      @case ('entity') {
+        @if (item.reactions) {
+          <div class="row">
+            <div class="label-container">Reaction</div>
+            <div class="composition-container tree-padding">
+              <cr-object-tree [type]="'reaction'" [data]="item.reactions" scope="event"></cr-object-tree>
+            </div>
+          </div>
+        }
+      }
+    }
+
+    @if (item.catalystActivityReference && item.catalystActivityReference.catalystActivity.dbId === item.dbId) {
+      <div class="row">
+        <div class="label-container">Reference</div>
+        <div class="composition-container ref-padding">
+
+          @for (ref of item.catalystActivityReference.literatureReference | sortByDate:'year'; track ref.dbId) {
+            <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+          }
+        </div>
+      </div>
+    }
+
+
+    @if (item.regulationReference) {
+      @for (ref of item.regulationReference; track ref.dbId) {
+        @if (ref.regulatedBy.dbId === item.dbId) {
+          <div class="row">
+            <div class="label-container">Reference</div>
+            <div class="composition-container ref-padding">
+              @for (ref of ref.literatureReference | sortByDate:'year'; track ref.dbId) {
+                <cr-publication [publication]=ref [showYear]="true"></cr-publication>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
+
+  </div>
+}
+
+

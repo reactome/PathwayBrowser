@@ -1,0 +1,120 @@
+#interactor-container {
+  width: 100%;
+  background: var(--surface-variant);
+}
+
+.button-container {
+  padding: 4px 0;
+}
+
+.card {
+  background: var(--surface-variant);
+}
+
+.main-resource{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0;
+  gap: 5px;
+}
+
+.full-width {
+  width: 100%;
+  color: var(--on-surface-variant) !important;
+  border-radius: 100px;
+  justify-content: flex-start;
+  height: 28px !important;
+}
+
+.raised-full-width-button {
+  width: 100%;
+  background: var(--surface);
+  color: var(--on-secondary-container);
+  border-radius: 100px;
+}
+
+::ng-deep .psicquic-button .mdc-button__label {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.resource-name {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+/** Divider */
+.divider-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.divider {
+  background: var(--outline);
+  --mat-divider-width: 2px;
+}
+
+.line {
+  flex: 1;
+}
+
+.text {
+  padding-left: 10px;
+  padding-right: 10px;
+  color: var(--on-surface-variant);
+}
+
+/** Spinner */
+.spinner-color::ng-deep circle {
+  stroke: var(--on-primary) !important;
+}
+
+/**
+   Highlight selection by giving a background color
+ */
+.active-button {
+  background: var(--primary) !important;
+  color: var(--on-primary) !important
+}
+
+.active-button[aria-selected="true"] {
+  background: var(--primary) !important;
+  color: var(--on-primary) !important;
+}
+
+/* Change background color for mat list option by using attribute aria-selected for custom interactor resource*/
+.active-button[aria-selected="true"] .resource-name,
+.active-button[aria-selected="true"] .resource-name div {
+  color: var(--on-primary) !important;
+}
+
+/* Remove selected color by overwriting default primary color when there is no active button class */
+//mat-list-option[aria-selected="true"] .resource-name,
+//mat-list-option[aria-selected="true"] .resource-name div {
+//  color: #000
+//}
+
+.active-icon {
+  color: var(--on-primary)
+}
+
+.surface-variant,
+.surface-variant div {
+  color: var(--on-surface-variant) !important;
+}
+
+.rounded-corner {
+  border-radius: 100px;
+}

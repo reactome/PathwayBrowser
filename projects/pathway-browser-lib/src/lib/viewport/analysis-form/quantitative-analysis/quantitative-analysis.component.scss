@@ -1,0 +1,75 @@
+*:has(.fill-height) {
+  flex: 1;
+  flex-direction: column;
+  display: flex;
+}
+
+.fill-height {
+  flex: 1;
+  flex-direction: column;
+  position: relative;
+}
+
+gsa-form {
+  position: absolute;
+  inset: 0;
+}
+
+svg.background {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+:host {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 100%;
+  container: quantitative-analysis / size;
+
+  --mat-stepper-header-height: 48px;
+
+  ::ng-deep .mat-horizontal-content-container {
+    padding: 0 !important;
+  }
+
+  gsa-form {
+    ::ng-deep {
+      .center-vertical {
+        height: calc(100cqh - 100px);
+      }
+    }
+
+  }
+}
+
+
+@container quantitative-analysis (height < 600px || width < 600px) {
+  .header {
+    display: none;
+
+    .description {
+    }
+  }
+}
+
+.header {
+  .title {
+    font: var(--mat-sys-title-medium);
+    color: var(--primary);
+  }
+
+  .description {
+    column-count: 2;
+    column-gap: 20px;
+    text-align: justify;
+    color: var(--on-surface);
+    font: var(--mat-sys-body-medium);
+  }
+
+}

@@ -1,0 +1,185 @@
+.variables {
+  position: relative;
+  height: 100%;
+}
+
+#ehld {
+  position: absolute;
+  inset: 0 0 0 0;
+  background: var(--surface);
+  letter-spacing: 0;
+  overflow-y: hidden;
+}
+
+#legend-boundary {
+  --legend-width: 400px;
+  --border-width: 2px;
+  --handle-width: 20px;
+
+  position: absolute;
+  pointer-events: none;
+  right: calc(-1 * var(--legend-width) - var(--border-width));
+  height: 100%;
+  width: calc(2 * var(--legend-width) + var(--handle-width));
+
+  #legend-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    left: calc(var(--legend-width) - var(--border-width));
+    pointer-events: all;
+    height: 100%;
+    &.animated-legend {
+      transition: 0.5s ease-out;
+    }
+  }
+  .legend-handlers-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    align-items: flex-end;
+    width: var(--handle-width);
+  }
+
+  .legend-handlers {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    align-content: flex-end;
+    align-items: flex-end;
+    width: var(--handle-width);
+
+    #legend-handle {
+      width: var(--handle-width);
+      text-orientation: upright;
+      writing-mode: vertical-lr;
+
+      border-radius: 8.5px 0 0 8.5px;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      backdrop-filter: blur(5px);
+      border-left: var(--border-width) solid var(--primary);
+      border-top: var(--border-width) solid var(--primary);
+      border-bottom: var(--border-width) solid var(--primary);
+      border-right: 0;
+      cursor: ew-resize;
+      color: var(--on-surface);
+    }
+
+    .analysis-legend {
+      //position: absolute;
+      right: 1px;
+      height: var(--handle-height);
+      bottom: 0;
+      flex: 0.5;
+    }
+  }
+
+  #legend {
+    width: var(--legend-width);
+    height: 100%;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    color: var(--on-surface);
+
+    &:before {
+      content: "";
+      height: 100%;
+      width: 2px;
+      background-color: var(--primary);
+      position: absolute;
+      left: -1px;
+      z-index: 4;
+    }
+
+    .legend-group span {
+      display: flex;
+      justify-content: center;
+      font-weight: 400;
+      font-size: 15px;
+      padding-top: 5px;
+
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+
+      span {
+        font-size: 12px;
+      }
+
+      img {
+        width: 55%;
+      }
+    }
+  }
+}
+
+body.dark :host ::ng-deep {
+  svg {
+    .human_tissue:not(.human_tissue .human_tissue):not(#R-ICO-012474) {
+      filter: invert(1) hue-rotate(-195deg);
+    }
+
+    filter: invert(1) hue-rotate(195deg);
+  }
+
+  #legend {
+    img {
+      filter: invert(1) hue-rotate(195deg);
+    }
+  }
+
+  text {
+    fill: var(--surface);
+    stroke: var(--on-surface);
+    stroke-width: 2px;
+    paint-order: stroke;
+    stroke-linejoin: round;
+  }
+}
+
+:host ::ng-deep {
+  .title-text {
+    fill: var(--surface);
+    stroke: var(--on-surface);
+    stroke-width: 3px;
+    paint-order: stroke;
+    stroke-linejoin: round;
+  }
+
+  .analysis-info-container {
+    opacity: 1 !important;
+    //-webkit-transition: all .9s ease-in-out;
+    //-moz-transition: all .9s ease-in-out;
+    //transition: all .9s ease-in-out;
+  }
+
+
+  .analysis-text {
+    alignment-baseline: central;
+    text-anchor: middle;
+
+    fill: var(--surface);
+    stroke: var(--on-surface);
+    stroke-width: 3px;
+    paint-order: stroke;
+    stroke-linejoin: round;
+  }
+
+}
+
+.pointer {
+  cursor: pointer;
+}

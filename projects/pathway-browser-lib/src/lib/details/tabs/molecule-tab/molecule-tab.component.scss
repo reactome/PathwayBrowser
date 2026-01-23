@@ -1,0 +1,84 @@
+@use '@angular/material' as mat;
+
+.container {
+  --gap: 20px;
+  --half-gap: calc(var(--gap) / 2);
+  --columns: 6;
+  --column-width: calc((100cqw - var(--gap) * (var(--columns) + 1)) / var(--columns)) ;
+
+  background: var(--surface);
+  font-family: 'Roboto', sans-serif;
+  gap: var(--gap);
+  padding-left: var(--gap);
+  align-content: space-between;
+  padding-top: var(--half-gap);
+  display: grid;
+  align-items: start;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  padding-right: 6px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--half-gap);
+  grid-column: span 5;
+}
+
+/* TOC */
+.toc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 5px 0 5px 0;
+  margin-right: 13px;
+  gap: 8px;
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height) - 20px);
+  overflow-y: auto;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: right;
+
+  // Sticky
+  position: sticky;
+  top: 10px;
+
+  .toc-item {
+    padding-right: 8px;
+    cursor: pointer;
+  }
+
+  .selected {
+    border-right: 4px solid var(--primary);
+    padding-right: 4px;
+  }
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100cqw;
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height));
+  container: spinner / size;
+  justify-content: center;
+
+  mat-spinner {
+    --size: min(50cqh, 50cqw);
+    width: var(--size) !important;
+    height: var(--size) !important;
+  }
+}
+
+.download-container {
+  width: 100%;
+
+  @include mat.expansion-overrides((
+    header-indicator-color: var(--primary),
+  ));
+
+  mat-expansion-panel {
+    margin-bottom: 8px; // make shadow visible
+  }
+}

@@ -1,0 +1,121 @@
+@if (obj()) {
+  <div id="overview-container">
+    <div class="common-container">
+      @if (obj().stId) {
+        <div class="row">
+          <div class="label">Stable identifier</div>
+          <div class="value">{{ obj().stId }}</div>
+        </div>
+      }
+      <div class="row">
+        <div class="label">Type</div>
+        <div class="value">
+          <!-- Display category for RLE -->
+          @if (category()) {
+            @if (obj().schemaClass === 'FailedReaction') {
+              Failed
+            }
+            {{ category() | titlecase }} {{ className() }}
+            @if (obj().schemaClass === 'Polymerisation' || obj().schemaClass === 'Depolymerisation') {
+              &middot; <span class='italic'>{{ obj().schemaClass }}</span>
+            }
+          } @else {
+            {{ className() === 'TopLevelPathway' ? 'Pathway' : className() }}
+            @if (obj().schemaClass !== className()) {
+              [{{ obj().schemaClass }}]
+            }
+          }
+        </div>
+      </div>
+      @if (cellType()) {
+        <div class="row">
+          <div class="label">Cell Type</div>
+          <div class="value compartment-row">
+            @for (type of cellType(); track type.dbId; let i = $index; ) {
+              <cr-ontology-term [term]="type"></cr-ontology-term>
+              <!-- Add comma separator except for last item -->
+              @if (i < cellType().length - 1) {
+                <span class="comma">,</span>
+              }
+            }
+          </div>
+        </div>
+      }
+      @if (speciesName() && showSpecies()) {
+        <div class="row">
+          <div class="label">Species</div>
+          <div class="value">{{ speciesName() }}</div>
+        </div>
+      }
+      @if (compartment()) {
+        <div class="row">
+          <div class="label">Compartment</div>
+          <div class="value compartment-row">
+            @for (has of compartment(); track has.element.dbId; let i = $index; ) {
+              <cr-ontology-term [term]="has.element"/>
+              <!-- Add comma separator except for last item -->
+              @if (i < compartment().length - 1) {
+                <span class="comma">,</span>
+              }
+            }
+          </div>
+        </div>
+      }
+      @if (disease()) {
+        <div class="row">
+          <div class="label">Disease</div>
+          <div class="value compartment-row">
+            @for (d of disease(); track d.dbId; let i = $index; ) {
+              <cr-ontology-term [term]="d" [titleCase]="true"/>
+              <!-- Add comma separator except for last item -->
+              @if (i < disease().length - 1) {
+                <span class="comma">,</span>
+              }
+            }
+          </div>
+        </div>
+      }
+      @if ((name().length || 0) > 1) {
+        <div class="row">
+          <div class="label">Synonyms</div>
+          <div class="value">{{ name().slice(1) }}</div>
+        </div>
+      }
+      @if (organ()) {
+        <div class="row">
+          <div class="label">Organ</div>
+          <div class="value">
+            <cr-ontology-term [term]="organ()"/>
+          </div>
+        </div>
+      }
+      @if (tissue()) {
+        <div class="row">
+          <div class="label">Tissue</div>
+          <div class="value">
+            <cr-ontology-term [term]="tissue()"/>
+          </div>
+        </div>
+      }
+      @if (tissueLayer()) {
+        <div class="row">
+          <div class="label">Tissue Layer</div>
+          <div class="value">
+            <cr-ontology-term [term]="tissueLayer()"/>
+          </div>
+        </div>
+      }
+    </div>
+    <!-- Common info ends here-->
+    @if (reviewStatus()) {
+      <div class="row">
+        <div class="label">Review Status</div>
+        <div class="value spinner-container">
+          <mat-progress-spinner color="primary" mode="determinate"
+          [value]="reviewStar[reviewStatus()!.displayName].percentage"></mat-progress-spinner>
+          <div class="score"> {{ reviewStar[reviewStatus()!.displayName].score }}/5</div>
+        </div>
+      </div>
+    }
+  </div>
+}

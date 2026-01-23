@@ -1,0 +1,411 @@
+@use '@angular/material' as mat;
+
+#details {
+
+  overflow-y: auto;
+  height: 100%;
+
+  background: var(--surface);
+  font-family: 'Roboto', sans-serif;
+  gap: var(--gap);
+  padding-left: var(--gap);
+  align-content: space-between;
+  display: grid;
+  align-items: start;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  scrollbar-gutter: stable;
+  padding-right: 7px;
+
+  --gap: 20px;
+  --half-gap: calc(var(--gap) / 2);
+  --columns: 6;
+  --column-width: calc((100cqw - var(--gap) * (var(--columns) + 1)) / var(--columns));
+
+  --padding: 20px;
+  --icon-width: var(--column-width);
+  --icon-height: 84px;
+  --margin-right: 2px;
+
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--half-gap);
+  grid-column: span 5;
+  height: 100%;
+
+  @container bottom-panel (width < 959px) {
+    grid-column: span 6;
+  }
+
+}
+
+/* Header */
+.header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  gap: 7px;
+  width: 100%;
+  height: 48px;
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: 11px; // Match the divider half height - divider thickness
+  flex-shrink: 0;
+
+
+  .label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    gap: var(--half-gap);
+    overflow: hidden;
+
+    & .name {
+      font-style: normal;
+      font-weight: 450;
+      font-size: 18px;
+      line-height: 32px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: var(--on-surface);
+      text-overflow: ellipsis;
+      padding-right: 2px;
+    }
+
+  }
+
+  .details-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0;
+    gap: 5px;
+    height: 40px;
+
+
+    .details-label {
+      width: 80px;
+      height: 20px;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      letter-spacing: 0.1px;
+      color: var(--primary);
+
+    }
+  }
+
+}
+
+
+/* TOC */
+.toc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 5px 5px 5px 0;
+  gap: 8px;
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height) - 20px);
+  overflow-y: auto;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: right;
+
+  // Sticky
+  position: sticky;
+  top: 10px;
+
+
+  // Reposition under content on small screens and remove
+  @container bottom-panel (width < 959px) {
+    grid-column: span 6 ;
+    display: none;
+  }
+
+  .toc-item {
+    padding-right: 8px;
+  }
+
+  .selected {
+    border-right: 4px solid var(--primary);
+    padding-right: 4px;
+  }
+
+}
+
+.custom-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 0 !important;
+  flex-shrink: 0;
+}
+
+.double-arrow {
+  width: 18px;
+  height: 18px;
+}
+
+/* Overview */
+.overview {
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 4px;
+  width: 100%;
+}
+
+.update-layout {
+  flex-direction: row;
+  gap: var(--gap);
+}
+
+.icon-container {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  margin: 0 auto;
+  width: var(--column-width);
+  height: var(--icon-height);
+
+  border: 1px solid var(--outline-variant);
+  box-shadow: inset 0 0 5px var(--outline);
+  border-radius: 16px;
+
+
+  .icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    object-fit: contain;
+  }
+  &.expanded {
+    .icon {
+      opacity: 0.3;
+    }
+  }
+}
+
+.figure {
+  cursor: zoom-in;
+  &.expanded {
+    cursor: zoom-out;
+  }
+}
+
+.divider-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.divider-name-container {
+  display: flex;
+  align-items: center;
+
+  width: var(--column-width);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--on-surface);
+  flex-shrink: 0; // Prevent shrinking
+
+}
+
+.divider-line-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+
+  .divider {
+    background: var(--outline);
+    --mat-divider-width: 2px;
+    width: 100%
+  }
+}
+
+
+/** Divider to place the text in the middle   ---text--- */
+.divider-name {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  //padding-top: 6px;
+  //padding-bottom: 6px;
+
+  .divider {
+    background: var(--outline);
+    --mat-divider-width: 2px;
+  }
+
+  .line {
+    flex: 1;
+  }
+
+  .text {
+    padding: 0 2px;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    color: var(--outline);
+  }
+
+}
+
+.depth-controller {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  width: var(--column-width);
+}
+
+.composition-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-left: 10px;
+  border-left: 2px solid var(--outline-variant);
+  flex: 1;
+
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+
+.margin-right {
+  margin-right: var(--margin-right);
+}
+
+
+.element-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 8px;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Multiple persons in a authorship row */
+.flex-column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.orcid-icon {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  margin-right: var(--margin-right);
+}
+
+.authorship-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  & a:last-child:not(:only-child) {
+    margin-right: var(--margin-right);
+  }
+}
+
+.columns {
+  column-count: 2;
+  display: block;
+
+  .padding {
+    padding: 4px 0;
+  }
+}
+
+.disease {
+  margin-left: 10px;
+  @include mat.slide-toggle-overrides((
+    track-width: 38px,
+    track-height: 26px,
+    with-icon-handle-size: 18px,
+    pressed-handle-size: 18px,
+    selected-with-icon-handle-horizontal-margin: 0 16px,
+    selected-pressed-handle-horizontal-margin: 0 16px,
+
+    label-text-font: var(--mat-sys-label-large-font),
+    label-text-size: var(--mat-sys-label-large-size),
+    label-text-weight: var(--mat-sys-label-large-weight),
+
+    selected-track-color: var(--error),
+    selected-pressed-track-color: var(--error),
+    selected-hover-track-color: var(--error),
+    selected-focus-track-color: var(--error),
+    selected-focus-handle-color: var(--error-container),
+    selected-hover-handle-color: var(--error-container),
+  ));
+}
+
+.summation {
+  margin-top: -6px; // appear as part of the description-overview
+  .composition-container {
+    border-left: 2px solid var(--primary);
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    font: var(--mat-sys-body-medium);
+    color: var(--on-surface);
+    white-space: normal;
+    text-align: justify;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    .italic {
+      font-style: italic;
+      display: contents;
+    }
+
+    .summation-refs-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+
+
+
+}

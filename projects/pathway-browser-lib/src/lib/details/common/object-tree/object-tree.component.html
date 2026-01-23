@@ -1,0 +1,134 @@
+<mat-tree #tree [dataSource]=dataSource [childrenAccessor]="childrenAccessor" class="component-tree"
+          [trackBy]="trackBy">
+  <!-- This is the tree node template for leaf nodes -->
+
+  <mat-nested-tree-node *matTreeNodeDef="let node">
+    {{ node.element.name?.[0] }}
+  </mat-nested-tree-node>
+
+
+  <!-- This is the tree node template for expandable nodes -->
+  <!--#treeNodeRef="matNestedTreeNode" the instance of the directive or component that is exported under the name matNestedTreeNode-->
+  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild"
+                        [cdkTreeNodeTypeaheadLabel]="node.name"
+                        #treeNodeRef='matNestedTreeNode'>
+    @let element = node.element;
+    <div class="connector-container" [style.--level]="getConnectorLevel(treeNodeRef.level, false)">
+      <!--To create an array of a specific length-->
+      @for (index of getArray(treeNodeRef.level, false); track index) {
+        <!-- TODO : avoid calling n time the getAllConnectors (removing this function from the for loop and removing the index from the function) -->
+        @let connector = getAllConnectors(treeNodeRef._getSetSize(), node, index, treeNodeRef.level)[index];
+        <div class="connector" [ngClass]="connector?.type" [attr.data-shape]="connector?.shape"
+             [matTooltip]="connector?.type">
+        </div>
+      }
+    </div>
+
+    <div class="mat-tree-node" (click)="loadChildren(node)"
+         [style.--level]="getConnectorLevel(treeNodeRef.level, false)"
+         [class.highlight]="moleculeView() && node.highlight">
+      <div class="left">
+        <mat-icon class="symbol-icon"
+                  [matTooltip]="moleculeView()? getSymbol(element.displayIcon).tooltip: getSymbol(element).tooltip"
+                  [svgIcon]="moleculeView()? getSymbol(element.displayIcon).name: getSymbol(element).name">
+        </mat-icon>
+
+        <div class="toggle-icon-container" [attr.aria-label]="'Toggle ' + element.name">
+          <mat-icon class="mat-icon-rtl-mirror" [svgIcon]="tree.isExpanded(node) ? 'collapse' : 'expand'"/>
+        </div>
+        <span class="name" #name
+              [matTooltip]="element.name?.[0]"
+              [matTooltipDisabled]="!isEllipsisActive(name)">
+
+          @if (node.stoichiometry > 1) {
+            <b>{{ node.stoichiometry }} ×</b>
+          }
+          {{ getDisplayName(node, element) }}
+        </span>
+      </div>
+
+
+      <div class="right">
+
+        @if (moleculeView()) {
+          <span class="molecule name">
+            {{ element.identifier }}
+          </span>
+        }
+
+        <!--Compartment-->
+        @for (comp of getCompartments(element); track comp) {
+          <span class="compartment name"
+                #compartment
+                [matTooltip]="comp"
+                [matTooltipDisabled]="!isEllipsisActive(compartment)">
+            {{ comp }}
+          </span>
+        }
+
+        <!--Species-->
+        @let finalSpeciesName = getSpeciesName(element);
+        @if (finalSpeciesName) {
+          <span class="species name" #speciesName
+                [matTooltip]="element.speciesName"
+                [matTooltipDisabled]="!isEllipsisActive(speciesName)">
+            {{ finalSpeciesName }}
+          </span>
+        }
+
+        @if (!disableNavigation()) {
+          <div class="select-container">
+            <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+            <button mat-icon-button class="select button" (click)="onSelectClick($event, element)" [matTooltip]="selectTooltip(element)">
+              <mat-icon class="custom-icon" svgIcon="select"></mat-icon>
+            </button>
+          </div>
+
+          <div class="goTo-container">
+            <a [href]="getUrl(element)" target="_blank" (click)="$event.stopPropagation()"
+               [matTooltip]="'Open origin of ' + (element.stId || element.dbId)">
+              <mat-icon class='custom-icon' [svgIcon]="'double-arrow-right'"></mat-icon>
+            </a>
+          </div>
+        }
+
+      </div>
+    </div>
+<!--      </div>-->
+
+    @if (tree.isExpanded(node)) {
+      <!-- Add this details-group and details-tree is for making the connector works in Firefox, to make the mat-nested-tree to take the full height of the parent -->
+      <div role="group" class="group"
+           [class.details-group]="!isNestedView(node.element) && tree.isExpanded(node) ? 'details-group' : ''">
+        <!--make sure getting full object content to render with _selectedTreeNodeData.hasValue()-->
+        @if (!isNestedView(node.element)) {
+          <!-- stopPropagation() prevent the matTreeNodeToggle event from triggering when clicking-->
+          <mat-nested-tree-node class='details-tree' (click)="$event.stopPropagation()">
+            <div class="details-connector-container" [style.--level]="getConnectorLevel(treeNodeRef.level, true)">
+              <!--To create an array of a specific length-->
+              @for (index of getArray(treeNodeRef.level, true); track index) {
+                @let connector = index != getArray(treeNodeRef.level, true).length - 1 ?
+                  getParentsConnector(node, true)[index] : {type: 'is', shape: 'L'};
+                <div class="connector" [ngClass]="connector?.type" [attr.data-shape]="connector?.shape"
+                     [matTooltip]="connector?.type">
+                </div>
+              }
+            </div>
+            <cr-object-tree-details [obj]="element"
+                                    [className]="element.className"
+                                    [isMoleculeView]="moleculeView()"
+                                    [refEntity]="isRefEntity(element) ? element : element.referenceEntity"
+                                    [xRefs]="element.crossReference ?? []"
+                                    [isLoading]="_selectedTreeNodeData.isLoading()"/>
+          </mat-nested-tree-node>
+        } @else {
+          <ng-container matTreeNodeOutlet></ng-container>
+        }
+      </div>
+    }
+
+
+  </mat-nested-tree-node>
+</mat-tree>
+
+

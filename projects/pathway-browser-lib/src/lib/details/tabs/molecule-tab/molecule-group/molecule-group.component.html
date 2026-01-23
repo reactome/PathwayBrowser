@@ -1,0 +1,25 @@
+<div class="container">
+  <div id="component-container">
+    <div class="controllers">
+      <div class="list" [id]=sanitizeId(group().category)>
+        <span class="header">
+          {{ group().category }}
+        </span>
+        <span class="count">{{ getStatistics(group()) }}</span>
+      </div>
+      @if (hasPagination()) {
+        <mat-paginator [pageSize]="pageSize()" [length]="group().data.length" (page)="currentPage.set($event)"
+                       hidePageSize></mat-paginator>
+      }
+    </div>
+  </div>
+
+  <div class="composition-container">
+    @for (molecule of pagedData(); track molecule.entity.dbId) {
+      <cr-object-tree [type]="group().category" [data]="[molecule.entity]"
+                      [stoichiometry]=molecule.stoichiometry [highlight]="molecule.highlight"
+                      [moleculeView]="true"></cr-object-tree>
+    }
+  </div>
+</div>
+

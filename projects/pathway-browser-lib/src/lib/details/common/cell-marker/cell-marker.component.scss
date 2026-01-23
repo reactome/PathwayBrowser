@@ -1,0 +1,48 @@
+:host {
+  width: 100%;
+}
+
+
+#markers {
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.marker-container {
+  display: flex;
+  flex-direction: column;
+
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  gap: 10px;
+  width: 100%;
+}
+
+
+.composition-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-left: 10px;
+  border-left: 2px solid var(--outline-variant);
+  flex: 1;
+  gap: 5px;
+
+}
+
+.ref-padding {
+  padding-left: 18px !important;
+}

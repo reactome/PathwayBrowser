@@ -1,0 +1,73 @@
+<table mat-table [dataSource]="dataSource" recycleRows id="result-table" matSort
+       [style.--header-row-height]="headerRowHeight()"
+       [style.--row-height]="parentRowHeight()"
+>
+
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Identifier</th>
+    <td mat-cell *matCellDef="let found, dataSource: dataSource">
+      {{ found.id }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="interactors">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="interactor">
+      Interactor match
+    </th>
+    <td mat-cell *matCellDef="let found, dataSource: dataSource">
+      @if (found.interactors) {
+        <mat-icon class="intact-icon" svgIcon="intact"></mat-icon>
+        @for (inter of found.interactors; track inter; ) {
+          <span class="interactor">{{ inter }}</span>
+          @if (!$last) {
+            &
+          }
+        }
+      }
+    </td>
+  </ng-container>
+
+  @for (resource of resources(); track resource; ) {
+    @let resourceColumn = resourceColumnIds()[$index];
+    @let prefix = resourceToIdentifiersPrefix.get(resource)!;
+    <ng-container [matColumnDef]="resourceColumn">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="curated">
+        {{ resource | titlecase }} entities
+      </th>
+      <td mat-cell *matCellDef="let found, dataSource: dataSource" class="resource-match">
+        <div class="found-entity matching">
+          @for (match of found.entities[resource]; track match; ) {
+            <cr-flag-button class="mini-flag" #flag [id]="prefix + ':' + match" />
+            <span [class.curated]="!found.interactors" (click)="flag.toggle()">{{ match }}</span>
+            @if (!$last) {
+              &
+            }
+          }
+        </div>
+      </td>
+    </ng-container>
+  }
+
+  @for (expression of expressionColumnIds(); track expression; let i = $index; ) {
+    <ng-container [matColumnDef]="expression">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header
+          [class.selected-expression]="state.sample() === expressionColumnNames()[i]">
+        {{ expressionColumnNames()[i] }}
+      </th>
+      <td mat-cell *matCellDef="let found, dataSource: dataSource">
+        <div class="found-entity expression">
+          <cr-expression-tag
+            [value]="found.exp[i]"
+            [isRegulation]="analysis.isGSARegulation()"
+            [scientificFormat]="analysis.expressionScientificFormat()"
+            [format]="undefined"
+          />
+        </div>
+      </td>
+    </ng-container>>
+  }
+
+  <tr mat-header-row *matHeaderRowDef="expandedColumns(); sticky: true"></tr>
+  <tr mat-row *matRowDef="let found; columns: expandedColumns(); dataSource: dataSource "
+  ></tr>
+</table>

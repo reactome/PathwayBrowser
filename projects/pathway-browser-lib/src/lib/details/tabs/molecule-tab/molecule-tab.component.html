@@ -1,0 +1,41 @@
+@if (_pathwayParticipants.isLoading()) {
+  <div class="spinner-container">
+    <mat-spinner/>
+    <p>Loading data for participating molecules, please wait...</p>
+  </div>
+} @else {
+  <div class="container">
+    <div class="content">
+      @for (group of moleculeData() | sortByText: 'category'; track group.category; ) {
+          <cr-molecule-group [group]="group"></cr-molecule-group>
+      }
+
+      <div id="download" class="download-container">
+        @if (moleculeData().length > 0) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <h3 class="badge">Download Molecules Data</h3>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <cr-molecule-download-table [moleculeData]="moleculeData()" [objId]="objStId()"></cr-molecule-download-table>
+          </mat-expansion-panel>
+        }
+      </div>
+    </div>
+
+    <div class="toc">
+      @for (group of moleculeData() | sortByText: 'category'; track group.category) {
+        <a class='toc-item' (click)="scrollTo(group.category)"
+           [class.selected]="selectedKey() == sanitizeId(group.category)">
+          {{ group.category }}
+        </a>
+      }
+      @if (moleculeData().length > 0) {
+        <!-- Add download link -->
+        <a class='toc-item' (click)="scrollTo('download')" [class.selected]="selectedKey() == sanitizeId('download')">Download </a>
+      }
+    </div>
+  </div>
+
+}

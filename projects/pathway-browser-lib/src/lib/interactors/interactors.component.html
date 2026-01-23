@@ -1,0 +1,91 @@
+<ng-template #dividerTemplate let-text>
+  <div class="divider-container">
+    <div class="line">
+      <mat-divider class="divider"></mat-divider>
+    </div>
+    <div class="text">{{ text }}</div>
+    <div class="line">
+      <mat-divider class="divider"></mat-divider>
+    </div>
+  </div>
+</ng-template>
+
+<div id="interactor-container" class="variables">
+
+  <mat-card class="card">
+    <mat-card-content>
+      <div class="button-container">
+        <button mat-raised-button class="raised-full-width-button" [disabled]="hasEHLD()" (click)="clearInteractors()"
+          [ngClass]="{'active-button': clear}">
+          <mat-icon [ngClass]="{'active-icon': clear}" color="primary">clear</mat-icon>
+          Clear overlays
+        </button>
+      </div>
+
+
+      <!--Using $implicit allows you to pass a value into a template without explicitly naming the context variable-->
+      <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Main' }"></ng-container>
+
+      <div class="main-resource">
+        <button class="full-width" mat-button  [disabled]="hasEHLD()" (click)="getInteractors(INTACT_RESOURCE)"
+          [ngClass]="{'active-button': currentResource().type === ResourceType.STATIC}">IntAct
+        </button>
+
+        <button class="full-width" mat-button [disabled]="hasEHLD()" (click)="getInteractors(DISEASE_RESOURCE)"
+          [ngClass]="{'active-button': currentResource().type === ResourceType.DISGENET}">DisGeNet
+        </button>
+      </div>
+
+      @if (psicquicResources.length > 0 && !isDataFromPsicquicLoading) {
+        <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'PSICQUIC' }"></ng-container>
+
+        <mat-grid-list cols="2" rowHeight="28px" [gutterSize]="'5px'">
+          @for (resource of psicquicResources; track resource) {
+            <mat-grid-tile class="rounded-corner">
+              <button class="full-width psicquic-button" mat-button [disabled]="hasEHLD()"
+                (click)="getInteractors(resource.name)"
+                [ngClass]="{'active-button': currentResource().name === resource.name}">
+                <div class="resource-name">
+                  <span>{{ resource.name }}</span>
+                  @if (isDataFromPsicquicLoading && currentResource().name === resource.name) {
+                    <mat-spinner class="spinner-color" diameter="20"
+                    ></mat-spinner>
+                  }
+                </div>
+              </button>
+            </mat-grid-tile>
+          }
+        </mat-grid-list>
+      }
+
+      <ng-container *ngTemplateOutlet="dividerTemplate; context: { $implicit: 'Custom' }"></ng-container>
+
+      @if (resourceTokens.length != 0) {
+        <mat-selection-list [multiple]=false hideSingleSelectionIndicator=true>
+          @for (resourceToken of resourceTokens; track resourceToken) {
+            <mat-list-option [value]="resourceToken"
+              [selected]="isSelected(resourceToken)" (click)="getInteractors(resourceToken)"
+              [ngClass]="{'active-button': currentResource().name === resourceToken.summary.name}"
+              class="full-width">
+              <div class="resource-name surface-variant">
+                <div>{{ resourceToken.summary.name }}</div>
+                <button mat-icon-button  [disabled]="hasEHLD()" (click)="deleteCustomResource(resourceToken)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </mat-list-option>
+          }
+        </mat-selection-list>
+      }
+
+      <div class="button-container">
+        <button mat-raised-button class="raised-full-width-button" [disabled]="hasEHLD()" (click)="openCustomInteractorDialog()">
+          <mat-icon color="primary">add</mat-icon>
+          Add overlay resource
+        </button>
+      </div>
+
+
+    </mat-card-content>
+  </mat-card>
+</div>

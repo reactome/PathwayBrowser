@@ -1,0 +1,12 @@
+<a [href]="term().url" target="_blank" [matTooltip]="term().definition">
+
+  @if (titleCase()) {
+    {{ name() | titlecase }}
+  } @else {
+    {{ name() }}
+  }
+
+  @if (displayId()) {
+    ({{ term().databaseName }}:{{ id() }})
+  }
+</a>

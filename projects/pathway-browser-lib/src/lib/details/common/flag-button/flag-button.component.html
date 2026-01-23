@@ -1,0 +1,5 @@
+<button mat-icon-button (click)="toggle()" [class.flagged]="flagged()" class="flag-button">
+  <mat-icon fontSet="symbols">
+    {{flagged() ? 'flag_check' : 'flag'}}
+  </mat-icon>
+</button>

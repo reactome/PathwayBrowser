@@ -1,0 +1,334 @@
+<!--ToDO investigate virtual scroll instead of pagination: https://material.angular.dev/cdk/scrolling/overview -->
+<div class="container" #container>
+  <div class="header">
+    {{ analysisType() }}
+    analysis results
+    @if (analysis.summary()?.sampleName) {
+      of {{ analysis.summary()?.sampleName }}
+    }
+    @if (analysis.species()) {
+      of {{ analysis.species()!.displayName }}
+    }
+    @if (state.resourceFilter()) {
+      on {{ state.resourceFilter() }} entities
+    }
+    @if (analysis.samples().length > 1) {
+      using sample
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select [(value)]="state.sample">
+          @for (sample of analysis.samples(); track sample) {
+            <mat-option [value]="sample">{{ sample }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+    }
+  </div>
+  <div class="found-section">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows [trackBy]="trackBy"
+           matSort [matSortActive]="currentSort().active" [matSortDirection]="currentSort().direction"
+           matSortDisableClear
+           (matSortChange)="currentSort.set($event)"
+           id="result-table">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Pathway
+          <button mat-icon-button (click)="$event.stopPropagation()" [matMenuTriggerFor]="filterMenu">
+            <mat-icon fontSet="symbols">filter_alt</mat-icon>
+          </button>
+        </th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span class="pathway-name">
+                      <mat-icon class='icon' [class.ehld]="!pathway.llp"
+                                [matTooltip]="pathway.llp ? 'Pathway' : 'Pathway with an enhanced diagram '"
+                                [svgIcon]="pathway.llp ? 'pathway' : 'pathway-ehld'"></mat-icon>
+            <span [matTooltip]="pathway.name">{{ pathway.name }}</span>
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expand-entities">
+        <th mat-header-cell *matHeaderCellDef>Matches</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <button
+            [matTooltip]="'Open matching identifiers of ' + pathway.stId "
+            mat-icon-button
+            aria-label="expand row"
+            (click)="toggle(pathway);"
+            class="expand-button"
+            [class.expanded]="isExpanded(0, pathway)">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="entities-found">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="entity-header-cell">
+            <span class="curated" [class.interactor]="analysis.hasInteractors()">Entities Found</span>
+            @if (analysis.hasInteractors()) {
+              = &#123;<span class="curated">curated</span> + <span class="interactor">interactors</span>&#125;
+            }
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span class="curated" [class.interactor]="analysis.hasInteractors()">{{ pathway.entities.found }}</span>
+          @if (analysis.hasInteractors()) {
+            = &#123;<span class="curated">{{ pathway.entities.curatedFound }}</span>
+            +
+            <span class="interactor">{{ pathway.entities.interactorsFound }}</span>&#125;
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="entities-total">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="entity-header-cell">
+            <span class="curated" [class.interactor]="analysis.hasInteractors()">Entities Total</span>
+            @if (analysis.hasInteractors()) {
+              = &#123;<span class="curated">curated</span> + <span class="interactor">interactors</span>&#125;
+            }
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span class="curated" [class.interactor]="analysis.hasInteractors()">{{ pathway.entities.total }}</span>
+          @if (analysis.hasInteractors()) {
+            = &#123;<span class="curated">{{ pathway.entities.curatedTotal }}</span>
+            +
+            <span class="interactor">{{ pathway.entities.interactorsTotal }}</span>&#125;
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="entities-ratio">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities Ratio</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.entities.ratio | number: '1.0-4' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="entities-pValue">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="no-wrap">Entities p-value</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <span [innerHTML]="pathway.entities.pValue | scientificNumber"></span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="entities-fdr">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Entities FDR</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+          <cr-expression-tag
+            [value]="pathway.entities.fdr"
+            [scientificFormat]="true"
+            [isFDR]="true"/>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="reactions-found">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Reactions Found</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.reactions.found }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="reactions-total">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Reactions Total</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.reactions.total }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="reactions-ratio">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Reactions Ratio</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.reactions.ratio | number: '1.0-4' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="species-name">
+        <th mat-header-cell *matHeaderCellDef>Species</th>
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource">{{ pathway.species.name }}</td>
+      </ng-container>
+
+
+      @for (expression of expressionColumnIds(); track expression; let i = $index; ) {
+        <ng-container [matColumnDef]="expression">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header
+              [class.selected-expression]="state.sample() === expressionColumnNames()[i]">
+            {{ expressionColumnNames()[i] }}
+          </th>
+          <td mat-cell *matCellDef="let pathway, dataSource: dataSource">
+            <cr-expression-tag
+              [value]="pathway.entities.exp[i]"
+              [fdr]="pathway.entities.fdr"
+              [scientificFormat]="analysis.expressionScientificFormat()"
+              [isRegulation]="analysis.isGSARegulation()"/>
+          </td>
+        </ng-container>>
+      }
+
+      <ng-container matColumnDef="expand-container">
+        <td mat-cell *matCellDef="let pathway, dataSource: dataSource" [colSpan]="displayedColumns().length"
+            [class.expanded]="isExpanded(0, pathway)">
+          @if (isExpanded(0, pathway)) {
+            <cr-found-table [pathway]="pathway"
+                            [headerRowHeight]="headerRowHeight()"
+                            [parentRowHeight]="expandedRowHeight()"
+
+            ></cr-found-table>
+          }
+        </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true" id="pathway-header-row"></tr>
+      <tr mat-row *matRowDef="let pathway; columns: displayedColumns(); dataSource: dataSource;"
+          (click)="selectPathway(pathway)"
+          (dblclick)="visitPathway(pathway)"
+          class="pathway-row" [id]="'pathway-' + pathway.stId + '-row'"
+          [class.selected]="pathway.stId === data.selectedPathwayStId()"
+          [class.expanded]="isExpanded(0, pathway)"
+          [style.--header-row-height]="headerRowHeight()"
+          [style.--row-height]="expandedRowHeight()"
+      ></tr>
+      <tr mat-row class="found-entity-row" [class.expanded]="isExpanded(0, pathway)"
+          *matRowDef="let pathway; columns: ['expand-container']; dataSource: dataSource;">
+      </tr>
+    </table>
+
+    <div class="controls mat-elevation-z2">
+      <mat-paginator [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons></mat-paginator>
+    </div>
+  </div>
+
+  @if (analysis.result()?.identifiersNotFound) {
+    <div class="not-found-section">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Identifiers not found <span class="badge">{{ analysis.result()?.identifiersNotFound }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <cr-not-found-table/>
+      </mat-expansion-panel>
+    </div>
+  }
+</div>
+
+<mat-menu #filterMenu="matMenu">
+  <mat-radio-group [(ngModel)]="filterViewMode">
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-radio-button [value]="'focus'" matTooltipPosition="after"
+                        matTooltip="Filters apply to both the table and the visualization. Only filtered pathways are shown in the ReacFoam view.">
+        <mat-icon fontSet="symbols">arrows_input</mat-icon>
+        Focus mode
+      </mat-radio-button>
+    </div>
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-radio-button [value]="'overview'" matTooltipPosition="after"
+                        matTooltip="Filters apply to the table only. The full pathway structure remains visible in the ReacFoam view, preserving the global context.">
+        <mat-icon fontSet="symbols">language</mat-icon>
+        Overview mode
+      </mat-radio-button>
+    </div>
+  </mat-radio-group>
+
+  <mat-divider></mat-divider>
+
+  <button mat-menu-item (click)="onTogglableFilterClick($event, llp)" [class.filter-active]="includeGrouping()">
+    <mat-checkbox [(ngModel)]="includeGrouping" #llp (click)="$event.stopPropagation()">
+      <mat-icon fontSet="symbols">graph_2</mat-icon>
+      Pathway grouping
+    </mat-checkbox>
+  </button>
+  <button mat-menu-item (click)="onTogglableFilterClick($event, disease)" [class.filter-active]="includeDisease()">
+    <mat-checkbox [(ngModel)]="includeDisease" #disease (click)="$event.stopPropagation()">
+      <mat-icon fontSet="symbols">microbiology</mat-icon>
+      Diseases
+    </mat-checkbox>
+  </button>
+  @if (analysis.hasPValues()) {
+    <div mat-menu-item class="slider-container single-thumb" [class.filter-active]="fdrFilterActive()">
+      <label (click)="$event.stopPropagation()">
+        FDR
+        <mat-slider min="0" [max]="fdrValues.length - 1" step="1" discrete showTickMarks [displayWith]="fdrLabel">
+          <input matSliderThumb [(value)]="fdrIndex">
+        </mat-slider>
+      </label>
+    </div>
+  }
+
+  <div mat-menu-item class="slider-container" [class.filter-active]="sizeFilterActive()">
+    <label (click)="$event.stopPropagation()">
+      Size
+      <mat-slider [min]="pathwaySizeStats().min" [max]="pathwaySizeStats().max" step="1" discrete>
+        <input matSliderStartThumb [(value)]="filterMinSize">
+        <input matSliderEndThumb [(value)]="filterMaxSize">
+      </mat-slider>
+    </label>
+  </div>
+  @if (hasExpression() && !analysis.isGSARegulation()) {
+    <div mat-menu-item class="slider-container expression"
+         [class.filter-active]="expressionFilterActive()"
+         [style.--gradient]="analysis.palette().horizontalGradient"
+         [style.--gradient-mask]="gradientMask()"
+         [style.--expression-color-start]="colorExpression(localMinExpression())"
+         [style.--expression-color-stop]="colorExpression(localMaxExpression())">
+      <label (click)="$event.stopPropagation()">
+        {{ state.sample() }}
+        <mat-slider [min]="minExpression()" [max]="maxExpression()" step="1" discrete [displayWith]="formatExpression">
+          <input matSliderStartThumb [(value)]="filterMinExpression" #start
+                 (input)="localMinExpression.set(+start.value)">
+          <input matSliderEndThumb [(value)]="filterMaxExpression" #end (input)="localMaxExpression.set(+end.value)">
+        </mat-slider>
+      </label>
+    </div>
+  }
+  @if (analysis.isGSARegulation()) {
+    <button mat-menu-item [matMenuTriggerFor]="gsaMenu" [class.filter-active]="gsaFilterActive()">{{ state.sample() }}
+    </button>
+  }
+  <button mat-menu-item [matMenuTriggerFor]="resourcesMenu" [disabled]="analysis.resourceOptions().length <= 2"
+          [class.filter-active]="analysis.resourceFilterActive()">
+    Resources
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="speciesMenu" [disabled]="analysis.speciesOptions().length <= 1"
+          [class.filter-active]="analysis.speciesFilterActive()">
+    Species
+  </button>
+</mat-menu>
+
+<mat-menu #resourcesMenu="matMenu">
+  <mat-radio-group [(ngModel)]="analysis.resourceFilter">
+    @for (resourceOption of analysis.resourceOptions(); track resourceOption.resource) {
+      <div mat-menu-item (click)="$event.stopPropagation()">
+        <mat-radio-button [value]="resourceOption.resource" (click)="$event.stopPropagation()">
+          {{ resourceOption.resource }}
+          <span class="facet">({{ resourceOption.filtered }} / {{ resourceOption.pathways }})</span>
+        </mat-radio-button>
+      </div>
+    }
+  </mat-radio-group>
+</mat-menu>
+
+<mat-menu #speciesMenu="matMenu">
+  @for (speciesOption of speciesOptions(); track speciesOption.dbId) {
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-checkbox [value]="speciesOption.taxId"
+                    [checked]="speciesOption.value"
+                    (change)="onToggleSpecies($event)"
+                    (click)="$event.stopPropagation()">
+        {{ speciesOption.name }}
+        <span class="facet">({{ speciesOption.filtered }} / {{ speciesOption.pathways }})</span>
+      </mat-checkbox>
+    </div>
+  }
+</mat-menu>
+
+<mat-menu #gsaMenu=matMenu>
+  @for (gsaOption of gsaOptions(); track gsaOption.exp) {
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <mat-checkbox [value]="gsaOption.exp + ''"
+                    [checked]="gsaOption.value"
+                    (change)="onToggleGsaFilter($event)"
+                    (click)="$event.stopPropagation()" class="no-wrap">
+        <cr-expression-tag [value]="gsaOption.exp" [scientificFormat]="false" [isRegulation]="true"></cr-expression-tag>
+        {{ gsaOption.label }}
+      </mat-checkbox>
+    </div>
+  }
+</mat-menu>

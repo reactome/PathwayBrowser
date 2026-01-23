@@ -1,0 +1,156 @@
+
+:host {
+  width: 100%;
+}
+
+.publication-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0;
+  gap: 20px;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 4px;
+    flex: 1 1 auto;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 0;
+   // gap: 4px;
+    min-width: fit-content;
+    height: 20px; // Fake height smaller than reality to ignore this section height (better looking)
+  }
+}
+
+.title {
+  white-space: normal;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0;
+
+
+  position: relative;
+  min-height: fit-content;
+  line-height: normal;
+
+  .publication-name {
+    padding-left: 12px;
+    margin: -2px 0px -2px 0px; // To make the ribbon has the same height as the text,  needs improvement
+  }
+}
+
+/* Ideas from : https://css-tricks.com/the-shapes-of-css/#aa-flag-shape-via-zoe-rooney */
+.ribbon {
+  width: 8px;
+  background: var(--primary);
+  position: absolute;
+  height: 100%;
+  border-radius: 1px 1px 0 0;
+}
+
+.ribbon:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-bottom: 4px solid var(--surface);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+
+.quote-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  gap: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50px;
+  background: var(--primary);
+
+
+  .quote-icon {
+    color: var(--on-primary);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    gap: 5px;
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.authors-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0 0 0 1.5px;
+  gap: 5px;
+
+}
+
+.authors-container:before {
+  content: "•";
+  vertical-align: middle;
+  color: var(--primary);
+  padding-top: 1.5px;
+}
+
+
+.ref-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 12px;
+  height: 12px
+}
+
+.additional-authors {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.authors {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 1.5px;
+  flex-wrap: wrap;
+
+  & > :last-child {
+    margin-left: 5px;
+  }
+
+  & > :only-child {
+    margin-left: 0;
+  }
+}

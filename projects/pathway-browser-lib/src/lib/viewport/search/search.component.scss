@@ -1,0 +1,353 @@
+@use "@angular/material" as mat;
+@use "../../details/common/flag-button/flag-button.customise" as flag-button;
+
+:host {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  display: flex;
+  background: light-dark(var(--primary), var(--primary-container));
+  color: light-dark(var(--on-primary), var(--on-primary-container));
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: var(--top-bar-height);
+  position: relative;
+  z-index: 1000; // Above collapse button
+
+
+  &:has(>input:focus-visible) {
+    > .search-icon > mat-icon {
+      text-shadow: 0 0 4px var(--on-primary);
+    }
+
+    > input::placeholder {
+      opacity: 0;
+    }
+  }
+
+  .text-container {
+    flex: 1;
+    position: relative;
+
+    input {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: light-dark(var(--on-primary), var(--on-primary-container));
+      font: var(--mat-sys-body-large);
+      vertical-align: sub;
+      padding: 0;
+
+
+      &::placeholder {
+        color: light-dark(var(--on-primary), var(--on-primary-container));
+        opacity: 0.8;
+      }
+
+      &:focus-visible {
+        border: none;
+        outline: none;
+      }
+    }
+
+    .suggest-preview {
+      position: absolute;
+      font: var(--mat-sys-body-large);
+      vertical-align: sub;
+      opacity: 0.5;
+    }
+
+  }
+
+  mat-icon {
+    color: light-dark(var(--on-primary), var(--on-primary-container));
+  }
+
+}
+
+.suggestions {
+  display: flex;
+  position: absolute;
+  top: 100%;
+  flex-direction: column;
+  width: 100%;
+  z-index: 1000;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(5px);
+  color: var(--on-surface);
+  border-bottom: 4px solid var(--primary);
+  overflow: clip;
+  box-sizing: border-box;
+  padding: 5px 33px;
+
+
+  .suggest-line {
+    padding: 2px 10px;
+    border-radius: 50px;
+    //transition: all 200ms ease;
+    &:hover,
+    &:focus-visible,
+    &.focused {
+      background: var(--primary);
+      color: var(--on-primary);
+      outline: none;
+    }
+  }
+}
+
+:host {
+  .scroller {
+    width: 100%;
+
+    ::ng-deep > .cdk-virtual-scroll-content-wrapper {
+      width: 100%;
+    }
+  }
+}
+
+.scope-container {
+  display: flex;
+  font: var(--mat-sys-label-medium);
+  gap: 4px;
+
+  > .scope {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-variant);
+    color: var(--outline);
+    padding: 8px;
+    cursor: pointer;
+
+    &.selected {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+  }
+}
+
+.count {
+  padding: 0 4.5px;
+  border-radius: 100px;
+  color: var(--surface-variant);
+  background: var(--outline);
+  font: var(--mat-sys-label-medium);
+
+
+  &.active {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+}
+
+.facets {
+  columns: 2;
+  column-gap: 4px;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  padding: 8px 0;
+
+  .facet {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    box-sizing: border-box;
+    color: var(--outline);
+    cursor: pointer;
+
+
+    &.active {
+      color: var(--on-primary-container);
+    }
+
+    @include mat.checkbox-overrides((
+      state-layer-size: 12px,
+      //label-text-color: currentColor,
+      touch-target-display: none,
+      label-text-line-height: var(--mat-sys-label-medium-line-height),
+      label-text-size: var(--mat-sys-label-medium-size),
+      label-text-weight: var(--mat-sys-label-medium-weight),
+    ));
+
+    ::ng-deep {
+      .mdc-checkbox {
+        --mdc-checkbox-size: 12px;
+        flex: 0 0 var(--mdc-checkbox-size);
+        width: var(--mdc-checkbox-size, 18px);
+        height: var(--mdc-checkbox-size, 18px);
+        padding: calc((var(--mdc-checkbox-state-layer-size, 40px) - var(--mdc-checkbox-size, 18px)) / 2);
+      }
+
+      .mdc-checkbox__background {
+        width: var(--mdc-checkbox-size, 18px);
+        height: var(--mdc-checkbox-size, 18px);
+        top: calc((var(--mdc-checkbox-state-layer-size, 40px) - var(--mdc-checkbox-size, 18px)) / 2);
+        left: calc((var(--mdc-checkbox-state-layer-size, 40px) - var(--mdc-checkbox-size, 18px)) / 2);
+      }
+    }
+  }
+}
+
+.result-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  padding: 0 2px 0 4px;
+  margin: 0 4px;
+  border-radius: 18px;
+  width: calc(100% - 8px);
+  box-sizing: border-box;
+  gap: 4px;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface2);
+    color: var(--on-surface);
+  }
+
+  &.selected {
+    background: var(--primary);
+    color: var(--on-primary);
+    .mat-icon {
+      color: var(--on-surface);
+      filter: invert(1) hue-rotate(180deg);
+    }
+  }
+
+  > mat-icon {
+    flex: 0 0 auto
+  }
+
+  > span {
+    display: flex;
+    flex: 1 1 auto;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .right {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    .flag-button {
+      @include flag-button.configure-flag-button(20px, 24px, 0.75);
+      height: 20px;
+    }
+
+    .icon-button {
+      --size: 16px;
+
+      &.primary {
+        background: var(--primary);
+        color: var(--on-primary);
+      }
+
+      @include mat.icon-button-overrides((
+        state-layer-size: 20px,
+        touch-target-display: none,
+        icon-size: var(--size)
+      ));
+
+      mat-icon {
+        width: var(--size);
+        height: var(--size);
+        font-size: var(--size);
+        line-height: var(--size);
+      }
+    }
+
+  }
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+
+  .collapsable {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 0;
+    border-bottom: 4px solid var(--primary);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+}
+
+.collapse-button {
+  position: absolute;
+  bottom: 4px;
+  left: calc(50% - 13px);
+  right: calc(50% - 13px);
+  height: 13px;
+  z-index: 99;
+  cursor: pointer;
+
+  > svg {
+    position: absolute;
+    inset: 0;
+  }
+
+  > mat-icon {
+    position: absolute;
+    color: var(--on-primary);
+    width: 10px;
+    height: 10px;
+    bottom: -2px;
+    left: 8px;
+    font-size: 10px;
+    line-height: 10px;
+    transform: rotate(270deg);
+  }
+}
+
+.results-content {
+  display: flex;
+  flex-direction: row;
+
+  > .result-pathways {
+    min-width: 50%;
+    overflow: auto;
+    width: 50%;
+  }
+}
+
+
+.ehld {
+  color: var(--primary);
+}
+
+.result-pathways {
+  --sticky-offset-top: 20px;
+  --scroll-margin-top: 5px;
+  .header {
+    position: sticky;
+    top: 0;
+    display: block;
+    background: var(--surface);
+    z-index: 100;
+  }
+}
+
+.no-result-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

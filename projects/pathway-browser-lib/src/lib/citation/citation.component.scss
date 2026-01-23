@@ -1,0 +1,44 @@
+@use '@angular/material' as mat;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  background: var(--primary-container);;
+
+  .close-button {
+    margin-right: 15px;
+    color: var(--primary);
+
+    @include mat.icon-button-overrides((
+      focus-state-layer-opacity: 0
+    ));
+  }
+}
+
+.dialog-container {
+  @include mat.dialog-overrides((
+    subhead-color: var(--primary),
+  ));
+
+  .mat-mdc-dialog-actions {
+    gap: 20px
+  }
+}
+
+.text-align {
+  text-align: justify;
+}
+
+.save {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 15px;
+  gap: 8px;
+
+  .save-button {
+    height: 30px;
+    margin-top: 5px;
+  }
+}

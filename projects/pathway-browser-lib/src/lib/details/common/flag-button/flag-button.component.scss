@@ -1,0 +1,29 @@
+@use "@angular/material" as mat;
+
+:host ::ng-deep .flag-button .mat-mdc-button-touch-target{
+  width: var(--touch-size, 48px);
+  height: var(--touch-size, 48px);
+}
+
+.flag-button {
+  background: var(--on-tertiary);
+  color: var(--tertiary);
+  border: 1px solid var(--tertiary);
+
+  @include mat.icon-button-overrides((
+    state-layer-size: var(--size, 40px),
+    icon-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6)),
+  ));
+
+  .mat-icon {
+    width: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    height: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+    font-size: calc(var(--size, 40px) * var(--icon-ratio, 0.6));
+  }
+
+  &.flagged {
+    background: var(--tertiary);
+    color: var(--on-tertiary);
+    border: 1px solid var(--on-tertiary);
+  }
+}

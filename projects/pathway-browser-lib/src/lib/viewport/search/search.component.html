@@ -1,0 +1,130 @@
+<div class="input" [class.collapsed]=""
+     (focusin)="focusIn($event, query)"
+     (focusout)="focusOut($event)"
+     (keydown.arrowDown)="nextSuggest($event)"
+     (keydown.arrowUp)="previousSuggest($event)"
+     (keydown.enter)="search(currentSuggest())" #inputBox>
+  <button mat-icon-button class="search-icon" (click)="search()">
+    <mat-icon fontSet="symbols">search</mat-icon>
+  </button>
+  <div class="text-container">
+    @if (currentSuggest() && hasFocus()) {
+      <div class="suggest-preview">{{ currentSuggest() }}</div>
+    }
+    <input type="text" placeholder="Search protein, gene, pathway, reaction" [(ngModel)]="searchText" #query
+           (keydown)="hasFocus.set(true)">
+  </div>
+  @if (scopes[currentScopeName()].found() || searchedNoResult()) {
+    <button mat-icon-button (click)="clear($event)">
+      <mat-icon fontSet="symbols">close</mat-icon>
+    </button>
+  }
+
+  @if (hasFocus() && suggestionResults().length >= 1) {
+    <div class="suggestions" @suggest>
+      @for (suggest of suggestionResults(); track suggest; let i = $index) {
+        <div class="suggest-line" tabindex="0" [class.focused]="i === suggestionIndex()"
+             (click)="search(suggest, $event)">
+          {{ suggest }}
+        </div>
+      }
+    </div>
+  }
+</div>
+
+
+@if (scopes.global.found() || searchedNoResult()) {
+  <div class="results" @results>
+    @if (collapsed() !== 'collapsed') {
+      <div class="collapsable" @collapsable>
+        <div class="scope-container">
+          @if (scopes.global.found() > 0 || searchedNoResult()) {
+          @if (state.pathwayId() && scopes.local.found()) {
+            <div class="scope" [class.selected]="currentScopeName() === 'local'"
+                 (click)="currentScopeName.set('local')">
+              <mat-icon svgIcon="local-scope"/>
+              <span>Current pathway</span>
+              <span class="count" [class.active]="currentScopeName() === 'local'">{{ scopes.local.found() }}</span>
+            </div>
+          }
+          <div class="scope" [class.selected]="currentScopeName() === 'global'"
+               (click)="currentScopeName.set('global')">
+            <mat-icon svgIcon="global-scope"/>
+            <span>All pathways</span>
+            <span class="count" [class.active]="currentScopeName() === 'global'">{{ scopes.global.found() }}</span>
+          </div>
+          }
+        </div>
+
+        @if (currentScope().facets().length > 0) {
+          <div class="facets">
+            @for (facet of currentScope().facets(); track facet.name) {
+              <div class="facet" [class.active]="check.checked" (click)="check.toggle()">
+                <mat-checkbox [value]="facet.name" #check (click)="$event.stopPropagation()"
+                              [checked]="typeFilter().includes(facet.name)"
+                              (change)="toggleTypeFacet(facet.name)">{{ facet.name }}
+                </mat-checkbox>
+                <span class="count" [class.active]="check.checked">{{ facet.count }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (searchedNoResult()) {
+          <div class="no-result-message">
+            <mat-icon class="no-results-icon">search_off</mat-icon>
+            <p>{{ searchErrorMessage() }}</p>
+          </div>
+        }
+
+        <div class="results-content">
+          <cdk-virtual-scroll-viewport [style.height.px]="resultHeight()" #resultScroll class="scroller"
+                                       [itemSize]="entryHeight()"
+                                       [maxBufferPx]="entryHeight() * 10"
+                                       [minBufferPx]="entryHeight() * 5">
+            <div *cdkVirtualFor="let entry of currentScope(); trackBy trackEntry; let i = index"
+                 [style.height.px]="entryHeight()" (click)="toggleSelection(entry)"
+                 [class.selected]="selectedResult()?.dbId === entry?.dbId"
+                 class="result-row">
+              @if (entry) {
+                @let iconDetails = icons.getIconDetails(entry.exactType);
+                <mat-icon class="symbol-icon" [class.ehld]="entry.hasEHLD" [matTooltip]="iconDetails.tooltip"
+                          [svgIcon]="iconDetails.name"></mat-icon>
+
+                <span>{{ entry.name }}</span>
+
+                <div class="right">
+                  <cr-flag-button [id]="entry.stId" class="flag-button" (click)="$event.stopPropagation()"></cr-flag-button>
+                </div>
+              } @else {
+                <mat-progress-spinner [diameter]="entryHeight()" mode="indeterminate">Loading ...</mat-progress-spinner>
+              }
+            </div>
+          </cdk-virtual-scroll-viewport>
+
+          @if (selectedResultPathwaysStable().length > 1) {
+            <shadow-scroll class="result-pathways" @result-pathways [height]="resultPathwaysHeight()" #resultPathways>
+              <span class="header">Available in:</span>
+              @for (pathway of selectedResultPathwaysStable(); track pathway.dbId) {
+                <div class="result-row" [matTooltip]="'Select ' + selectedResult()?.stId +' in '+ pathway.name"
+                     (click)="selectAndSetPathway(pathway.stId)" [class.selected]="pathway.stId === state.pathwayId()"
+                     matTooltipPosition="after">
+                  <mat-icon class='custom-icon' [class.ehld]="pathway.hasEHLD" svgIcon="pathway"></mat-icon>
+                  <span>{{ pathway.name }}</span>
+                </div>
+              }
+            </shadow-scroll>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="collapse-button" [@collapse-button]="collapsed()" (click)="toggleCollapse()"
+         [matTooltip]="collapsed() !== 'collapsed' ? 'Collapsed search results ': 'Open search results'">
+      <svg width="26px" height="13px" viewBox="0 0 1 1" preserveAspectRatio="none">
+        <path d="M 0 1 L 0.5 0 L 1 1Z" fill="var(--primary)"/>
+      </svg>
+      <mat-icon svgIcon="double-arrow-right"></mat-icon>
+    </div>
+  </div>
+}

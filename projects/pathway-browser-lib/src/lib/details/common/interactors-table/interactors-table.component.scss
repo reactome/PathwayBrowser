@@ -1,0 +1,180 @@
+@use '@angular/material' as mat;
+
+:host {
+  width: 100%;
+}
+
+.table-container {
+  @include mat.button-overrides((
+    text-label-text-color: var(--on-tertiary),
+  ));
+}
+
+
+.header-row {
+  margin-bottom: 8px;
+  box-shadow: 0px 3px 3px -3px var(--on-surface);
+  position: sticky;
+  top: 0;
+}
+
+.element-row, .header-row {
+  min-height: 24px !important;
+  gap: var(--gap);
+  align-content: center;
+}
+
+
+// Font weight for gene name
+.element-row .mat-column-geneName {
+  font-weight: 599;
+  font-size: 12px;
+}
+
+.mat-mdc-cell {
+  height: 20px !important;
+  min-height: 20px !important;
+  align-self: center;
+}
+
+// Remove the default border and use box-shadow
+.mat-mdc-header-cell,
+.mat-mdc-cell,
+.mat-mdc-cell > *,
+.mat-mdc-cell a {
+  border-bottom-style: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.mat-column-geneName {
+  display: flex;
+  justify-content: flex-end;
+  overflow: visible;
+  background: none;
+  position: relative;
+
+  // Divider
+  &::after {
+    content: "";
+    position: absolute;
+    right: -11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--outline-variant);
+  }
+}
+
+
+.mat-column-speciesName,
+.mat-column-score,
+.mat-column-entitiesCount {
+  justify-content: flex-end;
+}
+
+.mat-column-geneName,
+.mat-column-identifier,
+.mat-column-speciesName,
+.mat-column-entitiesCount {
+  max-width: var(--column-width);
+  flex: 0 0 calc(var(--column-width));
+  padding: 0 0 !important;
+
+}
+
+.mat-column-evidenceCount,
+.mat-column-score {
+  max-width: calc(var(--column-width) / 2 - var(--half-gap));
+  flex: 0 0 calc(var(--column-width) / 2 - var(--half-gap));
+  padding: 0 0 !important;
+  min-width: fit-content;
+}
+
+.mat-row {
+  gap: var(--gap)
+}
+
+
+// Score ellipse
+.score {
+  --diameter: 16px;
+  --padding: 4px;
+  width: calc(var(--diameter) - 2 * var(--padding));
+  height: var(--diameter);
+  max-height: var(--diameter);
+  border-radius: var(--diameter);
+  padding: 0 var(--padding);
+  background: var(--interactor-fill);
+  flex-shrink: 0;
+  margin: 0 var(--padding);
+}
+
+// Hover background
+.element-row:hover {
+  background: var(--surface2);
+  border-radius: 50px;
+
+  *:not(.score, .entity-button, .evidence-button, .search-icon, .intact-icon) {
+    background: none;
+  }
+}
+
+
+// Buttons
+a.disabled {
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+a {
+  text-decoration: none;
+}
+
+.evidence-button,
+.entity-button {
+  border-radius: 50px;
+  background: var(--outline);
+  height: 20px;
+}
+
+
+.entity-button:hover {
+  background: var(--primary);
+
+  // Fill the icon color when hovering
+  .search-icon {
+    color: var(--primary);
+  }
+
+}
+
+.evidence-button:hover {
+  background: var(--interactor-fill);
+
+  .intact-icon {
+    color: var(--interactor-fill);
+  }
+}
+
+.search-icon,
+.intact-icon {
+  height: 16px;
+  width: 16px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--on-tertiary);
+  border-radius: 50px;
+  color: var(--outline);
+}
+
+.search-icon {
+  margin-right: -14px !important; // Overwrite default margin-right
+}
+
+.intact-icon {
+  margin-left: -14px;
+  flex-shrink: 0;
+}

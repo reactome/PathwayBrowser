@@ -1,0 +1,221 @@
+@use "@angular/material" as mat;
+
+.variables {
+  position: relative;
+  height: 100%;
+}
+
+
+#cytoscape {
+  position: absolute;
+  inset: 0 0 0 0;
+  background: var(--surface);
+}
+
+#ehld {
+  position: absolute;
+  inset: 0 0 0 0;
+  background: var(--surface);
+}
+
+.thumbnail {
+  margin-bottom: 10px;
+
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(5px);
+  border-left: 1px solid var(--outline-variant);
+  border-top: 1px solid var(--outline-variant);
+  border-bottom: 1px solid var(--outline-variant);
+  z-index: 1;
+  padding: 5px;
+  border-radius: 5px 0 0 5px;
+  height: 70px;
+
+  img {
+    max-height: 70px;
+  }
+
+  svg.overlay {
+    position: absolute;
+    inset: 5px;
+    height: calc(100% - 2 * 5px);
+    width: calc(100% - 2 * 5px);
+  }
+}
+
+
+#legend-boundary {
+  --legend-width: 400px;
+  --border-width: 2px;
+  --handle-width: 20px;
+
+  position: absolute;
+  pointer-events: none;
+  right: calc(-1 * var(--legend-width) - var(--border-width));
+  height: 100%;
+  width: calc(2 * var(--legend-width) + var(--handle-width));
+
+  #legend-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    left: calc(var(--legend-width) - var(--border-width));
+    pointer-events: all;
+    height: 100%;
+    &.animated-legend {
+      transition: 0.5s ease-out;
+    }
+  }
+  .legend-handlers-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    align-items: flex-end;
+    width: var(--handle-width);
+  }
+
+  .legend-handlers {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    align-content: flex-end;
+    align-items: flex-end;
+    width: var(--handle-width);
+
+    #legend-handle {
+      width: var(--handle-width);
+      text-orientation: upright;
+      writing-mode: vertical-lr;
+
+      border-radius: 8.5px 0 0 8.5px;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      backdrop-filter: blur(5px);
+      border-left: var(--border-width) solid var(--primary);
+      border-top: var(--border-width) solid var(--primary);
+      border-bottom: var(--border-width) solid var(--primary);
+      border-right: 0;
+      cursor: ew-resize;
+      color: var(--on-surface);
+    }
+
+    .analysis-legend {
+      //position: absolute;
+      right: 1px;
+      height: var(--handle-height);
+      bottom: 0;
+      flex: 0.5;
+    }
+  }
+
+
+  #legend {
+    width: var(--legend-width);
+    height: 100%;
+    //border-left: var(--border-width) solid var(--primary);
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: blur(5px);
+    z-index: 2;
+
+    &:before {
+      content: "";
+      height: 100%;
+      width: 2px;
+      background-color: var(--primary);
+      position: absolute;
+      left: -1px;
+      z-index: 4;
+    }
+  }
+}
+
+.drag-container {
+  position: absolute;
+  left: 10%; // Important: Initial position of compare drag handle
+  width: 100%;
+  pointer-events: all;
+  //position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#handle-limits {
+  --width: 500px;
+  --height: 500px;
+  position: absolute;
+  left: calc(-1 / 2 * var(--width));
+  top: calc(50% - 1 / 2 * var(--height));
+  width: var(--width);
+  height: var(--height);
+  //background:#000000aa;
+  z-index: 5;
+  pointer-events: none;
+
+  &.active {
+    pointer-events: all;
+    cursor: ew-resize;
+  }
+}
+
+.drag-handle {
+  --width: 4px;
+  --height: 30px;
+
+  position: absolute;
+  left: calc(50% - 1 / 2 * var(--width) - 4px);
+  top: calc(50% - 1 / 2 * var(--height) - 4px);
+
+  border-radius: var(--height);
+  width: var(--width);
+  height: var(--height);
+  border: 4px solid var(--primary);
+  cursor: ew-resize;
+  color: var(--on-surface);
+  pointer-events: all;
+  filter: drop-shadow(-2px 0px 0px var(--primary-container)) drop-shadow(2px 0px 0px var(--error-container));
+  background: var(--surface);
+
+}
+
+
+#cytoscape-compare {
+  box-sizing: border-box;
+  position: absolute;
+  //border-left: 4px solid var(--error);
+  height: 100%;
+  width: 100%;
+  inset: 0 0 0 0;
+  background-color: color-mix(in srgb, var(--error) 5%, color-mix(in srgb, var(--surface) 50%, transparent));
+
+  &:before {
+    content: "";
+    height: 100%;
+    width: 4px;
+    background-color: var(--primary);
+    filter: drop-shadow(-2px 0px 0px var(--primary-container)) drop-shadow(2px 0px 0px var(--error-container));
+    position: absolute;
+    left: -2px;
+    z-index: 4;
+  }
+}
+
+.floating {
+  position: absolute;
+  right: 0;
+
+  &.center {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.pointer {
+  cursor: pointer;
+}

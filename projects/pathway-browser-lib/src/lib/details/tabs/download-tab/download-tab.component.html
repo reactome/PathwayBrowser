@@ -1,0 +1,112 @@
+<div class="download-container">
+
+  @if (!hasDownload()) {
+    <div>
+      <h3> 📥 Download</h3>
+      <p>When a pathway is displayed in the panel above,
+        download buttons are available for exporting the diagram in various formats for reuse or reference.
+        Supported formats include <b>PDF</b>, <b>SBML</b>, <b>SBGN</b>, <b>BioPAX 2</b>, <b>BioPAX 3</b>.
+        A link to the <b>Newt Editor</b> is also provided, allowing you to edit the pathway diagram interactively.
+      </p>
+      <p>After performing an analysis, you can also download a corresponding <b>analysis report</b>.</p>
+    </div>
+  }
+
+  @if (finalPathwayName()) {
+    <div class="header ">
+      <span>Downloads of "{{ finalPathwayName() }}"</span>
+    </div>
+  }
+
+
+  <!--pathway diagram-->
+  @if (pathwayId()) {
+    <h3 class="category">Pathway Diagram</h3>
+    <div class="container diagram">
+      @if (hasEHLD() && analysis.samples().length > 1) {
+        <cr-download-button (click)="onEHLDAnimatedDownload()" label="Animated SVG"
+                            [icon]="{id:'slow_motion_video'}"/>
+      }
+      @for (item of diagramItems(); track item) {
+        <cr-download-button
+          [url]="item.url?.()"
+          [label]="item.format.toUpperCase()"
+          [icon]="item.icon"
+          [download]="item.download"
+          (click)="item.method?.()">
+        </cr-download-button>
+      }
+    </div>
+  }
+
+  <!-- reacfoam -->
+  @if (!hasDetail() || (!hasDetail() && hasResult())) {
+    <h3 class="category">Reacfoam - Voronoi Treemap</h3>
+    <div class="container reacfoam">
+      @if (analysis.samples().length > 1) {
+        <cr-download-button (click)="onReacfoamAnimatedDownload()" label="Animated SVG"
+                            [icon]="{id:'slow_motion_video'}"/>
+      }
+
+      @for (format of reacfoamFormats; track format) {
+        <cr-download-button (click)="onReacfoamDownload(format)"
+                            [label]="format.toUpperCase()"
+                            [icon]="{id:'image'}"/>
+      }
+    </div>
+  }
+
+
+  <!--pathway format-->
+  @if (finalEventId()) {
+    <h3 class="category">Pathway Format</h3>
+    <div class="container pathway">
+      @for (item of pathwayItems; track item) {
+        <cr-download-button [url]="item.url()"
+                            [download]="item.fileName ? item.fileName(): true"
+                            [label]="item.name"
+                            [icon]="item.icon"
+        >
+        </cr-download-button>
+      }
+    </div>
+  }
+
+  <!--Analysis-->
+  @if (hasResult()) {
+    <h3 class="category">Analysis Results</h3>
+    <div class="container analysis">
+
+      <!--GSA analysis-->
+      @if (gsaReports()) {
+        @for (report of gsaReports(); track report.name) {
+          <cr-download-button [url]="report.url"
+                              [download]="true"
+                              [icon]="getGsaIcon(report.name)"
+                              [label]="getGsaLabel(report.name)">
+          </cr-download-button>
+        }
+      }
+
+      @for (item of analysisItems; track item) {
+        @if (item.isShown()) {
+          <cr-download-button [url]="item.url()"
+                              [matTooltip]="item.description"
+                              [download]="true"
+                              [icon]="item.icon"
+                              [label]="item.title">
+          </cr-download-button>
+        }
+      }
+    </div>
+  }
+
+  <div class="analysis container">
+    @if (hasGSAReports() && !gsaReports()) {
+      <div class="spinner-container">
+        <mat-spinner/>
+        <p>Loading GSA analysis results, please wait...</p>
+      </div>
+    }
+  </div>
+</div>

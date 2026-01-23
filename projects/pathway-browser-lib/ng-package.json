@@ -1,0 +1,35 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../dist/pathway-browser-lib",
+  "lib": {
+    "entryFile": "src/public-api.ts"
+  },
+  "assets": [
+    "src/assets"
+  ],
+  "allowedNonPeerDependencies": [
+    "@carrotsearch/foamtree",
+    "@hakimio/ngx-google-analytics",
+    "@lottiefiles/dotlottie-web",
+    "@ngneat/until-destroy",
+    "@swissprot/rhea-reaction-viz-test",
+    "angular-split",
+    "canvas-to-svg",
+    "chroma-js",
+    "cytoscape",
+    "cytoscape-fcose",
+    "cytoscape-layers",
+    "immer",
+    "ng-table-virtual-scroll",
+    "ngrx-wieder",
+    "ngx-custom-material-file-input",
+    "ngx-reactome-style",
+    "ngx-ui-tour-md-menu",
+    "reactome-cytoscape-style",
+    "reactome-gsa-form",
+    "reactome-table",
+    "svg-pan-zoom",
+    "svgcanvas",
+    "vectorious"
+  ]
+}

@@ -1,0 +1,58 @@
+<div class="container">
+  <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="qualitative | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Qualitative</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
+        </div>
+      </ng-template>
+      <cr-qualitative-analysis (close)="close.emit($event)" [status]="status()"/>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="quantitative | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Quantitative</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
+        </div>
+      </ng-template>
+      <cr-quantitative-analysis (close)="close.emit($event)" [status]="status()"/>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="species | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Species</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
+        </div>
+      </ng-template>
+      <cr-species-analysis (close)="close.emit($event)" [status]="status()"/>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="analysis-type-header">
+          <div class="analysis-type-icon" [innerHTML]="tissue | async | safe: 'html' : true">
+          </div>
+          <div class="analysis-type-label">
+            <u>Tissue</u>
+            <span class="normal">Pathway Enrichment</span>
+          </div>
+        </div>
+      </ng-template>
+      <cr-tissue-analysis (close)="close.emit($event)" [status]="status()"/>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+

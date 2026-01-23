@@ -1,0 +1,113 @@
+<div class="header">
+  <span class="title">Tissue expression overview</span>
+
+  <div class="description">
+    <div>
+      The tissue expression overview displays baseline expression levels of pathway-related proteins across a range of
+      healthy human tissues, based on data from the Human Protein Atlas (HPA).
+    </div>
+    <div>
+      This view helps you interpret your results by showing where the proteins involved in enriched or regulated
+      pathways are normally expressed. It answers the question: "In which tissues is this pathway typically active under
+      normal conditions?", offering valuable biological context to support your analysis.
+    </div>
+  </div>
+</div>
+
+<mat-stepper linear class="stepper">
+  <mat-step [stepControl]="selectTissuesControl" label="Data">
+    @if (tissue.summaries.isLoading()) {
+      <mat-progress-spinner mode="indeterminate">Loading experiments</mat-progress-spinner>
+    } @else {
+      <div class="experiment" [class.one-experiment]="summaries().length === 1">
+        <div class="experiment-selector-wrapper">
+          <mat-form-field class="experiment-selector" subscriptSizing="dynamic">
+            <mat-label>Experience</mat-label>
+            <mat-select [(value)]="experiment">
+              @for (summary of summaries(); track summary.id) {
+                <mat-option [value]="summary" [matTooltip]="tooltip(summary)">{{ summary.name }}- {{ summary.resource }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="headers">
+          <div class="header">Available Tissues</div>
+          <div class="placeholder"></div>
+          <div class="header">Selected Tissues</div>
+        </div>
+
+
+        @if (experiment()) {
+          @let available = availableTissues();
+          @let selected = selectedTissues();
+
+          <div class="tissue-selector-wrapper" [@.disabled]="!animate()">
+            <div class="tissue-columns">
+              <div cdkDropList #availableList="cdkDropList"
+                   [cdkDropListData]="available"
+                   [cdkDropListConnectedTo]="[selectedList]"
+                   class="tissue-list"
+                   (cdkDropListDropped)="drop($event)">
+                @for (tissue of available; track tissue) {
+                  <div class="tissue-box" cdkDrag @left-column (click)="moveRight(tissue)">{{ tissue }}</div>
+                }
+              </div>
+
+              <div class="controls">
+                <button mat-icon-button (click)="addAll()" [disabled]="available.length === 0 || interval() !== undefined" matTooltip="Select all">
+                  <mat-icon>fast_forward</mat-icon>
+                </button>
+                <button mat-icon-button (click)="removeAll()" [disabled]="selected.length === 0 || interval() !== undefined" matTooltip="Unselect all">
+                  <mat-icon>fast_rewind</mat-icon>
+                  <span></span>
+                </button>
+              </div>
+
+              <div cdkDropList #selectedList="cdkDropList"
+                   [cdkDropListData]="selected"
+                   [cdkDropListConnectedTo]="[availableList]"
+                   class="tissue-list"
+                   (cdkDropListDropped)="drop($event)" >
+                @for (tissue of selected; track tissue) {
+                  <div class="tissue-box" cdkDrag @right-column (click)="moveLeft(tissue)">{{ tissue }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="stepper-controls">
+        <button mat-stroked-button matStepperPrevious disabled>Previous</button>
+        <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+          <mat-icon class="red">close</mat-icon>
+          Close
+        </button>
+        <button mat-flat-button matStepperNext [disabled]="selectedTissues().length === 0" (click)="analyse()">Next</button>
+      </div>
+    }
+  </mat-step>
+  <mat-step label="Analysis">
+
+      <div class="loader-container" >
+        @if (analysisLaunched()) {
+          <canvas #lottie class="loader"></canvas>
+        }
+      </div>
+
+      <div class="stepper-controls">
+        <button mat-stroked-button matStepperPrevious>Previous</button>
+        <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+          <mat-icon class="red">close</mat-icon>
+          Close
+        </button>
+        <button mat-flat-button (click)="loadAnalysis()" [disabled]="!analysisAvailable()">See results</button>
+      </div>
+
+  </mat-step>
+</mat-stepper>
+
+
+

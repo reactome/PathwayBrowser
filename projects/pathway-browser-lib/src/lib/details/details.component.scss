@@ -1,0 +1,71 @@
+@use "@angular/material" as mat;
+
+#details-container {
+  color: var(--on-surface);
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+  font-family: 'Roboto', sans-serif;
+  --bottom-panel-tabs-header-height: 31px;
+
+  // Make the expression(gxa widget) tooltip visible when hovering
+  position: relative;
+  z-index: 0;
+}
+
+.custom-tab-group {
+  height: 100%;
+}
+
+/* Tab Label Contents */
+.label-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 4px 0;
+  gap: 8px;
+
+
+  .tab-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .label-text {
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.1px;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+}
+
+:host ::ng-deep .mat-mdc-tab-header {
+  padding: 0 20px;
+}
+
+
+.tab-description-container {
+  padding: 0 20px;
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100cqw;
+  height: calc(100cqh - var(--bottom-panel-tabs-header-height));
+  container: spinner / size;
+  justify-content: center;
+
+  mat-spinner {
+    --size: min(50cqh, 50cqw);
+    width: var(--size) !important;
+    height: var(--size) !important;
+  }
+}

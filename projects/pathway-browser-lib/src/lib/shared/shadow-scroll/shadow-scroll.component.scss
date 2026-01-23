@@ -1,0 +1,51 @@
+:host {
+  position: relative;
+}
+
+.shadow-scroll {
+  overflow: auto;
+  ::ng-deep * {
+    scroll-margin-top: calc(var(--sticky-offset-top) + var(--scroll-margin-top, 0));
+    scroll-margin-left: calc(var(--sticky-offset-left) + var(--scroll-margin-left, 0));
+  }
+}
+
+.shadow {
+  position: absolute;
+  z-index: 8;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease-in-out;
+  &.visible {
+    opacity: 1;
+  }
+  &.left, &.right {
+    width: 10px;
+    top: 0;
+    bottom: var(--sticky-offset-bottom, 0);
+  }
+
+  &.top, &.bottom {
+    height: 10px;
+    left: 0;
+    right: var(--sticky-offset-right, 0);
+  }
+
+  &.right {
+    right: var(--sticky-offset-right, 0);
+    background: linear-gradient(to left, var(--surface) 0%, transparent 100%);
+  }
+  &.left {
+    left: var(--sticky-offset-left, 0);
+    background: linear-gradient(to right, var(--surface) 0%, transparent 100%);
+  }
+  &.bottom {
+    bottom: var(--sticky-offset-bottom, 0);
+    background: linear-gradient(to top, var(--surface) 0%, transparent 100%);
+  }
+  &.top {
+    top: var(--sticky-offset-top, 0);
+    background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+  }
+
+}

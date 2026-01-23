@@ -1,0 +1,436 @@
+@use "@angular/material" as mat;
+
+#container {
+  position: absolute;
+  inset: 0 0 0 0;
+  height: 100%;
+
+  --top-bar-height: 60px;
+}
+
+.left-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.search {
+  flex: 0 0 auto;
+}
+
+
+//.sidebar {
+//  height: 90%;
+//  overflow: hidden;
+//}
+.primary {
+  color: var(--primary);
+}
+
+.error {
+  color: var(--error);
+}
+
+.on-primary {
+  color: var(--on-primary);
+}
+
+.right-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  height: var(--top-bar-height);
+  background: light-dark(var(--primary), var(--primary-container));
+  color: light-dark(var(--on-primary), var(--on-primary-container));
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 20px;
+
+  button,.mat-mdc-outlined-button {
+    background: var(--surface);
+  }
+
+  .top-left {
+    flex: 0;
+    display: flex;
+    gap: 20px;
+  }
+
+  .title {
+    padding: 0 20px;
+    font: var(--mat-sys-headline-small);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 0;
+    flex: 1;
+    text-align: center;
+  }
+
+  .top-right {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    font: var(--mat-sys-label-large);
+    flex: 0;
+
+    .logo {
+      display: flex;
+      //height: 100%;
+      width: fit-content;
+
+      mat-icon {
+        height: 44px;
+        margin-left: -6px;
+        color: light-dark(var(--on-primary), var(--primary));
+        width: max-content;
+      }
+
+      .version {
+        vertical-align: top;
+        text-decoration: underline;
+      }
+    }
+
+    .quote {
+      background: var(--surface);
+      @include mat.icon-button-overrides((
+        icon-color: var(--primary),
+        state-layer-size: 36px,
+      ));
+
+    }
+
+    #dark-toggle {
+      transform: rotate(90deg);
+      margin-right: -12px;
+      margin-left: -12px;
+      margin-top: 4px;
+
+      ::ng-deep svg {
+        transform: rotate(-90deg);
+      }
+
+      @include mat.slide-toggle-overrides((
+        track-width: 38px,
+        track-height: 26px,
+        with-icon-handle-size: 18px,
+        pressed-handle-size: 18px,
+        selected-with-icon-handle-horizontal-margin: 0 16px,
+        selected-pressed-handle-horizontal-margin: 0 16px,
+        track-outline-color: var(--primary),
+        selected-track-outline-color: var(--primary-container),
+        selected-track-color: var(--surface),
+        selected-focus-track-color: var(--surface),
+        selected-hover-track-color: var(--surface),
+        selected-pressed-track-color: var(--surface),
+        unselected-track-color: var(--surface),
+        unselected-focus-track-color: var(--surface),
+        unselected-hover-track-color: var(--surface),
+        unselected-pressed-track-color: var(--surface),
+        selected-handle-color: var(--primary),
+        selected-focus-handle-color: var(--primary),
+        selected-hover-handle-color: var(--primary),
+        selected-pressed-handle-color: var(--primary),
+        unselected-handle-color: var(--primary),
+        unselected-focus-handle-color: var(--primary),
+        unselected-hover-handle-color: var(--primary),
+        unselected-pressed-handle-color: var(--primary),
+        selected-icon-color: var(--surface),
+        unselected-icon-color: var(--surface),
+      ));
+    }
+
+  }
+}
+
+.content {
+  flex: 1 1 auto;
+  max-height: calc(100% - var(--top-bar-height));
+}
+
+.spinner-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .mdc-circular-progress {
+    --diameter: min(33cqw, 33cqh);
+    width: var(--diameter) !important;
+    height: var(--diameter) !important;
+  }
+}
+
+#view {
+  container: view / size;
+}
+
+#bottom-panel {
+  container: bottom-panel / size;
+}
+
+.custom-gutter {
+  background: var(--primary);
+  width: 100%;
+  height: 100%;
+}
+
+.custom-left-gutter {
+  //This creates a linear gradient that transitions from --on-primary to the --primary color at the 60px mark from top to bottom.
+  background: linear-gradient(to bottom, var(--on-primary) var(--top-bar-height), var(--primary) var(--top-bar-height));
+  width: 100%;
+  height: 100%;
+}
+
+.species-interactor-container {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+  width: 100%;
+  //width: calc(100% - 2px); __<<ngThemingMigrationEscapedComment1>>__
+  gap: 2px;
+  height: 56px;
+
+  /* sticky div */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.species,
+.interactor {
+  width: 50%;
+  background: var(--surface-variant);
+  color: var(--on-surface-variant);
+  border-bottom: 1px solid var(--on-surface-variant);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.custom-icon {
+  height: 48px;
+  width: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.custom-icon::ng-deep svg * {
+  fill: var(--on-surface-variant);
+}
+
+.selected .custom-icon::ng-deep svg * {
+  fill: var(--primary);
+}
+
+.selected {
+  background: var(--surface5);
+  border-bottom: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.species-content,
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+  //width: 72px;
+  max-width: 80%;
+
+  span:first-child {
+    font-size: 10px;
+    height: 16px
+  }
+
+  span:last-child {
+    font-size: 14px;
+    height: 20px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    overflow: hidden;
+  }
+}
+
+.event-hierarchy {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#view {
+  position: relative;
+}
+
+
+.analysis-button-group {
+  --outline-width: 1px;
+  background: var(--outline);
+  border: var(--outline-width) solid var(--outline);
+  border-radius: 50px;
+  display: flex;
+  flex-direction: row;
+  gap: var(--outline-width);
+
+  button.loading {
+    padding-right: 12px !important;
+  }
+
+  .profile-controls {
+    display: flex;
+    gap: var(--outline-width);
+    flex-direction: column;
+    height: 100%;
+    align-items: flex-start;
+    width: 155px;
+
+
+    .label {
+      align-self: stretch;
+      flex: 0 1 auto;
+      background: var(--surface);
+      color: var(--on-surface);
+      font: var(--mat-sys-body-small);
+      line-height: var(--mat-sys-body-small-line-height);
+      height: calc(50% - 0.5px);
+      white-space: nowrap;
+      text-align: center;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding: 0 5px;
+      box-sizing: border-box;
+    }
+
+    .buttons {
+      display: flex;
+      gap: var(--outline-width);
+      width: 100%;
+      height: calc(50% - 0.5px);
+      box-sizing: border-box;
+
+      button {
+        min-height: 0;
+        width: 38px;
+        height: 100%;
+        justify-content: center;
+        padding: 0;
+      }
+    }
+  }
+
+  button {
+    background: var(--surface);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: none;
+    font: var(--mat-sys-label-large);
+    cursor: pointer;
+
+    &[disabled] {
+      pointer-events: none;
+      color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+    }
+
+    &:hover {
+      background: color-mix(in oklch, currentColor 5%, var(--surface)) !important;
+    }
+
+    mat-icon {
+      font-size: 1.125rem;
+      height: 1.125rem;
+      width: 1.125rem;
+    }
+  }
+
+  > button {
+    padding-right: 12px;
+
+    &:first-child {
+      border-top-left-radius: 50px;
+      border-bottom-left-radius: 50px;
+      padding-left: 18px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 50px;
+      border-bottom-right-radius: 50px;
+    }
+
+    &:only-child {
+      padding-left: 18px;
+      padding-right: 24px;
+    }
+  }
+}
+
+:host {
+  @include mat.slider-overrides((
+    value-indicator-height: 8px,
+  ));
+}
+
+
+.hide-overflow {
+  overflow: hidden !important;
+}
+
+.content {
+  --as-transition-duration: 1500s;
+}
+
+.dropdown {
+  position: absolute;
+  inset: 0 0 0 0;
+  background: var(--surface);
+  z-index: 999;
+  overflow: hidden;
+}
+
+.feedback {
+  color: var(--warn);
+  font-variation-settings: 'FILL' 1;
+  margin-left: -12px;
+
+  @include mat.button-overrides((
+    outlined-label-text-color: var(--warn),
+    outlined-outline-width: 0
+  ));
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.version-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.beta {
+  font: var(--mat-sys-label-small);
+  color: var(--warn);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0 5px 0 4px;
+  font-style: italic;
+}
+
+

@@ -1,0 +1,67 @@
+@use "@angular/material" as mat;
+
+:host {
+  width: 100%;
+}
+
+.refs-tree {
+
+  @include mat.tree-overrides((
+    node-min-height: 0
+  ));
+
+  .refs-tree-invisible {
+    display: none;
+  }
+
+  .custom-margin {
+    margin-bottom: 8px;
+  }
+
+  .mat-nested-tree-node {
+    &:last-child:not(:only-child) {
+      margin-bottom: 7px; // Compensate for section of citation button that gets eaten by forced parent height (20px instead of 27px)
+    }
+  }
+}
+
+.button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 4px 4px 5px;
+  width: 100%;
+  height: 24px;
+  border-radius: 50px;
+  margin-left: -6px;
+}
+
+.ref-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 12px;
+  height: 12px
+}
+
+.ref-column-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 4px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  gap: 5px
+}

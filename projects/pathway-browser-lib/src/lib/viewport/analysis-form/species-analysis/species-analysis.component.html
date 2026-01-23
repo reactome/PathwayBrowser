@@ -1,0 +1,82 @@
+<div class="header">
+  <span class="title">Species comparison analysis</span>
+
+  <div class="description">
+    <div>
+      Species comparison analysis helps identify conserved pathway patterns across species. It answers the question:
+      "Does this human pathway have an equivalent within my species of interest, based on their orthologous genes?"
+    </div>
+    <div>
+      You can select one species bellow, and Reactome will compare all its orthologous proteins and genes it knows to
+      the human pathways. Ultimately, this is a qualitative enrichment analysis on the proteome of a species, projected
+      onto human pathways.
+    </div>
+  </div>
+</div>
+
+<mat-stepper class="stepper">
+  <mat-step label="Data">
+    <div class="wrapper">
+      <div class="species-selector-grid">
+        <div class="center-grid species-button">
+          <span class="title">Comparing</span>
+          <div class="comparison-container">
+            <div class="comparison">
+              <div matTooltip="Homo sapiens" class="flex-column">
+                <mat-icon class="custom-icon" svgIcon="9606"></mat-icon>
+                <span class="species-name">H. sapiens</span>
+              </div>
+            </div>
+            @if (selectedSpecies(); as species) {
+              <span>with</span>
+              <div class="comparison" (click)="toggle(species)">
+                <div [matTooltip]="species.displayName" class="flex-column">
+                  <mat-icon class="custom-icon" [svgIcon]="species.taxId"></mat-icon>
+                  <span class="species-name">{{ species.shortName }}</span>
+                </div>
+              </div>
+            }
+          </div>
+          <span class="title"> </span>
+
+
+        </div>
+        @for (species of comparableSpecies(); track species.dbId) {
+          <div class="species-button" matRipple (click)="toggle(species)"
+               [matTooltip]="species.displayName"
+               [class.selected]="selectedSpecies() === species">
+            <mat-icon class="custom-icon" [svgIcon]="species.taxId"></mat-icon>
+            <span class="species-name">{{ species.shortName }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+
+    <div class="stepper-controls">
+      <button mat-stroked-button matStepperPrevious disabled>Previous</button>
+      <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+        <mat-icon class="red">close</mat-icon>
+        Close
+      </button>
+      <button mat-flat-button matStepperNext [disabled]="selectedSpecies() === null" (click)="analyse()">Next
+      </button>
+    </div>
+
+  </mat-step>
+  <mat-step label="Analysis">
+    <div class="loader-container">
+      @if (analysisLaunched()) {
+        <canvas #lottie class="loader"></canvas>
+      }
+    </div>
+    <div class="stepper-controls">
+      <button mat-stroked-button matStepperPrevious>Previous</button>
+      <button mat-stroked-button (click)="close.emit({status: 'premature'})">
+        <mat-icon class="red">close</mat-icon>
+        Close
+      </button>
+      <button mat-flat-button (click)="loadAnalysis()" [disabled]="!analysisAvailable()">See results</button>
+    </div>
+  </mat-step>
+</mat-stepper>

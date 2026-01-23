@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Animated SVG options</h2>
+<mat-dialog-content>
+  <form #form="ngForm">
+    <p>
+      <mat-slide-toggle [(ngModel)]="includeLegend" name="includeLegend">Include legend</mat-slide-toggle>
+    </p>
+    <p>
+      <mat-slide-toggle [(ngModel)]="includeTimeline" name="includeTimeline">Include timeline</mat-slide-toggle>
+    </p>
+    <p>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Time per sample</mat-label>
+        <input matInput type="number" min="0" [(ngModel)]="timePerFrame" name="timePerFrame">
+        <span matTextSuffix>s</span>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Time of transitions</mat-label>
+        <input matInput type="number" step="0.01"  min="0" [max]="timePerFrame() / 2" [(ngModel)]="transitionTime" name="transitionTime">
+        <span matTextSuffix>s</span>
+        @if (transitionTime() > timePerFrame() / 2) {
+          <mat-error>Transition time cannot be greater than half the time per frame</mat-error>
+        }
+      </mat-form-field>
+    </p>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+  <button mat-flat-button [mat-dialog-close]="options()" [disabled]="form.invalid">Download</button>
+</mat-dialog-actions>

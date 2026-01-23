@@ -1,0 +1,37 @@
+#species-container {
+  width: 100%;
+  background: var(--surface-variant);
+
+}
+
+.species {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px;
+  gap: 8px;
+  border-radius: 10px;
+  color: var(--on-surface-variant);
+}
+
+.selection-list {
+  padding: 10px;
+}
+
+mat-list-option{
+  padding: 2px;
+  border-radius: 10px;
+}
+
+mat-list-option[aria-selected="true"],
+mat-list-option[aria-selected="true"] .species,
+mat-list-option[aria-selected="true"] .species::ng-deep svg * {
+  background: var(--primary);
+  color: var(--on-primary);
+  fill: var(--on-primary);
+}
+
+.custom-icon {
+  height: 32px;
+  width: 32px;
+}

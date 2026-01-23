@@ -18,6 +18,9 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "paths": {
+      "pathway-browser-lib": [
+        "./dist/pathway-browser-lib"
+      ],
       "reactome-cytoscape-style": [
         "dist/reactome-cytoscape-style"
       ]

@@ -1,0 +1,13 @@
+<div id="species-container" class="variables">
+  <mat-selection-list [multiple]="false" hideSingleSelectionIndicator=true class="selection-list">
+    @for (s of speciesService.allShortenSpecies(); track s) {
+      <mat-list-option [value]="s"
+        (click)="onSpeciesChange(s)" [selected]="s.taxId === speciesService.currentSpecies().taxId">
+        <div class="species">
+          <mat-icon class="custom-icon" [svgIcon]="s.taxId"></mat-icon>
+          <span>{{ s.displayName }}</span>
+        </div>
+      </mat-list-option>
+    }
+  </mat-selection-list>
+</div>
