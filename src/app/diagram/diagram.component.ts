@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import {DiagramService} from "../services/diagram.service";
 import {extract, ReactomeEvent, ReactomeEventTypes, Style} from "reactome-cytoscape-style";
-import cytoscape, {BoundingBoxWH, ElementsDefinition} from "cytoscape";
+import cytoscape, {BoundingBox12, BoundingBoxWH, ElementsDefinition} from "cytoscape";
 import {InteractorService} from "../interactors/services/interactor.service";
 import {
   catchError,
@@ -122,7 +122,7 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
       this.updateStyle();
     })
 
-    effect(() => {
+    effect(async () => {
       const request = this.download.downloadRequest();
       if (request) {
         this.export(request.format);
@@ -132,16 +132,70 @@ export class DiagramComponent implements AfterViewInit, OnDestroy {
 
   }
 
-  export(format: string) {
-    const options: cytoscape.ExportOptions = {
+  async export(format: string) {
+    const options: cytoscape.ExportJpgBlobPromiseOptions = {
       full: true,
-      ...(format === DownloadFormat.JPEG ? {quality: 0.9} : {})
+      ...(format === DownloadFormat.JPEG ? {quality: 0.9} : {}),
+      bg: 'transparent',
+      output: 'blob-promise'
     }
+
+    const blobs = this.cys.map(cy => format === DownloadFormat.PNG ? cy.png(options) : cy.jpg(options));
+    let blob: Blob;
+    if (blobs.length > 1) {
+      const images = await Promise.all(blobs.map(blob => blob.then(createImageBitmap)));
+      const bbs = this.cys.map(cy => cy.elements().boundingBox({includeLabels: false}));
+      const bgColors = this.cys.map(cy => getComputedStyle(cy.container()!).backgroundColor);
+      blob = await this.mergeImages(images, bbs, bgColors, format === DownloadFormat.JPEG ? 'image/jpeg' : 'image/png', options?.quality);
+    } else {
+      blob = await blobs[0];
+    }
+
     const a = document.createElement('a');
-    a.href = format === DownloadFormat.PNG ? this.cy.png(options) : this.cy.jpg(options);
+    a.href = URL.createObjectURL(blob);
     a.download = `${this.pathwayId()}.${format}`;
     a.click();
     a.remove();
+  }
+
+  async mergeImages(images: ImageBitmap[], bbs: BoundingBox12[], bgColors: string[], format: 'image/jpeg' | 'image/png', quality?: number): Promise<Blob> {
+    // Compute merged canvas size in model space
+    const xMin = Math.min(...bbs.map(bb => bb.x1));
+    const yMin = Math.min(...bbs.map(bb => bb.y1));
+    const xMax = Math.max(...bbs.map(bb => bb.x2));
+    const yMax = Math.max(...bbs.map(bb => bb.y2));
+
+    // Calculate scale ratio between pixel space (image) and model space (bounding box)
+    // Assume all images have the same scale - use the first one
+    const bbWidth = bbs[0].x2 - bbs[0].x1;
+    const scale = images[0].width / bbWidth;
+
+    const mergedWidth = (xMax - xMin) * scale;
+    const mergedHeight = (yMax - yMin) * scale;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = mergedWidth;
+    canvas.height = mergedHeight;
+    const ctx = canvas.getContext('2d')!;
+    if (format === 'image/jpeg') {
+      ctx.fillStyle = this.dark.isDark() ? '#000' : '#fff';
+      ctx.fillRect(0, 0, mergedWidth, mergedHeight);
+    }
+
+    images.forEach((image, i) => {
+      const offsetX = (bbs[i].x1 - xMin) * scale; // shift relative to merged bbox, scaled to pixel space
+      const offsetY = (bbs[i].y1 - yMin) * scale;
+
+      // Fill background color for this layer
+      ctx.fillStyle = bgColors[i];
+      ctx.fillRect(0, 0, mergedWidth, mergedHeight);
+
+      // Draw image on top
+      ctx.drawImage(image, offsetX, offsetY);
+      image.close();
+    });
+
+    return new Promise(resolve => canvas.toBlob(blob => resolve(blob!), format, quality));
   }
 
   zoomToCytoscapeTransform = (x: number) => this.minZoom() * Math.pow(this.maxZoom() / this.minZoom(), (x - this.controlMinZoom()) / this.controlRange());
