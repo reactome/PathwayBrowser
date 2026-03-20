@@ -148,9 +148,9 @@ export class Style {
           // @ts-ignore
           "background-image": node => this.imageBuilder(node)["background-image"],
           // @ts-ignore
-          "background-position-y": node => this.imageBuilder(node)["background-position-y"] || 0,
+          "background-position-y": node => this.imageBuilder(node)["background-position-y"] || [],
           // @ts-ignore
-          "background-position-x": node => this.imageBuilder(node)["background-position-x"] || 0,
+          "background-position-x": node => this.imageBuilder(node)["background-position-x"] || [],
           // @ts-ignore
           "background-height": node => this.imageBuilder(node)["background-height"] || '100%',
           // @ts-ignore

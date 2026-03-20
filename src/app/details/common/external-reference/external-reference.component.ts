@@ -44,7 +44,7 @@ export class ExternalReferenceComponent {
     return entity ? entity.moleculeType : null;
   })
 
-  hasStructure = computed(() => this.moleculeType() === MoleculeType.PROTEIN || this.moleculeType() === MoleculeType.CHEMICAL);
+  hasStructure = computed(() => [MoleculeType.CHEMICAL, MoleculeType.CHEMICAL_DRUG, MoleculeType.PROTEIN].includes(this.moleculeType() as MoleculeType));
 
 
   constructor(private entity: EntityService,

@@ -207,7 +207,7 @@ export class Interactivity {
         const url = e.target.data(prop);
         if (url) window.open(url);
       })
-      .on('tap', '.Compartment', () => cy.elements().unselect() )
+      .on('tap', '.Compartment', () => cy.elements().unselect())
 
     // .on('tap', e => {
     //   const openClass = 'opened';
@@ -310,12 +310,7 @@ export class Interactivity {
     // console.log('Remove diagram structure container because not found', loadingContainer, node)
     loadingContainer.classList.remove('loading')
     this.removeLoading(loadingContainer);
-
-    let baseFontSize = extract(this.properties.font.size);
-    node.style({
-      'font-size': baseFontSize,
-      'text-margin-x': 0,
-    })
+    node.removeStyle()
     this.structureContainers = this.structureContainers.not(node);
   };
 
@@ -438,20 +433,47 @@ export class Interactivity {
         'underlay-opacity': Math.min(shadowOpacity, trivialOpacity)
       });
     }
+    const updateDecorationPosition = (node: cytoscape.NodeSingular) => {
+      if (!this.structureContainers.has(node)) return;
+      node.removeStyle('background-position-x')
+      node.removeStyle('background-position-y')
+      node.removeStyle('background-width')
+      node.removeStyle('background-height')
+      const i = (node.numericStyle('background-image') as string[]).findIndex(svg => svg.includes('RX'));
+
+      const xs = [...node.numericStyle('background-position-x') as number[]];
+      const ys = [...node.numericStyle('background-position-y') as number[]];
+      const widths = [...node.numericStyle('background-width') as number[]];
+      const heights = [...node.numericStyle('background-height') as number[]];
+
+      const x = xs[i];
+      xs[i] = x + this.margin * 2 * node.data("width");
+      // margin : 0 -> 0.25
+      const scale = 1 - this.margin * 2; // 1 -> 0.5
+      widths[i] = widths[i] * scale;
+      heights[i] = heights[i] * scale;
+      ys[i] = ys[i] + heights[i] * this.margin * 2;
+      node.style('background-position-x', xs)
+      node.style('background-position-y', ys)
+      node.style('background-width', widths);
+      node.style('background-height', heights);
+    };
 
     this.onZoom.protein = () => {
       const zoomLevel = cy.zoom();
       const z = zoomLevel * 100;
       const videoOpacity = this.interpolate(z, extract(this.properties.structure.opacity).map(v => this.p(...v))) / 100;
 
-      const maxWidth = this.interpolate(z, [this.p(zoomStart, 100), this.p(zoomEnd, 50)]);
+      // const maxWidth = this.interpolate(z, [this.p(zoomStart, 100), this.p(zoomEnd, 50)]);
       this.margin = this.interpolate(z, [this.p(zoomStart, 0), this.p(zoomEnd, 0.25)]);
       const fontSize = this.interpolate(z, [this.p(zoomStart, baseFontSize), this.p(zoomEnd, baseFontSize / 2)]);
       this.structureContainers.style(
         {
           'font-size': fontSize,
-          'text-margin-x': (n: cytoscape.NodeSingular) => this.margin * n.data("width"),
+          'text-margin-x': (n: cytoscape.NodeSingular) => this.margin * n.data("width") + (n.hasClass('drug') ? 10 : 0),
         })
+
+      this.structureContainers.nodes('.drug').forEach(updateDecorationPosition);
 
       if (this.videoLayer) this.videoLayer.node.style.opacity = videoOpacity + '';
       if (this.moleculeLayer) this.moleculeLayer.node.style.opacity = videoOpacity + '';
@@ -459,6 +481,12 @@ export class Interactivity {
 
     cy.on('zoom', this.onZoom.shadow);
     cy.on('zoom', this.onZoom.protein);
+    const handler = (e: cytoscape.EventObject) => updateDecorationPosition(e.target);
+    cy
+      .on('mouseover', '.drug', handler)
+      .on('mouseout', '.drug', handler)
+      .on('deselect', '.drug', handler)
+      .on('select', '.drug', handler);
 
     this.triggerZoom()
   }

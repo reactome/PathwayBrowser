@@ -119,7 +119,7 @@ export class StructureViewerComponent {
   readonly moleculeType = input.required<string | null>();
   viewer = viewChild<ElementRef<HTMLElement>>('viewer');
   isProtein = computed(() => this.moleculeType() === MoleculeType.PROTEIN);
-  isChemical = computed(() => this.moleculeType() === MoleculeType.CHEMICAL);
+  isChemical = computed(() => this.moleculeType() === MoleculeType.CHEMICAL || MoleculeType.CHEMICAL_DRUG);
   chebiIdentifier = signal<string | undefined>(undefined);
 
   pdbIdentifiers = computed(() => this.getPDBIdentifiers(this.xRefs()));
@@ -215,10 +215,12 @@ export class StructureViewerComponent {
               private structure: StructureService) {
     effect(() => {
       const [isProtein, isChemical] = [this.isProtein(), this.isChemical()]
+
       if (isProtein) {
         this.getProteinStructure();
       } else if (isChemical) {
-        this.chebiIdentifier.set(this.obj().identifier);
+        const identifier = this.obj().databaseName === 'ChEBI' ? this.obj().identifier : (this.obj().crossReference as DatabaseIdentifier[]).find(c => c.databaseName === 'ChEBI')?.identifier;
+        if (identifier) this.chebiIdentifier.set(identifier);
       }
     });
 
